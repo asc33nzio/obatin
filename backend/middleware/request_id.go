@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"git.garena.com/naufal.yassar/group-project/appconstant"
-	"git.garena.com/naufal.yassar/group-project/apperror"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+
+	"obatin/appconstant"
+	"obatin/apperror"
 )
 
 func (m *GinMiddleware) RequestId(ctx *gin.Context) {

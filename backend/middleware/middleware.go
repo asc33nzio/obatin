@@ -1,6 +1,6 @@
 package middleware
 
-import "git.garena.com/naufal.yassar/group-project/config"
+import "obatin/config"
 
 type GinMiddleware struct {
 	config *config.Config

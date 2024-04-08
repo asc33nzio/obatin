@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"git.garena.com/naufal.yassar/group-project/config"
-	"git.garena.com/naufal.yassar/group-project/database"
-	"git.garena.com/naufal.yassar/group-project/server"
+	"obatin/config"
+	"obatin/database"
+	"obatin/server"
 )
 
 func main() {

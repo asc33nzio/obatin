@@ -5,12 +5,13 @@ import (
 	"net/http"
 	"time"
 
-	"git.garena.com/naufal.yassar/group-project/appconstant"
-	"git.garena.com/naufal.yassar/group-project/config"
-	"git.garena.com/naufal.yassar/group-project/dto"
-	"git.garena.com/naufal.yassar/group-project/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+
+	"obatin/appconstant"
+	"obatin/config"
+	"obatin/dto"
+	"obatin/middleware"
 )
 
 type RouterOpt struct {

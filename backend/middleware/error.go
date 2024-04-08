@@ -4,9 +4,10 @@ import (
 	"errors"
 	"net/http"
 
-	"git.garena.com/naufal.yassar/group-project/apperror"
-	"git.garena.com/naufal.yassar/group-project/dto"
 	"github.com/gin-gonic/gin"
+
+	"obatin/apperror"
+	"obatin/dto"
 )
 
 func (m *GinMiddleware) ErrorHandler(ctx *gin.Context) {
