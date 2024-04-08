@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 
-	"git.garena.com/naufal.yassar/group-project/config"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"obatin/config"
 )
 
 func ConnectDB(config *config.Config) (*sql.DB, error) {

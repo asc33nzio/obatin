@@ -1,4 +1,4 @@
-module git.garena.com/naufal.yassar/group-project
+module obatin
 
 go 1.18
 

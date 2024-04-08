@@ -4,10 +4,11 @@ import (
 	"errors"
 	"time"
 
-	"git.garena.com/naufal.yassar/group-project/appconstant"
-	"git.garena.com/naufal.yassar/group-project/apperror"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+
+	"obatin/appconstant"
+	"obatin/apperror"
 )
 
 func (m *GinMiddleware) Logger(log *logrus.Logger) func(c *gin.Context) {
