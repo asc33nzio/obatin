@@ -8,14 +8,23 @@ import {
   PasswordInputSubcontainer,
   ICOdiv,
 } from '@/styles/PasswordInput';
+import { debounce } from '@/utils/debounce';
 import React, { useState } from 'react';
 
 const PasswordInput = (props: {
   title: string;
   placeholder: string;
+  validationFunction: any;
   validationMessage?: string;
 }): React.ReactElement => {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+
+  const handleInputChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      props.validationFunction(event.target.value);
+    },
+    750,
+  );
 
   return (
     <PasswordInputContainer>
@@ -25,6 +34,7 @@ const PasswordInput = (props: {
         <PasswordCustomInput
           placeholder={props.placeholder}
           type={isPasswordVisible ? 'text' : 'password'}
+          onChange={handleInputChange}
         />
         <ICOdiv>
           <div onClick={() => setIsPasswordVisible(!isPasswordVisible)}>

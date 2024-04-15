@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import RegularInput from '@/components/RegularInput';
 import PasswordInput from '@/components/PasswordInput';
 import {
@@ -15,27 +15,33 @@ import CustomButton from '@/components/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
 const Page = (): React.ReactElement => {
-  const [isDesktopDisplay, setIsDesktopDisplay] = useState(false);
   const [email, setEmail] = useState<string>('');
-  const [emailValidationError, setEmailValidationError] = useState<string>(
-    'Example validation error',
-  );
+  const [emailValidationError, setEmailValidationError] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [passwordValidationError, setPasswordValidationError] =
-    useState<string>('Example password validation error');
+    useState<string>('');
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktopDisplay(window.outerWidth > 768);
-    };
+  const handleEmailValidation = (input: string) => {
+    setEmail(input);
 
-    handleResize();
+    if (input.length < 3) {
+      setEmailValidationError('E-mail must be longer than 3 characters');
+      return;
+    }
 
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+    setEmailValidationError('');
+  };
+
+  const handlePasswordValidation = (input: string) => {
+    setPassword(input);
+
+    if (input.length < 6) {
+      setPasswordValidationError('Password must be longer than 6 characters');
+      return;
+    }
+
+    setPasswordValidationError('');
+  };
 
   return (
     <LoginOrRegisterFormContainer>
@@ -49,12 +55,14 @@ const Page = (): React.ReactElement => {
       <RegularInput
         title='E-mail'
         placeholder='E-mail'
+        validationFunction={handleEmailValidation}
         validationMessage={emailValidationError}
       />
 
       <PasswordInput
         title='Password'
         placeholder='Password'
+        validationFunction={handlePasswordValidation}
         validationMessage={passwordValidationError}
       />
 

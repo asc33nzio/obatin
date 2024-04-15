@@ -1,34 +1,30 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import RegularInput from '@/components/RegularInput';
 import {
   CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
   OAuthDiv,
   SectionSeparator,
+  SeparatorLine,
 } from '@/styles/Auth';
 import CustomButton from '@/components/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
 const Page = (): React.ReactElement => {
-  const [isDesktopDisplay, setIsDesktopDisplay] = useState(false);
   const [email, setEmail] = useState<string>('');
-  const [emailValidationError, setEmailValidationError] = useState<string>(
-    'Example validation error',
-  );
+  const [emailValidationError, setEmailValidationError] = useState<string>('');
 
-	useEffect(() => {
-		const handleResize = () => {
-			setIsDesktopDisplay(window.outerWidth > 768);
-		};
+  const handleEmailValidation = (input: string) => {
+    setEmail(input);
 
-		handleResize();
+    if (input.length < 3) {
+      setEmailValidationError('E-mail must be longer than 3 characters');
+      return;
+    }
 
-		window.addEventListener("resize", handleResize);
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, []);
+    setEmailValidationError('');
+  };
 
   return (
     <LoginOrRegisterFormContainer>
@@ -42,19 +38,16 @@ const Page = (): React.ReactElement => {
       <RegularInput
         title='E-mail'
         placeholder='E-mail'
+        validationFunction={handleEmailValidation}
         validationMessage={emailValidationError}
       />
 
       <CustomButton content='Sign Up' />
 
       <SectionSeparator>
-        <s>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        </s>
+        <SeparatorLine />
         OR
-        <s>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        </s>
+        <SeparatorLine />
       </SectionSeparator>
 
       <OAuthDiv>
