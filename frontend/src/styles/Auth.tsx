@@ -14,7 +14,9 @@ export const AuthPagesContainer = styled.div`
   }
 `;
 
-export const AuthRightSubcontainer = styled.section<{ $isDesktopDisplay: boolean }>`
+export const AuthRightSubcontainer = styled.section<{
+  $isDesktopDisplay: boolean;
+}>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -136,4 +138,11 @@ export const OAuthDiv = styled.div`
     font-size: 24px;
     color: #67728a;
   }
+`;
+
+export const SeparatorLine = styled.div`
+  display: inline-block;
+  width: 100%;
+  height: 1px;
+  background-color: #a0aec0;
 `;
