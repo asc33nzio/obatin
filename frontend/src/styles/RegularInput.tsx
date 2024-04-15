@@ -8,7 +8,6 @@ export const RegularInputContainer = styled.div`
   height: 100px;
   gap: 5px;
 
-  background-color: yellow;
   font-size: 18px;
   color: #718096;
 
@@ -20,10 +19,12 @@ export const RegularCustomInput = styled.input`
   height: 50%;
 
   background-color: #f7fafc;
+  color: #4A5568;
   border: 1px solid #d0d9e3;
   border-radius: 10px;
   outline: none;
   padding-left: 15px;
+  font-size: 17px;
 
   &::placeholder {
     color: #949fb3;

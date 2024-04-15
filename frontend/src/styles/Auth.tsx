@@ -12,21 +12,19 @@ export const AuthPagesContainer = styled.div`
   svg {
     width: 50%;
   }
-
-  background-color: red;
 `;
 
-export const AuthRightSubcontainer = styled.section`
+export const AuthRightSubcontainer = styled.section<{ $isDesktopDisplay: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  width: 50%;
+  width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '100%')};
   height: 100%;
 `;
 
-export const LoginFormContainer = styled.div`
+export const LoginOrRegisterFormContainer = styled.div`
   display: flex;
   flex-direction: column;
 
@@ -50,7 +48,6 @@ export const CreateOrLoginSpan = styled.span`
   width: 100%;
   height: 35px;
 
-  background-color: green;
   gap: 10px;
   font-size: 18px;
   color: #718096;
@@ -59,5 +56,84 @@ export const CreateOrLoginSpan = styled.span`
   u {
     color: #00b5c0;
     cursor: pointer;
+  }
+`;
+
+export const RememberAndForgetDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 35px;
+  margin-bottom: 25px;
+
+  u {
+    cursor: pointer;
+    color: #00b5c0;
+    font-size: 18px;
+  }
+`;
+
+export const RememberMeDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  width: 200px;
+  height: 100%;
+  gap: 10px;
+
+  color: #718096;
+  font-size: 18px;
+
+  input {
+    cursor: pointer;
+  }
+`;
+
+export const SectionSeparator = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 35px;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  gap: 15px;
+
+  color: #a0aec0;
+  font-size: 18px;
+`;
+
+export const OAuthDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  cursor: pointer;
+  width: 100%;
+  height: 75px;
+  padding-left: 25px;
+
+  border: 1px solid #cbd5e0;
+  border-radius: 50px;
+  gap: 25px;
+
+  svg {
+    width: 50px;
+    height: 95%;
+  }
+
+  p {
+    width: 100%;
+    background-color: transparent;
+
+    text-align: center;
+    font-size: 24px;
+    color: #67728a;
   }
 `;

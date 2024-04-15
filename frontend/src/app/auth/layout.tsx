@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AuthPagesContainer, AuthRightSubcontainer } from '@/styles/Auth';
 import { WelcomeImage } from '@/assets/auth/WelcomeImage';
 
@@ -8,10 +8,26 @@ export default function AuthPageLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const [isDesktopDisplay, setIsDesktopDisplay] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktopDisplay(window.innerWidth > 768);
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isDesktopDisplay]);
   return (
     <AuthPagesContainer>
-      <WelcomeImage />
-      <AuthRightSubcontainer>{children}</AuthRightSubcontainer>
+      {isDesktopDisplay ? <WelcomeImage /> : null}
+      <AuthRightSubcontainer $isDesktopDisplay={isDesktopDisplay}>
+        {children}
+      </AuthRightSubcontainer>
     </AuthPagesContainer>
   );
 }
