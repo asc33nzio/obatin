@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { AuthPagesContainer, AuthRightSubcontainer } from '@/styles/Auth';
 import { WelcomeImage } from '@/assets/auth/WelcomeImage';
 
-export default function AuthPageLayout({
-  children,
-}: {
+export default function AuthPageLayout({children}: {
   children: React.ReactNode;
 }) {
   const [isDesktopDisplay, setIsDesktopDisplay] = useState(false);

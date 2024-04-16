@@ -15,8 +15,10 @@ import CustomButton from '@/components/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
 const Page = (): React.ReactElement => {
+  //eslint-disable-next-line
   const [email, setEmail] = useState<string>('');
   const [emailValidationError, setEmailValidationError] = useState<string>('');
+  //eslint-disable-next-line
   const [password, setPassword] = useState<string>('');
   const [passwordValidationError, setPasswordValidationError] =
     useState<string>('');
