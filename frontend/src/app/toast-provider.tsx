@@ -18,7 +18,7 @@ interface ToastContextPropsItf {
   toastMessage: string;
   toastType: AcceptableToastType;
   resolution: AcceptableResolutionType;
-  orientation?: AcceptableToastOrientation;
+  orientation: AcceptableToastOrientation;
   setToast: Dispatch<
     SetStateAction<{
       showToast: boolean;
@@ -35,12 +35,14 @@ const ToastContext = createContext<ToastContextPropsItf | undefined>(undefined);
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [toast, setToast] = useState({
+  const [toast, setToast] = useState<ToastContextPropsItf>({
     showToast: false,
     toastMessage: '',
     toastType: 'ok',
     resolution: 'desktop',
     orientation: 'center',
+    setToast: (newToast) =>
+      setToast((prevToast) => ({ ...prevToast, ...newToast })),
   });
 
   useEffect(() => {
