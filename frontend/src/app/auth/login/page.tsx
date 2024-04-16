@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import RegularInput from '@/components/RegularInput';
-import PasswordInput from '@/components/PasswordInput';
+import { debounce } from '@/utils/debounce';
+import { navigateToHome, navigateToRegister } from './actions';
 import {
   CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
@@ -11,38 +11,72 @@ import {
   SectionSeparator,
   SeparatorLine,
 } from '@/styles/Auth';
+import RegularInput from '@/components/RegularInput';
+import PasswordInput from '@/components/PasswordInput';
 import CustomButton from '@/components/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
-const Page = (): React.ReactElement => {
-  //eslint-disable-next-line
+const LoginPage = (): React.ReactElement => {
   const [email, setEmail] = useState<string>('');
   const [emailValidationError, setEmailValidationError] = useState<string>('');
-  //eslint-disable-next-line
   const [password, setPassword] = useState<string>('');
   const [passwordValidationError, setPasswordValidationError] =
     useState<string>('');
 
-  const handleEmailValidation = (input: string) => {
-    setEmail(input);
+  const validateEmail = (input: string) => {
+    const sanitizedInput = input.trim();
 
     if (input.length < 3) {
       setEmailValidationError('E-mail must be longer than 3 characters');
-      return;
+      return false;
+    }
+
+    if (!/^[\w-.]+(\+[\w-]+)?@([\w-]+\.)+[\w-]{2,4}$/.test(sanitizedInput)) {
+      setEmailValidationError('Invalid e-mail format');
+      return false;
     }
 
     setEmailValidationError('');
+    return true;
   };
 
-  const handlePasswordValidation = (input: string) => {
-    setPassword(input);
+  const validatePassword = (input: string) => {
+    const sanitizedInput = input.trim();
 
-    if (input.length < 6) {
+    if (sanitizedInput.length < 6) {
       setPasswordValidationError('Password must be longer than 6 characters');
-      return;
+      return false;
     }
 
     setPasswordValidationError('');
+    return true;
+  };
+
+  const handleEmailInputChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setEmail(event.target.value);
+      validateEmail(event.target.value);
+    },
+    750,
+  );
+
+  const handlePasswordInputChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setPassword(event.target.value);
+      validatePassword(event.target.value);
+    },
+    750,
+  );
+
+  const handleLogin = () => {
+    const isValidEmail = validateEmail(email);
+    const isValidPassword = validatePassword(password);
+
+    if (!isValidEmail || !isValidPassword) {
+      return;
+    }
+
+    navigateToHome();
   };
 
   return (
@@ -51,20 +85,20 @@ const Page = (): React.ReactElement => {
 
       <CreateOrLoginSpan>
         <p>Don&apos;t have an account?</p>
-        <u>Create now</u>
+        <u onClick={() => navigateToRegister()}>Create now</u>
       </CreateOrLoginSpan>
 
       <RegularInput
         title='E-mail'
         placeholder='E-mail'
-        validationFunction={handleEmailValidation}
+        onChange={handleEmailInputChange}
         validationMessage={emailValidationError}
       />
 
       <PasswordInput
         title='Password'
         placeholder='Password'
-        validationFunction={handlePasswordValidation}
+        onChange={handlePasswordInputChange}
         validationMessage={passwordValidationError}
       />
 
@@ -77,7 +111,7 @@ const Page = (): React.ReactElement => {
         <u>Forgot Password?</u>
       </RememberAndForgetDiv>
 
-      <CustomButton content='Sign In' />
+      <CustomButton content='Sign In' onClick={handleLogin} />
 
       <SectionSeparator>
         <SeparatorLine />
@@ -93,4 +127,4 @@ const Page = (): React.ReactElement => {
   );
 };
 
-export default Page;
+export default LoginPage;

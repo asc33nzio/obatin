@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import RegularInput from '@/components/RegularInput';
+import { navigateToLogin, navigateToSetPassword } from './actions';
+import { debounce } from '@/utils/debounce';
 import {
   CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
@@ -8,23 +9,40 @@ import {
   SectionSeparator,
   SeparatorLine,
 } from '@/styles/Auth';
+import RegularInput from '@/components/RegularInput';
 import CustomButton from '@/components/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
-const Page = (): React.ReactElement => {
-  //eslint-disable-next-line
+const RegisterPage = (): React.ReactElement => {
   const [email, setEmail] = useState<string>('');
   const [emailValidationError, setEmailValidationError] = useState<string>('');
 
-  const handleEmailValidation = (input: string) => {
-    setEmail(input);
-
+  const validateEmail = (input: string) => {
     if (input.length < 3) {
       setEmailValidationError('E-mail must be longer than 3 characters');
-      return;
+      return false;
     }
 
     setEmailValidationError('');
+    return true;
+  };
+
+  const handleEmailInputChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setEmail(event.target.value);
+      validateEmail(event.target.value);
+    },
+    750,
+  );
+
+  const handleSignUp = () => {
+    const isValidEmail = validateEmail(email);
+
+    if (!isValidEmail) {
+      return;
+    }
+
+    navigateToSetPassword();
   };
 
   return (
@@ -33,17 +51,17 @@ const Page = (): React.ReactElement => {
 
       <CreateOrLoginSpan>
         <p>Already have an account?</p>
-        <u>Login Here</u>
+        <u onClick={() => navigateToLogin()}>Login Here</u>
       </CreateOrLoginSpan>
 
       <RegularInput
         title='E-mail'
         placeholder='E-mail'
-        validationFunction={handleEmailValidation}
         validationMessage={emailValidationError}
+        onChange={handleEmailInputChange}
       />
 
-      <CustomButton content='Sign Up' />
+      <CustomButton content='Sign Up' onClick={handleSignUp} />
 
       <SectionSeparator>
         <SeparatorLine />
@@ -59,4 +77,4 @@ const Page = (): React.ReactElement => {
   );
 };
 
-export default Page;
+export default RegisterPage;

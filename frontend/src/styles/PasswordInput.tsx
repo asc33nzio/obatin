@@ -17,12 +17,11 @@ export const PasswordInputContainer = styled.div`
 export const PasswordInputSubcontainer = styled.div`
   display: flex;
   flex-direction: row;
-
   align-items: center;
   justify-content: center;
-
+  
   width: 100%;
-  height: 80%;
+  height: 50%;
 `;
 
 export const ICOdiv = styled.div`

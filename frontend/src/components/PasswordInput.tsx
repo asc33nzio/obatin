@@ -8,33 +8,29 @@ import {
   PasswordInputSubcontainer,
   ICOdiv,
 } from '@/styles/PasswordInput';
-import { debounce } from '@/utils/debounce';
-import React, { useState } from 'react';
+import React, { InputHTMLAttributes, useState } from 'react';
 
-const PasswordInput = (props: {
-  title: string;
+interface PasswordInputItf extends InputHTMLAttributes<HTMLInputElement> {
   placeholder: string;
-  validationFunction: any;
+  title?: string;
   validationMessage?: string;
-}): React.ReactElement => {
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+}
 
-  const handleInputChange = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      props.validationFunction(event.target.value);
-    },
-    750,
-  );
+const PasswordInput = ({
+  title = 'Default input label',
+  validationMessage = 'Default error message',
+  ...props
+}: PasswordInputItf): React.ReactElement => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
   return (
     <PasswordInputContainer>
-      {props.title}
+      {title}
 
       <PasswordInputSubcontainer>
         <PasswordCustomInput
-          placeholder={props.placeholder}
           type={isPasswordVisible ? 'text' : 'password'}
-          onChange={handleInputChange}
+          {...props}
         />
         <ICOdiv>
           <div onClick={() => setIsPasswordVisible(!isPasswordVisible)}>
@@ -44,9 +40,9 @@ const PasswordInput = (props: {
       </PasswordInputSubcontainer>
 
       <PasswordInputErrorDiv
-        $hasError={props.validationMessage !== '' ? true : false}
+        $hasError={validationMessage !== '' ? true : false}
       >
-        {props?.validationMessage}
+        {validationMessage}
       </PasswordInputErrorDiv>
     </PasswordInputContainer>
   );

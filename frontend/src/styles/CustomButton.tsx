@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const CustomButtonStyle = styled.button`
+  cursor: pointer;
   width: 100%;
   height: 65px;
 

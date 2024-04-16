@@ -3,33 +3,25 @@ import {
   RegularInputErrorDiv,
   RegularInputContainer,
 } from '@/styles/RegularInput';
-import { debounce } from '@/utils/debounce';
-import React from 'react';
+import React, { InputHTMLAttributes } from 'react';
 
-const RegularInput = (props: {
-  title: string;
+interface RegularInputItf extends InputHTMLAttributes<HTMLInputElement> {
   placeholder: string;
-  validationFunction: any;
+  title?: string;
   validationMessage?: string;
-}): React.ReactElement => {
-  const handleInputChange = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      props.validationFunction(event.target.value);
-    },
-    750,
-  );
+}
 
+const RegularInput = ({
+  title = 'Default input label',
+  validationMessage = 'Default error message',
+  ...props
+}: RegularInputItf): React.ReactElement => {
   return (
     <RegularInputContainer>
-      {props.title}
-      <RegularCustomInput
-        placeholder={props.placeholder}
-        onChange={handleInputChange}
-      />
-      <RegularInputErrorDiv
-        $hasError={props.validationMessage !== '' ? true : false}
-      >
-        {props?.validationMessage}
+      {title}
+      <RegularCustomInput {...props} />
+      <RegularInputErrorDiv $hasError={validationMessage !== '' ? true : false}>
+        {validationMessage}
       </RegularInputErrorDiv>
     </RegularInputContainer>
   );
