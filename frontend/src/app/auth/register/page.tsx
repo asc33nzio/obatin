@@ -8,7 +8,7 @@ import {
   OAuthDiv,
   SectionSeparator,
   SeparatorLine,
-} from '@/styles/Auth';
+} from '@/styles/Auth.styles';
 import RegularInput from '@/components/RegularInput';
 import CustomButton from '@/components/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';

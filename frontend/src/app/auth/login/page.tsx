@@ -10,13 +10,15 @@ import {
   RememberMeDiv,
   SectionSeparator,
   SeparatorLine,
-} from '@/styles/Auth';
+} from '@/styles/Auth.styles';
 import RegularInput from '@/components/RegularInput';
 import PasswordInput from '@/components/PasswordInput';
 import CustomButton from '@/components/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
+import { useToast } from '@/app/toast-provider';
 
 const LoginPage = (): React.ReactElement => {
+  const { setToast } = useToast();
   const [email, setEmail] = useState<string>('');
   const [emailValidationError, setEmailValidationError] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -73,6 +75,8 @@ const LoginPage = (): React.ReactElement => {
     const isValidPassword = validatePassword(password);
 
     if (!isValidEmail || !isValidPassword) {
+      setToast(true, "login failed", "error", "desktop", "");
+      console.log('called')
       return;
     }
 

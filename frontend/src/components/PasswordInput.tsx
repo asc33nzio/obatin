@@ -7,7 +7,7 @@ import {
   PasswordInputContainer,
   PasswordInputSubcontainer,
   ICOdiv,
-} from '@/styles/PasswordInput';
+} from '@/styles/PasswordInput.styles';
 import React, { InputHTMLAttributes, useState } from 'react';
 
 interface PasswordInputItf extends InputHTMLAttributes<HTMLInputElement> {

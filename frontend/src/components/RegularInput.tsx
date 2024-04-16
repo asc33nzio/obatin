@@ -2,7 +2,7 @@ import {
   RegularCustomInput,
   RegularInputErrorDiv,
   RegularInputContainer,
-} from '@/styles/RegularInput';
+} from '@/styles/RegularInput.styles';
 import React, { InputHTMLAttributes } from 'react';
 
 interface RegularInputItf extends InputHTMLAttributes<HTMLInputElement> {
