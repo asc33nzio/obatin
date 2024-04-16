@@ -75,11 +75,23 @@ const LoginPage = (): React.ReactElement => {
     const isValidPassword = validatePassword(password);
 
     if (!isValidEmail || !isValidPassword) {
-      setToast(true, "login failed", "error", "desktop", "");
-      console.log('called')
+      setToast({
+        showToast: true,
+        toastMessage: 'login failed',
+        toastType: 'error',
+        resolution: 'desktop',
+        orientation: 'center',
+      });
       return;
     }
 
+    setToast({
+      showToast: true,
+      toastMessage: 'successfully logged in',
+      toastType: 'ok',
+      resolution: 'desktop',
+      orientation: 'center',
+    });
     navigateToHome();
   };
 

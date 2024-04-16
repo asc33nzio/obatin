@@ -16,16 +16,16 @@ import {
 interface ToastContextPropsItf {
   showToast: boolean;
   toastMessage: string;
-  toastType: AcceptableToastType | string;
-  resolution: AcceptableResolutionType | string;
-  orientation?: AcceptableToastOrientation | string;
+  toastType: AcceptableToastType;
+  resolution: AcceptableResolutionType;
+  orientation?: AcceptableToastOrientation;
   setToast: Dispatch<
     SetStateAction<{
       showToast: boolean;
       toastMessage: string;
-      toastType: string;
-      resolution: string;
-      orientation: string;
+      toastType: AcceptableToastType;
+      resolution: AcceptableResolutionType;
+      orientation: AcceptableToastOrientation;
     }>
   >;
 }
@@ -38,7 +38,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   const [toast, setToast] = useState({
     showToast: false,
     toastMessage: '',
-    toastType: '',
+    toastType: 'ok',
     resolution: 'desktop',
     orientation: 'center',
   });
@@ -47,39 +47,19 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
     let timeoutId: NodeJS.Timeout;
     if (toast.showToast) {
       timeoutId = setTimeout(() => {
-        setToast({
+        setToast((prevState) => ({
+          ...prevState,
           showToast: false,
-          toastMessage: '',
-          toastType: '',
-          resolution: 'desktop',
-          orientation: '',
-        });
+        }));
       }, 3000);
     }
 
     return () => clearTimeout(timeoutId);
   }, [toast]);
 
-  // const value = {
-  //   showToast: toast.showToast,
-  //   toastMessage: toast.toastMessage,
-  //   toastType: toast.toastType,
-  //   resolution: toast.resolution,
-  //   orientation: toast.orientation,
-  //   setToast: (
-  //     showToast: boolean,
-  //     toastMessage: string,
-  //     toastType: string,
-  //     resolution: string,
-  //     orientation: string,
-  //   ) =>
-  //     setToast({ showToast, toastMessage, toastType, resolution, orientation }),
-  // };
-
   const { showToast, toastMessage, toastType, resolution, orientation } = toast;
 
   return (
-    // <ToastContext.Provider value={value}>
     <ToastContext.Provider
       value={{
         showToast,
