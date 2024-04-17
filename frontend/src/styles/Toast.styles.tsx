@@ -1,28 +1,28 @@
 import styled from 'styled-components';
 
-export const StyledToastContainer = styled.div<{ orientation?: string }>`
+export const StyledToastContainer = styled.div<{ $orientation?: string }>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: ${(props) =>
-    props.orientation === 'left'
+  justify-content: ${({ $orientation }) =>
+    $orientation === 'left'
       ? 'flex-start'
-      : props.orientation === 'right'
+      : $orientation === 'right'
       ? 'flex-end'
       : 'center'};
-  padding-right: ${(props) => (props.orientation === 'right' ? '50px' : 0)};
-  padding-left: ${(props) => (props.orientation === 'left' ? '50px' : 0)};
 
+  width: 100vw;
+  height: 175px;
   background: transparent;
   position: fixed;
-  z-index: 10;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
 
-  width: 100vw;
-  height: ${(props) => (props.orientation === 'right' ? '300px' : '100px')};
+  padding-right: ${({ $orientation }) =>
+    $orientation === 'right' ? '50px' : 0};
+  padding-left: ${({ $orientation }) => ($orientation === 'left' ? '50px' : 0)};
 
   animation: dropAnimation 1.5s ease;
   @keyframes dropAnimation {
@@ -33,36 +33,43 @@ export const StyledToastContainer = styled.div<{ orientation?: string }>`
       transform: translateY(0);
     }
   }
+
+  z-index: 5;
 `;
 
-export const StyledToast = styled.div<{ type: string; $resolution: string }>`
-  --bg-color-ok: green;
-  --color-ok: black;
-  --bg-color-warning: yellow;
-  --color-warning: black;
-  --bg-color-error: red;
-  --color-error: black;
-
-  width: ${({ $resolution }) => ($resolution === 'desktop' ? '30%' : '60%')};
-  height: ${({ $resolution }) => ($resolution === 'desktop' ? '50px' : '60px')};
+export const StyledToast = styled.div<{ $type: string; $resolution: string }>`
+  --bg-color-ok: #05b6c1;
+  --color-ok: white;
+  --bg-color-warning: #c8e6c9;
+  --color-warning: white;
+  --bg-color-error: #dc185d;
+  --color-error: white;
 
   display: flex;
   flex-direction: center;
   align-items: center;
   justify-content: center;
-  z-index: 3;
+  width: ${({ $resolution }) => ($resolution === 'desktop' ? '30%' : '60%')};
+  height: ${({ $resolution }) => ($resolution === 'desktop' ? '50px' : '60px')};
 
-  background-color: ${(props) =>
-    props.type === 'ok' ? 'var(--bg-color-ok)' : 'var(--bg-color-error)'};
-  color: ${(props) =>
-    props.type === 'ok' ? 'var(--color-ok)' : 'var(--color-error)'};
-  border: ${(props) =>
-    props.type === 'ok'
-      ? '2px solid var(--color-ok)'
-      : '2px solid var(--color-error)'};
+  background-color: ${({ $type }) =>
+    $type === 'ok'
+      ? 'var(--bg-color-ok)'
+      : $type === 'warning'
+      ? 'var(--bg-color-warning)'
+      : 'var(--bg-color-error)'};
+  border: 1px solid #cbd5e0;
   border-radius: 15px;
 
+  color: ${({ $type }) =>
+    $type === 'ok'
+      ? 'var(--color-ok)'
+      : $type === 'warning'
+      ? 'var(--color-warning)'
+      : 'var(--color-error)'};
   text-align: center;
   font-size: 24px;
   font-weight: 500;
+
+  z-index: 10;
 `;

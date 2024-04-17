@@ -1,6 +1,6 @@
-'use client'
+'use client';
 import React from 'react';
-import { useToast } from '@/app/toast-provider';
+import { useToast } from '@/app/ToastProvider';
 import { StyledToast, StyledToastContainer } from '@/styles/Toast.styles';
 
 const Toast = (): React.ReactElement | null => {
@@ -12,8 +12,8 @@ const Toast = (): React.ReactElement | null => {
   }
 
   return (
-    <StyledToastContainer orientation={orientation}>
-      <StyledToast type={toastType} $resolution={resolution}>
+    <StyledToastContainer $orientation={orientation}>
+      <StyledToast $type={toastType} $resolution={resolution}>
         {toastMessage}
       </StyledToast>
     </StyledToastContainer>

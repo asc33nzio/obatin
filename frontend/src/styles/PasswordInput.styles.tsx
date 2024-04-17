@@ -19,12 +19,12 @@ export const PasswordInputSubcontainer = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  
+
   width: 100%;
   height: 50%;
 `;
 
-export const ICOdiv = styled.div`
+export const ICOdiv = styled.div<{ $hasError?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,7 +33,8 @@ export const ICOdiv = styled.div`
   width: 100px;
   height: 100%;
 
-  border: 1px solid #d0d9e3;
+  border: ${({ $hasError }) =>
+    $hasError ? '1px solid #e04146' : '1px solid #d0d9e3'};
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   border-left: none;
@@ -56,20 +57,21 @@ export const ICOdiv = styled.div`
 
       path {
         cursor: pointer;
-        background-color: #f7fafc;  
+        background-color: #f7fafc;
         object-fit: cover;
       }
     }
   }
 `;
 
-export const PasswordCustomInput = styled.input`
+export const PasswordCustomInput = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   height: 100%;
 
   background-color: #f7fafc;
   color: #4a5568;
-  border: 1px solid #d0d9e3;
+  border: ${({ $hasError }) =>
+    $hasError ? '1px solid #e04146' : '1px solid #d0d9e3'};
   border-right: none;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;

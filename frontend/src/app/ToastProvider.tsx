@@ -13,7 +13,7 @@ import {
   AcceptableToastType,
 } from '@/types/toast';
 
-interface ToastContextPropsItf {
+interface ToastContextItf {
   showToast: boolean;
   toastMessage: string;
   toastType: AcceptableToastType;
@@ -30,26 +30,29 @@ interface ToastContextPropsItf {
   >;
 }
 
-const ToastContext = createContext<ToastContextPropsItf | undefined>(undefined);
+const ToastContext = createContext<ToastContextItf | undefined>(undefined);
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [toast, setToast] = useState<ToastContextPropsItf>({
+  const [toastState, setToastState] = useState<ToastContextItf>({
     showToast: false,
     toastMessage: '',
     toastType: 'ok',
     resolution: 'desktop',
     orientation: 'center',
-    setToast: (newToast) =>
-      setToast((prevToast) => ({ ...prevToast, ...newToast })),
+    setToast: () => {},
   });
+
+  const setToast: ToastContextItf['setToast'] = (newState) => {
+    setToastState((prevState) => ({ ...prevState, ...newState }));
+  };
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-    if (toast.showToast) {
+    if (toastState.showToast) {
       timeoutId = setTimeout(() => {
-        setToast((prevState) => ({
+        setToastState((prevState) => ({
           ...prevState,
           showToast: false,
         }));
@@ -57,9 +60,10 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     return () => clearTimeout(timeoutId);
-  }, [toast]);
+  }, [toastState]);
 
-  const { showToast, toastMessage, toastType, resolution, orientation } = toast;
+  const { showToast, toastMessage, toastType, resolution, orientation } =
+    toastState;
 
   return (
     <ToastContext.Provider
@@ -77,7 +81,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useToast = (): ToastContextPropsItf => {
+export const useToast = (): ToastContextItf => {
   const context = useContext(ToastContext);
   if (!context) {
     throw new Error('Toast context missing!');

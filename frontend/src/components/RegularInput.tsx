@@ -19,7 +19,10 @@ const RegularInput = ({
   return (
     <RegularInputContainer>
       {title}
-      <RegularCustomInput {...props} />
+      <RegularCustomInput
+        {...props}
+        $hasError={validationMessage !== '' ? true : false}
+      />
       <RegularInputErrorDiv $hasError={validationMessage !== '' ? true : false}>
         {validationMessage}
       </RegularInputErrorDiv>

@@ -30,9 +30,10 @@ const PasswordInput = ({
       <PasswordInputSubcontainer>
         <PasswordCustomInput
           type={isPasswordVisible ? 'text' : 'password'}
+          $hasError={validationMessage !== '' ? true : false}
           {...props}
         />
-        <ICOdiv>
+        <ICOdiv $hasError={validationMessage !== '' ? true : false}>
           <div onClick={() => setIsPasswordVisible(!isPasswordVisible)}>
             {!isPasswordVisible ? <ShowPasswordICO /> : <HidePasswordICO />}
           </div>

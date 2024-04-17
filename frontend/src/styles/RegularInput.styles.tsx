@@ -14,13 +14,14 @@ export const RegularInputContainer = styled.div`
   margin-bottom: 25px;
 `;
 
-export const RegularCustomInput = styled.input`
+export const RegularCustomInput = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   height: 50%;
 
   background-color: #f7fafc;
-  color: #4A5568;
-  border: 1px solid #d0d9e3;
+  color: #4a5568;
+  border: ${({ $hasError }) =>
+    $hasError ? '1px solid #e04146' : '1px solid #d0d9e3'};
   border-radius: 10px;
   outline: none;
   padding-left: 15px;

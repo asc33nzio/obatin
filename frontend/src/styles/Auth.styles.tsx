@@ -1,31 +1,5 @@
 import styled from 'styled-components';
 
-export const AuthPagesContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-
-  width: 100vw;
-  height: 100vh;
-
-  svg {
-    width: 50%;
-  }
-`;
-
-export const AuthRightSubcontainer = styled.section<{
-  $isDesktopDisplay: boolean;
-}>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '100%')};
-  height: 100%;
-`;
-
 export const LoginOrRegisterFormContainer = styled.div`
   display: flex;
   flex-direction: column;
