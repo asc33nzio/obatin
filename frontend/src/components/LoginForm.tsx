@@ -98,10 +98,10 @@ const LoginForm = (): React.ReactElement => {
   };
 
   return (
-    <LoginOrRegisterFormContainer>
+    <LoginOrRegisterFormContainer $isLoginPage={true}>
       <h1>Log In</h1>
 
-      <CreateOrLoginSpan>
+      <CreateOrLoginSpan $marBot={25}>
         <p>Baru di ObatIn?</p>
         <u onClick={() => navigateToRegister()}>Daftar Sekarang</u>
       </CreateOrLoginSpan>
@@ -111,6 +111,7 @@ const LoginForm = (): React.ReactElement => {
         placeholder='E-mail'
         onChange={handleEmailInputChange}
         validationMessage={emailValidationError}
+        $marBot={25}
       />
 
       <PasswordInput

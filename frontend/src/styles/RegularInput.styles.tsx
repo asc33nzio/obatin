@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const RegularInputContainer = styled.div`
+export const RegularInputContainer = styled.div<{ $marBot: number }>`
   display: flex;
   flex-direction: column;
 
@@ -11,7 +11,7 @@ export const RegularInputContainer = styled.div`
   font-size: 18px;
   color: #718096;
 
-  margin-bottom: 25px;
+  margin-bottom: ${({ $marBot }) => `${$marBot}px`};
 `;
 
 export const RegularCustomInput = styled.input<{ $hasError?: boolean }>`

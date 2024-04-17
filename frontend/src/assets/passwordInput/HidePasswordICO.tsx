@@ -1,5 +1,3 @@
-import React from 'react';
-
 const HidePasswordICO = (): React.ReactElement => {
   return (
     <svg

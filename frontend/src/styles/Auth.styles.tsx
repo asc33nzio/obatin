@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
-export const LoginOrRegisterFormContainer = styled.div`
+export const LoginOrRegisterFormContainer = styled.div<{
+  $isLoginPage: boolean;
+}>`
   display: flex;
   flex-direction: column;
 
@@ -11,12 +13,52 @@ export const LoginOrRegisterFormContainer = styled.div`
     font-size: 48px;
     color: #00b5c0;
 
-    margin-top: 100px;
+    margin-top: ${({ $isLoginPage }) => ($isLoginPage ? '100px' : 0)};
     margin-bottom: 20px;
   }
 `;
 
-export const CreateOrLoginSpan = styled.span`
+export const UserTypeSelectionSection = styled.section`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 300px;
+
+  margin-bottom: 20px;
+`;
+
+export const SelectUserTypeBox = styled.div<{ $isActive: boolean }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 48%;
+  height: 100%;
+  padding: 10px;
+  gap: 10px;
+
+  font-size: 26px;
+  color: #00b5c0;
+
+  border: ${({ $isActive }) => ($isActive ? '2px solid #00b5c0' : 'none')};
+  border-radius: 25px;
+  background-color: #f7fafc;
+  cursor: pointer;
+
+  svg {
+    object-fit: cover;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: transparent;
+  }
+`;
+
+export const CreateOrLoginSpan = styled.span<{ $marBot: number }>`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -27,7 +69,7 @@ export const CreateOrLoginSpan = styled.span`
   gap: 10px;
   font-size: 18px;
   color: #718096;
-  margin-bottom: 25px;
+  margin-bottom: ${({ $marBot }) => `${$marBot}px`};
 
   u {
     color: #00b5c0;
