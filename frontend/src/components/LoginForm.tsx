@@ -87,6 +87,8 @@ const LoginForm = (): React.ReactElement => {
       return;
     }
 
+    //? POST request
+
     setToast({
       showToast: true,
       toastMessage: 'Login berhasil',
@@ -138,7 +140,7 @@ const LoginForm = (): React.ReactElement => {
         <SeparatorLine />
       </SectionSeparator>
 
-      <OAuthDiv>
+      <OAuthDiv $isDesktopDisplay={isDesktopDisplay}>
         <GoogleICO />
         <p>Lanjutkan Dengan Google</p>
       </OAuthDiv>

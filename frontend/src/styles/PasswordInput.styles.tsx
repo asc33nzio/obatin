@@ -50,15 +50,17 @@ export const ICOdiv = styled.div<{ $hasError?: boolean }>`
     border-left: 1px solid #d0d9e3;
 
     svg {
-      cursor: pointer;
+      display: flex;
       background-color: #f7fafc;
-      width: 70%;
-      height: 70%;
+      width: 60%;
+      height: 95%;
+      overflow: hidden;
+      object-fit: cover;
+      cursor: pointer;
 
       path {
         cursor: pointer;
         background-color: #f7fafc;
-        object-fit: cover;
       }
     }
   }
