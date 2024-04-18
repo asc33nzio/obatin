@@ -4,9 +4,10 @@ import { debounce } from '@/utils/debounce';
 import { useToast } from '@/app/ToastProvider';
 import { useClientDisplayResolution } from '@/app/ClientDisplayResolutionProvider';
 import {
+  navigateToHome,
   navigateToLogin,
   navigateToSetPassword,
-} from '@/app/auth/register/actions';
+} from '@/app/auth/actions';
 import {
   CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
@@ -173,14 +174,13 @@ const RegisterForm = (): React.ReactElement => {
       orientation: 'center',
     });
 
-    //!
-    // navigateToSetPassword();
+    navigateToHome();
   };
 
   const handleSignUpDoctor = () => {
     const isValidEmail = validateEmail(email);
     const isValidUpload = validateUpload(userUpload);
-    
+
     if (!isValidEmail || !isValidUpload) {
       setToast({
         showToast: true,
@@ -192,19 +192,12 @@ const RegisterForm = (): React.ReactElement => {
       return;
     }
 
-    // console.log(selectedOption) -- specialization
+    // console.log(selectedOption) -- specialization select
     //? POST request
 
-    setToast({
-      showToast: true,
-      toastMessage: 'Berhasil mendaftar',
-      toastType: 'ok',
-      resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-      orientation: 'center',
-    });
-
-    //!
-    // navigateToSetPassword();
+    //! temp -- onboarding flow for successful doctor registration
+    // fill form -> get email with temp password -> can login with temp pass -> tracking page -> admin approval -> set new password
+    navigateToSetPassword();
   };
 
   return (

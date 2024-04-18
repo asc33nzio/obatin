@@ -91,8 +91,9 @@ export const PasswordInputErrorDiv = styled.div<{ $hasError: boolean }>`
   width: 100%;
   height: 20%;
 
-  font-size: 18px;
+  font-size: 14px;
   color: #cc3535;
+  padding-left: 10px;
 
   opacity: ${({ $hasError }) => ($hasError ? 1 : 0)};
 `;

@@ -1,48 +1,28 @@
 'use client';
 import React, { useState } from 'react';
 import {
-  CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
   OAuthDiv,
-  RememberAndForgetDiv,
-  RememberMeDiv,
   SectionSeparator,
   SeparatorLine,
 } from '@/styles/Auth.styles';
 import { debounce } from '@/utils/debounce';
 import { useToast } from '@/app/ToastProvider';
 import { useClientDisplayResolution } from '@/app/ClientDisplayResolutionProvider';
-import { navigateToHome, navigateToRegister } from '@/app/auth/actions';
-import RegularInput from '@/components/RegularInput';
+import { navigateToHome } from '@/app/auth/actions';
 import PasswordInput from '@/components/PasswordInput';
 import CustomButton from '@/components/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
-const LoginForm = (): React.ReactElement => {
+const SetPasswordForm = (): React.ReactElement => {
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  const [email, setEmail] = useState<string>('');
-  const [emailValidationError, setEmailValidationError] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [passwordValidationError, setPasswordValidationError] =
     useState<string>('');
-
-  const validateEmail = (input: string) => {
-    const sanitizedInput = input.trim();
-
-    if (input.length < 3) {
-      setEmailValidationError('E-mail harus lebih dari 3 karakter');
-      return false;
-    }
-
-    if (!/^[\w-.]+(\+[\w-]+)?@([\w-]+\.)+[\w-]{2,4}$/.test(sanitizedInput)) {
-      setEmailValidationError('Pola e-mail tidak sesuai');
-      return false;
-    }
-
-    setEmailValidationError('');
-    return true;
-  };
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [confirmPasswordValidationError, setConfirmPasswordValidationError] =
+    useState<string>('');
 
   const validatePassword = (input: string) => {
     const sanitizedInput = input.trim();
@@ -56,13 +36,24 @@ const LoginForm = (): React.ReactElement => {
     return true;
   };
 
-  const handleEmailInputChange = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setEmail(event.target.value);
-      validateEmail(event.target.value);
-    },
-    750,
-  );
+  const validateConfirmPassword = (input: string) => {
+    const sanitizedInput = input.trim();
+
+    if (sanitizedInput.length === 0) {
+      setConfirmPasswordValidationError('Konfirmasi sandi tidak boleh kosong');
+      return false;
+    }
+
+    if (sanitizedInput !== password) {
+      setConfirmPasswordValidationError(
+        'Konfirmasi sandi tidak sama. Mohon cek kembali',
+      );
+      return false;
+    }
+
+    setConfirmPasswordValidationError('');
+    return true;
+  };
 
   const handlePasswordInputChange = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,14 +63,22 @@ const LoginForm = (): React.ReactElement => {
     750,
   );
 
-  const handleLogin = () => {
-    const isValidEmail = validateEmail(email);
-    const isValidPassword = validatePassword(password);
+  const handleConfirmPasswordInputChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setConfirmPassword(event.target.value);
+      validateConfirmPassword(event.target.value);
+    },
+    750,
+  );
 
-    if (!isValidEmail || !isValidPassword) {
+  const handleSignUp = () => {
+    const isValidPassword = validatePassword(password);
+    const isValidConfimPassword = validateConfirmPassword(confirmPassword);
+
+    if (!isValidPassword || !isValidConfimPassword) {
       setToast({
         showToast: true,
-        toastMessage: 'Login gagal',
+        toastMessage: 'Pendaftaran gagal',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
@@ -91,7 +90,7 @@ const LoginForm = (): React.ReactElement => {
 
     setToast({
       showToast: true,
-      toastMessage: 'Login berhasil',
+      toastMessage: 'Berhasil mendaftar',
       toastType: 'ok',
       resolution: isDesktopDisplay ? 'desktop' : 'mobile',
       orientation: 'center',
@@ -101,20 +100,7 @@ const LoginForm = (): React.ReactElement => {
 
   return (
     <LoginOrRegisterFormContainer $isLoginPage={true}>
-      <h1>Selamat Datang!</h1>
-
-      <CreateOrLoginSpan $marBot={25}>
-        <p>Baru di ObatIn?</p>
-        <u onClick={() => navigateToRegister()}>Daftar Sekarang</u>
-      </CreateOrLoginSpan>
-
-      <RegularInput
-        title='E-mail'
-        placeholder='E-mail'
-        onChange={handleEmailInputChange}
-        validationMessage={emailValidationError}
-        $marBot={25}
-      />
+      <h1>Buat Kata Sandi</h1>
 
       <PasswordInput
         title='Kata Sandi'
@@ -123,16 +109,14 @@ const LoginForm = (): React.ReactElement => {
         validationMessage={passwordValidationError}
       />
 
-      <RememberAndForgetDiv>
-        <RememberMeDiv>
-          <input type='checkbox' name='remember-me' id='remember-me' />
-          <p>Ingat Saya</p>
-        </RememberMeDiv>
+      <PasswordInput
+        title='Konfirmasi Kata Sandi'
+        placeholder='Konfirmasi Kata Sandi'
+        onChange={handleConfirmPasswordInputChange}
+        validationMessage={confirmPasswordValidationError}
+      />
 
-        <u>Lupa Kata Sandi?</u>
-      </RememberAndForgetDiv>
-
-      <CustomButton content='Log In' onClick={handleLogin} />
+      <CustomButton content='Daftar' onClick={handleSignUp} />
 
       <SectionSeparator>
         <SeparatorLine />
@@ -148,4 +132,4 @@ const LoginForm = (): React.ReactElement => {
   );
 };
 
-export default LoginForm;
+export default SetPasswordForm;

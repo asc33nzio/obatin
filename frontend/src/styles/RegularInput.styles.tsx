@@ -71,7 +71,7 @@ export const RegularInputErrorDiv = styled.div<{ $hasError: boolean }>`
 
   font-size: 14px;
   color: #cc3535;
-  padding-left: 15px;
+  padding-left: 10px;
 
   opacity: ${({ $hasError }) => ($hasError ? 1 : 0)};
 `;
