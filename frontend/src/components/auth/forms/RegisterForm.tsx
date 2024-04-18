@@ -1,8 +1,9 @@
 'use client';
-import React, { useState } from 'react';
-import { debounce } from '@/utils/debounce';
-import { useToast } from '@/app/ToastProvider';
-import { useClientDisplayResolution } from '@/app/ClientDisplayResolutionProvider';
+import { useState } from 'react';
+import { useToast } from '@/hooks/useToast';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useEmailValidation } from '@/hooks/useEmailValidation';
+import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import {
   navigateToHome,
   navigateToLogin,
@@ -28,46 +29,28 @@ import DoctorICO from '@/assets/auth/DoctorICO';
 const RegisterForm = (): React.ReactElement => {
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  const [isDoctor, setIsDoctor] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>('');
-  const [emailValidationError, setEmailValidationError] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [passwordValidationError, setPasswordValidationError] =
-    useState<string>('');
+  const {
+    email,
+    setEmail,
+    validateEmail,
+    emailValidationError,
+    setEmailValidationError,
+    handleEmailInputChange,
+  } = useEmailValidation();
+  const {
+    password,
+    setPassword,
+    validatePassword,
+    passwordValidationError,
+    setPasswordValidationError,
+    handlePasswordInputChange,
+  } = usePasswordValidation();
   const [userUpload, setUserUpload] = useState<File | undefined>(undefined);
   const [userUploadValidationError, setUserUploadValidationError] =
     useState<string>('');
+  const [isDoctor, setIsDoctor] = useState<boolean>(false);
   const specializations = ['bidan', 'kulit kelamin', 'internis'];
   const [selectedOption, setSelectedOption] = useState<string>('');
-
-  const validateEmail = (input: string) => {
-    const sanitizedInput = input.trim();
-
-    if (input.length < 3) {
-      setEmailValidationError('E-mail harus lebih dari 3 karakter');
-      return false;
-    }
-
-    if (!/^[\w-.]+(\+[\w-]+)?@([\w-]+\.)+[\w-]{2,4}$/.test(sanitizedInput)) {
-      setEmailValidationError('Pola e-mail tidak sesuai');
-      return false;
-    }
-
-    setEmailValidationError('');
-    return true;
-  };
-
-  const validatePassword = (input: string) => {
-    const sanitizedInput = input.trim();
-
-    if (sanitizedInput.length < 6) {
-      setPasswordValidationError('Sandi harus lebih dari 6 karakter');
-      return false;
-    }
-
-    setPasswordValidationError('');
-    return true;
-  };
 
   const validateUpload = (input: File | undefined) => {
     if (input === undefined) {
@@ -109,22 +92,6 @@ const RegisterForm = (): React.ReactElement => {
     setUserUploadValidationError('');
     return true;
   };
-
-  const handleEmailInputChange = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setEmail(event.target.value);
-      validateEmail(event.target.value);
-    },
-    750,
-  );
-
-  const handlePasswordInputChange = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setPassword(event.target.value);
-      validatePassword(event.target.value);
-    },
-    750,
-  );
 
   const handleCertificateChange = (
     event: React.ChangeEvent<HTMLInputElement>,

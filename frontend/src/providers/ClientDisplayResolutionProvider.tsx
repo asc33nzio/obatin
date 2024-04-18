@@ -1,13 +1,6 @@
-'use client'
-import React, { createContext, useContext, useEffect, useState } from 'react';
-
-interface ClientDisplayResolutionItf {
-  isDesktopDisplay: boolean;
-}
-
-const ClientDisplayResolutionContext = createContext<
-  ClientDisplayResolutionItf | undefined
->(undefined);
+'use client';
+import { useEffect, useState } from 'react';
+import ClientDisplayResolutionContext from '@/contexts/clientDisplayResolutionContext';
 
 export const ClientDisplayResolutionProvider: React.FC<{
   children: React.ReactNode;
@@ -32,14 +25,4 @@ export const ClientDisplayResolutionProvider: React.FC<{
       {children}
     </ClientDisplayResolutionContext.Provider>
   );
-};
-
-export const useClientDisplayResolution = () => {
-  const context = useContext(ClientDisplayResolutionContext);
-  if (!context) {
-    throw new Error(
-      'ClientDisplayResolution context missing!',
-    );
-  }
-  return context;
 };

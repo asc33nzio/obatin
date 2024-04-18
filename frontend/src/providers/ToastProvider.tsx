@@ -1,36 +1,7 @@
 'use client';
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-} from 'react';
-import {
-  AcceptableResolutionType,
-  AcceptableToastOrientation,
-  AcceptableToastType,
-} from '@/types/toast';
-
-interface ToastContextItf {
-  showToast: boolean;
-  toastMessage: string;
-  toastType: AcceptableToastType;
-  resolution: AcceptableResolutionType;
-  orientation: AcceptableToastOrientation;
-  setToast: Dispatch<
-    SetStateAction<{
-      showToast: boolean;
-      toastMessage: string;
-      toastType: AcceptableToastType;
-      resolution: AcceptableResolutionType;
-      orientation: AcceptableToastOrientation;
-    }>
-  >;
-}
-
-const ToastContext = createContext<ToastContextItf | undefined>(undefined);
+import { useState, useEffect } from 'react';
+import { ToastContextItf } from '@/types/toastTypes';
+import ToastContext from '@/contexts/toastContext';
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -79,13 +50,4 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </ToastContext.Provider>
   );
-};
-
-export const useToast = (): ToastContextItf => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('Toast context missing!');
-  }
-
-  return context;
 };

@@ -1,5 +1,4 @@
 'use client';
-import React, { useState } from 'react';
 import {
   CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
@@ -9,9 +8,10 @@ import {
   SectionSeparator,
   SeparatorLine,
 } from '@/styles/Auth.styles';
-import { debounce } from '@/utils/debounce';
-import { useToast } from '@/app/ToastProvider';
-import { useClientDisplayResolution } from '@/app/ClientDisplayResolutionProvider';
+import { useToast } from '@/hooks/useToast';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useEmailValidation } from '@/hooks/useEmailValidation';
+import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import {
   navigateToForgotPassword,
   navigateToHome,
@@ -25,56 +25,14 @@ import GoogleICO from '@/assets/icons/GoogleICO';
 const LoginForm = (): React.ReactElement => {
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  const [email, setEmail] = useState<string>('');
-  const [emailValidationError, setEmailValidationError] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [passwordValidationError, setPasswordValidationError] =
-    useState<string>('');
-
-  const validateEmail = (input: string) => {
-    const sanitizedInput = input.trim();
-
-    if (input.length < 3) {
-      setEmailValidationError('E-mail harus lebih dari 3 karakter');
-      return false;
-    }
-
-    if (!/^[\w-.]+(\+[\w-]+)?@([\w-]+\.)+[\w-]{2,4}$/.test(sanitizedInput)) {
-      setEmailValidationError('Pola e-mail tidak sesuai');
-      return false;
-    }
-
-    setEmailValidationError('');
-    return true;
-  };
-
-  const validatePassword = (input: string) => {
-    const sanitizedInput = input.trim();
-
-    if (sanitizedInput.length < 6) {
-      setPasswordValidationError('Sandi harus lebih dari 6 karakter');
-      return false;
-    }
-
-    setPasswordValidationError('');
-    return true;
-  };
-
-  const handleEmailInputChange = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setEmail(event.target.value);
-      validateEmail(event.target.value);
-    },
-    750,
-  );
-
-  const handlePasswordInputChange = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setPassword(event.target.value);
-      validatePassword(event.target.value);
-    },
-    750,
-  );
+  const { email, validateEmail, emailValidationError, handleEmailInputChange } =
+    useEmailValidation();
+  const {
+    password,
+    validatePassword,
+    passwordValidationError,
+    handlePasswordInputChange,
+  } = usePasswordValidation();
 
   const handleLogin = () => {
     const isValidEmail = validateEmail(email);

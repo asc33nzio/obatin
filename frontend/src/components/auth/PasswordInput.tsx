@@ -1,6 +1,4 @@
 'use client';
-import HidePasswordICO from '@/assets/passwordInput/HidePasswordICO';
-import ShowPasswordICO from '@/assets/passwordInput/ShowPasswordICO';
 import {
   PasswordCustomInput,
   PasswordInputErrorDiv,
@@ -8,7 +6,9 @@ import {
   PasswordInputSubcontainer,
   ICOdiv,
 } from '@/styles/PasswordInput.styles';
-import React, { InputHTMLAttributes, useState } from 'react';
+import { InputHTMLAttributes, useState } from 'react';
+import HidePasswordICO from '@/assets/passwordInput/HidePasswordICO';
+import ShowPasswordICO from '@/assets/passwordInput/ShowPasswordICO';
 
 interface PasswordInputItf extends InputHTMLAttributes<HTMLInputElement> {
   placeholder: string;

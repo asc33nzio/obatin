@@ -4,7 +4,7 @@ import {
   RegularInputContainer,
   CustomUploadButton,
 } from '@/styles/RegularInput.styles';
-import React, { InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes } from 'react';
 
 interface RegularInputItf extends InputHTMLAttributes<HTMLInputElement> {
   placeholder: string;

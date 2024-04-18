@@ -1,5 +1,5 @@
 import { CustomButtonStyle } from '@/styles/CustomButton.styles';
-import React, { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes } from 'react';
 
 interface CustomButtonItf extends ButtonHTMLAttributes<HTMLButtonElement> {
   content?: string;

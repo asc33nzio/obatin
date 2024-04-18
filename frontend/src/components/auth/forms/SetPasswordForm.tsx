@@ -1,14 +1,14 @@
 'use client';
-import React, { useState } from 'react';
 import {
   LoginOrRegisterFormContainer,
   OAuthDiv,
   SectionSeparator,
   SeparatorLine,
 } from '@/styles/Auth.styles';
+import { useState } from 'react';
 import { debounce } from '@/utils/debounce';
-import { useToast } from '@/app/ToastProvider';
-import { useClientDisplayResolution } from '@/app/ClientDisplayResolutionProvider';
+import { useToast } from '@/hooks/useToast';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { navigateToHome } from '@/app/auth/actions';
 import PasswordInput from '../PasswordInput';
 import CustomButton from '../CustomButton';

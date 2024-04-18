@@ -1,6 +1,5 @@
 'use client';
-import React from 'react';
-import { useToast } from '@/app/ToastProvider';
+import { useToast } from '@/hooks/useToast';
 import { StyledToast, StyledToastContainer } from '@/styles/Toast.styles';
 
 const Toast = (): React.ReactElement | null => {

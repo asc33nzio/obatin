@@ -1,13 +1,12 @@
 'use client';
-import React, { useState } from 'react';
 import {
   CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
   ReturnHomeContainerDiv,
 } from '@/styles/Auth.styles';
-import { debounce } from '@/utils/debounce';
-import { useToast } from '@/app/ToastProvider';
-import { useClientDisplayResolution } from '@/app/ClientDisplayResolutionProvider';
+import { useToast } from '@/hooks/useToast';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { navigateToHome, navigateToLogin } from '@/app/auth/actions';
 import RegularInput from '../RegularInput';
 import CustomButton from '../CustomButton';
@@ -16,33 +15,12 @@ import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
 const ForgotPasswordForm = (): React.ReactElement => {
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  const [email, setEmail] = useState<string>('');
-  const [emailValidationError, setEmailValidationError] = useState<string>('');
-
-  const validateEmail = (input: string) => {
-    const sanitizedInput = input.trim();
-
-    if (input.length < 3) {
-      setEmailValidationError('E-mail harus lebih dari 3 karakter');
-      return false;
-    }
-
-    if (!/^[\w-.]+(\+[\w-]+)?@([\w-]+\.)+[\w-]{2,4}$/.test(sanitizedInput)) {
-      setEmailValidationError('Pola e-mail tidak sesuai');
-      return false;
-    }
-
-    setEmailValidationError('');
-    return true;
-  };
-
-  const handleEmailInputChange = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setEmail(event.target.value);
-      validateEmail(event.target.value);
-    },
-    750,
-  );
+  const {
+    email,
+    validateEmail,
+    emailValidationError,
+    handleEmailInputChange,
+  } = useEmailValidation();
 
   const handleResetPasswordRequest = () => {
     const isValidEmail = validateEmail(email);

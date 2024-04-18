@@ -2,7 +2,7 @@ import {
   SpecializationCustomSelect,
   SpecializationOptionContainer,
 } from '@/styles/SpecializationOption.styles';
-import React, { SelectHTMLAttributes } from 'react';
+import { SelectHTMLAttributes } from 'react';
 
 interface SpecializationOptionItf
   extends SelectHTMLAttributes<HTMLSelectElement> {
