@@ -1,4 +1,4 @@
-import SetPasswordForm from '@/components/SetPasswordForm';
+import SetPasswordForm from "@/components/auth/forms/SetPasswordForm";
 
 const OnboardingPage = (): React.ReactElement => {
   return <SetPasswordForm />;

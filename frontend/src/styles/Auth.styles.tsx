@@ -168,3 +168,37 @@ export const SeparatorLine = styled.div`
   height: 1px;
   background-color: #a0aec0;
 `;
+
+export const ReturnHomeContainerDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 50px;
+  margin-top: 35px;
+
+  span {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+    width: 30%;
+    gap: 15px;
+    background: transparent;
+    color: #718096;
+    font-size: 18px;
+    font-weight: 600;
+
+    svg {
+      cursor: pointer;
+      object-fit: cover;
+      background: transparent;
+      width: 25px;
+      height: 25px;
+    }
+  }
+`;

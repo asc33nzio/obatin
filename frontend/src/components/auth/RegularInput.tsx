@@ -25,6 +25,7 @@ const RegularInput = ({
       {title}
       <RegularCustomInput
         {...props}
+        placeholder={placeholder}
         $hasError={validationMessage !== '' ? true : false}
       />
       {props?.type === 'file' && (

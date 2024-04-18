@@ -10,8 +10,8 @@ import { debounce } from '@/utils/debounce';
 import { useToast } from '@/app/ToastProvider';
 import { useClientDisplayResolution } from '@/app/ClientDisplayResolutionProvider';
 import { navigateToHome } from '@/app/auth/actions';
-import PasswordInput from '@/components/PasswordInput';
-import CustomButton from '@/components/CustomButton';
+import PasswordInput from '../PasswordInput';
+import CustomButton from '../CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
 const SetPasswordForm = (): React.ReactElement => {

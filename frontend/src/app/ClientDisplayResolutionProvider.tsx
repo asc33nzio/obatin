@@ -38,7 +38,7 @@ export const useClientDisplayResolution = () => {
   const context = useContext(ClientDisplayResolutionContext);
   if (!context) {
     throw new Error(
-      'ClientDisplayResolution context missing!F',
+      'ClientDisplayResolution context missing!',
     );
   }
   return context;

@@ -17,13 +17,13 @@ import {
   SeparatorLine,
   UserTypeSelectionSection,
 } from '@/styles/Auth.styles';
-import RegularInput from '@/components/RegularInput';
-import CustomButton from '@/components/CustomButton';
+import RegularInput from '../RegularInput';
+import CustomButton from '../CustomButton';
+import PasswordInput from '../PasswordInput';
+import SpecializationOption from '../SpecializationOption';
 import GoogleICO from '@/assets/icons/GoogleICO';
-import PasswordInput from './PasswordInput';
 import PatientICO from '@/assets/auth/PatientICO';
 import DoctorICO from '@/assets/auth/DoctorICO';
-import SpecializationOption from './SpecializationOption';
 
 const RegisterForm = (): React.ReactElement => {
   const { setToast } = useToast();
@@ -237,7 +237,7 @@ const RegisterForm = (): React.ReactElement => {
             $marBot={0}
           />
           <SpecializationOption
-            title='Specialization'
+            title='Spesialisasi'
             $marBot={0}
             options={specializations}
             onOptionChange={handleOptionChange}

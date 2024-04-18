@@ -12,10 +12,14 @@ import {
 import { debounce } from '@/utils/debounce';
 import { useToast } from '@/app/ToastProvider';
 import { useClientDisplayResolution } from '@/app/ClientDisplayResolutionProvider';
-import { navigateToHome, navigateToRegister } from '@/app/auth/actions';
-import RegularInput from '@/components/RegularInput';
-import PasswordInput from '@/components/PasswordInput';
-import CustomButton from '@/components/CustomButton';
+import {
+  navigateToForgotPassword,
+  navigateToHome,
+  navigateToRegister,
+} from '@/app/auth/actions';
+import RegularInput from '../RegularInput';
+import PasswordInput from '../PasswordInput';
+import CustomButton from '../CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
 const LoginForm = (): React.ReactElement => {
@@ -129,7 +133,7 @@ const LoginForm = (): React.ReactElement => {
           <p>Ingat Saya</p>
         </RememberMeDiv>
 
-        <u>Lupa Kata Sandi?</u>
+        <u onClick={() => navigateToForgotPassword()}>Lupa Kata Sandi?</u>
       </RememberAndForgetDiv>
 
       <CustomButton content='Log In' onClick={handleLogin} />
