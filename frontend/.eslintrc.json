@@ -1,6 +1,16 @@
 {
-  "extends": ["next/babel", "next/core-web-vitals", "prettier"],
+  //! using "extends": ["next/babel"], the error in next.config.mjs dissappears but npm run lint wont
+  //! work as expected as the module cant be resolved somehow
+  //! err: Failed to load parser '@babel/eslint-parser' declared in '.eslintrc.json': Cannot find module '@babel/eslint-parser'
+  "extends": ["next", "next/core-web-vitals", "prettier"],
   "rules": {
     "no-unused-vars": "error"
   }
+  // ,
+  // "parser": "@babel/eslint-parser",
+  // "parserOptions": {
+  //   "babelOptions": {
+  //     "presets": ["next/babel"]
+  //   }
+  // }
 }

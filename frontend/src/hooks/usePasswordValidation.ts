@@ -5,6 +5,9 @@ export const usePasswordValidation = () => {
   const [password, setPassword] = useState<string>('');
   const [passwordValidationError, setPasswordValidationError] =
     useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [confirmPasswordValidationError, setConfirmPasswordValidationError] =
+    useState<string>('');
 
   const validatePassword = (input: string) => {
     const sanitizedInput = input.trim();
@@ -18,10 +21,37 @@ export const usePasswordValidation = () => {
     return true;
   };
 
+  const validateConfirmPassword = (input: string) => {
+    const sanitizedInput = input.trim();
+
+    if (sanitizedInput.length === 0) {
+      setConfirmPasswordValidationError('Konfirmasi sandi tidak boleh kosong');
+      return false;
+    }
+
+    if (sanitizedInput !== password) {
+      setConfirmPasswordValidationError(
+        'Konfirmasi sandi tidak sama. Mohon cek kembali',
+      );
+      return false;
+    }
+
+    setConfirmPasswordValidationError('');
+    return true;
+  };
+
   const handlePasswordInputChange = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(event.target.value);
       validatePassword(event.target.value);
+    },
+    750,
+  );
+
+  const handleConfirmPasswordInputChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setConfirmPassword(event.target.value);
+      validateConfirmPassword(event.target.value);
     },
     750,
   );
@@ -33,5 +63,11 @@ export const usePasswordValidation = () => {
     passwordValidationError,
     setPasswordValidationError,
     handlePasswordInputChange,
+    confirmPassword,
+    setConfirmPassword,
+    validateConfirmPassword,
+    confirmPasswordValidationError,
+    setConfirmPasswordValidationError,
+    handleConfirmPasswordInputChange,
   };
 };
