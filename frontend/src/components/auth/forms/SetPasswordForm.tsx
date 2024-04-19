@@ -10,7 +10,7 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { navigateToHome } from '@/app/auth/actions';
 import PasswordInput from '../PasswordInput';
-import CustomButton from '../CustomButton';
+import CustomButton from '../../elements/button/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
 const SetPasswordForm = (): React.ReactElement => {

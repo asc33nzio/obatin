@@ -42,10 +42,10 @@ export default function RootLayout({
     <html lang='en'>
       <body className={inter.className}>
         <ClientDisplayResolutionProvider>
-          <ToastProvider>
-            {children}
-            <Toast />
-          </ToastProvider>
+            <ToastProvider>
+              {children}
+              <Toast />
+            </ToastProvider>
         </ClientDisplayResolutionProvider>
       </body>
     </html>

@@ -2,11 +2,11 @@
 import { redirect } from 'next/navigation';
 
 export const navigateToLogin = async () => {
-    redirect('/auth/login');
+  redirect('/auth/login');
 };
 
 export const navigateToRegister = async () => {
-    redirect('/auth/register');
+  redirect('/auth/register');
 };
 
 export const navigateToSetPassword = async () => {
@@ -19,4 +19,8 @@ export const navigateToForgotPassword = async () => {
 
 export const navigateToHome = async () => {
   redirect('/home');
+};
+
+export const navigateToDashboard = async () => {
+  redirect('/dashboard');
 };

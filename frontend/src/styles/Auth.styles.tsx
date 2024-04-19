@@ -136,7 +136,7 @@ export const OAuthDiv = styled.div<{ $isDesktopDisplay: boolean }>`
 
   cursor: pointer;
   width: 100%;
-  height: 75px;
+  height: 55px;
   padding-left: 25px;
 
   border: 1px solid #cbd5e0;

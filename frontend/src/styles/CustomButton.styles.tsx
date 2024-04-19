@@ -1,17 +1,28 @@
 import styled from 'styled-components';
 
-export const CustomButtonStyle = styled.button`
+interface ButtonPropsItf {
+  width?: string | undefined;
+  height?: string | undefined;
+  fontSize?: string | undefined;
+}
+
+export const CustomButtonStyle = styled.button<{
+  $buttonProps: ButtonPropsItf;
+}>`
   cursor: pointer;
-  width: 100%;
-  height: 65px;
+  width: ${({ $buttonProps }) =>
+    $buttonProps.width ? $buttonProps.width : '100%'};
+  height: ${({ $buttonProps }) =>
+    $buttonProps.height ? $buttonProps.height : '55px'};
 
   background-color: #00b5c0;
   color: #f7fafc;
-  
+
   border-radius: 10px;
   border: none;
   outline: none;
 
-  font-size: 24px;
+  font-size: ${({ $buttonProps }) =>
+    $buttonProps.fontSize ? $buttonProps.fontSize : '24px'};
   font-weight: 600;
 `;

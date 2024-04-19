@@ -7,9 +7,9 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
-import { navigateToHome, navigateToLogin } from '@/app/auth/actions';
+import { navigateToHome, navigateToLogin } from '@/app/actions';
 import RegularInput from '../RegularInput';
-import CustomButton from '../CustomButton';
+import CustomButton from '../../elements/button/CustomButton';
 import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
 
 const ForgotPasswordForm = (): React.ReactElement => {

@@ -8,7 +8,7 @@ import {
   navigateToHome,
   navigateToLogin,
   navigateToSetPassword,
-} from '@/app/auth/actions';
+} from '@/app/actions';
 import {
   CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
@@ -19,9 +19,9 @@ import {
   UserTypeSelectionSection,
 } from '@/styles/Auth.styles';
 import RegularInput from '../RegularInput';
-import CustomButton from '../CustomButton';
+import CustomButton from '../../elements/button/CustomButton';
 import PasswordInput from '../PasswordInput';
-import SpecializationOption from '../SpecializationOption';
+import SpecializationSelect from '../SpecializationSelect';
 import GoogleICO from '@/assets/icons/GoogleICO';
 import PatientICO from '@/assets/auth/PatientICO';
 import DoctorICO from '@/assets/auth/DoctorICO';
@@ -50,7 +50,9 @@ const RegisterForm = (): React.ReactElement => {
     useState<string>('');
   const [isDoctor, setIsDoctor] = useState<boolean>(false);
   const specializations = ['bidan', 'kulit kelamin', 'internis'];
-  const [selectedOption, setSelectedOption] = useState<string>('');
+  const [selectedOption, setSelectedOption] = useState<string>(
+    specializations[1],
+  );
 
   const validateUpload = (input: File | undefined) => {
     if (input === undefined) {
@@ -131,6 +133,12 @@ const RegisterForm = (): React.ReactElement => {
       return;
     }
 
+    const payload = {
+      email: email,
+      specialization: selectedOption,
+      certificate: userUpload,
+    };
+
     //? POST request
 
     setToast({
@@ -159,12 +167,31 @@ const RegisterForm = (): React.ReactElement => {
       return;
     }
 
+    if (selectedOption === '') {
+      setToast({
+        showToast: true,
+        toastMessage: 'Anda belum memilih spesialisasi',
+        toastType: 'warning',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      return;
+    }
+
     // console.log(selectedOption) -- specialization select
     //? POST request
 
     //! temp -- onboarding flow for successful doctor registration
     // fill form -> get email with temp password -> can login with temp pass -> tracking page -> admin approval -> set new password
-    navigateToSetPassword();
+    
+    setToast({
+      showToast: true,
+      toastMessage: 'Terima kasih! Tolong cek e-mail anda',
+      toastType: 'ok',
+      resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+      orientation: 'center',
+    });
+    navigateToLogin();
   };
 
   return (
@@ -203,7 +230,7 @@ const RegisterForm = (): React.ReactElement => {
             onChange={handleEmailInputChange}
             $marBot={0}
           />
-          <SpecializationOption
+          <SpecializationSelect
             title='Spesialisasi'
             $marBot={0}
             options={specializations}

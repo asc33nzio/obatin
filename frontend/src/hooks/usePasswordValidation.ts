@@ -12,8 +12,8 @@ export const usePasswordValidation = () => {
   const validatePassword = (input: string) => {
     const sanitizedInput = input.trim();
 
-    if (sanitizedInput.length < 6) {
-      setPasswordValidationError('Sandi harus lebih dari 6 karakter');
+    if (sanitizedInput.length < 8) {
+      setPasswordValidationError('Sandi harus lebih dari 8 karakter');
       return false;
     }
 

@@ -40,7 +40,7 @@ export const StyledToastContainer = styled.div<{ $orientation?: string }>`
 export const StyledToast = styled.div<{ $type: string; $resolution: string }>`
   --bg-color-ok: #05b6c1;
   --color-ok: white;
-  --bg-color-warning: #c8e6c9;
+  --bg-color-warning: #d9ca86;
   --color-warning: white;
   --bg-color-error: #dc185d;
   --color-error: white;

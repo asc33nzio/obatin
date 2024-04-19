@@ -12,14 +12,17 @@ import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { setCookie } from 'cookies-next';
 import {
+  navigateToDashboard,
   navigateToForgotPassword,
   navigateToHome,
-  navigateToRegister,
-} from '@/app/auth/actions';
+  navigateToRegister 
+} from "../../../app/actions"
+import Axios from 'axios';
 import RegularInput from '../RegularInput';
 import PasswordInput from '../PasswordInput';
-import CustomButton from '../CustomButton';
+import CustomButton from '../../elements/button/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
 const LoginForm = (): React.ReactElement => {
@@ -34,7 +37,7 @@ const LoginForm = (): React.ReactElement => {
     handlePasswordInputChange,
   } = usePasswordValidation();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const isValidEmail = validateEmail(email);
     const isValidPassword = validatePassword(password);
 
@@ -49,16 +52,58 @@ const LoginForm = (): React.ReactElement => {
       return;
     }
 
-    //? POST request
+    const payload = {
+      email: email?.trim(),
+      password: password?.trim(),
+    };
 
-    setToast({
-      showToast: true,
-      toastMessage: 'Login berhasil',
-      toastType: 'ok',
-      resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-      orientation: 'center',
-    });
-    navigateToHome();
+    try {
+      const response = await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
+        payload,
+      );
+
+      const access_token = response?.data?.data?.access_token;
+
+      if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION === undefined) {
+        throw new Error('please define access token valid duration env var');
+      }
+      const validTokenExpiryMilliseconds: number = parseInt(
+        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION,
+        10,
+      );
+
+      setCookie('session_token', access_token, {
+        // httpOnly: true,
+        priority: 'high',
+        path: '/',
+        maxAge: validTokenExpiryMilliseconds,
+      });
+
+      setToast({
+        showToast: true,
+        toastMessage: 'Login berhasil',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+
+      navigateToDashboard();
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message;
+      const appError = error?.message;
+      setToast({
+        showToast: true,
+        toastMessage: errorMessage
+          ? errorMessage
+          : appError
+          ? appError
+          : 'Login gagal',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    }
   };
 
   return (
