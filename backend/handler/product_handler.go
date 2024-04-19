@@ -47,3 +47,24 @@ func (h *ProductHandler) GetAllProducts(ctx *gin.Context) {
 		Data:       productsRes.Data,
 	})
 }
+
+func (h *ProductHandler) GetProductDetailBySlug(ctx *gin.Context) {
+	var slugParam dto.ProductSlugParam
+	err := ctx.ShouldBindUri(&slugParam)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+
+	product, err := h.productUsecase.GetProductDetailBySlug(ctx, slugParam.Slug)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res := dto.ToProductDetailResponse(product)
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseOkMsg,
+		Data:    res,
+	})
+}

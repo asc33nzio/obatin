@@ -26,6 +26,8 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusBadRequest
 	case FileUploadedInvalid:
 		return http.StatusBadRequest
+	case ErrorSqlNoProductExists: 
+		return http.StatusNotFound
 	default:
 		return http.StatusInternalServerError
 	}

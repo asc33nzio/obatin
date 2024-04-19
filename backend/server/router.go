@@ -74,6 +74,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndpointApproval, h.AuthenticationHandler.UpdateApproval)
 
 	r.GET(appconstant.EndpointGetProductsList, h.ProductHandler.GetAllProducts)
+	r.GET(appconstant.EndpointGetProductDetail, h.ProductHandler.GetProductDetailBySlug)
 	r.PATCH(appconstant.EndpointUpdatePassword, h.AuthenticationHandler.UpdatePassword)
 	
 	r.Use(h.Middleware.JWTAuth)
