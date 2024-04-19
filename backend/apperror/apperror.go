@@ -20,6 +20,15 @@ func NewInternal(err error) *AppError {
 	}
 }
 
+func NewProductNotFound(err error) *AppError {
+	return &AppError{
+		code:    ErrorSqlNoProductExists,
+		err:     err,
+		message: InternalErrMsg,
+		stack:   debug.Stack(),
+	}
+}
+
 func (e *AppError) Error() string {
 	return e.message
 }
