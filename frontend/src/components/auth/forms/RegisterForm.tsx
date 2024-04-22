@@ -260,6 +260,7 @@ const RegisterForm = (): React.ReactElement => {
             onChange={handlePasswordInputChange}
             validationMessage={passwordValidationError}
             $viewBox='0 -2 22 22'
+            $viewBoxHide='0 0 22 22'
           />
         </>
       )}

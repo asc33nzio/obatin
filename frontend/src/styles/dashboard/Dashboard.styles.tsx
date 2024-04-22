@@ -6,8 +6,6 @@ export const DashboardPageContainer = styled.div`
 
   width: 100vw;
   height: 100vh;
-
-  background-color: green;
 `;
 
 export const DashboardPageContentContainer = styled.div`
@@ -17,8 +15,6 @@ export const DashboardPageContentContainer = styled.div`
 
   width: 100vw;
   height: inherit;
-
-  background-color: grey;
 `;
 
 export const ProfileContainer = styled.div`
@@ -29,8 +25,6 @@ export const ProfileContainer = styled.div`
   width: 45%;
   height: 60%;
   gap: 10px;
-
-  /* background-color: blue; */
 `;
 
 export const ProfileHeader = styled.div`
@@ -150,6 +144,23 @@ export const AddressContainer = styled.div`
 
   width: 45%;
   height: 40%;
+`;
 
-  background-color: yellow;
+export const AddressHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 15%;
+  padding-left: 25px;
+  padding-right: 25px;
+  border-bottom: 1px solid #00b5c0;
+
+  h1 {
+    color: #00b5c0;
+    font-size: 38px;
+    background: transparent;
+  }
 `;

@@ -7,6 +7,7 @@ import { DecodedJwtItf } from '@/types/jwtTypes';
 import { EditProfileStateItf } from '@/types/dashboardTypes';
 import {
   AddressContainer,
+  AddressHeader,
   DashboardPageContainer,
   DashboardPageContentContainer,
   ImgBg,
@@ -179,6 +180,7 @@ const DashboardPage = (): React.ReactElement => {
                       title=''
                       placeholder=''
                       $viewBox='0 0 22 22'
+                      $viewBoxHide='0 2 22 22'
                     />
                     <EditPencilICO
                       onClick={() =>
@@ -207,7 +209,18 @@ const DashboardPage = (): React.ReactElement => {
           </ProfileContent>
         </ProfileContainer>
 
-        <AddressContainer>ASD</AddressContainer>
+        <AddressContainer>
+          <AddressHeader>
+            <h1>Address</h1>
+            <CustomButton
+              content='Tambah Alamat'
+              $bgColor='#00B5C0'
+              $width='150px'
+              $height='35px'
+              $fontSize='18px'
+            />
+          </AddressHeader>
+        </AddressContainer>
       </DashboardPageContentContainer>
     </DashboardPageContainer>
   );

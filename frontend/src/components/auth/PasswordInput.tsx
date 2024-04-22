@@ -15,6 +15,7 @@ interface PasswordInputItf extends InputHTMLAttributes<HTMLInputElement> {
   title?: string;
   validationMessage?: string;
   $viewBox: string;
+  $viewBoxHide: string;
 }
 
 const PasswordInput = ({
@@ -39,7 +40,7 @@ const PasswordInput = ({
             {!isPasswordVisible ? (
               <ShowPasswordICO $viewBox={props.$viewBox} />
             ) : (
-              <HidePasswordICO $viewBox={props.$viewBox} />
+              <HidePasswordICO $viewBoxHide={props.$viewBoxHide} />
             )}
           </div>
         </ICOdiv>
