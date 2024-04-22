@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
-export default nextConfig;
+const nextConfig = {
+    transpilePackages: ['react-icons'],
+    compiler: {
+      styledComponents: true,
+    },
+  };
+  
+  export default nextConfig;
+  
