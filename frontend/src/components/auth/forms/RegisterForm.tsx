@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { getCookie, setCookie } from 'cookies-next';
 import {
   navigateToDashboard,
   navigateToHome,
@@ -25,7 +26,7 @@ import SpecializationSelect from '../SpecializationSelect';
 import GoogleICO from '@/assets/icons/GoogleICO';
 import PatientICO from '@/assets/auth/PatientICO';
 import DoctorICO from '@/assets/auth/DoctorICO';
-import { getCookie } from 'cookies-next';
+import { Axios } from 'axios';
 
 const RegisterForm = (): React.ReactElement => {
   const { setToast } = useToast();
@@ -119,7 +120,7 @@ const RegisterForm = (): React.ReactElement => {
     setSelectedOption(selectedValue);
   };
 
-  const handleSignUpPatient = () => {
+  const handleSignUpPatient = async () => {
     const isValidEmail = validateEmail(email);
     const isValidPassword = validatePassword(password);
 
@@ -134,23 +135,53 @@ const RegisterForm = (): React.ReactElement => {
       return;
     }
 
-    const payload = {
-      email: email,
-      specialization: selectedOption,
-      certificate: userUpload,
-    };
+    try {
+      const response = await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
+        payload,
+      );
 
-    //? POST request
+      const access_token = response?.data?.data?.access_token;
 
-    setToast({
-      showToast: true,
-      toastMessage: 'Berhasil mendaftar',
-      toastType: 'ok',
-      resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-      orientation: 'center',
-    });
+      if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS === undefined) {
+        throw new Error('please define access token valid duration env var');
+      }
+      const validTokenExpiryMilliseconds: number = parseInt(
+        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS,
+        10,
+      );
 
-    navigateToHome();
+      setCookie('session_token', access_token, {
+        // httpOnly: true,
+        priority: 'high',
+        path: '/',
+        maxAge: validTokenExpiryMilliseconds,
+      });
+
+      setToast({
+        showToast: true,
+        toastMessage: 'Berhasil mendaftar',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+  
+      navigateToDashboard();
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message;
+      const appError = error?.message;
+      setToast({
+        showToast: true,
+        toastMessage: errorMessage
+          ? errorMessage
+          : appError
+          ? appError
+          : 'Login gagal',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    }
   };
 
   const handleSignUpDoctor = () => {
@@ -178,6 +209,12 @@ const RegisterForm = (): React.ReactElement => {
       });
       return;
     }
+
+    const payload = {
+      email: email,
+      specialization: selectedOption,
+      certificate: userUpload,
+    };
 
     // console.log(selectedOption) -- specialization select
     //? POST request

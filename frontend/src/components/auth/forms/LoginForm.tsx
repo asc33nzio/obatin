@@ -8,6 +8,7 @@ import {
   SectionSeparator,
   SeparatorLine,
 } from '@/styles/Auth.styles';
+import { useEffect } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
@@ -23,9 +24,6 @@ import RegularInput from '../RegularInput';
 import PasswordInput from '../PasswordInput';
 import CustomButton from '../../elements/button/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
-import { useEffect } from 'react';
-import { DecodedJwtItf } from '@/types/jwtTypes';
-import { jwtDecode } from 'jwt-decode';
 
 const LoginForm = (): React.ReactElement => {
   const { setToast } = useToast();
@@ -74,7 +72,6 @@ const LoginForm = (): React.ReactElement => {
         process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS,
         10,
       );
-      console.log(validTokenExpiryMilliseconds)
 
       setCookie('session_token', access_token, {
         // httpOnly: true,
