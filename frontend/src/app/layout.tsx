@@ -5,7 +5,10 @@ import { ToastProvider } from '@/providers/ToastProvider';
 import { ClientDisplayResolutionProvider } from '../providers/ClientDisplayResolutionProvider';
 import Toast from '@/components/toast/Toast';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Obatin',
@@ -42,10 +45,10 @@ export default function RootLayout({
     <html lang='en'>
       <body className={inter.className}>
         <ClientDisplayResolutionProvider>
-            <ToastProvider>
-              {children}
-              <Toast />
-            </ToastProvider>
+          <ToastProvider>
+            {children}
+            <Toast />
+          </ToastProvider>
         </ClientDisplayResolutionProvider>
       </body>
     </html>
