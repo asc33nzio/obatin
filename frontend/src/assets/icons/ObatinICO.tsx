@@ -1,5 +1,3 @@
-import React from 'react';
-
 const ObatinICO = (): React.ReactElement => {
   return (
     <svg

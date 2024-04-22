@@ -1,14 +1,13 @@
-import React from 'react'
-import { SearchContainer } from '../../../styles/homepage/Search.style'
 import SearchIcon from '@mui/icons-material/Search';
+import { SearchContainer } from '../../../styles/homepage/Search.style';
 
-const SearchComponent = () => {
+const SearchComponent = ():React.ReactElement => {
   return (
     <SearchContainer>
-        <SearchIcon/>
-        <p>Cari produk di sini</p>
+      <SearchIcon />
+      <p>Cari produk di sini</p>
     </SearchContainer>
-  )
-}
+  );
+};
 
-export default SearchComponent
+export default SearchComponent;
