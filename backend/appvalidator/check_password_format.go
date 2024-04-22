@@ -1,7 +1,7 @@
 package appvalidator
 
 func IsValidPassword(password string) bool {
-	if len(password) < 8 {
+	if len(password) < 9 {
 		return false
 	}
 

@@ -31,8 +31,10 @@ func (m *GinMiddleware) JWTAuth(ctx *gin.Context) {
 		return
 	}
 
-	uid := claims.Payload.UserId
+	aid := claims.Payload.AuthenticationId
+	arole := claims.Payload.Role
 
-	ctx.Set(constant.AuthenticationIdKey, uid)
+	ctx.Set(constant.AuthenticationIdKey, aid)
+	ctx.Set(constant.AuthenticationRole, arole)
 	ctx.Next()
 }

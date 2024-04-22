@@ -45,7 +45,6 @@ func (h *AuthenticationHandler) Login(ctx *gin.Context) {
 }
 
 func (h *AuthenticationHandler) RegisterDoctor(ctx *gin.Context) {
-	body := dto.DoctorRegisterReq{}
 
 	file, FileHeader, err := ctx.Request.FormFile(constant.CertificateJSONTag)
 	if err != nil {
@@ -61,9 +60,20 @@ func (h *AuthenticationHandler) RegisterDoctor(ctx *gin.Context) {
 	}
 	defer file.Close()
 
-	body = dto.DoctorRegisterReq{
-		Email:       ctx.Request.FormValue(constant.EmailJSONTag),
-		Certificate: file,
+	result, err := strconv.Atoi(ctx.Request.FormValue(constant.SpecializationIdJSONTag))
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+	body := dto.DoctorRegisterReq{
+		Email:            ctx.Request.FormValue(constant.EmailJSONTag),
+		Certificate:      file,
+		SpecializationId: int64(result),
+	}
+	err = ctx.ShouldBind(&body)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
 	}
 
 	err = h.userUsecase.RegisterDoctor(ctx, body.ToDoctor())
@@ -98,7 +108,7 @@ func (h *AuthenticationHandler) RegisterUser(ctx *gin.Context) {
 }
 
 func (h *AuthenticationHandler) SendVerifyToEmail(ctx *gin.Context) {
-	err := h.userUsecase.SendVerifiedEmail(ctx)
+	err := h.userUsecase.SendVerificationEmail(ctx)
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -112,7 +122,7 @@ func (h *AuthenticationHandler) SendVerifyToEmail(ctx *gin.Context) {
 func (h *AuthenticationHandler) VerifyEmail(ctx *gin.Context) {
 	token := ctx.Query(constant.TokenQueryParam)
 
-	err := h.userUsecase.VerifiedEmail(ctx, token)
+	err := h.userUsecase.VerifyEmail(ctx, token)
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -157,7 +167,7 @@ func (h *AuthenticationHandler) UpdateApproval(ctx *gin.Context) {
 		return
 	}
 
-	_, err = h.userUsecase.UpdateApproval(ctx, authID, isApprove)
+	err = h.userUsecase.UpdateApproval(ctx, authID, isApprove)
 
 	if err != nil {
 		ctx.JSON(http.StatusOK, dto.APIResponse{
@@ -168,5 +178,39 @@ func (h *AuthenticationHandler) UpdateApproval(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseUpdateApprovalAcceptedMsg,
+	})
+}
+
+func (h *AuthenticationHandler) SendVerifyForgotPassword(ctx *gin.Context) {
+	body := dto.UpdatePasswordReq{}
+
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+
+	err = h.userUsecase.SendEmailForgotPasssword(ctx, body.ToEmail())
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseSendVerifyResetPassword,
+	})
+}
+
+func (h *AuthenticationHandler) GetPendingDoctorApproval(ctx *gin.Context) {
+	doctorPendingApproval, err := h.userUsecase.GetPendingDoctorApproval(ctx)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res := dto.ToGetAllDoctorPendingApprovalRes(doctorPendingApproval)
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseGetAllPendingDoctorApproval,
+		Data:    res,
 	})
 }
