@@ -14,9 +14,11 @@ type JWTItf interface {
 }
 
 type JWTPayload struct {
-	UserId      int64  `json:"uid,omitempty"`
-	Role        string `json:"role,omitempty"`
-	RandomToken string `json:"random_token,omitempty"`
+	AuthenticationId int64  `json:"aid,omitempty"`
+	Role             string `json:"role,omitempty"`
+	RandomToken      string `json:"random_token,omitempty"`
+	IsVerified       bool   `json:"is_verified,omitempty"`
+	IsApproval       bool   `json:"is_approval,omitempty"`
 }
 
 type JWTCustomClaims struct {

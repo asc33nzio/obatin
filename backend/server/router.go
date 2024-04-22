@@ -19,9 +19,10 @@ import (
 )
 
 type RouterOpt struct {
-	AuthenticationHandler *handler.AuthenticationHandler
-	ProductHandler *handler.ProductHandler
-	Middleware            *middleware.GinMiddleware
+	AuthenticationHandler       *handler.AuthenticationHandler
+	ProductHandler              *handler.ProductHandler
+	Middleware                  *middleware.GinMiddleware
+	DoctorSpecializationHandler *handler.DoctorSpecializationHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -39,10 +40,14 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	productUseCase := usecase.NewProductUsecaseImpl(dbStore, config)
 	productHandler := handler.NewProductHandler(productUseCase)
 
+	doctorSpecializationUsecase := usecase.NewDoctorSpecializationUsecaseImpl(dbStore, config)
+	doctorSpecializationHandler := handler.NewDoctorSpecializationHandler(doctorSpecializationUsecase)
+
 	return NewRouter(RouterOpt{
-		Middleware:            middleware,
-		AuthenticationHandler: authentiationHandler,
-		ProductHandler: productHandler,
+		Middleware:                  middleware,
+		AuthenticationHandler:       authentiationHandler,
+		ProductHandler:              productHandler,
+		DoctorSpecializationHandler: doctorSpecializationHandler,
 	})
 }
 
@@ -67,24 +72,25 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.Use(h.Middleware.RequestId)
 	r.Use(h.Middleware.Logger(log))
 	r.Use(h.Middleware.ErrorHandler)
-	r.POST(appconstant.EndpointLogin, h.AuthenticationHandler.Login)
-	r.POST(appconstant.EndpointRegisterDoctor, h.AuthenticationHandler.RegisterDoctor)
-	r.POST(appconstant.EndpointRegisterUser, h.AuthenticationHandler.RegisterUser)
-	r.POST(appconstant.EndpointVerify, h.AuthenticationHandler.VerifyEmail)
-	r.POST(appconstant.EndpointApproval, h.AuthenticationHandler.UpdateApproval)
-
-	r.GET(appconstant.EndpointGetProductsList, h.ProductHandler.GetAllProducts)
-	r.GET(appconstant.EndpointGetProductDetail, h.ProductHandler.GetProductDetailBySlug)
-	r.PATCH(appconstant.EndpointUpdatePassword, h.AuthenticationHandler.UpdatePassword)
-	
-	r.Use(h.Middleware.JWTAuth)
-	r.POST(appconstant.EndpointSendVerifyToEmail, h.AuthenticationHandler.SendVerifyToEmail)
-
 	r.GET(appconstant.EndpointPing, func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, dto.APIResponse{
 			Message: appconstant.ResponsePongMsg,
 		})
 	})
+	r.POST(appconstant.EndpointLogin, h.AuthenticationHandler.Login)
+	r.POST(appconstant.EndpointRegisterDoctor, h.AuthenticationHandler.RegisterDoctor)
+	r.POST(appconstant.EndpointRegisterUser, h.AuthenticationHandler.RegisterUser)
+	r.POST(appconstant.EndpointVerify, h.AuthenticationHandler.VerifyEmail)
 
+	r.GET(appconstant.EndpointGetProductsList, h.ProductHandler.GetAllProducts)
+	r.GET(appconstant.EndpointGetProductDetail, h.ProductHandler.GetProductDetailBySlug)
+	r.PATCH(appconstant.EndpointUpdatePassword, h.AuthenticationHandler.UpdatePassword)
+	r.POST(appconstant.EndpointForgotPassword, h.AuthenticationHandler.SendVerifyForgotPassword)
+	r.GET(appconstant.EndpointGetDoctorSpecialization, h.DoctorSpecializationHandler.GetAll)
+
+	r.Use(h.Middleware.JWTAuth)
+	r.POST(appconstant.EndpointSendVerifyToEmail, h.AuthenticationHandler.SendVerifyToEmail)
+	r.POST(appconstant.EndpointApproval, h.AuthenticationHandler.UpdateApproval)
+	r.GET(appconstant.EndpointGetDoctorPendingApproval, h.AuthenticationHandler.GetPendingDoctorApproval)
 	return r
 }

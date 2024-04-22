@@ -8,14 +8,16 @@ import (
 )
 
 type AuthenticationRepository interface {
-	FindUserByEmail(ctx context.Context, email string) (*entity.Authentication, error)
+	FindAuthenticationByEmail(ctx context.Context, email string) (*entity.Authentication, error)
 	IsEmailExist(ctx context.Context, email string) (bool, error)
 	CreateOne(ctx context.Context, u entity.Authentication) (*entity.Authentication, error)
-	VerifiedEmail(ctx context.Context, token string) (*entity.Authentication, error)
+	VerifyEmail(ctx context.Context, token string) (*entity.Authentication, error)
 	UpdateToken(ctx context.Context, token string, userId int) (*entity.Authentication, error)
 	UpdatePassword(ctx context.Context, password string, token string) (*entity.Authentication, error)
 	UpdateApproval(ctx context.Context, authId int, isApprove bool) (*entity.Authentication, error)
 	GetById(ctx context.Context, authId int) (*entity.Authentication, error)
+	IsVerified(ctx context.Context, email string) (bool, error)
+	GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error)
 }
 
 type authenticationRepositoryPostgres struct {
@@ -28,10 +30,10 @@ func NewAuthenticationRepositoryPostgres(db *sql.DB) *authenticationRepositoryPo
 	}
 }
 
-func (r *authenticationRepositoryPostgres) FindUserByEmail(ctx context.Context, email string) (*entity.Authentication, error) {
-	user := entity.Authentication{}
+func (r *authenticationRepositoryPostgres) FindAuthenticationByEmail(ctx context.Context, email string) (*entity.Authentication, error) {
+	AuthenticationId := entity.Authentication{}
 
-	queryFindUser := `
+	queryFindAuthentication := `
 	SELECT 
 		id,
 		email,
@@ -47,15 +49,15 @@ func (r *authenticationRepositoryPostgres) FindUserByEmail(ctx context.Context, 
 
 	err := r.db.QueryRowContext(
 		ctx,
-		queryFindUser,
+		queryFindAuthentication,
 		email,
 	).Scan(
-		&user.Id,
-		&user.Email,
-		&user.Password,
-		&user.Token,
-		&user.IsVerified,
-		&user.Role,
+		&AuthenticationId.Id,
+		&AuthenticationId.Email,
+		&AuthenticationId.Password,
+		&AuthenticationId.Token,
+		&AuthenticationId.IsVerified,
+		&AuthenticationId.Role,
 	)
 
 	if err != nil {
@@ -66,7 +68,7 @@ func (r *authenticationRepositoryPostgres) FindUserByEmail(ctx context.Context, 
 		return nil, apperror.NewInternal(err)
 	}
 
-	return &user, nil
+	return &AuthenticationId, nil
 }
 
 func (r *authenticationRepositoryPostgres) IsEmailExist(ctx context.Context, email string) (bool, error) {
@@ -79,6 +81,8 @@ func (r *authenticationRepositoryPostgres) IsEmailExist(ctx context.Context, ema
 				authentications 
 			WHERE 
 				email = $1
+			AND 
+				deletedAt IS NULL
 		)
 	`
 
@@ -97,7 +101,7 @@ func (r *authenticationRepositoryPostgres) IsEmailExist(ctx context.Context, ema
 }
 
 func (r *authenticationRepositoryPostgres) CreateOne(ctx context.Context, u entity.Authentication) (*entity.Authentication, error) {
-	queryCreateUser := `
+	queryCreateAuthentication := `
 		INSERT INTO
 			authentications(
 				email,
@@ -113,7 +117,7 @@ func (r *authenticationRepositoryPostgres) CreateOne(ctx context.Context, u enti
 
 	err := r.db.QueryRowContext(
 		ctx,
-		queryCreateUser,
+		queryCreateAuthentication,
 		u.Email,
 		u.Password,
 		u.Token,
@@ -131,7 +135,7 @@ func (r *authenticationRepositoryPostgres) CreateOne(ctx context.Context, u enti
 	}, nil
 }
 
-func (r *authenticationRepositoryPostgres) VerifiedEmail(ctx context.Context, token string) (*entity.Authentication, error) {
+func (r *authenticationRepositoryPostgres) VerifyEmail(ctx context.Context, token string) (*entity.Authentication, error) {
 	user := entity.Authentication{}
 
 	queryVerifiedEmail := `
@@ -145,7 +149,8 @@ func (r *authenticationRepositoryPostgres) VerifiedEmail(ctx context.Context, to
 			is_approved = true
 		RETURNING 
 			id, 
-			email
+			email, 
+			role
 	`
 
 	err := r.db.QueryRowContext(
@@ -155,6 +160,7 @@ func (r *authenticationRepositoryPostgres) VerifiedEmail(ctx context.Context, to
 	).Scan(
 		&user.Id,
 		&user.Email,
+		&user.Role,
 	)
 
 	if err != nil {
@@ -168,12 +174,12 @@ func (r *authenticationRepositoryPostgres) VerifiedEmail(ctx context.Context, to
 	return &entity.Authentication{
 		Id:    user.Id,
 		Email: user.Email,
+		Role:  user.Role,
 	}, nil
 }
 
 func (r *authenticationRepositoryPostgres) UpdateToken(ctx context.Context, token string, authenticationId int) (*entity.Authentication, error) {
 	user := entity.Authentication{}
-
 	queryUpdateToken := `
 		UPDATE 
 			authentications
@@ -212,7 +218,7 @@ func (r *authenticationRepositoryPostgres) UpdateToken(ctx context.Context, toke
 	}, nil
 }
 
-func (r *authenticationRepositoryPostgres) UpdatePassword(ctx context.Context, password string, token string) (*entity.Authentication, error) {
+func (r *authenticationRepositoryPostgres) UpdatePassword(ctx context.Context, password string, email string) (*entity.Authentication, error) {
 	user := entity.Authentication{}
 
 	queryUpdatePassword := `
@@ -221,11 +227,13 @@ func (r *authenticationRepositoryPostgres) UpdatePassword(ctx context.Context, p
 		SET 
 			password = $1
 		WHERE 
-			token = $2
+			email = $2
 		AND 
 			is_approved = true
 		AND 
 			is_verified = true
+		AND 
+			deletedAt IS NULL
 		RETURNING 
 			id, 
 			email
@@ -235,7 +243,7 @@ func (r *authenticationRepositoryPostgres) UpdatePassword(ctx context.Context, p
 		ctx,
 		queryUpdatePassword,
 		password,
-		token,
+		email,
 	).Scan(
 		&user.Id,
 		&user.Email,
@@ -243,7 +251,7 @@ func (r *authenticationRepositoryPostgres) UpdatePassword(ctx context.Context, p
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, apperror.ErrInvalidReq(err)
+			return nil, apperror.ErrEmailNotRegistered(err)
 		}
 
 		return nil, apperror.NewInternal(err)
@@ -267,6 +275,8 @@ func (r *authenticationRepositoryPostgres) UpdateApproval(ctx context.Context, a
 		WHERE 
 			id = $1 
 		AND 
+			role = 'doctor'
+		AND
 			deletedAt IS NULL
 		RETURNING 
 			id, 
@@ -285,7 +295,7 @@ func (r *authenticationRepositoryPostgres) UpdateApproval(ctx context.Context, a
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, apperror.ErrInvalidReq(err)
+			return nil, apperror.ErrEmailNotRegistered(err)
 		}
 
 		return nil, apperror.NewInternal(err)
@@ -336,4 +346,96 @@ func (r *authenticationRepositoryPostgres) GetById(ctx context.Context, authId i
 	}
 
 	return &user, nil
+}
+
+func (r *authenticationRepositoryPostgres) IsVerified(ctx context.Context, email string) (bool, error) {
+	var isVerified bool
+	queryIsVerified := `
+		SELECT EXISTS (
+			SELECT 
+				1 	
+			FROM 
+				authentications 
+			WHERE 
+				email = $1
+			AND
+				is_verified = TRUE
+			AND 
+				deletedAt IS NULL
+		)
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		queryIsVerified,
+		email,
+	).Scan(
+		&isVerified,
+	)
+
+	if err != nil {
+		return false, apperror.NewInternal(err)
+	}
+
+	return isVerified, nil
+}
+
+func (r *authenticationRepositoryPostgres) GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error) {
+	doctors := []entity.Doctor{}
+
+	queryGetPendingDoctorApproval := `
+	SELECT 
+		a.id,
+		a.email,
+		d.certificate_url,
+		ds.name,
+		ds.description
+	FROM
+		authentications a
+	JOIN
+		doctors d
+	ON
+		a.id = d.authentication_id
+	JOIN 
+		doctor_specializations ds
+	ON 
+		d.doctor_specialization_id = ds.id
+	WHERE 
+		a.role = 'doctor'
+	AND
+		a.is_approved = false
+	AND 	
+		a.deletedAt IS NULL
+	`
+
+	rows, err := r.db.QueryContext(
+		ctx,
+		queryGetPendingDoctorApproval,
+	)
+
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		doctor := entity.Doctor{}
+		err = rows.Scan(
+			&doctor.AuthenticationID,
+			&doctor.Email,
+			&doctor.Certificate,
+			&doctor.SpecializationName,
+			&doctor.SpecializationDescription,
+		)
+		if err != nil {
+			return nil, err
+		}
+		doctors = append(doctors, doctor)
+	}
+
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+
+	return doctors, nil
 }

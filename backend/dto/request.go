@@ -16,14 +16,17 @@ type UserRegisterReq struct {
 }
 
 type DoctorRegisterReq struct {
-	Email       string         `json:"email" binding:"required"`
-	Password    string         `json:"password"`
-	Certificate multipart.File `json:"certificate" binding:"required"`
+	Email            string         `form:"email" binding:"required"`
+	Password         string         `form:"password"`
+	Certificate      multipart.File 
+	SpecializationId int64          `form:"doctor_specialization_id" binding:"required"`
 }
 
 type UpdatePasswordReq struct {
-	Password string `json:"password" binding:"required,min=8"`
-	Token    string `json:"token"`
+	Email           string `json:"email"`
+	Password        string `json:"password"`
+	Token           string `json:"token"`
+	ConfirmPassword string `json:"confirm_password"`
 }
 
 func (u UserLoginReq) ToUser() entity.Authentication {
@@ -42,14 +45,22 @@ func (u UserRegisterReq) ToUser() entity.Authentication {
 
 func (u DoctorRegisterReq) ToDoctor() entity.Authentication {
 	return entity.Authentication{
-		Email:       u.Email,
-		Password:    u.Password,
-		Certificate: u.Certificate,
+		Email:            u.Email,
+		Password:         u.Password,
+		Certificate:      u.Certificate,
+		SpecializationID: u.SpecializationId,
 	}
 }
 
 func (u UpdatePasswordReq) ToPassword() entity.Authentication {
 	return entity.Authentication{
-		Password: u.Password,
+		Password:        u.Password,
+		ConfirmPassword: u.ConfirmPassword,
+	}
+}
+
+func (u UpdatePasswordReq) ToEmail() entity.Authentication {
+	return entity.Authentication{
+		Email: u.Email,
 	}
 }

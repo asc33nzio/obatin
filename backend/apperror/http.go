@@ -26,6 +26,10 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusBadRequest
 	case FileUploadedInvalid:
 		return http.StatusBadRequest
+	case EmailNotVerified:
+		return http.StatusUnauthorized
+	case ForbiddenAccess:
+		return http.StatusForbidden
 	case ErrorSqlNoProductExists: 
 		return http.StatusNotFound
 	default:

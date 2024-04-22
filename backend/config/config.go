@@ -73,7 +73,6 @@ func NewConfig() (*Config, error) {
 	jwtIss := os.Getenv("JWT_ISSUER")
 	jwtSecret := os.Getenv("JWT_SECRET_KEY")
 	serverPort := os.Getenv("SERVER_PORT")
-	defaultPassword := os.Getenv("DEFAULT_REGISTER_PASSWORD")
 	appMailPassword := os.Getenv("DEFAULT_GMAIL_APP_PASSWORD")
 	defaultEndpoint := os.Getenv("DEFAULT_ENDPOINT")
 	emailUsernameSender := os.Getenv("DEFAULT_USERNAME_EMAIL")
@@ -93,7 +92,6 @@ func NewConfig() (*Config, error) {
 		jwtSecret:              jwtSecret,
 		serverPort:             serverPort,
 		hashCost:               hashCost,
-		defaultPassword:        defaultPassword,
 		appMailPassword:        appMailPassword,
 		defaultEndpoint:        defaultEndpoint,
 		emailUsernameSender:    emailUsernameSender,
