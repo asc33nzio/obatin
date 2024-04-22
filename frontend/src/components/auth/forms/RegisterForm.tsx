@@ -1,10 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import {
+  navigateToDashboard,
   navigateToHome,
   navigateToLogin,
 } from '@/app/actions';
@@ -24,6 +25,7 @@ import SpecializationSelect from '../SpecializationSelect';
 import GoogleICO from '@/assets/icons/GoogleICO';
 import PatientICO from '@/assets/auth/PatientICO';
 import DoctorICO from '@/assets/auth/DoctorICO';
+import { getCookie } from 'cookies-next';
 
 const RegisterForm = (): React.ReactElement => {
   const { setToast } = useToast();
@@ -192,6 +194,17 @@ const RegisterForm = (): React.ReactElement => {
     });
     navigateToLogin();
   };
+
+  useEffect(() => {
+    const isAuthenticatedCheck = () => {
+      const sessionToken = getCookie('session_token');
+      if (sessionToken !== undefined) {
+        navigateToDashboard();
+      }
+    };
+
+    isAuthenticatedCheck();
+  }, []);
 
   return (
     <LoginOrRegisterFormContainer $isLoginPage={false}>

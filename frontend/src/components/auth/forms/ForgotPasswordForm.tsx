@@ -7,10 +7,12 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
-import { navigateToHome, navigateToLogin } from '@/app/actions';
+import { navigateToDashboard, navigateToHome, navigateToLogin } from '@/app/actions';
 import RegularInput from '../RegularInput';
 import CustomButton from '../../elements/button/CustomButton';
 import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
+import { useEffect } from 'react';
+import { getCookie } from 'cookies-next';
 
 const ForgotPasswordForm = (): React.ReactElement => {
   const { setToast } = useToast();
@@ -48,6 +50,17 @@ const ForgotPasswordForm = (): React.ReactElement => {
     });
     navigateToHome();
   };
+
+  useEffect(() => {
+    const isAuthenticatedCheck = () => {
+      const sessionToken = getCookie('session_token');
+      if (sessionToken !== undefined) {
+        navigateToDashboard();
+      }
+    };
+
+    isAuthenticatedCheck();
+  }, []);
 
   return (
     <LoginOrRegisterFormContainer $isLoginPage={true}>

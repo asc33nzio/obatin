@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
-import { setCookie } from 'cookies-next';
+import { getCookie, setCookie } from 'cookies-next';
 import {
   navigateToDashboard,
   navigateToForgotPassword,
@@ -23,6 +23,9 @@ import RegularInput from '../RegularInput';
 import PasswordInput from '../PasswordInput';
 import CustomButton from '../../elements/button/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
+import { useEffect } from 'react';
+import { DecodedJwtItf } from '@/types/jwtTypes';
+import { jwtDecode } from 'jwt-decode';
 
 const LoginForm = (): React.ReactElement => {
   const { setToast } = useToast();
@@ -105,6 +108,17 @@ const LoginForm = (): React.ReactElement => {
       });
     }
   };
+
+  useEffect(() => {
+    const isAuthenticatedCheck = () => {
+      const sessionToken = getCookie('session_token');
+      if (sessionToken !== undefined) {
+        navigateToDashboard();
+      }
+    };
+
+    isAuthenticatedCheck();
+  }, []);
 
   return (
     <LoginOrRegisterFormContainer $isLoginPage={true}>
