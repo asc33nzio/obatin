@@ -7,6 +7,7 @@ interface CustomButtonPropsItf extends ButtonHTMLAttributes<HTMLButtonElement> {
   $height?: string;
   $fontSize?: string;
   $bgColor?: string;
+  disabled?: boolean;
 }
 
 const CustomButton = ({

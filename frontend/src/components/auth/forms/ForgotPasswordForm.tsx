@@ -7,24 +7,25 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
-import { navigateToDashboard, navigateToHome, navigateToLogin } from '@/app/actions';
-import { useEffect } from 'react';
+import {
+  navigateToDashboard,
+  navigateToLogin,
+} from '@/app/actions';
+import { useEffect, useState } from 'react';
 import { getCookie } from 'cookies-next';
 import RegularInput from '../RegularInput';
 import CustomButton from '../../elements/button/CustomButton';
 import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
+import Axios from 'axios';
 
 const ForgotPasswordForm = (): React.ReactElement => {
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  const {
-    email,
-    validateEmail,
-    emailValidationError,
-    handleEmailInputChange,
-  } = useEmailValidation();
+  const { email, validateEmail, emailValidationError, handleEmailInputChange } =
+    useEmailValidation();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleResetPasswordRequest = () => {
+  const handleResetPasswordRequest = async () => {
     const isValidEmail = validateEmail(email);
 
     if (!isValidEmail) {
@@ -38,17 +39,37 @@ const ForgotPasswordForm = (): React.ReactElement => {
       return;
     }
 
-    //? GET request
-    //? POST request
+    const payload = {
+      email: email,
+    };
 
-    setToast({
-      showToast: true,
-      toastMessage: 'Berhasil. Cek e-mail anda',
-      toastType: 'ok',
-      resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-      orientation: 'center',
-    });
-    navigateToHome();
+    try {
+      setIsLoading(true);
+      await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/forgot-password`,
+        payload,
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage: 'Berhasil. Cek e-mail anda',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      navigateToLogin();
+    } catch (error: any) {
+      const errMsg = error?.response?.data?.message;
+      setToast({
+        showToast: true,
+        toastMessage: errMsg ? errMsg : 'Gagal. Cek kembali e-mail anda',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -78,7 +99,11 @@ const ForgotPasswordForm = (): React.ReactElement => {
         $marBot={25}
       />
 
-      <CustomButton content='Daftar' onClick={handleResetPasswordRequest} />
+      <CustomButton
+        content='Reset Sandi'
+        onClick={handleResetPasswordRequest}
+        disabled={isLoading}
+      />
 
       <ReturnHomeContainerDiv>
         <span onClick={() => navigateToLogin()}>

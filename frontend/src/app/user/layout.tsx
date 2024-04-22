@@ -1,5 +1,5 @@
 'use client';
-import Navbar from '@/components/fragments/Navbar/Navbar';
+import Navbar from '@/components/fragments/navbar/Navbar';
 import Sidebar from '@/components/fragments/sidebar/Sidebar';
 import { Body } from '@/styles/Global.styles';
 import { Inter } from 'next/font/google';

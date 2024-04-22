@@ -1,16 +1,17 @@
-import MagnifyICO from '@/assets/icons/MagnifyICO';
 import {
   SpecializationCustomSelect,
   SpecializationSelectContainer,
   TitleAndSearchDiv,
 } from '@/styles/SpecializationOption.styles';
+import { DoctorSpecializationsType } from '@/types/registerTypes';
 import { SelectHTMLAttributes, useState } from 'react';
+import MagnifyICO from '@/assets/icons/MagnifyICO';
 
 interface SpecializationSelectItf
   extends SelectHTMLAttributes<HTMLSelectElement> {
   title: string;
   $marBot: number;
-  options: Array<string>;
+  options: Array<DoctorSpecializationsType>;
   onOptionChange: Function;
 }
 
@@ -27,7 +28,7 @@ const SpecializationSelect = ({
   };
 
   const filteredOptions = options.filter((option) =>
-    option.toLowerCase().includes(query.toLowerCase()),
+    option.name.toLowerCase().includes(query.toLowerCase()),
   );
 
   return (
@@ -44,12 +45,12 @@ const SpecializationSelect = ({
           />
         )}
       </TitleAndSearchDiv>
-      
+
       <SpecializationCustomSelect onChange={handleOptionChange}>
         {filteredOptions.map((option, index) => {
           return (
-            <option key={`specializationOption${index}`} value={option}>
-              {option}
+            <option key={`specializationOption${index}`} value={option.id}>
+              {option.name}
             </option>
           );
         })}

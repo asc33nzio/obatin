@@ -5,6 +5,7 @@ interface ButtonPropsItf {
   $height?: string | undefined;
   $fontSize?: string | undefined;
   $bgColor?: string | undefined;
+  disabled?: boolean | undefined;
 }
 
 export const CustomButtonStyle = styled.button<{
@@ -17,7 +18,11 @@ export const CustomButtonStyle = styled.button<{
     $buttonProps.$height ? $buttonProps.$height : '55px'};
 
   background-color: ${({ $buttonProps }) =>
-    $buttonProps.$bgColor ? $buttonProps.$bgColor : '#00b5c0'};
+    $buttonProps.$bgColor
+      ? $buttonProps.$bgColor
+      : $buttonProps.disabled
+      ? '#cbd5e0'
+      : '#00b5c0'};
   color: #f7fafc;
 
   border-radius: 10px;

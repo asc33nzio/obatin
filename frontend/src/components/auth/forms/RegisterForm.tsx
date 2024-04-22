@@ -5,11 +5,8 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { getCookie, setCookie } from 'cookies-next';
-import {
-  navigateToDashboard,
-  navigateToHome,
-  navigateToLogin,
-} from '@/app/actions';
+import { DoctorSpecializationsType } from '@/types/registerTypes';
+import { navigateToDashboard, navigateToLogin } from '@/app/actions';
 import {
   CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
@@ -26,7 +23,7 @@ import SpecializationSelect from '../SpecializationSelect';
 import GoogleICO from '@/assets/icons/GoogleICO';
 import PatientICO from '@/assets/auth/PatientICO';
 import DoctorICO from '@/assets/auth/DoctorICO';
-import { Axios } from 'axios';
+import Axios from 'axios';
 
 const RegisterForm = (): React.ReactElement => {
   const { setToast } = useToast();
@@ -47,16 +44,17 @@ const RegisterForm = (): React.ReactElement => {
     setPasswordValidationError,
     handlePasswordInputChange,
   } = usePasswordValidation();
-  const [userUpload, setUserUpload] = useState<File | undefined>(undefined);
+  const [userUpload, setUserUpload] = useState<Blob | undefined>(undefined);
   const [userUploadValidationError, setUserUploadValidationError] =
     useState<string>('');
   const [isDoctor, setIsDoctor] = useState<boolean>(false);
-  const specializations = ['bidan', 'kulit kelamin', 'internis'];
-  const [selectedOption, setSelectedOption] = useState<string>(
-    specializations[1],
-  );
+  const [specializations, setSpecializations] = useState<
+    Array<DoctorSpecializationsType>
+  >([]);
+  const [selectedOption, setSelectedOption] = useState<number>(1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const validateUpload = (input: File | undefined) => {
+  const validateUpload = (input: Blob | undefined) => {
     if (input === undefined) {
       setUserUploadValidationError(
         'Anda harus mengunggah sertifikat untuk mendaftar',
@@ -64,26 +62,9 @@ const RegisterForm = (): React.ReactElement => {
       return false;
     }
 
-    const acceptableUploadExtensions = [
-      'image/jpg',
-      'image/jpeg',
-      'image/webp',
-      'image/svg',
-      'image/svg+xml',
-      'image/png',
-      'application/pdf',
-    ];
-    let validUploadExtension = false;
-    for (let i = 0; i < acceptableUploadExtensions.length; i++) {
-      if (input.type === acceptableUploadExtensions[i]) {
-        validUploadExtension = true;
-        break;
-      }
-    }
-
-    if (!validUploadExtension) {
+    if (input.type !== 'application/pdf') {
       setUserUploadValidationError(
-        'Format gambar salah. Hanya boleh mengunggah jpg/jpeg/webp/svg/png/pdf',
+        'Format gambar salah. Hanya boleh mengunggah .pdf',
       );
       return false;
     }
@@ -110,13 +91,13 @@ const RegisterForm = (): React.ReactElement => {
     setEmailValidationError('');
     setPassword('');
     setPasswordValidationError('');
-    setSelectedOption('');
+    setSelectedOption(1);
     setUserUpload(undefined);
     setUserUploadValidationError('');
     setIsDoctor(isDoctor);
   };
 
-  const handleOptionChange = (selectedValue: string) => {
+  const handleOptionChange = (selectedValue: number) => {
     setSelectedOption(selectedValue);
   };
 
@@ -135,7 +116,17 @@ const RegisterForm = (): React.ReactElement => {
       return;
     }
 
+    const payload = {
+      email: email,
+      password: password,
+    };
+
     try {
+      await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register/users`,
+        payload,
+      );
+
       const response = await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
         payload,
@@ -143,7 +134,9 @@ const RegisterForm = (): React.ReactElement => {
 
       const access_token = response?.data?.data?.access_token;
 
-      if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS === undefined) {
+      if (
+        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS === undefined
+      ) {
         throw new Error('please define access token valid duration env var');
       }
       const validTokenExpiryMilliseconds: number = parseInt(
@@ -165,7 +158,7 @@ const RegisterForm = (): React.ReactElement => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
-  
+
       navigateToDashboard();
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message;
@@ -184,7 +177,7 @@ const RegisterForm = (): React.ReactElement => {
     }
   };
 
-  const handleSignUpDoctor = () => {
+  const handleSignUpDoctor = async () => {
     const isValidEmail = validateEmail(email);
     const isValidUpload = validateUpload(userUpload);
 
@@ -199,7 +192,7 @@ const RegisterForm = (): React.ReactElement => {
       return;
     }
 
-    if (selectedOption === '') {
+    if (!selectedOption) {
       setToast({
         showToast: true,
         toastMessage: 'Anda belum memilih spesialisasi',
@@ -210,26 +203,54 @@ const RegisterForm = (): React.ReactElement => {
       return;
     }
 
-    const payload = {
-      email: email,
-      specialization: selectedOption,
-      certificate: userUpload,
-    };
+    const payload = new FormData();
+    payload.append('email', email);
+    payload.append('doctor_specialization_id', selectedOption.toString());
+    if (userUpload === undefined) {
+      setToast({
+        showToast: true,
+        toastMessage: 'Anda harus mengunggah sertifikat anda',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      throw new Error('Anda harus mengunggah sertifikat anda');
+    }
+    payload.append('certificate', userUpload);
 
-    // console.log(selectedOption) -- specialization select
-    //? POST request
+    try {
+      setIsLoading(true);
+      await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register/doctors`,
+        payload,
+      );
 
-    //! temp -- onboarding flow for successful doctor registration
-    // fill form -> get email with temp password -> can login with temp pass -> tracking page -> admin approval -> set new password
-    
-    setToast({
-      showToast: true,
-      toastMessage: 'Terima kasih! Tolong cek e-mail anda',
-      toastType: 'ok',
-      resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-      orientation: 'center',
-    });
-    navigateToLogin();
+      setToast({
+        showToast: true,
+        toastMessage: 'Berhasil mendaftar. Tolong cek e-mail anda',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+
+      navigateToLogin();
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message;
+      const appError = error?.message;
+      setToast({
+        showToast: true,
+        toastMessage: errorMessage
+          ? errorMessage
+          : appError
+          ? appError
+          : 'Pendaftaran gagal',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -241,6 +262,33 @@ const RegisterForm = (): React.ReactElement => {
     };
 
     isAuthenticatedCheck();
+  }, []);
+
+  useEffect(() => {
+    const getAllSpecializations = async () => {
+      try {
+        const response = await Axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctor-specializations`,
+        );
+
+        const doctorSpecializations: Array<DoctorSpecializationsType> = [];
+        response.data.data.map((specialization: DoctorSpecializationsType) => {
+          doctorSpecializations.push(specialization);
+        });
+        setSpecializations(doctorSpecializations);
+      } catch (error) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Error mengambil data spesialisasi',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+      }
+    };
+
+    getAllSpecializations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -320,6 +368,7 @@ const RegisterForm = (): React.ReactElement => {
         onClick={
           isDoctor ? () => handleSignUpDoctor() : () => handleSignUpPatient()
         }
+        disabled={isLoading ? true : false}
       />
 
       <SectionSeparator>
