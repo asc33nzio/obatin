@@ -8,7 +8,7 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
-import { navigateToHome } from '@/app/auth/actions';
+import { navigateToHome } from '@/app/actions';
 import PasswordInput from '../PasswordInput';
 import CustomButton from '../../elements/button/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
@@ -63,6 +63,7 @@ const SetPasswordForm = (): React.ReactElement => {
         placeholder='Kata Sandi'
         onChange={handlePasswordInputChange}
         validationMessage={passwordValidationError}
+        $viewBox='0 -2 22 22'
       />
 
       <PasswordInput
@@ -70,6 +71,7 @@ const SetPasswordForm = (): React.ReactElement => {
         placeholder='Konfirmasi Kata Sandi'
         onChange={handleConfirmPasswordInputChange}
         validationMessage={confirmPasswordValidationError}
+        $viewBox='0 -2 22 22'
       />
 
       <CustomButton content='Daftar' onClick={handleSignUp} />

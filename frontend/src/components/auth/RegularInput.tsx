@@ -14,7 +14,7 @@ interface RegularInputItf extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const RegularInput = ({
-  title = 'Default input label',
+  title = '',
   placeholder = 'Default placeholder',
   validationMessage = 'Default error message',
   $marBot = 0,

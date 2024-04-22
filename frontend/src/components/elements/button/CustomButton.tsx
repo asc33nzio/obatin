@@ -3,9 +3,10 @@ import { ButtonHTMLAttributes } from 'react';
 
 interface CustomButtonPropsItf extends ButtonHTMLAttributes<HTMLButtonElement> {
   content?: string;
-  width?: string;
-  height?: string;
-  fontSize?: string;
+  $width?: string;
+  $height?: string;
+  $fontSize?: string;
+  $bgColor?: string;
 }
 
 const CustomButton = ({

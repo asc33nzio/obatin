@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 
 interface ButtonPropsItf {
-  width?: string | undefined;
-  height?: string | undefined;
-  fontSize?: string | undefined;
+  $width?: string | undefined;
+  $height?: string | undefined;
+  $fontSize?: string | undefined;
+  $bgColor?: string | undefined;
 }
 
 export const CustomButtonStyle = styled.button<{
@@ -11,11 +12,12 @@ export const CustomButtonStyle = styled.button<{
 }>`
   cursor: pointer;
   width: ${({ $buttonProps }) =>
-    $buttonProps.width ? $buttonProps.width : '100%'};
+    $buttonProps.$width ? $buttonProps.$width : '100%'};
   height: ${({ $buttonProps }) =>
-    $buttonProps.height ? $buttonProps.height : '55px'};
+    $buttonProps.$height ? $buttonProps.$height : '55px'};
 
-  background-color: #00b5c0;
+  background-color: ${({ $buttonProps }) =>
+    $buttonProps.$bgColor ? $buttonProps.$bgColor : '#00b5c0'};
   color: #f7fafc;
 
   border-radius: 10px;
@@ -23,6 +25,6 @@ export const CustomButtonStyle = styled.button<{
   outline: none;
 
   font-size: ${({ $buttonProps }) =>
-    $buttonProps.fontSize ? $buttonProps.fontSize : '24px'};
+    $buttonProps.$fontSize ? $buttonProps.$fontSize : '24px'};
   font-weight: 600;
 `;

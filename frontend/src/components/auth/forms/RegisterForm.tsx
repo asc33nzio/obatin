@@ -7,7 +7,6 @@ import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import {
   navigateToHome,
   navigateToLogin,
-  navigateToSetPassword,
 } from '@/app/actions';
 import {
   CreateOrLoginSpan,
@@ -260,6 +259,7 @@ const RegisterForm = (): React.ReactElement => {
             placeholder='Kata Sandi'
             onChange={handlePasswordInputChange}
             validationMessage={passwordValidationError}
+            $viewBox='0 -2 22 22'
           />
         </>
       )}

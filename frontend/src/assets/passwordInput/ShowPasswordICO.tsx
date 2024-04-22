@@ -1,9 +1,9 @@
-const ShowPasswordICO = (): React.ReactElement => {
+const ShowPasswordICO = (props: { $viewBox: string }): React.ReactElement => {
   return (
     <svg
       width='22'
-      height='21'
-      viewBox='0 -2 22 21'
+      height='22'
+      viewBox={props.$viewBox}
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
     >

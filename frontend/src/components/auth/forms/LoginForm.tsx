@@ -16,7 +16,6 @@ import { setCookie } from 'cookies-next';
 import {
   navigateToDashboard,
   navigateToForgotPassword,
-  navigateToHome,
   navigateToRegister 
 } from "../../../app/actions"
 import Axios from 'axios';
@@ -65,13 +64,14 @@ const LoginForm = (): React.ReactElement => {
 
       const access_token = response?.data?.data?.access_token;
 
-      if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION === undefined) {
+      if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS === undefined) {
         throw new Error('please define access token valid duration env var');
       }
       const validTokenExpiryMilliseconds: number = parseInt(
-        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION,
+        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS,
         10,
       );
+      console.log(validTokenExpiryMilliseconds)
 
       setCookie('session_token', access_token, {
         // httpOnly: true,
@@ -128,6 +128,7 @@ const LoginForm = (): React.ReactElement => {
         placeholder='Kata Sandi'
         onChange={handlePasswordInputChange}
         validationMessage={passwordValidationError}
+        $viewBox='0 -2 22 22'
       />
 
       <RememberAndForgetDiv>

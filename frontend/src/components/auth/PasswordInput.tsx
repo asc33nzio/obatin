@@ -14,6 +14,7 @@ interface PasswordInputItf extends InputHTMLAttributes<HTMLInputElement> {
   placeholder: string;
   title?: string;
   validationMessage?: string;
+  $viewBox: string;
 }
 
 const PasswordInput = ({
@@ -35,7 +36,11 @@ const PasswordInput = ({
         />
         <ICOdiv $hasError={validationMessage !== '' ? true : false}>
           <div onClick={() => setIsPasswordVisible(!isPasswordVisible)}>
-            {!isPasswordVisible ? <ShowPasswordICO /> : <HidePasswordICO />}
+            {!isPasswordVisible ? (
+              <ShowPasswordICO $viewBox={props.$viewBox} />
+            ) : (
+              <HidePasswordICO $viewBox={props.$viewBox} />
+            )}
           </div>
         </ICOdiv>
       </PasswordInputSubcontainer>

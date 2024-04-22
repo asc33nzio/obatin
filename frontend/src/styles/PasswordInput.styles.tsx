@@ -26,6 +26,7 @@ export const PasswordInputSubcontainer = styled.div`
 
 export const ICOdiv = styled.div<{ $hasError?: boolean }>`
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 
@@ -45,12 +46,16 @@ export const ICOdiv = styled.div<{ $hasError?: boolean }>`
     justify-content: center;
 
     background-color: #f7fafc;
-    width: 100%;
+    width: 90%;
     height: 70%;
     border-left: 1px solid #d0d9e3;
 
     svg {
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
       background-color: #f7fafc;
       width: 60%;
       height: 95%;

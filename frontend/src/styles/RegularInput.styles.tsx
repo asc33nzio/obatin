@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 
-export const RegularInputContainer = styled.div<{ $marBot: number }>`
+export const RegularInputContainer = styled.div<{
+  $marBot?: number;
+  $title?: string;
+}>`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -9,8 +12,9 @@ export const RegularInputContainer = styled.div<{ $marBot: number }>`
   height: 100px;
   gap: 5px;
 
-  font-size: 18px;
+  font-size: '20px';
   color: #718096;
+  opacity: ${({ $title }) => ($title !== '' ? 1 : 0)};
 
   margin-bottom: ${({ $marBot }) => `${$marBot}px`};
 `;
@@ -53,8 +57,7 @@ export const CustomUploadButton = styled.button<{
   width: 100%;
   height: 100%;
   z-index: 1;
-  background-color: ${({ $hasError }) =>
-    $hasError ? '#e04146' : '#b3e5fc'};
+  background-color: ${({ $hasError }) => ($hasError ? '#e04146' : '#b3e5fc')};
   border: none;
   outline: none;
 
