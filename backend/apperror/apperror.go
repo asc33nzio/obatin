@@ -20,6 +20,15 @@ func NewInternal(err error) *AppError {
 	}
 }
 
+func NewProductNotFound(err error) *AppError {
+	return &AppError{
+		code:    ErrorSqlNoProductExists,
+		err:     err,
+		message: InternalErrMsg,
+		stack:   debug.Stack(),
+	}
+}
+
 func (e *AppError) Error() string {
 	return e.message
 }
@@ -113,6 +122,33 @@ func ErrFileUploadInvalid(err error) *AppError {
 		code:    FileUploadedInvalid,
 		err:     err,
 		message: FileUploadedInvalidMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrConfirmPasswordNotMatch(err error) *AppError {
+	return &AppError{
+		code:    InvalidReq,
+		err:     err,
+		message: ConfirmPasswordNotMatchMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrEmailNotVerified(err error) *AppError {
+	return &AppError{
+		code:    EmailNotVerified,
+		err:     err,
+		message: EmailNotVerifiedMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrForbiddenAccess(err error) *AppError {
+	return &AppError{
+		code:    ForbiddenAccess,
+		err:     err,
+		message: ForbiddenAccessMsg,
 		stack:   debug.Stack(),
 	}
 }

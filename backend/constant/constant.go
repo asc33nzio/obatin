@@ -3,9 +3,11 @@ package constant
 const (
 	RoleDoctor                 = "doctor"
 	RoleUser                   = "user"
+	RoleAdmin                  = "admin"
 	HasApproved                = true
 	HasNotApproved             = false
 	CertificateJSONTag         = "certificate"
+	SpecializationIdJSONTag    = "doctor_specialization_id"
 	EmailJSONTag               = "email"
 	TokenQueryParam            = "token"
 	ApproveQueryParam          = "approve"
@@ -16,4 +18,5 @@ const (
 	EmailTypeApprove           = "approved"
 	EmailTypeRejected          = "rejected"
 	EmailTypePasswordTemporary = "temporary"
+	EmailForgotPassword        = "forgot"
 )

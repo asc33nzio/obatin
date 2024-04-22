@@ -10,6 +10,7 @@ import (
 
 type ProductUsecase interface {
 	GetAllProducts(ctx context.Context, params entity.ProductFilter) (*entity.ProductListPage, error)
+	GetProductDetailBySlug(ctx context.Context, slug string) (*entity.ProductDetail, error)
 }
 
 type productUsecaseImpl struct {
@@ -52,4 +53,15 @@ func (u *productUsecaseImpl) GetAllProducts(ctx context.Context, params entity.P
 	}
 
 	return res, nil
+}
+
+func (u *productUsecaseImpl) GetProductDetailBySlug(ctx context.Context, slug string) (*entity.ProductDetail, error) {
+	repo := u.repoStore.ProductRepository()
+
+	product, err := repo.FindProductDetailBySlug(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+
+	return product, nil
 }

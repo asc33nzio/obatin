@@ -11,4 +11,7 @@ const (
 	InvalidEmailFormat
 	InvalidPasswordFormat
 	FileUploadedInvalid
+	ErrorSqlNoProductExists
+	EmailNotVerified
+	ForbiddenAccess
 )
