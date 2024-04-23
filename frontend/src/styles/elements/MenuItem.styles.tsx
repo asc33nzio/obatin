@@ -1,10 +1,7 @@
-import { COLORS } from "@/constants/variables";
-import styled from "styled-components";
+import { COLORS } from '@/constants/variables';
+import styled from 'styled-components';
 
-export const MenuItemContainer =
-  styled.a <
-  { $depth: number } >
-  `
+export const MenuItemContainer = styled.a<{ $depth: number }>`
   display: flex;
   flex-direction: row;
   font-size: 20px;
@@ -23,16 +20,18 @@ export const MenuItemContainer =
 `;
 
 export const MenuItems = styled.div`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: ${COLORS.primary_text};
+  text-decoration: none;
+
+  &.selected {
+    color: ${COLORS.primary_color};
+  }
+
+  span {
     color: ${COLORS.primary_text};
     text-decoration: none;
-    &.selected {
-        color: ${COLORS.primary_color};
-    }
-    span{
-        color: ${COLORS.primary_text};
-        text-decoration: none;
-    }
-`
+  }
+`;

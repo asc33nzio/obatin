@@ -1,9 +1,9 @@
 'use client';
-import Navbar from '@/components/fragments/navbar/Navbar';
-import Sidebar from '@/components/fragments/sidebar/Sidebar';
 import { Body } from '@/styles/Global.styles';
 import { Inter } from 'next/font/google';
 import { useState } from 'react';
+import Navbar from '@/components/organisms/navbar/Navbar';
+import Sidebar from '@/components/organisms/sidebar/Sidebar';
 
 const inter = Inter({
   subsets: ['latin'],

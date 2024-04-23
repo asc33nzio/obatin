@@ -13,14 +13,16 @@ export const SidebarContainer = styled.aside<{ $isOpened: boolean }>`
   flex-direction: column;
   gap: 20px;
   position: fixed;
-  z-index: 9999;
   background-color: white;
+
   svg {
     width: 40px;
   }
+
   a {
     text-decoration: none;
   }
+  z-index: 10;
 `;
 
 export const TOP = styled.div`
@@ -28,6 +30,7 @@ export const TOP = styled.div`
   align-items: center;
   padding: 20px;
   justify-content: center;
+
   svg {
     width: 100px;
   }

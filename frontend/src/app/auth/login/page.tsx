@@ -1,4 +1,4 @@
-import LoginForm from '@/components/auth/forms/LoginForm';
+import LoginForm from '@/components/organisms/forms/LoginForm';
 
 const LoginPage = (): React.ReactElement => {
   return <LoginForm />;
