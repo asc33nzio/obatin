@@ -14,4 +14,5 @@ const (
 	ResponseSendVerifyResetPassword     = "reset password link has been sent to email"
 	ResponseGetDoctorSpecializations    = "get doctor specialization successfully"
 	ResponseGetAllPendingDoctorApproval = "get all doctor pending approval successfully"
+	ResponseGetNewRefreshToken          = "successfully get new refresh token"
 )

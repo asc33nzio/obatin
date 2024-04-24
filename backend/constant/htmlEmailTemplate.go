@@ -8,7 +8,7 @@ func GetEmailTemplate(senderEmail string, receiverEmail string, verificationLink
 	var msg string
 	switch emailType {
 	case EmailTypeApprove:
-		msg = fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Verification Link\r\n"+
+		msg = fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Account Registered Has Been Approved\r\n"+
 			"Content-Type: text/html; charset=utf-8\r\n\r\n"+
 			"<html><body>"+
 			"<p>Your account has been approved.</p>"+
@@ -22,7 +22,7 @@ func GetEmailTemplate(senderEmail string, receiverEmail string, verificationLink
 			"<div style=\"font-size: 14px;font-weight:400;\">Jakarta, Indonesia</div>"+
 			"</body></html>", senderEmail, receiverEmail, verificationLink)
 	case EmailTypeRejected:
-		msg = fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Verification Link\r\n"+
+		msg = fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Account Registered Has Been Rejected\r\n"+
 			"Content-Type: text/html; charset=utf-8\r\n\r\n"+
 			"<html><body>"+
 			"<p>Sorry your account approval has been rejected.</p>"+
@@ -34,7 +34,7 @@ func GetEmailTemplate(senderEmail string, receiverEmail string, verificationLink
 			"<div style=\"font-size: 14px;font-weight:400;\">Jakarta, Indonesia</div>"+
 			"</body></html>", senderEmail, receiverEmail)
 	case EmailTypePasswordTemporary:
-		msg = fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Verification Link\r\n"+
+		msg = fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Info : Temporary Account Password\r\n"+
 			"Content-Type: text/html; charset=utf-8\r\n\r\n"+
 			"<html><body>"+
 			"<p>You can login using this default password for temporary:</p>"+
@@ -47,7 +47,7 @@ func GetEmailTemplate(senderEmail string, receiverEmail string, verificationLink
 			"<div style=\"font-size: 14px;font-weight:400;\">Jakarta, Indonesia</div>"+
 			"</body></html>", senderEmail, receiverEmail, defaultPassword)
 	case EmailForgotPassword:
-		msg = fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Verification Link\r\n"+
+		msg = fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: Reset Password\r\n"+
 			"Content-Type: text/html; charset=utf-8\r\n\r\n"+
 			"<html><body>"+
 			"<p>Click the following button to reset your password:</p>"+

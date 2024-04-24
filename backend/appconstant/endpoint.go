@@ -14,4 +14,5 @@ const (
 	EndpointGetDoctorSpecialization  = "/doctor-specializations"
 	EndpointGetDoctorPendingApproval = "/doctor-pending-approval"
 	EndpointGetProductDetail         = "/shop/products/:product_slug"
+	EndpointRefreshToken             = "/auth/refresh-token"
 )

@@ -18,6 +18,8 @@ type AuthenticationRepository interface {
 	GetById(ctx context.Context, authId int) (*entity.Authentication, error)
 	IsVerified(ctx context.Context, email string) (bool, error)
 	GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error)
+	IsTokenHasUsed(ctx context.Context, token string) (bool, error)
+	IsApproved(ctx context.Context, email string) (bool, error)
 }
 
 type authenticationRepositoryPostgres struct {
@@ -266,7 +268,25 @@ func (r *authenticationRepositoryPostgres) UpdatePassword(ctx context.Context, p
 func (r *authenticationRepositoryPostgres) UpdateApproval(ctx context.Context, authId int, isApprove bool) (*entity.Authentication, error) {
 	user := entity.Authentication{}
 
-	queryUpdateApproval := `
+	var queryUpdateApproval string
+	if isApprove {
+		queryUpdateApproval = `
+		UPDATE 
+			authentications
+		SET 
+			is_approved = $2,
+		WHERE 
+			id = $1 
+		AND 
+			role = 'doctor'
+		AND
+			deletedAt IS NULL
+		RETURNING 
+			id, 
+			email
+	`
+	} else {
+		queryUpdateApproval = `
 		UPDATE 
 			authentications
 		SET 
@@ -282,6 +302,7 @@ func (r *authenticationRepositoryPostgres) UpdateApproval(ctx context.Context, a
 			id, 
 			email
 	`
+	}
 
 	err := r.db.QueryRowContext(
 		ctx,
@@ -310,7 +331,7 @@ func (r *authenticationRepositoryPostgres) UpdateApproval(ctx context.Context, a
 func (r *authenticationRepositoryPostgres) GetById(ctx context.Context, authId int) (*entity.Authentication, error) {
 	user := entity.Authentication{}
 
-	queryFindUser := `
+	queryGetById := `
 	SELECT 
 		id,
 		email,
@@ -326,7 +347,7 @@ func (r *authenticationRepositoryPostgres) GetById(ctx context.Context, authId i
 
 	err := r.db.QueryRowContext(
 		ctx,
-		queryFindUser,
+		queryGetById,
 		authId,
 	).Scan(
 		&user.Id,
@@ -359,7 +380,7 @@ func (r *authenticationRepositoryPostgres) IsVerified(ctx context.Context, email
 			WHERE 
 				email = $1
 			AND
-				is_verified = TRUE
+				is_verified = true
 			AND 
 				deletedAt IS NULL
 		)
@@ -438,4 +459,68 @@ func (r *authenticationRepositoryPostgres) GetPendingDoctorApproval(ctx context.
 	}
 
 	return doctors, nil
+}
+
+func (r *authenticationRepositoryPostgres) IsTokenHasUsed(ctx context.Context, token string) (bool, error) {
+	var isTokenHasUsed bool
+	queryIsTokenHasUsed := `
+		SELECT EXISTS (
+			SELECT 
+				1 	
+			FROM 
+				authentications 
+			WHERE 
+				token = $1
+			AND
+				is_verified = TRUE
+			AND 
+				deletedAt IS NULL
+		)
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		queryIsTokenHasUsed,
+		token,
+	).Scan(
+		&isTokenHasUsed,
+	)
+
+	if err != nil {
+		return false, apperror.ErrInvalidToken(err)
+	}
+
+	return isTokenHasUsed, nil
+}
+
+func (r *authenticationRepositoryPostgres) IsApproved(ctx context.Context, email string) (bool, error) {
+	var isApproved bool
+	queryIsApproved := `
+		SELECT EXISTS (
+			SELECT 
+				1 	
+			FROM 
+				authentications 
+			WHERE 
+				email = $1
+			AND
+				is_approved = true
+			AND 
+				deletedAt IS NULL
+		)
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		queryIsApproved,
+		email,
+	).Scan(
+		&isApproved,
+	)
+
+	if err != nil {
+		return false, apperror.NewInternal(err)
+	}
+
+	return isApproved, nil
 }
