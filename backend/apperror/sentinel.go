@@ -12,4 +12,5 @@ var (
 	ErrStlConfirmPasswordNotMatch = errors.New("confirm password not match with password")
 	ErrStlEmailNotVerified        = errors.New("email has not been verified")
 	ErrStlForbiddenAccess         = errors.New("you do not have access")
+	ErrStlAccountHasNotApproved   = errors.New("you should wait approval by admin")
 )

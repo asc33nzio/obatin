@@ -30,6 +30,8 @@ type Config struct {
 	verificationLinkBase   string
 	jwtVerifyDoctorExp     int
 	jwtVerifyUserExp       int
+	jwtRefreshTokenExp     int
+	jwtForgotPasswordExp   int
 }
 
 func NewConfig() (*Config, error) {
@@ -50,6 +52,11 @@ func NewConfig() (*Config, error) {
 		return nil, err
 	}
 
+	jwtRefreshTokenExp, err := strconv.Atoi(os.Getenv("JWT_REFRESH_TOKEN_EXP"))
+	if err != nil {
+		return nil, err
+	}
+
 	tokenLength, err := strconv.Atoi(os.Getenv("RANDOM_TOKEN_LENGTH"))
 	if err != nil {
 		return nil, err
@@ -66,6 +73,11 @@ func NewConfig() (*Config, error) {
 	}
 
 	jwtVerifyUserExp, err := strconv.Atoi(os.Getenv("JWT_VERIFY_USER_EXP"))
+	if err != nil {
+		return nil, err
+	}
+
+	jwtForgotPasswordExp, err := strconv.Atoi(os.Getenv("JWT_FORGOT_PASSWORD_EXP"))
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +119,8 @@ func NewConfig() (*Config, error) {
 		verificationLinkBase:   verificationLinkBase,
 		jwtVerifyDoctorExp:     jwtVerifyDoctorExp,
 		jwtVerifyUserExp:       jwtVerifyUserExp,
+		jwtRefreshTokenExp:     jwtRefreshTokenExp,
+		jwtForgotPasswordExp:   jwtForgotPasswordExp,
 	}, nil
 }
 
@@ -190,10 +204,18 @@ func (c *Config) VerificationLinkBase() string {
 	return c.verificationLinkBase
 }
 
-func (c *Config) JWTVerifyDoctorExpired() int {
+func (c *Config) JwtVerifyDoctorExpired() int {
 	return c.jwtVerifyDoctorExp
 }
 
-func (c *Config) JWTVerifyUserExpired() int {
+func (c *Config) JwtVerifyUserExpired() int {
 	return c.jwtVerifyUserExp
+}
+
+func (c *Config) JwtRefreshTokenExpired() int {
+	return c.jwtRefreshTokenExp
+}
+
+func (c *Config) JwtForgotPasswordExp() int {
+	return c.jwtForgotPasswordExp
 }

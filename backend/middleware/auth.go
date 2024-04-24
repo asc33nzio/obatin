@@ -26,7 +26,11 @@ func (m *GinMiddleware) JWTAuth(ctx *gin.Context) {
 
 	claims, err := m.jwtAuth.ParseAndVerify(accessToken, m.config.JwtSecret())
 	if err != nil {
-		ctx.Error(apperror.ErrInvalidToken(err))
+		if strings.Contains(err.Error(), constant.ErrorTokenIsExpired) {
+			ctx.Error(apperror.ErrTokenHasExpired(err))
+		} else {
+			ctx.Error(apperror.ErrInvalidToken(err))
+		}
 		ctx.Abort()
 		return
 	}

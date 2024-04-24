@@ -14,5 +14,9 @@ const (
 	ConfirmPasswordNotMatchMsg = "confirm password and password should be the same"
 	EmailNotVerifiedMsg        = "you have not verified your account, check your email and verified first"
 	ForbiddenAccessMsg         = "You do not access to do this action"
-	ProductNotFoundMsg        = "product not found"
+	ProductNotFoundMsg         = "product not found"
+	EmailHasNotApprovedMsg     = "you must wait until admin approved your account"
+	TokenHasExpiredMsg         = "token has expired"
+	UserStillHaveValidTokenMsg = "you can not make this request, you stil have valid token"
+	TokenHasBeenUsedBefore     = "token has been used before, please make new request"
 )

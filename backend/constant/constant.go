@@ -19,4 +19,5 @@ const (
 	EmailTypeRejected          = "rejected"
 	EmailTypePasswordTemporary = "temporary"
 	EmailForgotPassword        = "forgot"
+	ErrorTokenIsExpired        = "token is expired"
 )
