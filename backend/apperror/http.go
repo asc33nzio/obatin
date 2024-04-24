@@ -32,6 +32,10 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusForbidden
 	case ErrorSqlNoProductExists: 
 		return http.StatusNotFound
+	case InvalidSlug:
+	    return http.StatusBadRequest
+	case ErrorCategoryNotFound:
+		return http.StatusBadRequest
 	default:
 		return http.StatusInternalServerError
 	}

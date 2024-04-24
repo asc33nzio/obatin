@@ -8,6 +8,7 @@ const (
 	HasNotApproved             = false
 	CertificateJSONTag         = "certificate"
 	SpecializationIdJSONTag    = "doctor_specialization_id"
+	ImageUrlFormKey            = "image"
 	EmailJSONTag               = "email"
 	TokenQueryParam            = "token"
 	ApproveQueryParam          = "approve"
@@ -15,6 +16,7 @@ const (
 	HeaderBearerToken          = "Authorization"
 	PrefixBearerToken          = "Bearer"
 	MaximumSizeFileUploaded    = 1000000
+	MaximumSizeImageUploaded   = 500000
 	EmailTypeApprove           = "approved"
 	EmailTypeRejected          = "rejected"
 	EmailTypePasswordTemporary = "temporary"
