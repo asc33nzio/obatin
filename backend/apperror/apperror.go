@@ -179,3 +179,39 @@ func ErrTokenHasBeenUsedBefore(err error) *AppError {
 		stack:   debug.Stack(),
 	}
 }
+
+func ErrImgUploadInvalid(err error) *AppError {
+	return &AppError{
+		code:    FileUploadedInvalid,
+		err:     err,
+		message: ImgUploadedInvalidMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrInvalidSlug(err error) *AppError {
+	return &AppError{
+		code:    InvalidSlug,
+		err:     err,
+		message: CategorySlugInvalidMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrDuplicateSlug(err error) *AppError {
+	return &AppError{
+        code:    InvalidSlug,
+        err:     err,
+        message: CategorySlugDuplicateInvalidMsg,
+        stack:   debug.Stack(),
+    }
+}
+
+func ErrCategoryNotFound(err error) *AppError {
+	return &AppError{
+        code:    ErrorCategoryNotFound,
+        err:     err,
+        message: CategoryNotFoundMsg,
+        stack:   debug.Stack(),
+    }
+}
