@@ -19,6 +19,8 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { getCookie, setCookie } from 'cookies-next';
+import { useObatinDispatch } from '@/redux/store/store';
+import { setAuthState } from '@/redux/reducers/authSlice';
 import Axios from 'axios';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
@@ -26,6 +28,7 @@ import CustomButton from '@/components/atoms/button/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
 
 const LoginForm = (): React.ReactElement => {
+  const dispatch = useObatinDispatch();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const { email, validateEmail, emailValidationError, handleEmailInputChange } =
@@ -79,6 +82,19 @@ const LoginForm = (): React.ReactElement => {
         path: '/',
         maxAge: validTokenExpiryMilliseconds,
       });
+
+      dispatch(
+        setAuthState({
+          email: 'example@example.com',
+          name: 'John Doe',
+          gender: 'male',
+          birthDate: new Date('1970-01-01'),
+          specialization: 'Dokter Kelamin',
+          role: 'user',
+          isVerified: true,
+          isApproved: true,
+        }),
+      );
 
       setToast({
         showToast: true,

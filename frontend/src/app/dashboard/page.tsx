@@ -41,8 +41,10 @@ import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import DatePicker from 'react-date-picker';
+import { useObatinSelector } from '@/redux/store/store';
 
 const DashboardPage = (): React.ReactElement => {
+  const userBirthDate = useObatinSelector((state) => state.auth.birthDate);
   const { isDesktopDisplay } = useClientDisplayResolution();
   // eslint-disable-next-line
   const [userRole, setUserRole] = useState<string>('');
@@ -432,7 +434,9 @@ const DashboardPage = (): React.ReactElement => {
                 ) : (
                   <>
                     {/* //! user.birthDate */}
-                    <span>7 Juli 2000</span>
+                    <span>
+                      {userBirthDate ? userBirthDate.toLocaleDateString() : '-'}
+                    </span>
                     <EditPencilICO
                       isEditSuccessful={false}
                       onClick={() =>
