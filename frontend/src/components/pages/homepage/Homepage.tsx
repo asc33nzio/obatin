@@ -2,7 +2,6 @@
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { useState } from 'react';
 import {
   Body,
   Container,
@@ -15,19 +14,20 @@ import {
   Bold,
   Smallfont,
   Content,
-} from '../../../styles/homepage/Homepage.styles';
+} from '@/styles/pages/homepage/Homepage.styles';
+import { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Product } from '@/types/Product';
 import { Keyboard, Mousewheel, Navigation, Pagination } from 'swiper/modules';
 import { CSSProperties } from 'styled-components';
-import Navbar from '../../fragments/navbar/Navbar';
-import Footer from '../../fragments/footer/Footer';
-import Banner from '../../fragments/banner/Banner';
+import Navbar from '../../organisms/navbar/Navbar';
+import Footer from '../../organisms/footer/Footer';
+import Banner from '../../molecules/banner/Banner';
 import Image from 'next/image';
 import toko from '@/assets/homepage/Pharmacist-pana 1.svg';
 import konsul from '@/assets/homepage/Researching-amico 1(1).svg';
-import CustomButton from '../../elements/button/CustomButton';
-import Sidebar from '@/components/fragments/sidebar/Sidebar';
+import CustomButton from '../../atoms/button/CustomButton';
+import Sidebar from '@/components/organisms/sidebar/Sidebar';
 
 const CategoryImg = [
   'https://d2qjkwm11akmwu.cloudfront.net/categories/42753_12-4-2023_9-48-50.png',

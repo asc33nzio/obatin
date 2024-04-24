@@ -1,5 +1,3 @@
-import React from 'react';
-
 const DoctorICO = (): React.ReactElement => {
   return (
     <svg

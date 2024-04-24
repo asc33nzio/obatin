@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+set +e
+
+git diff HEAD --quiet -- frontend
+
+if [ $? -ne 0 ]; then
+  echo "Please commit the changes before a push."
+  exit 1
+fi
+
+cd frontend
+
+npm run lint

@@ -1,4 +1,4 @@
-import RegisterForm from '@/components/auth/forms/RegisterForm';
+import RegisterForm from '@/components/organisms/forms/RegisterForm';
 
 const RegisterPage = (): React.ReactElement => {
   return <RegisterForm />;

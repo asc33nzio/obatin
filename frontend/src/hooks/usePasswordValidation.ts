@@ -42,16 +42,18 @@ export const usePasswordValidation = () => {
 
   const handlePasswordInputChange = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setPassword(event.target.value);
-      validatePassword(event.target.value);
+      if (validatePassword(event.target.value)) {
+        setPassword(event.target.value);
+      }
     },
     750,
   );
 
   const handleConfirmPasswordInputChange = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setConfirmPassword(event.target.value);
-      validateConfirmPassword(event.target.value);
+      if (validateConfirmPassword(event.target.value)) {
+        setConfirmPassword(event.target.value);
+      }
     },
     750,
   );

@@ -1,9 +1,11 @@
-import '../styles/globals.css';
+import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ToastProvider } from '@/providers/ToastProvider';
+import { ModalProvider } from '@/providers/ModalProvider';
 import { ClientDisplayResolutionProvider } from '../providers/ClientDisplayResolutionProvider';
-import Toast from '@/components/toast/Toast';
+import Toast from '@/components/organisms/toast/Toast';
+import Modal from '@/components/organisms/modal/Modal';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -45,10 +47,13 @@ export default function RootLayout({
     <html lang='en'>
       <body className={inter.className}>
         <ClientDisplayResolutionProvider>
-          <ToastProvider>
-            {children}
-            <Toast />
-          </ToastProvider>
+          <ModalProvider>
+            <ToastProvider>
+              {children}
+              <Toast />
+              <Modal />
+            </ToastProvider>
+          </ModalProvider>
         </ClientDisplayResolutionProvider>
       </body>
     </html>

@@ -1,4 +1,4 @@
-import ForgotPasswordForm from '@/components/auth/forms/ForgotPasswordForm';
+import ForgotPasswordForm from '@/components/organisms/forms/ForgotPasswordForm';
 
 const ForgotPasswordPage = (): React.ReactElement => {
   return <ForgotPasswordForm />;

@@ -1,0 +1,15 @@
+.date-picker-custom-style {
+  display: flex;
+  width: 100%;
+  color: black;
+  border: 1px solid #00b5c0;
+  outline: none;
+
+  svg {
+    stroke: #00b5c0;
+
+    line {
+      stroke: #ff3f3f;
+    }
+  }
+}
