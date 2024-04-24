@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 interface ButtonPropsItf {
+  content?: string;
   $width?: string | undefined;
   $height?: string | undefined;
   $fontSize?: string | undefined;
