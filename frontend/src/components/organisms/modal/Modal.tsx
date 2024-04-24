@@ -8,42 +8,47 @@ import {
 import ChangePasswordModalContent from './modalContent/ChangePasswordModalContent';
 import CloseICO from '@/assets/icons/CloseICO';
 
-// export interface ModalPropsItf {
-//   $fontSize?: string | undefined;
-//   $color?: string | undefined;
-//   $bgColor?: string | undefined;
-//   disabled?: boolean | undefined;
-// }
+export interface ModalPropsItf {
+  $containerWidth: string;
+  $containerHeight: string;
+  $fontSize?: string | undefined;
+  $color?: string | undefined;
+  $bgColor?: string | undefined;
+}
 
 const Modal = () => {
   const { isOpen, modalType, closeModal } = useModal();
 
   let modalContent: React.ReactElement | null;
   let title: string | null = null;
-  let $width: string = '0px';
-  let $height: string = '0px';
+  let modalProps: ModalPropsItf = {
+    $containerWidth: '500px',
+    $containerHeight: '500px',
+    $fontSize: '18px',
+    $color: '#4a5568',
+    $bgColor: 'white',
+  };
 
-  //? add a new case for your modal
   switch (modalType) {
     case 'confirm-password':
       modalContent = <ChangePasswordModalContent />;
       title = 'Tolong konfirmasi sandi anda';
-      $width = '500px';
-      $height = '200px';
+      modalProps = {
+        $containerWidth: '500px',
+        $containerHeight: '250px',
+      };
       break;
 
     default:
       modalContent = null;
       title = null;
-      $width = '0px';
-      $height = '0px';
       break;
   }
 
   return (
     isOpen && (
       <ModalOverlay>
-        <ModalContainer $width={$width} $height={$height}>
+        <ModalContainer {...modalProps}>
           <ModalHeader>
             <h1>{title}</h1>
             <CloseICO onClick={closeModal} />

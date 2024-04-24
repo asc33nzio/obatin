@@ -1,4 +1,4 @@
-// import { ModalPropsItf } from '@/components/organisms/modal/Modal';
+import { ModalPropsItf } from '@/components/organisms/modal/Modal';
 import styled from 'styled-components';
 
 export const ModalOverlay = styled.div`
@@ -15,25 +15,22 @@ export const ModalOverlay = styled.div`
   right: 0;
   bottom: 0;
 
-  background: grey;
-  opacity: 0.95;
-  /* filter: blur(3.5px); */
-  /* filter: grayscale(0.5); */
+  background: rgba(128, 128, 128, 0.5);
+  backdrop-filter: blur(4px);
 
   z-index: 15;
 `;
 
-export const ModalContainer = styled.div<{ $width: string; $height: string }>`
+export const ModalContainer = styled.div<ModalPropsItf>`
   display: flex;
   flex-direction: column;
   align-items: center;
 
   border-radius: 25px;
   padding: 15px 20px;
-  opacity: 1;
 
-  width: ${({ $width }) => $width};
-  height: ${({ $height }) => $height};
+  width: ${({ $containerWidth }) => $containerWidth};
+  height: ${({ $containerHeight }) => $containerHeight};
 
   z-index: 20;
 `;
@@ -61,5 +58,13 @@ export const ModalHeader = styled.div`
     width: 35px;
     height: 35px;
     background: transparent;
+
+    path {
+      transition: fill 0.3s ease;
+    }
+
+    &:hover path {
+      fill: #de161c !important;
+    }
   }
 `;

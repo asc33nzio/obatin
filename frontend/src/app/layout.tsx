@@ -1,9 +1,10 @@
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { ClientDisplayResolutionProvider } from '../providers/ClientDisplayResolutionProvider';
+import { PasswordValidationProvider } from '@/providers/PasswordValidationProvider';
 import { ToastProvider } from '@/providers/ToastProvider';
 import { ModalProvider } from '@/providers/ModalProvider';
-import { ClientDisplayResolutionProvider } from '../providers/ClientDisplayResolutionProvider';
 import Toast from '@/components/organisms/toast/Toast';
 import Modal from '@/components/organisms/modal/Modal';
 
@@ -49,9 +50,11 @@ export default function RootLayout({
         <ClientDisplayResolutionProvider>
           <ModalProvider>
             <ToastProvider>
-              {children}
-              <Toast />
-              <Modal />
+              <PasswordValidationProvider>
+                {children}
+                <Toast />
+                <Modal />
+              </PasswordValidationProvider>
             </ToastProvider>
           </ModalProvider>
         </ClientDisplayResolutionProvider>

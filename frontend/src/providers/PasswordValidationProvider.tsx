@@ -1,7 +1,12 @@
+'use client';
+import { PasswordValidationItf } from '@/types/passwordValidationTypes';
 import { debounce } from '@/utils/debounce';
 import { useState } from 'react';
+import PasswordValidationContext from '@/contexts/passwordValidationContext';
 
-export const usePasswordValidation = () => {
+export const PasswordValidationProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [password, setPassword] = useState<string>('');
   const [passwordValidationError, setPasswordValidationError] =
     useState<string>('');
@@ -46,7 +51,7 @@ export const usePasswordValidation = () => {
         setPassword(event.target.value);
       }
     },
-    750,
+    500,
   );
 
   const handleConfirmPasswordInputChange = debounce(
@@ -55,10 +60,10 @@ export const usePasswordValidation = () => {
         setConfirmPassword(event.target.value);
       }
     },
-    750,
+    500,
   );
 
-  return {
+  const contextValue: PasswordValidationItf = {
     password,
     setPassword,
     validatePassword,
@@ -72,4 +77,10 @@ export const usePasswordValidation = () => {
     setConfirmPasswordValidationError,
     handleConfirmPasswordInputChange,
   };
+
+  return (
+    <PasswordValidationContext.Provider value={contextValue}>
+      {children}
+    </PasswordValidationContext.Provider>
+  );
 };

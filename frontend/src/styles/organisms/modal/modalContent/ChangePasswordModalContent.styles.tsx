@@ -7,5 +7,16 @@ export const PasswordModalContentContainer = styled.div`
   justify-content: center;
 
   width: 100%;
-  height: 100px;
+  height: 200px;
+`;
+
+export const PasswordModalButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-self: flex-end;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 70%;
+  height: 50px;
 `;
