@@ -7,13 +7,15 @@ import (
 	"obatin/appvalidator"
 	"obatin/config"
 	"obatin/constant"
+	"strings"
+
 	"obatin/entity"
 	"obatin/repository"
 	"obatin/util"
 )
 
 type AuthenticationUsecase interface {
-	Login(ctx context.Context, uReq entity.Authentication) (string, error)
+	Login(ctx context.Context, uReq entity.Authentication) (*entity.AuthenticationToken, error)
 	RegisterDoctor(ctx context.Context, uReq entity.Authentication) error
 	VerifyEmail(ctx context.Context, token string) error
 	RegisterUser(ctx context.Context, uReq entity.Authentication) error
@@ -23,6 +25,7 @@ type AuthenticationUsecase interface {
 	SendEmailForgotPasssword(ctx context.Context, uReq entity.Authentication) error
 	ResendVerificationEmail(ctx context.Context, email string) error
 	GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error)
+	GenerateRefreshToken(ctx context.Context, refreshToken string) (*entity.AuthenticationToken, error)
 }
 
 type authentictionUsecaseImpl struct {
@@ -55,29 +58,87 @@ func NewAuthenticationUsecaseImpl(
 	}
 }
 
-func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authentication) (string, error) {
+func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authentication) (*entity.AuthenticationToken, error) {
 	ur := u.repoStore.AuthenticationRepository()
+	rt := u.repoStore.RefreshTokenRepository()
 
-	user, err := ur.FindAuthenticationByEmail(ctx, uReq.Email)
+	authentication, err := ur.FindAuthenticationByEmail(ctx, uReq.Email)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	err = u.cryptoHash.CheckPassword(uReq.Password, []byte(user.Password))
+	err = u.cryptoHash.CheckPassword(uReq.Password, []byte(authentication.Password))
 	if err != nil {
-		return "", apperror.ErrWrongPassword(err)
+		return nil, apperror.ErrWrongPassword(err)
 	}
 
 	token, err := u.jwtAuth.CreateAndSign(
-		util.JWTPayload{AuthenticationId: user.Id, Role: user.Role},
+		util.JWTPayload{AuthenticationId: authentication.Id, Role: authentication.Role},
 		u.config.JwtLoginExp(),
 		u.config.JwtSecret(),
 	)
+
 	if err != nil {
-		return "", apperror.NewInternal(err)
+		return nil, apperror.NewInternal(err)
 	}
 
-	return token, nil
+	err = rt.DeleteRefreshTokenAfterExpired(ctx)
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+
+	isRefreshTokenValid, err := rt.IsRefreshTokenValidByEmail(ctx, uReq.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isRefreshTokenValid {
+		randomRefreshToken, err := u.tokenGenerator.GetRandomToken(u.config.RandomTokenLength())
+		if err != nil {
+			return nil, err
+		}
+		randomRefreshTokenJWT, err := u.jwtAuth.CreateAndSign(
+			util.JWTPayload{RandomToken: randomRefreshToken, Role: authentication.Role, AuthenticationId: authentication.Id},
+			u.config.JwtRefreshTokenExpired(),
+			u.config.JwtSecret(),
+		)
+
+		if err != nil {
+			return nil, apperror.NewInternal(err)
+		}
+
+		err = rt.CreateNewRefreshToken(ctx, randomRefreshToken, int(authentication.Id))
+		if err != nil {
+			return nil, apperror.NewInternal(err)
+		}
+
+		authenticationToken := entity.AuthenticationToken{
+			AccessToken:  token,
+			RefreshToken: randomRefreshTokenJWT,
+		}
+
+		return &authenticationToken, nil
+	}
+
+	refreshToken, err := rt.GetByEmail(ctx, uReq.Email)
+	if err != nil {
+		return nil, err
+	}
+	existingRefreshTokenJWT, err := u.jwtAuth.CreateAndSign(
+		util.JWTPayload{RandomToken: refreshToken.RefreshToken},
+		u.config.JwtRefreshTokenExpired(),
+		u.config.JwtSecret(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	authenticationToken := entity.AuthenticationToken{
+		AccessToken:  token,
+		RefreshToken: existingRefreshTokenJWT,
+	}
+
+	return &authenticationToken, nil
 }
 
 func (u *authentictionUsecaseImpl) RegisterDoctor(ctx context.Context, uReq entity.Authentication) error {
@@ -220,6 +281,15 @@ func (u *authentictionUsecaseImpl) VerifyEmail(ctx context.Context, token string
 		return apperror.ErrInvalidToken(err)
 	}
 
+	isTokenHasUsed, err := ur.IsTokenHasUsed(ctx, claims.Payload.RandomToken)
+	if err != nil {
+		return apperror.ErrInvalidToken(err)
+	}
+
+	if isTokenHasUsed {
+		return apperror.ErrInvalidToken(nil)
+	}
+
 	user, err := ur.VerifyEmail(ctx, claims.Payload.RandomToken)
 	if err != nil {
 		return err
@@ -253,7 +323,7 @@ func (u *authentictionUsecaseImpl) SendVerificationEmail(ctx context.Context) er
 
 	tokenJWT, err := u.jwtAuth.CreateAndSign(
 		util.JWTPayload{RandomToken: token},
-		u.config.JWTVerifyUserExpired(),
+		u.config.JwtVerifyUserExpired(),
 		u.config.JwtSecret(),
 	)
 	if err != nil {
@@ -286,6 +356,18 @@ func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, uReq enti
 	ur := u.repoStore.AuthenticationRepository()
 	rpr := u.repoStore.ResetPasswordRepository()
 
+	claims, err := u.jwtAuth.ParseAndVerify(token, u.config.JwtSecret())
+	if err != nil {
+		if strings.Contains(err.Error(), constant.ErrorTokenIsExpired) {
+			err := rpr.DeleteResetPasswordTokenAfterExpired(ctx)
+			if err != nil {
+				return err
+			}
+			return apperror.ErrTokenHasExpired(err)
+		}
+		return apperror.ErrInvalidToken(err)
+	}
+
 	isPasswordValid := appvalidator.IsValidPassword(uReq.Password)
 	if !isPasswordValid {
 		return apperror.ErrInvalidPassword(apperror.ErrStlInvalidPassword)
@@ -296,9 +378,12 @@ func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, uReq enti
 		return apperror.ErrConfirmPasswordNotMatch(apperror.ErrStlConfirmPasswordNotMatch)
 	}
 
-	claims, err := u.jwtAuth.ParseAndVerify(token, u.config.JwtSecret())
+	isTokenResetHasUsed, err := rpr.IsTokenResetHasUsed(ctx, claims.Payload.RandomToken)
 	if err != nil {
-		return apperror.ErrInvalidToken(err)
+		return err
+	}
+	if isTokenResetHasUsed {
+		return apperror.ErrTokenHasBeenUsedBefore(nil)
 	}
 
 	resetPassword, err := rpr.GetByToken(ctx, claims.Payload.RandomToken)
@@ -314,6 +399,11 @@ func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, uReq enti
 	uReq.Password = string(hashedPass)
 
 	_, err = ur.UpdatePassword(ctx, uReq.Password, resetPassword.Email)
+	if err != nil {
+		return err
+	}
+
+	err = rpr.DeleteResetPasswordTokenAfterUsed(ctx, claims.Payload.RandomToken)
 	if err != nil {
 		return err
 	}
@@ -344,7 +434,7 @@ func (u *authentictionUsecaseImpl) UpdateApproval(ctx context.Context, authentic
 
 	tokenJWT, err := u.jwtAuth.CreateAndSign(
 		util.JWTPayload{RandomToken: token},
-		u.config.JWTVerifyDoctorExpired(),
+		u.config.JwtVerifyDoctorExpired(),
 		u.config.JwtSecret(),
 	)
 	if err != nil {
@@ -410,6 +500,14 @@ func (u *authentictionUsecaseImpl) SendEmailForgotPasssword(ctx context.Context,
 		return apperror.ErrEmailNotRegistered(nil)
 	}
 
+	isApprove, err := ar.IsApproved(ctx, uReq.Email)
+	if err != nil {
+		return err
+	}
+	if !isApprove {
+		return apperror.ErrAccountNotApproved(apperror.ErrStlAccountHasNotApproved)
+	}
+
 	isUserVerified, err := ar.IsVerified(ctx, uReq.Email)
 	if err != nil {
 		return err
@@ -422,6 +520,46 @@ func (u *authentictionUsecaseImpl) SendEmailForgotPasssword(ctx context.Context,
 		}
 	}
 
+	err = rpr.DeleteResetPasswordTokenAfterExpired(ctx)
+	if err != nil {
+		return err
+	}
+
+	isUserHaveValidToken, err := rpr.IsUserStillHaveValidToken(ctx, uReq.Email)
+	if err != nil {
+		return err
+	}
+	if isUserHaveValidToken {
+
+		resetPassword, err := rpr.GetByEmail(ctx, uReq.Email)
+		if err != nil {
+			return err
+		}
+		tokenJWT, err := u.jwtAuth.CreateAndSign(
+			util.JWTPayload{RandomToken: resetPassword.Token},
+			u.config.JwtForgotPasswordExp(),
+			u.config.JwtSecret(),
+		)
+		if err != nil {
+			return err
+		}
+
+		verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpoint(), u.config.VerificationLinkBase(), tokenJWT)
+		emailParamsResetPassword := util.EmailParams{
+			ToEmail:          uReq.Email,
+			VerificationLink: verificationLink,
+			IsAccepted:       true,
+			DefaultPassword:  "",
+			IsForgotPassword: true,
+		}
+		err = u.sendEmail.SendVerificationEmail(emailParamsResetPassword)
+		if err != nil {
+			return apperror.NewInternal(err)
+		}
+
+		return nil
+	}
+
 	token, err := u.tokenGenerator.GetRandomToken(u.config.RandomTokenLength())
 	if err != nil {
 		return err
@@ -429,7 +567,7 @@ func (u *authentictionUsecaseImpl) SendEmailForgotPasssword(ctx context.Context,
 
 	tokenJWT, err := u.jwtAuth.CreateAndSign(
 		util.JWTPayload{RandomToken: token},
-		u.config.JWTVerifyUserExpired(),
+		u.config.JwtForgotPasswordExp(),
 		u.config.JwtSecret(),
 	)
 
@@ -473,7 +611,7 @@ func (u *authentictionUsecaseImpl) ResendVerificationEmail(ctx context.Context, 
 	}
 	tokenJWT, err := u.jwtAuth.CreateAndSign(
 		util.JWTPayload{RandomToken: token},
-		u.config.JWTVerifyUserExpired(),
+		u.config.JwtVerifyUserExpired(),
 		u.config.JwtSecret(),
 	)
 	if err != nil {
@@ -518,4 +656,38 @@ func (u *authentictionUsecaseImpl) GetPendingDoctorApproval(ctx context.Context)
 		return nil, apperror.NewInternal(err)
 	}
 	return doctorPendingApproval, nil
+}
+
+func (u *authentictionUsecaseImpl) GenerateRefreshToken(ctx context.Context, refreshToken string) (*entity.AuthenticationToken, error) {
+	rt := u.repoStore.RefreshTokenRepository()
+
+	claims, err := u.jwtAuth.ParseAndVerify(refreshToken, u.config.JwtSecret())
+	if err != nil {
+		return nil, apperror.ErrInvalidToken(err)
+	}
+
+	isRefreshTokenValid, err := rt.IsRefreshTokenValidByToken(ctx, claims.Payload.RandomToken)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isRefreshTokenValid {
+		return nil, apperror.ErrTokenHasExpired(nil)
+	}
+
+	newAccessToken, err := u.jwtAuth.CreateAndSign(
+		util.JWTPayload{AuthenticationId: claims.Payload.AuthenticationId, Role: claims.Payload.Role},
+		u.config.JwtLoginExp(),
+		u.config.JwtSecret(),
+	)
+	if err != nil {
+		return nil, apperror.ErrInvalidToken(err)
+	}
+
+	authenticationToken := entity.AuthenticationToken{
+		AccessToken: newAccessToken,
+	}
+
+	return &authenticationToken, nil
+
 }

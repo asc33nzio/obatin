@@ -87,6 +87,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.PATCH(appconstant.EndpointUpdatePassword, h.AuthenticationHandler.UpdatePassword)
 	r.POST(appconstant.EndpointForgotPassword, h.AuthenticationHandler.SendVerifyForgotPassword)
 	r.GET(appconstant.EndpointGetDoctorSpecialization, h.DoctorSpecializationHandler.GetAll)
+	r.POST(appconstant.EndpointRefreshToken, h.AuthenticationHandler.GetRefreshToken)
 
 	r.Use(h.Middleware.JWTAuth)
 	r.POST(appconstant.EndpointSendVerifyToEmail, h.AuthenticationHandler.SendVerifyToEmail)

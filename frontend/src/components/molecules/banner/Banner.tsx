@@ -4,7 +4,7 @@ import 'swiper/css/pagination';
 import {
   BannerContainer,
   Imagecontainer,
-} from '@/styles/pages/homepage/Banner.styles';
+} from '@/styles/molecules/Banner.styles';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Keyboard, Mousewheel, Navigation, Pagination } from 'swiper/modules';
 import { CSSProperties } from 'styled-components';

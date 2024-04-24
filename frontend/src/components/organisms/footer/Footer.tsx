@@ -1,66 +1,71 @@
-import { 
+import {
   Copyright,
   FooterContainer,
   Sitemap,
   Slogan,
   Title,
-  Top
-} from '@/styles/pages/homepage/Footer.styles'
-import React from 'react'
-import Link from 'next/link'
-import ObatinICO from '@/assets/icons/ObatinICO'
+  Top,
+} from '@/styles/organisms/Footer.styles';
+import React from 'react';
+import ObatinICO from '@/assets/icons/ObatinICO';
+import { navigateToHome } from '@/app/actions';
 
-const Footer = (): React.ReactElement =>  {
+const Footer = (): React.ReactElement => {
   return (
     <FooterContainer $resolution='desktop'>
       <Top>
         <Slogan>
-          <ObatinICO/>
+          <ObatinICO />
         </Slogan>
         <Sitemap>
           <ul>
             <Title>
-              <Link href="/home" style={{textDecoration:'none'}}>Pages</Link>
+              <a
+                onClick={() => navigateToHome()}
+                style={{ textDecoration: 'none' }}
+              >
+                Pages
+              </a>
             </Title>
             <li>
-              <Link href="/home">Home</Link>
+              <a onClick={() => navigateToHome()}>Home</a>
             </li>
             <li>
-              <Link href="/home">FAQ</Link>
+              <a onClick={() => navigateToHome()}>FAQ</a>
             </li>
             <li>
-              <Link href="/home">Kebijakan Privasi</Link>
+              <a onClick={() => navigateToHome()}>Kebijakan Privasi</a>
             </li>
           </ul>
 
           <ul>
             <Title>
-              <Link href="/home">Service</Link>
+              <a onClick={() => navigateToHome()}>Service</a>
             </Title>
             <li>
-              <Link href="/home">Chat Dokter</Link>
+              <a onClick={() => navigateToHome()}>Chat Dokter</a>
             </li>
             <li>
-              <Link href="/home">Beli Obat</Link>
+              <a onClick={() => navigateToHome()}>Beli Obat</a>
             </li>
           </ul>
 
           <ul>
             <Title>
-              <Link href="/home">Contact</Link>
+              <a onClick={() => navigateToHome()}>Contact</a>
             </Title>
             <li>
-              <Link href="/home">00909098</Link>
+              <a onClick={() => navigateToHome()}>00909098</a>
             </li>
             <li>
-              <Link href="/home">obatin.pharma@gmail.com</Link>
+              <a onClick={() => navigateToHome()}>obatin.pharma@gmail.com</a>
             </li>
           </ul>
         </Sitemap>
       </Top>
       <Copyright>@ Obatin Pharma 2024</Copyright>
     </FooterContainer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

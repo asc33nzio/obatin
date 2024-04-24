@@ -1,4 +1,6 @@
-const HidePasswordICO = (props: { $viewBoxHide: string }): React.ReactElement => {
+const HidePasswordICO = (props: {
+  $viewBoxHide: string;
+}): React.ReactElement => {
   return (
     <svg
       width='22'

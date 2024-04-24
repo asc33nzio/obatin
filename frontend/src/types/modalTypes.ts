@@ -1,19 +1,14 @@
 import { Dispatch, SetStateAction } from 'react';
 
-type modalType = 'confirm-password' | '';
+export type OpenModalFunction = (modalTypeArg: ModalType) => void;
+export type ToggleModalFunction = (modalTypeArg: ModalType) => void;
+
+export type ModalType = 'confirm-password' | '';
 
 export interface ModalContextItf {
   isOpen: boolean;
-  modalType: string;
-  openModal: Dispatch<
-    SetStateAction<{
-      modalType: modalType;
-    }>
-  >;
-  closeModal: Dispatch<SetStateAction<null>>;
-  toggleModal: Dispatch<
-    SetStateAction<{
-      modalType: modalType;
-    }>
-  >;
+  modalType: ModalType;
+  openModal: OpenModalFunction;
+  closeModal: Dispatch<SetStateAction<void>>;
+  toggleModal: ToggleModalFunction;
 }

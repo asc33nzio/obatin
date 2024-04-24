@@ -1,12 +1,4 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useToast } from '@/hooks/useToast';
-import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { useEmailValidation } from '@/hooks/useEmailValidation';
-import { usePasswordValidation } from '@/hooks/usePasswordValidation';
-import { getCookie, setCookie } from 'cookies-next';
-import { DoctorSpecializationsType } from '@/types/registerTypes';
-import { navigateToDashboard, navigateToLogin } from '@/app/actions';
 import {
   CreateOrLoginSpan,
   LoginOrRegisterFormContainer,
@@ -16,6 +8,14 @@ import {
   SeparatorLine,
   UserTypeSelectionSection,
 } from '@/styles/pages/auth/Auth.styles';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/useToast';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useEmailValidation } from '@/hooks/useEmailValidation';
+import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { getCookie, setCookie } from 'cookies-next';
+import { DoctorSpecializationsType } from '@/types/registerTypes';
+import { navigateToDashboard, navigateToLogin } from '@/app/actions';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import CustomButton from '@/components/atoms/button/CustomButton';
@@ -168,8 +168,8 @@ const RegisterForm = (): React.ReactElement => {
         toastMessage: errorMessage
           ? errorMessage
           : appError
-          ? appError
-          : 'Login gagal',
+            ? appError
+            : 'Login gagal',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
@@ -242,8 +242,8 @@ const RegisterForm = (): React.ReactElement => {
         toastMessage: errorMessage
           ? errorMessage
           : appError
-          ? appError
-          : 'Pendaftaran gagal',
+            ? appError
+            : 'Pendaftaran gagal',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
@@ -277,6 +277,7 @@ const RegisterForm = (): React.ReactElement => {
         });
         setSpecializations(doctorSpecializations);
       } catch (error) {
+        console.error(error);
         setToast({
           showToast: true,
           toastMessage: 'Error mengambil data spesialisasi',

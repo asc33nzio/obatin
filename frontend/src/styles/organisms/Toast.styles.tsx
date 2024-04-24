@@ -8,8 +8,8 @@ export const StyledToastContainer = styled.div<{ $orientation?: string }>`
     $orientation === 'left'
       ? 'flex-start'
       : $orientation === 'right'
-      ? 'flex-end'
-      : 'center'};
+        ? 'flex-end'
+        : 'center'};
 
   width: 100vw;
   height: 175px;
@@ -56,8 +56,8 @@ export const StyledToast = styled.div<{ $type: string; $resolution: string }>`
     $type === 'ok'
       ? 'var(--bg-color-ok)'
       : $type === 'warning'
-      ? 'var(--bg-color-warning)'
-      : 'var(--bg-color-error)'};
+        ? 'var(--bg-color-warning)'
+        : 'var(--bg-color-error)'};
   border: 1px solid #cbd5e0;
   border-radius: 15px;
 
@@ -65,8 +65,8 @@ export const StyledToast = styled.div<{ $type: string; $resolution: string }>`
     $type === 'ok'
       ? 'var(--color-ok)'
       : $type === 'warning'
-      ? 'var(--color-warning)'
-      : 'var(--color-error)'};
+        ? 'var(--color-warning)'
+        : 'var(--color-error)'};
   text-align: center;
   font-size: 24px;
   font-weight: 500;

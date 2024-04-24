@@ -37,7 +37,11 @@ func (h *AuthenticationHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	res := dto.UserAccessToken{AccessToken: token}
+	res := dto.UserAccessToken{
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+	}
+
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseLoginMsg,
 		Data:    res,
@@ -128,7 +132,7 @@ func (h *AuthenticationHandler) VerifyEmail(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, dto.APIResponse{
+	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseVerifiedMsg,
 	})
 }
@@ -213,4 +217,29 @@ func (h *AuthenticationHandler) GetPendingDoctorApproval(ctx *gin.Context) {
 		Message: constant.ResponseGetAllPendingDoctorApproval,
 		Data:    res,
 	})
+}
+
+func (h *AuthenticationHandler) GetRefreshToken(ctx *gin.Context) {
+
+	tokenReq := dto.RefreshTokenReq{}
+	if err := ctx.ShouldBindJSON(&tokenReq); err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+
+	newTokens, err := h.userUsecase.GenerateRefreshToken(ctx, tokenReq.RefreshToken)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res := dto.UserAccessToken{
+		AccessToken:  newTokens.AccessToken,
+		RefreshToken: newTokens.RefreshToken,
+	}
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseGetNewRefreshToken,
+		Data:    res,
+	})
+
 }

@@ -152,3 +152,30 @@ func ErrForbiddenAccess(err error) *AppError {
 		stack:   debug.Stack(),
 	}
 }
+
+func ErrAccountNotApproved(err error) *AppError {
+	return &AppError{
+		code:    EmailNotVerified,
+		err:     err,
+		message: EmailHasNotApprovedMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrTokenHasExpired(err error) *AppError {
+	return &AppError{
+		code:    InvalidToken,
+		err:     err,
+		message: TokenHasExpiredMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrTokenHasBeenUsedBefore(err error) *AppError {
+	return &AppError{
+		code:    InvalidReq,
+		err:     err,
+		message: TokenHasBeenUsedBefore,
+		stack:   debug.Stack(),
+	}
+}

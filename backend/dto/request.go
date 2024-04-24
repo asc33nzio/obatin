@@ -15,6 +15,10 @@ type UserRegisterReq struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type RefreshTokenReq struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
 type DoctorRegisterReq struct {
 	Email            string         `form:"email" binding:"required"`
 	Password         string         `form:"password"`

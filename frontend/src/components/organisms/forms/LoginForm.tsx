@@ -8,17 +8,17 @@ import {
   SectionSeparator,
   SeparatorLine,
 } from '@/styles/pages/auth/Auth.styles';
+import {
+  navigateToDashboard,
+  navigateToForgotPassword,
+  navigateToRegister,
+} from '@/app/actions';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { getCookie, setCookie } from 'cookies-next';
-import {
-  navigateToDashboard,
-  navigateToForgotPassword,
-  navigateToRegister,
-} from '@/app/actions';
 import Axios from 'axios';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
@@ -65,13 +65,11 @@ const LoginForm = (): React.ReactElement => {
 
       const access_token = response?.data?.data?.access_token;
 
-      if (
-        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS === undefined
-      ) {
+      if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S === undefined) {
         throw new Error('please define access token valid duration env var');
       }
       const validTokenExpiryMilliseconds: number = parseInt(
-        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS,
+        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S,
         10,
       );
 
@@ -99,8 +97,8 @@ const LoginForm = (): React.ReactElement => {
         toastMessage: errorMessage
           ? errorMessage
           : appError
-          ? appError
-          : 'Login gagal',
+            ? appError
+            : 'Login gagal',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',

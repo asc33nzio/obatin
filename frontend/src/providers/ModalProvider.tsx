@@ -1,6 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { ModalContextItf } from '@/types/modalTypes';
+import {
+  ModalContextItf,
+  ModalType,
+  OpenModalFunction,
+  ToggleModalFunction,
+} from '@/types/modalTypes';
 import ModalContext from '@/contexts/modalContext';
 
 export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -14,12 +19,14 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({
     toggleModal: () => {},
   });
 
-  const openModal: ModalContextItf['openModal'] = (newState) => {
-    setModalState((prevState) => ({
-      ...prevState,
-      ...newState,
+  const openModal: OpenModalFunction = (modalTypeArg: ModalType) => {
+    setModalState({
       isOpen: true,
-    }));
+      modalType: modalTypeArg,
+      openModal,
+      closeModal,
+      toggleModal,
+    });
   };
 
   const closeModal: ModalContextItf['closeModal'] = () => {
@@ -30,12 +37,14 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({
     }));
   };
 
-  const toggleModal: ModalContextItf['toggleModal'] = (newState) => {
-    setModalState((prevState) => ({
-      ...prevState,
-      ...newState,
+  const toggleModal: ToggleModalFunction = (modalTypeArg: ModalType) => {
+    setModalState({
       isOpen: !modalState.isOpen,
-    }));
+      modalType: modalTypeArg,
+      openModal,
+      closeModal,
+      toggleModal,
+    });
   };
 
   const { isOpen, modalType } = modalState;

@@ -1,13 +1,27 @@
-import { SearchContainer } from '@/styles/pages/homepage/Search.style';
-import SearchIcon from '@mui/icons-material/Search';
+import { SearchContainer, SearchInput } from '@/styles/molecules/Search.styles';
+import { useSearchParams } from 'next/navigation';
 
-const SearchComponent = ():React.ReactElement => {
+export default function Search() {
+  const searchParams = useSearchParams();
+  function handleSearch(term: string) {
+    console.log(`Searching... ${term}`);
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set('query', term);
+    } else {
+      params.delete('query');
+    }
+  }
   return (
     <SearchContainer>
-      <SearchIcon />
-      <p>Cari produk di sini</p>
+      <SearchInput
+        className='peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500'
+        placeholder='Search Product'
+        onChange={(e) => {
+          handleSearch(e.target.value);
+        }}
+        defaultValue={searchParams.get('query')?.toString()}
+      />
     </SearchContainer>
   );
-};
-
-export default SearchComponent;
+}

@@ -1,7 +1,7 @@
 import {
   MenuItemContainer,
   MenuItems,
-} from '@/styles/elements/MenuItem.styles';
+} from '@/styles/organisms/sidebar/MenuItem.styles';
 import { usePathname } from 'next/navigation';
 import { MenuItem as MenuItemType } from '@/constants/menu-items';
 import { useState } from 'react';

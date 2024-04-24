@@ -1,6 +1,9 @@
 import { MENU_ITEMS } from '@/constants/menu-items';
-import { SidebarContainer, TOP } from '@/styles/elements/Sidebar.styles';
-import { IconContainer } from '@/styles/pages/homepage/Navbar.styles';
+import {
+  SidebarContainer,
+  TOP,
+} from '@/styles/organisms/sidebar/Sidebar.styles';
+import { IconContainer } from '@/styles/organisms/Navbar.styles';
 import { ChevronLeft } from '@styled-icons/material';
 import MenuItemsList from './MenuItemList';
 import ObatinICO from '@/assets/icons/ObatinICO';

@@ -11,7 +11,7 @@ export const RegularInputContainer = styled.div<{
   justify-content: center;
 
   width: 100%;
-  height: ${({ $height }) => $height ? `${$height}px` : '100px'};
+  height: ${({ $height }) => ($height ? `${$height}px` : '100px')};
   gap: 5px;
 
   font-size: 20px;

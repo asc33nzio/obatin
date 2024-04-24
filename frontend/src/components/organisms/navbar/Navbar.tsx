@@ -2,7 +2,7 @@ import {
   IconContainer,
   Left,
   NavContainer,
-} from '@/styles/pages/homepage/Navbar.styles';
+} from '@/styles/organisms/Navbar.styles';
 import { Menu, ChevronLeft } from '@styled-icons/material';
 import ObatinICO from '@/assets/icons/ObatinICO';
 import SearchComponent from '../../molecules/search/SearchComponent';

@@ -42,6 +42,7 @@ import DatePicker from 'react-date-picker';
 
 const DashboardPage = (): React.ReactElement => {
   const { isDesktopDisplay } = useClientDisplayResolution();
+  // eslint-disable-next-line
   const [userRole, setUserRole] = useState<string>('');
   const [isNavbarExpanded, setisNavbarExpanded] = useState<boolean>(false);
   const [editingFields, setEditingFields] = useState<EditProfileStateItf>({
@@ -57,6 +58,7 @@ const DashboardPage = (): React.ReactElement => {
     usePasswordValidation();
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
+  // eslint-disable-next-line
   const [gender, setGender] = useState<GenderItf>({ isMale: undefined });
   const [date, setDate] = useState<DatePickerType>(new Date());
   const currentYear = new Date().getFullYear();
@@ -294,8 +296,8 @@ const DashboardPage = (): React.ReactElement => {
                       {gender.isMale === undefined
                         ? null
                         : gender.isMale
-                        ? 'Laki-laki'
-                        : 'Perempuan'}
+                          ? 'Laki-laki'
+                          : 'Perempuan'}
                     </span>
                     <EditPencilICO
                       onClick={() =>
@@ -332,9 +334,7 @@ const DashboardPage = (): React.ReactElement => {
                   </>
                 ) : (
                   <>
-                    <span>
-                      7 Juli 2000
-                    </span>
+                    <span>7 Juli 2000</span>
                     <EditPencilICO
                       onClick={() =>
                         setEditingFields((prevState) => ({
