@@ -19,7 +19,7 @@ const ChangePasswordModalContent = (): React.ReactElement => {
         onChange={handleConfirmPasswordInputChange}
         title=''
         placeholder=''
-        $height={60}
+        $height={55}
         $viewBox='0 0 22 22'
         $viewBoxHide='0 2 22 22'
       />
