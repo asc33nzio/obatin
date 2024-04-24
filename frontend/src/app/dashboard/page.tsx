@@ -30,6 +30,7 @@ import {
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useModal } from '@/hooks/useModal';
 import { debounce } from '@/utils/debounce';
 import Header from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
@@ -39,6 +40,7 @@ import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import DatePicker from 'react-date-picker';
+import { useToast } from '@/hooks/useToast';
 
 const DashboardPage = (): React.ReactElement => {
   const { isDesktopDisplay } = useClientDisplayResolution();
@@ -49,13 +51,20 @@ const DashboardPage = (): React.ReactElement => {
     email: false,
     name: false,
     password: false,
+    confirmPassword: false,
     gender: false,
     birthDate: false,
   });
+  const { setToast } = useToast();
+  const { openModal } = useModal();
   const { email, emailValidationError, handleEmailInputChange } =
     useEmailValidation();
-  const { password, passwordValidationError, handlePasswordInputChange } =
-    usePasswordValidation();
+  const {
+    password,
+    passwordValidationError,
+    confirmPasswordValidationError,
+    handlePasswordInputChange,
+  } = usePasswordValidation();
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
   // eslint-disable-next-line
@@ -97,6 +106,43 @@ const DashboardPage = (): React.ReactElement => {
   //     field = true
   //   });
   // };
+
+  const openPasswordInterface = () => {
+    setEditingFields((prevState) => ({
+      ...prevState,
+      password: true,
+    }));
+  };
+
+  const openConfirmPasswordInterface = () => {
+    if (password && !passwordValidationError) {
+      openModal('confirm-password');
+    }
+
+    setEditingFields((prevState) => ({
+      ...prevState,
+      password: false,
+      confirmPassword: true,
+    }));
+  };
+
+  const closePasswordInterface = () => {
+    if (passwordValidationError || confirmPasswordValidationError) {
+      setToast({
+        showToast: true,
+        toastMessage: 'Tolong cek kembali sandi anda',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    }
+
+    setEditingFields((prevState) => ({
+      ...prevState,
+      password: false,
+      confirmPassword: false,
+    }));
+  };
 
   const handleDateChange = (value: DatePickerType) => {
     setDate(value);
@@ -233,7 +279,21 @@ const DashboardPage = (): React.ReactElement => {
 
               <h2>Password</h2>
               <UserDetailDiv>
-                {editingFields.password ? (
+                {editingFields.password && passwordValidationError ? (
+                  <>
+                    <PasswordInput
+                      defaultValue={password}
+                      validationMessage={passwordValidationError}
+                      onChange={handlePasswordInputChange}
+                      title=''
+                      placeholder=''
+                      $height={60}
+                      $viewBox='0 0 22 22'
+                      $viewBoxHide='0 2 22 22'
+                    />
+                    <EditPencilICO onClick={() => closePasswordInterface()} />
+                  </>
+                ) : editingFields.password ? (
                   <>
                     <PasswordInput
                       defaultValue={password}
@@ -246,25 +306,13 @@ const DashboardPage = (): React.ReactElement => {
                       $viewBoxHide='0 2 22 22'
                     />
                     <EditPencilICO
-                      onClick={() =>
-                        setEditingFields((prevState) => ({
-                          ...prevState,
-                          password: false,
-                        }))
-                      }
+                      onClick={() => openConfirmPasswordInterface()}
                     />
                   </>
                 ) : (
                   <>
                     <span>***************</span>
-                    <EditPencilICO
-                      onClick={() =>
-                        setEditingFields((prevState) => ({
-                          ...prevState,
-                          password: true,
-                        }))
-                      }
-                    />
+                    <EditPencilICO onClick={() => openPasswordInterface()} />
                   </>
                 )}
               </UserDetailDiv>

@@ -26,7 +26,7 @@ import Banner from '../../molecules/banner/Banner';
 import Image from 'next/image';
 import toko from '@/assets/homepage/Pharmacist-pana 1.svg';
 import konsul from '@/assets/homepage/Researching-amico 1(1).svg';
-import CustomButton from '../../atoms/button/CustomButton';
+import CustomButton from '@/components/atoms/button/CustomButton';
 import Sidebar from '@/components/organisms/sidebar/Sidebar';
 
 const CategoryImg = [

@@ -134,13 +134,11 @@ const RegisterForm = (): React.ReactElement => {
 
       const access_token = response?.data?.data?.access_token;
 
-      if (
-        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS === undefined
-      ) {
+      if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S === undefined) {
         throw new Error('please define access token valid duration env var');
       }
       const validTokenExpiryMilliseconds: number = parseInt(
-        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_MS,
+        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S,
         10,
       );
 

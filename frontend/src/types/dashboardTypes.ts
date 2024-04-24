@@ -5,6 +5,7 @@ export interface EditProfileStateItf {
   email: boolean;
   name: boolean;
   password: boolean;
+  confirmPassword: boolean;
   gender: boolean;
   birthDate: boolean;
 }
