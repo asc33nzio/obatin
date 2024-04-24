@@ -24,8 +24,9 @@ export const useEmailValidation = () => {
 
   const handleEmailInputChange = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setEmail(event.target.value);
-      validateEmail(event.target.value);
+      if (validateEmail(event.target.value)) {
+        setEmail(event.target.value);
+      }
     },
     750,
   );
