@@ -7,7 +7,6 @@ interface CustomButtonPropsItf extends ButtonHTMLAttributes<HTMLButtonElement> {
   $height?: string;
   $fontSize?: string;
   $color?: string;
-
   $bgColor?: string;
   disabled?: boolean;
 }
@@ -16,7 +15,6 @@ const CustomButton = ({
   content = 'Default button content',
   ...props
 }: CustomButtonPropsItf): React.ReactElement => {
-  let _test;
   return <CustomButtonStyle {...props}>{content}</CustomButtonStyle>;
 };
 
