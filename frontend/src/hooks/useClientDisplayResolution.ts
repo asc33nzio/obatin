@@ -7,5 +7,6 @@ export const useClientDisplayResolution = (): ClientDisplayResolutionItf => {
   if (!context) {
     throw new Error('ClientDisplayResolution context missing!');
   }
+
   return context;
 };

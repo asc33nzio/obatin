@@ -17,18 +17,20 @@ interface PasswordInputItf extends InputHTMLAttributes<HTMLInputElement> {
   $viewBox?: string | undefined;
   $viewBoxHide?: string | undefined;
   $height?: number | undefined;
+  $marBot?: number | undefined;
 }
 
 const PasswordInput = ({
   title = 'Default input label',
   validationMessage = 'Default error message',
   $height = 100,
+  $marBot = 25,
   ...props
 }: PasswordInputItf): React.ReactElement => {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
   return (
-    <PasswordInputContainer $height={$height}>
+    <PasswordInputContainer $height={$height} $marBot={$marBot}>
       {title}
 
       <PasswordInputSubcontainer>

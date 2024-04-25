@@ -13,13 +13,13 @@ export const FooterContainer = styled.div<{ $resolution: string }>`
   padding: 2rem 0 0 0;
 `;
 
-export const Top = styled.nav`
+export const Top = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
 `;
 
-export const Sitemap = styled.nav`
+export const Sitemap = styled.div`
   display: flex;
   gap: 40px;
 

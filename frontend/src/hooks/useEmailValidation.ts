@@ -28,7 +28,7 @@ export const useEmailValidation = () => {
         setEmail(event.target.value);
       }
     },
-    750,
+    300,
   );
 
   return {

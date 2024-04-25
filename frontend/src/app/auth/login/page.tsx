@@ -1,6 +1,7 @@
+'use server';
 import LoginForm from '@/components/organisms/forms/LoginForm';
 
-const LoginPage = (): React.ReactElement => {
+export const LoginPage = async (): Promise<React.ReactElement> => {
   return <LoginForm />;
 };
 

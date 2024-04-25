@@ -1,6 +1,7 @@
+'use server';
 import SetPasswordForm from '@/components/organisms/forms/SetPasswordForm';
 
-const OnboardingPage = (): React.ReactElement => {
+const OnboardingPage = async (): Promise<React.ReactElement> => {
   return <SetPasswordForm />;
 };
 

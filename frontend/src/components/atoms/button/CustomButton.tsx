@@ -15,11 +15,7 @@ const CustomButton = ({
   content = 'Default button content',
   ...props
 }: CustomButtonPropsItf): React.ReactElement => {
-  return (
-    <CustomButtonStyle $buttonProps={{ ...props }} {...props}>
-      {content}
-    </CustomButtonStyle>
-  );
+  return <CustomButtonStyle {...props}>{content}</CustomButtonStyle>;
 };
 
 export default CustomButton;
