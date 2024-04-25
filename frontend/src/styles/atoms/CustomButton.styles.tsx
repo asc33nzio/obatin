@@ -7,6 +7,7 @@ interface ButtonPropsItf {
   $fontSize?: string | undefined;
   $color?: string | undefined;
   $bgColor?: string | undefined;
+  $border?: string | undefined;
   disabled?: boolean | undefined;
 }
 
@@ -20,7 +21,7 @@ export const CustomButtonStyle = styled.button<ButtonPropsItf>`
   color: ${({ $color }) => ($color ? $color : '#f7fafc')};
 
   border-radius: 10px;
-  border: none;
+  border: ${({ $border }) => ($border ? `1px solid ${$border}` : 'none')};
   outline: none;
 
   font-size: ${({ $fontSize }) => ($fontSize ? $fontSize : '24px')};
