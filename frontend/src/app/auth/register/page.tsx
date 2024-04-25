@@ -1,6 +1,7 @@
+'use server';
 import RegisterForm from '@/components/organisms/forms/RegisterForm';
 
-const RegisterPage = (): React.ReactElement => {
+const RegisterPage = async (): Promise<React.ReactElement> => {
   return <RegisterForm />;
 };
 

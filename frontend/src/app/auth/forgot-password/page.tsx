@@ -1,6 +1,7 @@
+'use server';
 import ForgotPasswordForm from '@/components/organisms/forms/ForgotPasswordForm';
 
-const ForgotPasswordPage = (): React.ReactElement => {
+const ForgotPasswordPage = async (): Promise<React.ReactElement> => {
   return <ForgotPasswordForm />;
 };
 

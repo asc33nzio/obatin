@@ -67,6 +67,18 @@ export const ProfileContentLeft = styled.div<{ $isDesktopDisplay: boolean }>`
   width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '100%')};
   height: inherit;
   gap: 15px;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 60%;
+    height: 15%;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 export const ImgBg = styled.div`
@@ -133,6 +145,7 @@ export const UserDetailDiv = styled.div`
     object-fit: cover;
     width: 30px;
     height: 30px;
+    margin-top: 5px;
 
     :hover {
       fill: #ff3f3f;

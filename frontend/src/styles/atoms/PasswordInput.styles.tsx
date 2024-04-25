@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 
-export const PasswordInputContainer = styled.div<{ $height: number }>`
+export const PasswordInputContainer = styled.div<{
+  $height: number;
+  $marBot?: number;
+}>`
   display: flex;
   flex-direction: column;
 
@@ -11,7 +14,7 @@ export const PasswordInputContainer = styled.div<{ $height: number }>`
   font-size: 18px;
   color: #718096;
 
-  margin-bottom: 25px;
+  margin-bottom: ${({ $marBot }) => ($marBot ? `${$marBot}px` : '25px')};
 `;
 
 export const PasswordInputSubcontainer = styled.div`
