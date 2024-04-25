@@ -5,7 +5,7 @@ export const useUploadValidation = () => {
   const [userUploadValidationError, setUserUploadValidationError] =
     useState<string>('');
 
-  const validateUpload = (input: Blob | undefined) => {
+  const validatePdfUpload = (input: Blob | undefined) => {
     if (input === undefined) {
       setUserUploadValidationError(
         'Anda harus mengunggah sertifikat untuk mendaftar',
@@ -29,12 +29,55 @@ export const useUploadValidation = () => {
     return true;
   };
 
-  const handleCertificateChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const validateImageUpload = (input: Blob | undefined) => {
+    if (input === undefined) {
+      setUserUploadValidationError('Gambar tidak terpilih');
+      return false;
+    }
+
+    const allowedExtenstions = [
+      'image/jpg',
+      'image/jpeg,',
+      'image/png',
+      'image/svg+xml',
+      'image/webp',
+    ];
+
+    let validExtension: boolean = false;
+    allowedExtenstions.map((extension) => {
+      if (input.type === extension) {
+        validExtension = true;
+      }
+    });
+
+    if (!validExtension) {
+      setUserUploadValidationError(
+        'Format gambar salah. Hanya boleh mengunggah .JPG .JPEG .PNG .SVG .WEBP',
+      );
+      return false;
+    }
+
+    if (input.size > 1 * 500 * 1000) {
+      setUserUploadValidationError('Ukuran file tidak boleh lebih dari 500kb');
+      return false;
+    }
+
+    setUserUploadValidationError('');
+    return true;
+  };
+
+  const handlePdfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const userUpload = event?.target?.files?.[0];
-    setUserUpload(userUpload);
-    validateUpload(userUpload);
+    if (validatePdfUpload(userUpload)) {
+      setUserUpload(userUpload);
+    }
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const userUpload = event?.target?.files?.[0];
+    if (validateImageUpload(userUpload)) {
+      setUserUpload(userUpload);
+    }
   };
 
   return {
@@ -42,7 +85,9 @@ export const useUploadValidation = () => {
     setUserUpload,
     userUploadValidationError,
     setUserUploadValidationError,
-    validateUpload,
-    handleCertificateChange,
+    validatePdfUpload,
+    validateImageUpload,
+    handlePdfChange,
+    handleImageChange,
   };
 };

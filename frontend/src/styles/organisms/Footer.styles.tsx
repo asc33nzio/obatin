@@ -10,7 +10,7 @@ export const FooterContainer = styled.div<{ $resolution: string }>`
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid ${COLORS.input_border};
-  padding: 2rem 0 0 0;
+  padding: 2rem 5rem;
 `;
 
 export const Top = styled.nav`

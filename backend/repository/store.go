@@ -15,6 +15,7 @@ type RepoStore interface {
 	UserRepository() UserRepository
 	ResetPasswordRepository() ResetPasswordRepository
 	DoctorSpecializationRepository() DoctorSpecializationRepository
+	CategoryRepository() CategoryRepository
 	RefreshTokenRepository() RefreshTokenRepository
 }
 
@@ -93,6 +94,12 @@ func (s *dbStore) DoctorSpecializationRepository() DoctorSpecializationRepositor
 
 func (s *dbStore) RefreshTokenRepository() RefreshTokenRepository {
 	return &refreshTokenRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) CategoryRepository() CategoryRepository {
+	return &categoryRepositoryPostgres{
 		db: s.querier,
 	}
 }

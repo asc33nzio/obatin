@@ -29,6 +29,7 @@ import { useEffect, useState } from 'react';
 import { DecodedJwtItf } from '@/types/jwtTypes';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { useUploadValidation } from '@/hooks/useUploadValidation';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
@@ -76,6 +77,18 @@ const DashboardPage = (): React.ReactElement => {
     confirmPasswordValidationError,
     handlePasswordInputChange,
   } = usePasswordValidation();
+  const {
+    // eslint-disable-next-line
+    userUpload,
+    // eslint-disable-next-line
+    setUserUpload,
+    userUploadValidationError,
+    // eslint-disable-next-line
+    setUserUploadValidationError,
+    // eslint-disable-next-line
+    validateImageUpload,
+    handleImageChange,
+  } = useUploadValidation();
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
   // eslint-disable-next-line
@@ -216,16 +229,17 @@ const DashboardPage = (): React.ReactElement => {
               <ImgBg>
                 <PlaceholderAva />
               </ImgBg>
-              <span>
-                Besar file: maksimum 500 Kb. Ekstensi file yang diperbolehkan:
-                .JPG .JPEG .PNG .SVG .WEBP
-              </span>
-              <CustomButton
-                content='Pilih Foto'
-                $bgColor='#00B5C0'
-                $width='175px'
-                $height='50px'
-                $fontSize='22px'
+              <span>Gambar Profil</span>
+              <RegularInput
+                type='file'
+                title=''
+                placeholder='Pilih Foto'
+                $width={45}
+                $height={35}
+                validationMessage={userUploadValidationError}
+                onChange={handleImageChange}
+                $marBot={0}
+                accept='image/*'
               />
             </ProfileContentLeft>
 

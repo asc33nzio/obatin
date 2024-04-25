@@ -8,6 +8,7 @@ interface CustomButtonPropsItf extends ButtonHTMLAttributes<HTMLButtonElement> {
   $fontSize?: string;
   $color?: string;
   $bgColor?: string;
+  $border?: string;
   disabled?: boolean;
 }
 

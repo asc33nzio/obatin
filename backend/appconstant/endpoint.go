@@ -10,6 +10,8 @@ const (
 	EndpointGetProductsList          = "/shop/products"
 	EndpointUpdatePassword           = "/auth/update-password"
 	EndpointApproval                 = "/approve/:authentication_id"
+	EndPointAllCategories            = "/shop/categories"
+	EndpointUpdateCategory           = "/shop/categories/:category_slug"
 	EndpointForgotPassword           = "/auth/forgot-password"
 	EndpointGetDoctorSpecialization  = "/doctor-specializations"
 	EndpointGetDoctorPendingApproval = "/doctor-pending-approval"
