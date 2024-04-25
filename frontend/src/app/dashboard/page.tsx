@@ -35,7 +35,7 @@ import { useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
 import { debounce } from '@/utils/debounce';
-import Header from '@/components/organisms/navbar/Navbar';
+import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import PlaceholderAva from '@/assets/PlaceholderAva';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
@@ -50,7 +50,6 @@ const DashboardPage = (): React.ReactElement => {
   const { isDesktopDisplay } = useClientDisplayResolution();
   // eslint-disable-next-line
   const [userRole, setUserRole] = useState<string>('');
-  const [isNavbarExpanded, setisNavbarExpanded] = useState<boolean>(false);
   const [isEditingField, setIsEditingField] = useState<EditProfileStateItf>({
     email: false,
     name: false,
@@ -91,7 +90,6 @@ const DashboardPage = (): React.ReactElement => {
   } = useUploadValidation();
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
-  // eslint-disable-next-line
   const [gender, setGender] = useState<GenderItf>({ isMale: true });
   const [date, setDate] = useState<DatePickerType>(new Date());
   const currentYear = new Date().getFullYear();
@@ -206,10 +204,7 @@ const DashboardPage = (): React.ReactElement => {
 
   return (
     <DashboardPageContainer $isDesktopDisplay={isDesktopDisplay}>
-      <Header
-        isOpened={isNavbarExpanded}
-        toggleDrawer={() => setisNavbarExpanded(!isNavbarExpanded)}
-      />
+      <Navbar />
 
       <DashboardPageContentContainer>
         <ProfileContainer $isDesktopDisplay={isDesktopDisplay}>
@@ -229,7 +224,7 @@ const DashboardPage = (): React.ReactElement => {
               <ImgBg>
                 <PlaceholderAva />
               </ImgBg>
-              <span>Gambar Profil</span>
+
               <RegularInput
                 type='file'
                 title=''

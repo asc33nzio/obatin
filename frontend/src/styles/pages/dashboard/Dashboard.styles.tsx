@@ -6,8 +6,10 @@ export const DashboardPageContainer = styled.div<{
   display: flex;
   flex-direction: column;
 
-  width: 100vw;
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '100vh' : '200vh')};
+  width: 99vw;
+  max-width: 100vw;
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '125vh' : '200vh')};
+  overflow-x: hidden;
 `;
 
 export const DashboardPageContentContainer = styled.div`
@@ -89,6 +91,7 @@ export const ImgBg = styled.div`
 
   width: 275px;
   height: 275px;
+  margin-bottom: 20px;
 
   border-radius: 50%;
   box-shadow: 0 0 10px 5px #bdbdbd;

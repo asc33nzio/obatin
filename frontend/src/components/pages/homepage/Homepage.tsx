@@ -15,7 +15,6 @@ import {
   Smallfont,
   Content,
 } from '@/styles/pages/homepage/Homepage.styles';
-import { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Product } from '@/types/Product';
 import { Keyboard, Mousewheel, Navigation, Pagination } from 'swiper/modules';
@@ -27,7 +26,6 @@ import Image from 'next/image';
 import toko from '@/assets/homepage/Pharmacist-pana 1.svg';
 import konsul from '@/assets/homepage/Researching-amico 1(1).svg';
 import CustomButton from '@/components/atoms/button/CustomButton';
-import Sidebar from '@/components/organisms/sidebar/Sidebar';
 
 const CategoryImg = [
   'https://d2qjkwm11akmwu.cloudfront.net/categories/42753_12-4-2023_9-48-50.png',
@@ -49,18 +47,11 @@ const CategoryImg = [
 ];
 
 const Homepage = (): React.ReactElement => {
-  const [isOpened, setOpened] = useState(false);
-
-  const toggleDrawer = () => {
-    setOpened((prev) => !prev);
-  };
-
   return (
     <>
       <Content>
-        <Sidebar toggleDrawer={toggleDrawer} isOpened={isOpened} />
         <Body>
-          <Navbar isOpened={isOpened} toggleDrawer={toggleDrawer} />
+          <Navbar />
           <Banner />
           <FiturContainer>
             <Fitur>

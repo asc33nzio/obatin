@@ -2,7 +2,8 @@ import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
 export const SidebarContainer = styled.aside<{ $isOpened: boolean }>`
-  border-right: 1px solid ${COLORS.input_border};
+  border-right: ${(props) =>
+    props.$isOpened ? `1px solid ${COLORS.input_border}` : 'none'};
   width: ${(props) => (props.$isOpened ? '15vw' : '0vw')};
   min-height: 100vh;
   transition: width 0.5s;
@@ -22,7 +23,9 @@ export const SidebarContainer = styled.aside<{ $isOpened: boolean }>`
   a {
     text-decoration: none;
   }
+
   z-index: 10;
+
   @media (max-width: 1440px) {
     width: ${(props) => (props.$isOpened ? '30vw' : '0vw')};
   }
