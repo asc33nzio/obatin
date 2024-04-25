@@ -6,20 +6,22 @@ const PropagateLoad = (): React.ReactElement => {
     <div
       style={{
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         height: '100vh',
         width: '100vw',
-        backgroundColor: '#ffffff',
+        background: '#ffffff',
+        backdropFilter: 'blur(4px)',
+        zIndex: '30',
       }}
     >
       <PropagateLoader
         color='#36d7b7'
         loading={true}
         size={25}
-        cssOverride={{ display: 'block', margin: '0 auto' }}
+        cssOverride={{ display: 'flex' }}
       />
-      ;
     </div>
   );
 };

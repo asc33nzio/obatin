@@ -1,4 +1,4 @@
-type datePickerData = Date | null;
+export type datePickerData = Date | null;
 export type DatePickerType = datePickerData | [datePickerData, datePickerData];
 
 export interface EditProfileStateItf {
@@ -11,5 +11,5 @@ export interface EditProfileStateItf {
 }
 
 export interface GenderItf {
-  isMale: boolean | undefined;
+  isMale: boolean;
 }

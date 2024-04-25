@@ -24,6 +24,7 @@ import GoogleICO from '@/assets/icons/GoogleICO';
 import PatientICO from '@/assets/auth/PatientICO';
 import DoctorICO from '@/assets/auth/DoctorICO';
 import Axios from 'axios';
+import { useUploadValidation } from '@/hooks/useUploadValidation';
 
 const RegisterForm = (): React.ReactElement => {
   const { setToast } = useToast();
@@ -44,9 +45,17 @@ const RegisterForm = (): React.ReactElement => {
     setPasswordValidationError,
     handlePasswordInputChange,
   } = usePasswordValidation();
-  const [userUpload, setUserUpload] = useState<Blob | undefined>(undefined);
-  const [userUploadValidationError, setUserUploadValidationError] =
-    useState<string>('');
+  const {
+    userUpload,
+    setUserUpload,
+    userUploadValidationError,
+    setUserUploadValidationError,
+    validateUpload,
+    handleCertificateChange,
+  } = useUploadValidation();
+  // const [userUpload, setUserUpload] = useState<Blob | undefined>(undefined);
+  // const [userUploadValidationError, setUserUploadValidationError] =
+  //   useState<string>('');
   const [isDoctor, setIsDoctor] = useState<boolean>(false);
   const [specializations, setSpecializations] = useState<
     Array<DoctorSpecializationsType>
@@ -54,37 +63,37 @@ const RegisterForm = (): React.ReactElement => {
   const [selectedOption, setSelectedOption] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const validateUpload = (input: Blob | undefined) => {
-    if (input === undefined) {
-      setUserUploadValidationError(
-        'Anda harus mengunggah sertifikat untuk mendaftar',
-      );
-      return false;
-    }
+  // const validateUpload = (input: Blob | undefined) => {
+  //   if (input === undefined) {
+  //     setUserUploadValidationError(
+  //       'Anda harus mengunggah sertifikat untuk mendaftar',
+  //     );
+  //     return false;
+  //   }
 
-    if (input.type !== 'application/pdf') {
-      setUserUploadValidationError(
-        'Format gambar salah. Hanya boleh mengunggah .pdf',
-      );
-      return false;
-    }
+  //   if (input.type !== 'application/pdf') {
+  //     setUserUploadValidationError(
+  //       'Format gambar salah. Hanya boleh mengunggah .pdf',
+  //     );
+  //     return false;
+  //   }
 
-    if (input.size > 1 * 500 * 1000) {
-      setUserUploadValidationError('Ukuran file tidak boleh lebih dari 500kb');
-      return false;
-    }
+  //   if (input.size > 1 * 500 * 1000) {
+  //     setUserUploadValidationError('Ukuran file tidak boleh lebih dari 500kb');
+  //     return false;
+  //   }
 
-    setUserUploadValidationError('');
-    return true;
-  };
+  //   setUserUploadValidationError('');
+  //   return true;
+  // };
 
-  const handleCertificateChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const userUpload = event?.target?.files?.[0];
-    setUserUpload(userUpload);
-    validateUpload(userUpload);
-  };
+  // const handleCertificateChange = (
+  //   event: React.ChangeEvent<HTMLInputElement>,
+  // ) => {
+  //   const userUpload = event?.target?.files?.[0];
+  //   setUserUpload(userUpload);
+  //   validateUpload(userUpload);
+  // };
 
   const handleTabChange = (isDoctor: boolean) => {
     setEmail('');

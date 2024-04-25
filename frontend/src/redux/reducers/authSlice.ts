@@ -5,7 +5,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState: AuthReduxItf = {
   email: '',
   name: '',
-  gender: undefined,
+  gender: 'laki-laki',
   birthDate: undefined,
   specialization: null,
   role: 'user',

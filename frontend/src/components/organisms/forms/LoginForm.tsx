@@ -87,7 +87,7 @@ const LoginForm = (): React.ReactElement => {
         setAuthState({
           email: 'example@example.com',
           name: 'John Doe',
-          gender: 'male',
+          gender: 'laki-laki',
           birthDate: new Date('1970-01-01'),
           specialization: 'Dokter Kelamin',
           role: 'user',

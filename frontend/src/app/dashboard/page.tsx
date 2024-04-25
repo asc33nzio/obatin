@@ -30,6 +30,7 @@ import { DecodedJwtItf } from '@/types/jwtTypes';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
 import { debounce } from '@/utils/debounce';
@@ -41,10 +42,10 @@ import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import DatePicker from 'react-date-picker';
-import { useObatinSelector } from '@/redux/store/store';
 
 const DashboardPage = (): React.ReactElement => {
-  const userBirthDate = useObatinSelector((state) => state.auth.birthDate);
+  const userInfo = useObatinSelector((state) => state?.auth);
+  // const userName = useObatinSelector((state) => state.a);
   const { isDesktopDisplay } = useClientDisplayResolution();
   // eslint-disable-next-line
   const [userRole, setUserRole] = useState<string>('');
@@ -78,7 +79,7 @@ const DashboardPage = (): React.ReactElement => {
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
   // eslint-disable-next-line
-  const [gender, setGender] = useState<GenderItf>({ isMale: undefined });
+  const [gender, setGender] = useState<GenderItf>({ isMale: true });
   const [date, setDate] = useState<DatePickerType>(new Date());
   const currentYear = new Date().getFullYear();
   const dateRangeMin = new Date();
@@ -155,10 +156,21 @@ const DashboardPage = (): React.ReactElement => {
     }));
   };
 
-  const handleDateChange = (value: DatePickerType) => {
-    setDate(value);
+  const _handleDateChange = (selectedValue: Date) => {
+    const originalValue = userInfo?.birthDate;
 
-    //! if value !== user.birthDate
+    if (selectedValue === originalValue) {
+      setToast({
+        showToast: true,
+        toastMessage: 'Tidak ada perubahan',
+        toastType: 'warning',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      return;
+    }
+
+    setDate(selectedValue);
     setHasNewValue((prevState) => ({
       ...prevState,
       birthDate: true,
@@ -225,7 +237,11 @@ const DashboardPage = (): React.ReactElement => {
                 {isEditingField.email ? (
                   <>
                     <RegularInput
-                      defaultValue={email}
+                      defaultValue={
+                        userInfo?.email && !hasNewValue.email
+                          ? userInfo?.email
+                          : email
+                      }
                       validationMessage={emailValidationError}
                       onChange={handleEmailInputChange}
                       $height={60}
@@ -234,7 +250,7 @@ const DashboardPage = (): React.ReactElement => {
                       placeholder=''
                     />
                     <EditPencilICO
-                      isEditSuccessful={false}
+                      isEditSuccessful={hasNewValue.email}
                       onClick={() => {
                         if (!emailValidationError) {
                           setHasNewValue((prevState) => ({
@@ -252,7 +268,13 @@ const DashboardPage = (): React.ReactElement => {
                   </>
                 ) : (
                   <>
-                    <span>{email}</span>
+                    <span>
+                      {hasNewValue.email
+                        ? email
+                        : userInfo?.email
+                          ? userInfo?.email
+                          : ''}
+                    </span>
                     <EditPencilICO
                       isEditSuccessful={hasNewValue.email}
                       onClick={() =>
@@ -271,7 +293,11 @@ const DashboardPage = (): React.ReactElement => {
                 {isEditingField.name ? (
                   <>
                     <RegularInput
-                      defaultValue={name}
+                      defaultValue={
+                        userInfo?.name && !hasNewValue.name
+                          ? userInfo?.name
+                          : name
+                      }
                       validationMessage={nameValidationError}
                       onChange={handleNameInputChange}
                       $height={60}
@@ -298,7 +324,13 @@ const DashboardPage = (): React.ReactElement => {
                   </>
                 ) : (
                   <>
-                    <span>{name}</span>
+                    <span>
+                      {hasNewValue.name
+                        ? name
+                        : userInfo?.name
+                          ? userInfo?.name
+                          : ''}
+                    </span>
                     <EditPencilICO
                       isEditSuccessful={hasNewValue.name}
                       onClick={() =>
@@ -361,7 +393,17 @@ const DashboardPage = (): React.ReactElement => {
               <UserDetailDiv>
                 {isEditingField.gender ? (
                   <>
-                    <GenderSelect defaultValue={gender.isMale ? 1 : 0}>
+                    <GenderSelect
+                      defaultValue={gender.isMale ? 1 : 0}
+                      onChange={(
+                        event: React.ChangeEvent<HTMLSelectElement>,
+                      ) => {
+                        const isMale = parseInt(event.target.value, 10);
+                        setGender(
+                          isMale ? { isMale: true } : { isMale: false },
+                        );
+                      }}
+                    >
                       <option id='maleOption' value={1}>
                         laki-laki
                       </option>
@@ -370,27 +412,40 @@ const DashboardPage = (): React.ReactElement => {
                       </option>
                     </GenderSelect>
                     <EditPencilICO
-                      //! user.gender !== gender
                       isEditSuccessful={false}
-                      onClick={() =>
+                      onClick={() => {
+                        let isMale: boolean;
+                        userInfo?.gender === 'laki-laki'
+                          ? (isMale = true)
+                          : (isMale = false);
+
+                        if (isMale !== gender.isMale) {
+                          setHasNewValue((prevState) => ({
+                            ...prevState,
+                            gender: true,
+                          }));
+                        }
+
                         setIsEditingField((prevState) => ({
                           ...prevState,
                           gender: false,
-                        }))
-                      }
+                        }));
+                      }}
                     />
                   </>
                 ) : (
                   <>
                     <span>
-                      {gender.isMale === undefined
-                        ? null
-                        : gender.isMale
-                          ? 'Laki-laki'
-                          : 'Perempuan'}
+                      {hasNewValue.gender && gender.isMale
+                        ? 'laki - laki'
+                        : hasNewValue.gender && !gender.isMale
+                          ? 'perempuan'
+                          : userInfo?.gender
+                            ? userInfo?.gender
+                            : 'laki - laki'}
                     </span>
                     <EditPencilICO
-                      isEditSuccessful={false}
+                      isEditSuccessful={hasNewValue.gender}
                       onClick={() =>
                         setIsEditingField((prevState) => ({
                           ...prevState,
@@ -410,20 +465,13 @@ const DashboardPage = (): React.ReactElement => {
                       className='date-picker-custom-style'
                       minDate={dateRangeMin}
                       maxDate={dateRangeMax}
-                      format='dd-MMMM-yyy'
+                      format='ddMMMMyyy'
                       value={date}
-                      onChange={handleDateChange}
+                      // onChange={handleDateChange}
                     />
                     <EditPencilICO
-                      //! currentDate !== user.birthDate
                       isEditSuccessful={false}
                       onClick={() => {
-                        //! if (currentDate !== user.birthDate)
-                        setHasNewValue((prevState) => ({
-                          ...prevState,
-                          birthDate: true,
-                        }));
-
                         setIsEditingField((prevState) => ({
                           ...prevState,
                           birthDate: false,
@@ -433,12 +481,20 @@ const DashboardPage = (): React.ReactElement => {
                   </>
                 ) : (
                   <>
-                    {/* //! user.birthDate */}
                     <span>
-                      {userBirthDate ? userBirthDate.toLocaleDateString() : '-'}
+                      {hasNewValue.birthDate
+                        ? date
+                            ?.toLocaleString()
+                            .split(',')?.[0]
+                            .replaceAll('/', '-')
+                        : userInfo?.birthDate
+                          ? userInfo?.birthDate
+                              ?.toLocaleString()
+                              ?.split('T')?.[0]
+                          : '-'}
                     </span>
                     <EditPencilICO
-                      isEditSuccessful={false}
+                      isEditSuccessful={hasNewValue.birthDate}
                       onClick={() =>
                         setIsEditingField((prevState) => ({
                           ...prevState,

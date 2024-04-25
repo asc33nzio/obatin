@@ -14,7 +14,7 @@ export const RegularInputContainer = styled.div<{
   height: ${({ $height }) => ($height ? `${$height}px` : '100px')};
   gap: 5px;
 
-  font-size: 20px;
+  font-size: 18px;
   color: #718096;
   opacity: ${({ $title }) => ($title !== '' ? 1 : 0)};
 

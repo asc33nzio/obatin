@@ -29,7 +29,7 @@ export const AddressCardHeader = styled.div`
   justify-content: flex-start;
 
   width: 100%;
-  height: 30%;
+  height: 32.5%;
   gap: 25px;
 
   h1 {

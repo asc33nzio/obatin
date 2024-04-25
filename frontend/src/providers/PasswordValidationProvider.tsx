@@ -51,7 +51,7 @@ export const PasswordValidationProvider: React.FC<{
         setPassword(event.target.value);
       }
     },
-    500,
+    300,
   );
 
   const handleConfirmPasswordInputChange = debounce(
@@ -60,7 +60,7 @@ export const PasswordValidationProvider: React.FC<{
         setConfirmPassword(event.target.value);
       }
     },
-    500,
+    300,
   );
 
   const contextValue: PasswordValidationItf = {
