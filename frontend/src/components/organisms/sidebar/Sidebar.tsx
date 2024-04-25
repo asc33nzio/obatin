@@ -1,4 +1,4 @@
-import { MENU_ITEMS } from '@/constants/menu-items';
+import { MENU_ITEMS_USER } from '@/constants/menu-items';
 import {
   SidebarContainer,
   TOP,
@@ -25,7 +25,7 @@ export default function Sidebar({
           {isOpened ? <ChevronLeft /> : null}
         </IconContainer>
       </TOP>
-      <MenuItemsList options={MENU_ITEMS} />
+      <MenuItemsList options={MENU_ITEMS_USER} />
     </SidebarContainer>
   );
 }

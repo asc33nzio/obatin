@@ -3,6 +3,7 @@ import ConsulICO from '@/assets/icons/ConsulICO';
 import DoctorICO from '@/assets/icons/DoctorICO';
 import HomeICO from '@/assets/icons/HomeICO';
 import OrderICO from '@/assets/icons/OrderICO';
+import ProductICO from '@/assets/icons/ProductICO';
 import UserICO from '@/assets/icons/UserICO';
 
 type MenuOption = {
@@ -12,7 +13,7 @@ type MenuOption = {
   subItems?: MenuOption[];
 };
 
-const MENU_OPTIONS: MenuOption[] = [
+const MENU_USER: MenuOption[] = [
   {
     name: 'Home',
     icon: HomeICO,
@@ -21,12 +22,17 @@ const MENU_OPTIONS: MenuOption[] = [
   {
     name: 'Profile',
     icon: UserICO,
-    url: '/home',
+    url: '/dashboard',
+  },
+  {
+    name: 'Products',
+    icon: ProductICO,
+    url: '/products',
   },
   {
     name: 'Cart',
     icon: CartICO,
-    url: '/home',
+    url: '/products',
   },
   {
     name: 'Order History',
@@ -45,6 +51,38 @@ const MENU_OPTIONS: MenuOption[] = [
   },
 ];
 
+// const MENU_DOCTOR: MenuOption[] = [
+//   {
+//     name: 'Home',
+//     icon: HomeICO,
+//     url: '/',
+//   },
+//   {
+//     name: 'Profile',
+//     icon: UserICO,
+//     url: '/dashboard',
+//   },
+//   {
+//     name: 'Cart',
+//     icon: CartICO,
+//     url: '/products',
+//   },
+//   {
+//     name: 'Order History',
+//     icon: OrderICO,
+//     url: '/home',
+//   },
+//   {
+//     name: 'Consultation',
+//     icon: ConsulICO,
+//     url: '/home',
+//   },
+//   {
+//     name: 'Doctor',
+//     icon: DoctorICO,
+//     url: '/home',
+//   },
+// ];
 export type MenuItem = {
   name: string;
   icon: React.ComponentType;
@@ -66,4 +104,4 @@ function makeMenuLevel(options: MenuOption[], depth = 0): MenuItem[] {
   }));
 }
 
-export const MENU_ITEMS: MenuItem[] = makeMenuLevel(MENU_OPTIONS);
+export const MENU_ITEMS_USER: MenuItem[] = makeMenuLevel(MENU_USER);
