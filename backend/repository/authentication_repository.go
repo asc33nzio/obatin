@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"obatin/apperror"
 	"obatin/entity"
+	"strings"
 )
 
 type AuthenticationRepository interface {
@@ -20,6 +21,8 @@ type AuthenticationRepository interface {
 	GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error)
 	IsTokenHasUsed(ctx context.Context, token string) (bool, error)
 	IsApproved(ctx context.Context, email string) (bool, error)
+	UpdateAuthenticationPartner(ctx context.Context, body entity.PartnerUpdateRequest, idAuth int64) (*entity.Authentication, error) 
+	IsEmailExistUpdatePartner(ctx context.Context, email string, id int64) (int, error)
 }
 
 type authenticationRepositoryPostgres struct {
@@ -110,9 +113,11 @@ func (r *authenticationRepositoryPostgres) CreateOne(ctx context.Context, u enti
 				password,
 				token,
 				role,
-				is_approved)
+				is_approved,
+				is_verified
+			)
 			VALUES 
-				($1, $2, $3, $4, $5)
+				($1, $2, $3, $4, $5, $6)
 		RETURNING 
 			id
 	`
@@ -125,6 +130,7 @@ func (r *authenticationRepositoryPostgres) CreateOne(ctx context.Context, u enti
 		u.Token,
 		u.Role,
 		u.IsApproved,
+		u.IsVerified,
 	).Scan(&u.Id)
 	if err != nil {
 		return nil, apperror.NewInternal(err)
@@ -523,4 +529,59 @@ func (r *authenticationRepositoryPostgres) IsApproved(ctx context.Context, email
 	}
 
 	return isApproved, nil
+}
+
+
+func (r *authenticationRepositoryPostgres) UpdateAuthenticationPartner(ctx context.Context, body entity.PartnerUpdateRequest, idAuth int64) (*entity.Authentication, error) {
+	authentiaction := entity.Authentication{}
+	var query strings.Builder
+	var data []interface{}
+
+	query.WriteString(`
+		UPDATE
+			authentications
+		SET `)
+
+	queryParams, paramsData := convertUpdateAuthenticationPartnerQueryParamstoSql(body, idAuth)
+	query.WriteString(queryParams)
+	data = append(data, paramsData...)
+
+	err := r.db.QueryRowContext(ctx, query.String(), data...).
+		Scan(&authentiaction.Id, &authentiaction.Email)
+
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+
+	return &authentiaction, nil
+}
+
+
+
+func (r *authenticationRepositoryPostgres) IsEmailExistUpdatePartner(ctx context.Context, email string, id int64) (int, error) {
+	var count int
+	queryIsEmailExist := `
+	SELECT 
+		COUNT(*)
+	FROM 
+		authentications
+	WHERE 
+		email = $1
+	AND 
+		id<>$2
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		queryIsEmailExist,
+		email,
+		id,
+	).Scan(
+		&count,
+	)
+	if err != nil {
+		return 0, apperror.NewInternal(err)
+	}
+
+	return count, nil
 }

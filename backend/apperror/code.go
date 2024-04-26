@@ -16,4 +16,5 @@ const (
 	ErrorCategoryNotFound
 	EmailNotVerified
 	ForbiddenAccess
+	ErrPartnerNotExist
 )

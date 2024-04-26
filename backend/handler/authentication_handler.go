@@ -56,10 +56,10 @@ func (h *AuthenticationHandler) RegisterDoctor(ctx *gin.Context) {
 		return
 	}
 
-	isValidFileUploaded := appvalidator.IsValidFileUploaded(int(FileHeader.Size), FileHeader.Filename)
+	isValidFileUploaded := appvalidator.IsValidCertificateFileUploaded(int(FileHeader.Size), FileHeader.Filename)
 
 	if !isValidFileUploaded {
-		ctx.Error(apperror.ErrFileUploadInvalid(apperror.ErrStlUploadFileInvalid))
+		ctx.Error(apperror.ErrFileCertificateUploadInvalid(apperror.ErrStlUploadFileInvalid))
 		return
 	}
 	defer file.Close()
@@ -238,7 +238,7 @@ func (h *AuthenticationHandler) GetRefreshToken(ctx *gin.Context) {
 		RefreshToken: newTokens.RefreshToken,
 	}
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseGetNewRefreshToken,
+		Message: constant.ResponseGetNewRefreshTokenMsg,
 		Data:    res,
 	})
 

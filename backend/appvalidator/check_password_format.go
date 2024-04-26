@@ -1,25 +1,26 @@
 package appvalidator
 
+import (
+	"obatin/constant"
+	"regexp"
+)
+
 func IsValidPassword(password string) bool {
-	if len(password) < 9 {
+	if len(password) < 8 {
 		return false
 	}
 
-	hasLowerCase := false
-	hasUpperCase := false
-	hasDigit := false
-
-	for _, char := range password {
-		if 'a' <= char && char <= 'z' {
-			hasLowerCase = true
-		}
-		if 'A' <= char && char <= 'Z' {
-			hasUpperCase = true
-		}
-		if '0' <= char && char <= '9' {
-			hasDigit = true
-		}
+	if !regexp.MustCompile(constant.RegexLowerCase).MatchString(password) {
+		return false
 	}
 
-	return hasLowerCase && hasUpperCase && hasDigit
+	if !regexp.MustCompile(constant.RegexUpperCase).MatchString(password) {
+		return false
+	}
+
+	if !regexp.MustCompile(constant.RegexDigitCase).MatchString(password) {
+		return false
+	}
+
+	return true
 }

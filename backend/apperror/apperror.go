@@ -117,11 +117,11 @@ func ErrInvalidPassword(err error) *AppError {
 	}
 }
 
-func ErrFileUploadInvalid(err error) *AppError {
+func ErrFileCertificateUploadInvalid(err error) *AppError {
 	return &AppError{
 		code:    FileUploadedInvalid,
 		err:     err,
-		message: FileUploadedInvalidMsg,
+		message: FileCertificateUploadedInvalidMsg,
 		stack:   debug.Stack(),
 	}
 }
@@ -175,7 +175,25 @@ func ErrTokenHasBeenUsedBefore(err error) *AppError {
 	return &AppError{
 		code:    InvalidReq,
 		err:     err,
-		message: TokenHasBeenUsedBefore,
+		message: TokenHasBeenUsedBeforeMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrPartnerAlreadyExist(err error) *AppError {
+	return &AppError{
+		code:    EmailAlreadyRegistered,
+		err:     err,
+		message: PartnerAlreadyExistMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrFileLogoUploadInvalid(err error) *AppError {
+	return &AppError{
+		code:    FileUploadedInvalid,
+		err:     err,
+		message: FileLogoUploadedInvalidMsg,
 		stack:   debug.Stack(),
 	}
 }
@@ -212,6 +230,16 @@ func ErrCategoryNotFound(err error) *AppError {
         code:    ErrorCategoryNotFound,
         err:     err,
         message: CategoryNotFoundMsg,
+        stack:   debug.Stack(),
+    }
+}
+
+
+func ErrPartnerNotFound(err error) *AppError {
+	return &AppError{
+        code:    ErrPartnerNotExist,
+        err:     err,
+        message: PartnerNotExistMsg,
         stack:   debug.Stack(),
     }
 }

@@ -20,10 +20,10 @@ type RefreshTokenReq struct {
 }
 
 type DoctorRegisterReq struct {
-	Email            string         `form:"email" binding:"required"`
-	Password         string         `form:"password"`
-	Certificate      multipart.File 
-	SpecializationId int64          `form:"doctor_specialization_id" binding:"required"`
+	Email            string `form:"email" binding:"required"`
+	Password         string `form:"password"`
+	Certificate      multipart.File
+	SpecializationId int64 `form:"doctor_specialization_id" binding:"required"`
 }
 
 type UpdatePasswordReq struct {
@@ -31,6 +31,13 @@ type UpdatePasswordReq struct {
 	Password        string `json:"password"`
 	Token           string `json:"token"`
 	ConfirmPassword string `json:"confirm_password"`
+}
+
+type PartnerRegisterReq struct {
+	Email    string `form:"email" binding:"required"`
+	Password string `form:"password" binding:"required"`
+	Logo     multipart.File
+	Name     string `form:"name" binding:"required"`
 }
 
 func (u UserLoginReq) ToUser() entity.Authentication {
@@ -66,5 +73,14 @@ func (u UpdatePasswordReq) ToPassword() entity.Authentication {
 func (u UpdatePasswordReq) ToEmail() entity.Authentication {
 	return entity.Authentication{
 		Email: u.Email,
+	}
+}
+
+func (u PartnerRegisterReq) ToPartner() entity.Partner {
+	return entity.Partner{
+		Email: u.Email,
+		Password: u.Password,
+		Logo: u.Logo,
+		Name: u.Name,
 	}
 }

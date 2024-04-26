@@ -20,10 +20,11 @@ import (
 
 type RouterOpt struct {
 	AuthenticationHandler       *handler.AuthenticationHandler
-	ProductHandler                     *handler.ProductHandler
-	CategoryHandler       *handler.CategoryHandler
+	ProductHandler              *handler.ProductHandler
+	CategoryHandler             *handler.CategoryHandler
 	Middleware                  *middleware.GinMiddleware
 	DoctorSpecializationHandler *handler.DoctorSpecializationHandler
+	PartnerHandler              *handler.PartnerHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -47,12 +48,16 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	categoryUseCase := usecase.NewCategoryUsecaseImpl(dbStore, config, cloudinaryUpload)
 	categoryHandler := handler.NewCategoryHandler(categoryUseCase)
 
+	partnerUsecase := usecase.NewPartnerUsecaseImpl(dbStore, config, cryptoHash, jwtAuth, tokenGenerator, cloudinaryUpload, sendEmail)
+	partnerHandler := handler.NewPartnerHandler(partnerUsecase)
+
 	return NewRouter(RouterOpt{
 		Middleware:                  middleware,
 		AuthenticationHandler:       authentiationHandler,
-		ProductHandler:                     productHandler,
+		ProductHandler:              productHandler,
 		DoctorSpecializationHandler: doctorSpecializationHandler,
-		CategoryHandler:       categoryHandler,
+		CategoryHandler:             categoryHandler,
+		PartnerHandler:              partnerHandler,
 	})
 }
 
@@ -102,5 +107,9 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndpointSendVerifyToEmail, h.AuthenticationHandler.SendVerifyToEmail)
 	r.POST(appconstant.EndpointApproval, h.AuthenticationHandler.UpdateApproval)
 	r.GET(appconstant.EndpointGetDoctorPendingApproval, h.AuthenticationHandler.GetPendingDoctorApproval)
+	r.POST(appconstant.EndpointRegisterPartner, h.PartnerHandler.RegisterPartner)
+	r.GET(appconstant.EndpointGetPartnerList, h.PartnerHandler.GetAllPartner)
+	r.PATCH(appconstant.EndpointUpdatePartner, h.PartnerHandler.UpdateOnePartner)
+	r.GET(appconstant.EndpointGetPartnerById, h.PartnerHandler.GetPartnerDetailById)
 	return r
 }
