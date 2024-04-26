@@ -6,8 +6,10 @@ export const DashboardPageContainer = styled.div<{
   display: flex;
   flex-direction: column;
 
-  width: 100vw;
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '100vh' : '200vh')};
+  width: 99vw;
+  max-width: 100vw;
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '125vh' : '200vh')};
+  overflow-x: hidden;
 `;
 
 export const DashboardPageContentContainer = styled.div`
@@ -15,8 +17,10 @@ export const DashboardPageContentContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
+  padding-top: 50px;
+
   width: 100vw;
-  height: inherit;
+  height: 95%;
 `;
 
 export const ProfileContainer = styled.div<{ $isDesktopDisplay: boolean }>`
@@ -25,8 +29,10 @@ export const ProfileContainer = styled.div<{ $isDesktopDisplay: boolean }>`
   align-items: center;
 
   width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '66%' : '100%')};
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '40%' : '100%')};
   gap: 10px;
+
+  margin-bottom: 100px;
 `;
 
 export const ProfileHeader = styled.div<{ $isDesktopDisplay: boolean }>`
@@ -89,6 +95,7 @@ export const ImgBg = styled.div`
 
   width: 275px;
   height: 275px;
+  margin-bottom: 20px;
 
   border-radius: 50%;
   box-shadow: 0 0 10px 5px #bdbdbd;

@@ -13,20 +13,18 @@ import {
   ProductCard,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
+import { CategoryType, ProductType } from '@/types/Product';
+import { Body, Container } from '@/styles/Global.styles';
+import { useFullscreen } from '@mantine/hooks';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Navbar from '@/components/organisms/navbar/Navbar';
-import Sidebar from '@/components/organisms/sidebar/Sidebar';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useFullscreen } from '@mantine/hooks';
-import { Body, Container } from '@/styles/Global.styles';
-import { CategoryType, ProductType } from '@/types/Product';
 
 const ProductsPage = () => {
   const router = useRouter();
   const [products, setProducts] = useState<ProductType[]>([]);
-  const [isOpened, setOpened] = useState(false);
   const { ref, toggle } = useFullscreen();
   const [categories, setCategories] = useState<CategoryType[]>([]);
 
@@ -66,15 +64,11 @@ const ProductsPage = () => {
     router.push(`products/${slug}`);
   };
 
-  const toggleDrawer = () => {
-    setOpened((prev) => !prev);
-  };
-
   return (
     <Container>
-      <Sidebar toggleDrawer={toggleDrawer} isOpened={isOpened} />
+      <Navbar />
+
       <Body>
-        <Navbar isOpened={isOpened} toggleDrawer={toggleDrawer} />
         <Content>
           <CategoryContainer>
             {categories.map((category) => {

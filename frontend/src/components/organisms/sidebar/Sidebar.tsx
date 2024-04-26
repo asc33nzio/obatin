@@ -1,31 +1,28 @@
-import { MENU_ITEMS_USER } from '@/constants/menu-items';
 import {
   SidebarContainer,
   TOP,
 } from '@/styles/organisms/sidebar/Sidebar.styles';
+import { MENU_ITEMS_USER } from '@/constants/menu-items';
 import { IconContainer } from '@/styles/organisms/Navbar.styles';
 import { ChevronLeft } from '@styled-icons/material';
+import { useNavbar } from '@/hooks/useNavbar';
 import MenuItemsList from './MenuItemList';
 import ObatinICO from '@/assets/icons/ObatinICO';
 
-type SidebarProps = {
-  isOpened: boolean;
-  toggleDrawer: () => void;
-};
+const Sidebar = (): React.ReactElement => {
+  const { isOpened, toggleDrawer } = useNavbar();
 
-export default function Sidebar({
-  isOpened,
-  toggleDrawer,
-}: SidebarProps): React.ReactElement {
   return (
     <SidebarContainer $isOpened={isOpened}>
       <TOP>
         <ObatinICO />
-        <IconContainer onClick={toggleDrawer}>
+        <IconContainer onClick={() => toggleDrawer()}>
           {isOpened ? <ChevronLeft /> : null}
         </IconContainer>
       </TOP>
       <MenuItemsList options={MENU_ITEMS_USER} />
     </SidebarContainer>
   );
-}
+};
+
+export default Sidebar;

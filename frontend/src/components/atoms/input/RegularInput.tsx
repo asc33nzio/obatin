@@ -11,6 +11,7 @@ interface RegularInputItf extends InputHTMLAttributes<HTMLInputElement> {
   title?: string;
   validationMessage?: string;
   $marBot?: number;
+  $width?: number;
   $height?: number;
 }
 
@@ -19,11 +20,12 @@ const RegularInput = ({
   placeholder = 'Default placeholder',
   validationMessage = 'Default error message',
   $marBot = 0,
+  $width = 100,
   $height = 100,
   ...props
 }: RegularInputItf): React.ReactElement => {
   return (
-    <RegularInputContainer $marBot={$marBot} $height={$height}>
+    <RegularInputContainer $marBot={$marBot} $width={$width} $height={$height}>
       {title}
       <RegularCustomInput
         {...props}
