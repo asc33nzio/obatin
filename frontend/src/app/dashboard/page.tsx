@@ -29,12 +29,13 @@ import { useEffect, useState } from 'react';
 import { DecodedJwtItf } from '@/types/jwtTypes';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { useUploadValidation } from '@/hooks/useUploadValidation';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
 import { debounce } from '@/utils/debounce';
-import Header from '@/components/organisms/navbar/Navbar';
+import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import PlaceholderAva from '@/assets/PlaceholderAva';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
@@ -49,7 +50,6 @@ const DashboardPage = (): React.ReactElement => {
   const { isDesktopDisplay } = useClientDisplayResolution();
   // eslint-disable-next-line
   const [userRole, setUserRole] = useState<string>('');
-  const [isNavbarExpanded, setisNavbarExpanded] = useState<boolean>(false);
   const [isEditingField, setIsEditingField] = useState<EditProfileStateItf>({
     email: false,
     name: false,
@@ -76,9 +76,20 @@ const DashboardPage = (): React.ReactElement => {
     confirmPasswordValidationError,
     handlePasswordInputChange,
   } = usePasswordValidation();
+  const {
+    // eslint-disable-next-line
+    userUpload,
+    // eslint-disable-next-line
+    setUserUpload,
+    userUploadValidationError,
+    // eslint-disable-next-line
+    setUserUploadValidationError,
+    // eslint-disable-next-line
+    validateImageUpload,
+    handleImageChange,
+  } = useUploadValidation();
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
-  // eslint-disable-next-line
   const [gender, setGender] = useState<GenderItf>({ isMale: true });
   const [date, setDate] = useState<DatePickerType>(new Date());
   const currentYear = new Date().getFullYear();
@@ -193,10 +204,7 @@ const DashboardPage = (): React.ReactElement => {
 
   return (
     <DashboardPageContainer $isDesktopDisplay={isDesktopDisplay}>
-      <Header
-        isOpened={isNavbarExpanded}
-        toggleDrawer={() => setisNavbarExpanded(!isNavbarExpanded)}
-      />
+      <Navbar />
 
       <DashboardPageContentContainer>
         <ProfileContainer $isDesktopDisplay={isDesktopDisplay}>
@@ -216,16 +224,17 @@ const DashboardPage = (): React.ReactElement => {
               <ImgBg>
                 <PlaceholderAva />
               </ImgBg>
-              <span>
-                Besar file: maksimum 500 Kb. Ekstensi file yang diperbolehkan:
-                .JPG .JPEG .PNG .SVG .WEBP
-              </span>
-              <CustomButton
-                content='Pilih Foto'
-                $bgColor='#00B5C0'
-                $width='175px'
-                $height='50px'
-                $fontSize='22px'
+
+              <RegularInput
+                type='file'
+                title=''
+                placeholder='Pilih Foto'
+                $width={45}
+                $height={35}
+                validationMessage={userUploadValidationError}
+                onChange={handleImageChange}
+                $marBot={0}
+                accept='image/*'
               />
             </ProfileContentLeft>
 

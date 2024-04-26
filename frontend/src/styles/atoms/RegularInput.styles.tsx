@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export const RegularInputContainer = styled.div<{
   $marBot?: number;
   $title?: string;
+  $width?: number;
   $height?: number;
 }>`
   position: relative;
@@ -10,7 +11,7 @@ export const RegularInputContainer = styled.div<{
   flex-direction: column;
   justify-content: center;
 
-  width: 100%;
+  width: ${({ $width }) => ($width ? `${$width}%` : '100%')};
   height: ${({ $height }) => ($height ? `${$height}px` : '100px')};
   gap: 5px;
 

@@ -3,6 +3,7 @@ import { ClientDisplayResolutionProvider } from './ClientDisplayResolutionProvid
 import { PasswordValidationProvider } from './PasswordValidationProvider';
 import { ModalProvider } from './ModalProvider';
 import { ToastProvider } from './ToastProvider';
+import { NavbarProvider } from './NavbarProvider';
 import ReduxProvider from './ReduxProvider';
 
 export function Providers({
@@ -13,11 +14,15 @@ export function Providers({
   return (
     <ReduxProvider>
       <ClientDisplayResolutionProvider>
-        <ModalProvider>
-          <ToastProvider>
-            <PasswordValidationProvider>{children}</PasswordValidationProvider>
-          </ToastProvider>
-        </ModalProvider>
+        <NavbarProvider>
+          <ModalProvider>
+            <ToastProvider>
+              <PasswordValidationProvider>
+                {children}
+              </PasswordValidationProvider>
+            </ToastProvider>
+          </ModalProvider>
+        </NavbarProvider>
       </ClientDisplayResolutionProvider>
     </ReduxProvider>
   );
