@@ -8,9 +8,13 @@ export const NavContainer = styled.div`
   justify-content: space-between;
 
   align-self: center;
-  /* justify-self: center; */
-  height: 150px;
-  width: 90vw;
+  justify-self: center;
+
+  height: 125px;
+  width: 100vw;
+
+  padding-left: 50px;
+  padding-right: 75px;
 
   border-bottom: 0.5px solid ${COLORS.input_border};
 `;

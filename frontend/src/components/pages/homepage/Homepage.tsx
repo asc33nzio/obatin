@@ -49,9 +49,10 @@ const CategoryImg = [
 const Homepage = (): React.ReactElement => {
   return (
     <>
+      <Navbar />
+
       <Content>
         <Body>
-          <Navbar />
           <Banner />
           <FiturContainer>
             <Fitur>
@@ -122,9 +123,10 @@ const Homepage = (): React.ReactElement => {
               })}
             </Container>
           </NewSection>
-          <Footer />
         </Body>
       </Content>
+
+      <Footer />
     </>
   );
 };

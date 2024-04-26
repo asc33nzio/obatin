@@ -2,18 +2,20 @@ import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
 export const SidebarContainer = styled.aside<{ $isOpened: boolean }>`
-  border-right: ${(props) =>
-    props.$isOpened ? `1px solid ${COLORS.input_border}` : 'none'};
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+
   width: ${(props) => (props.$isOpened ? '15vw' : '0vw')};
   min-height: 100vh;
+
+  border-right: ${(props) =>
+    props.$isOpened ? `1px solid ${COLORS.input_border}` : 'none'};
   transition: width 0.5s;
   overflow: hidden;
   color: ${COLORS.primary_text};
   padding: 40px 0px;
-  display: flex;
-  flex-direction: column;
   gap: 20px;
-  position: fixed;
   background-color: white;
 
   svg {
@@ -25,10 +27,6 @@ export const SidebarContainer = styled.aside<{ $isOpened: boolean }>`
   }
 
   z-index: 10;
-
-  @media (max-width: 1440px) {
-    width: ${(props) => (props.$isOpened ? '30vw' : '0vw')};
-  }
 `;
 
 export const TOP = styled.div`

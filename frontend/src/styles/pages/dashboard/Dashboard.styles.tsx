@@ -17,8 +17,10 @@ export const DashboardPageContentContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
+  padding-top: 50px;
+
   width: 100vw;
-  height: inherit;
+  height: 95%;
 `;
 
 export const ProfileContainer = styled.div<{ $isDesktopDisplay: boolean }>`
@@ -27,8 +29,10 @@ export const ProfileContainer = styled.div<{ $isDesktopDisplay: boolean }>`
   align-items: center;
 
   width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '66%' : '100%')};
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '40%' : '100%')};
   gap: 10px;
+
+  margin-bottom: 100px;
 `;
 
 export const ProfileHeader = styled.div<{ $isDesktopDisplay: boolean }>`
