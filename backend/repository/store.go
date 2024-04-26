@@ -17,6 +17,7 @@ type RepoStore interface {
 	DoctorSpecializationRepository() DoctorSpecializationRepository
 	CategoryRepository() CategoryRepository
 	RefreshTokenRepository() RefreshTokenRepository
+	PartnerRepository() PartnerRepository
 }
 
 type dbStore struct {
@@ -100,6 +101,12 @@ func (s *dbStore) RefreshTokenRepository() RefreshTokenRepository {
 
 func (s *dbStore) CategoryRepository() CategoryRepository {
 	return &categoryRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) PartnerRepository() PartnerRepository {
+	return &partnerRepositoryPostgres{
 		db: s.querier,
 	}
 }

@@ -62,6 +62,16 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 	ur := u.repoStore.AuthenticationRepository()
 	rt := u.repoStore.RefreshTokenRepository()
 
+	isPasswordValid := appvalidator.IsValidPassword(uReq.Password)
+	if !isPasswordValid {
+		return nil, apperror.ErrInvalidPassword(apperror.ErrStlInvalidPassword)
+	}
+
+	isValidEmailFormat := appvalidator.IsValidEmail(uReq.Email)
+	if !isValidEmailFormat {
+		return nil, apperror.ErrInvalidEmail(apperror.ErrStlInvalidEmail)
+	}
+
 	authentication, err := ur.FindAuthenticationByEmail(ctx, uReq.Email)
 	if err != nil {
 		return nil, err

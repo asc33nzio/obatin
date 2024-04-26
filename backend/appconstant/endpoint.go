@@ -17,4 +17,8 @@ const (
 	EndpointGetDoctorPendingApproval = "/doctor-pending-approval"
 	EndpointGetProductDetail         = "/shop/products/:product_slug"
 	EndpointRefreshToken             = "/auth/refresh-token"
+	EndpointRegisterPartner          = "/auth/register/partners"
+	EndpointGetPartnerList           = "/partners"
+	EndpointUpdatePartner            = "/partners/:id"
+	EndpointGetPartnerById            = "/partners/:id"
 )

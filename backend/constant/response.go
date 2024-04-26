@@ -16,5 +16,6 @@ const (
 	ResponseGetAllPendingDoctorApproval = "get all doctor pending approval successfully"
 	ResponseCategoryCreatedMsg          = "category created succesfully"
 	ResponseCategoryUpdatedMsg          = "category updated succesfully"
-	ResponseGetNewRefreshToken          = "successfully get new refresh token"
+	ResponseGetNewRefreshTokenMsg       = "successfully get new refresh token"
+	ResponsePartnerUpdateMsg            = "partner updated succesfully"
 )
