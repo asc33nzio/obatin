@@ -34,7 +34,7 @@ func (r *doctorSpecializationRepositoryPostgres) GetAll(ctx context.Context) ([]
 	FROM
 		doctor_specializations
 	WHERE 
-		deletedAt IS NULL
+		deleted_at IS NULL
 	`
 
 	rows, err := r.db.QueryContext(

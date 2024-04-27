@@ -26,4 +26,8 @@ const (
 	PartnerAlreadyExistMsg            = "partner already exist"
 	FileLogoUploadedInvalidMsg        = "file uploaded can not be more than 10 MB and type must be jpg/jpeg/png"
 	PartnerNotExistMsg                = "partner not exist"
+	UserNotFoundMsg                   = "user not found"
+	NoAccessAccountNotVerifiedMsg     = "you don't have access, please verify your account first"
+	TokenHasBeenUsedBefore            = "token has been used before, please make new request"
+	AddressNotFoundMsg                = "address not found"
 )

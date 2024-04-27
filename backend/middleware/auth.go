@@ -35,10 +35,9 @@ func (m *GinMiddleware) JWTAuth(ctx *gin.Context) {
 		return
 	}
 
-	aid := claims.Payload.AuthenticationId
-	arole := claims.Payload.Role
-
-	ctx.Set(constant.AuthenticationIdKey, aid)
-	ctx.Set(constant.AuthenticationRole, arole)
+	ctx.Set(constant.AuthenticationIdKey, claims.Payload.AuthenticationId)
+	ctx.Set(constant.AuthenticationRole, claims.Payload.Role)
+	ctx.Set(constant.IsVerifiedKey, claims.Payload.IsVerified)
+	ctx.Set(constant.IsApprovedKey, claims.Payload.IsApproved)
 	ctx.Next()
 }

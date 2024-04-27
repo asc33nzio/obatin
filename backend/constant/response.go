@@ -18,4 +18,8 @@ const (
 	ResponseCategoryUpdatedMsg          = "category updated succesfully"
 	ResponseGetNewRefreshTokenMsg       = "successfully get new refresh token"
 	ResponsePartnerUpdateMsg            = "partner updated succesfully"
+	ResponseUpdateUserMsg               = "user updated successfully"
+	ResponseAddressCreatedMsg           = "address created successfully"
+	ResponseAddressUpdatedMsg           = "address updated successfully"
+	ResponseAddressDeletedMsg           = "address deleted successfully"
 )

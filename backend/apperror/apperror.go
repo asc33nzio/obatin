@@ -126,6 +126,15 @@ func ErrFileCertificateUploadInvalid(err error) *AppError {
 	}
 }
 
+func ErrUserNotFound(err error) *AppError {
+	return &AppError{
+		code:    UserNotFound,
+		err:     err,
+		message: UserNotFoundMsg,
+		stack:   debug.Stack(),
+	}
+}
+
 func ErrConfirmPasswordNotMatch(err error) *AppError {
 	return &AppError{
 		code:    InvalidReq,
@@ -149,6 +158,15 @@ func ErrForbiddenAccess(err error) *AppError {
 		code:    ForbiddenAccess,
 		err:     err,
 		message: ForbiddenAccessMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrNoAccessAccountNotVerified(err error) *AppError {
+	return &AppError{
+		code:    NoAccessAccountNotVerified,
+		err:     err,
+		message: NoAccessAccountNotVerifiedMsg,
 		stack:   debug.Stack(),
 	}
 }
@@ -218,28 +236,35 @@ func ErrInvalidSlug(err error) *AppError {
 
 func ErrDuplicateSlug(err error) *AppError {
 	return &AppError{
-        code:    InvalidSlug,
-        err:     err,
-        message: CategorySlugDuplicateInvalidMsg,
-        stack:   debug.Stack(),
-    }
+		code:    InvalidSlug,
+		err:     err,
+		message: CategorySlugDuplicateInvalidMsg,
+		stack:   debug.Stack(),
+	}
 }
 
 func ErrCategoryNotFound(err error) *AppError {
 	return &AppError{
-        code:    ErrorCategoryNotFound,
-        err:     err,
-        message: CategoryNotFoundMsg,
-        stack:   debug.Stack(),
-    }
+		code:    ErrorCategoryNotFound,
+		err:     err,
+		message: CategoryNotFoundMsg,
+		stack:   debug.Stack(),
+	}
 }
-
-
 func ErrPartnerNotFound(err error) *AppError {
 	return &AppError{
-        code:    ErrPartnerNotExist,
-        err:     err,
-        message: PartnerNotExistMsg,
-        stack:   debug.Stack(),
-    }
+		code:    ErrPartnerNotExist,
+		err:     err,
+		message: PartnerNotExistMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrAddressNotFound(err error) *AppError {
+	return &AppError{
+		code:    AddressNotFound,
+		err:     err,
+		message: AddressNotFoundMsg,
+		stack:   debug.Stack(),
+	}
 }
