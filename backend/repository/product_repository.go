@@ -123,7 +123,7 @@ func (r *productRepositoryPostgres) FindProductDetailBySlug(ctx context.Context,
 		WHERE
 			p.product_slug = $1
 		AND
-		    p.deletedAt IS NULL
+		    p.deleted_at IS NULL
 		AND 
 			p.is_active IS TRUE
 

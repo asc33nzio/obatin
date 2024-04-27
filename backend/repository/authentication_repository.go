@@ -21,8 +21,10 @@ type AuthenticationRepository interface {
 	GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error)
 	IsTokenHasUsed(ctx context.Context, token string) (bool, error)
 	IsApproved(ctx context.Context, email string) (bool, error)
-	UpdateAuthenticationPartner(ctx context.Context, body entity.PartnerUpdateRequest, idAuth int64) (*entity.Authentication, error) 
+	UpdateAuthenticationPartner(ctx context.Context, body entity.PartnerUpdateRequest, idAuth int64) (*entity.Authentication, error)
 	IsEmailExistUpdatePartner(ctx context.Context, email string, id int64) (int, error)
+	FindAuthenticationById(ctx context.Context, authenticationId int64) (*entity.Authentication, error)
+	DeleteOneAuthenticationById(ctx context.Context, authenticationId int64) error
 }
 
 type authenticationRepositoryPostgres struct {
@@ -87,7 +89,7 @@ func (r *authenticationRepositoryPostgres) IsEmailExist(ctx context.Context, ema
 			WHERE 
 				email = $1
 			AND 
-				deletedAt IS NULL
+				deleted_at IS NULL
 		)
 	`
 
@@ -241,7 +243,7 @@ func (r *authenticationRepositoryPostgres) UpdatePassword(ctx context.Context, p
 		AND 
 			is_verified = true
 		AND 
-			deletedAt IS NULL
+			deleted_at IS NULL
 		RETURNING 
 			id, 
 			email
@@ -286,7 +288,7 @@ func (r *authenticationRepositoryPostgres) UpdateApproval(ctx context.Context, a
 		AND 
 			role = 'doctor'
 		AND
-			deletedAt IS NULL
+			deleted_at IS NULL
 		RETURNING 
 			id, 
 			email
@@ -297,13 +299,13 @@ func (r *authenticationRepositoryPostgres) UpdateApproval(ctx context.Context, a
 			authentications
 		SET 
 			is_approved = $2,
-			deletedAt = now()
+			deleted_at = now()
 		WHERE 
 			id = $1 
 		AND 
 			role = 'doctor'
 		AND
-			deletedAt IS NULL
+			deleted_at IS NULL
 		RETURNING 
 			id, 
 			email
@@ -388,7 +390,7 @@ func (r *authenticationRepositoryPostgres) IsVerified(ctx context.Context, email
 			AND
 				is_verified = true
 			AND 
-				deletedAt IS NULL
+				deleted_at IS NULL
 		)
 	`
 
@@ -432,7 +434,7 @@ func (r *authenticationRepositoryPostgres) GetPendingDoctorApproval(ctx context.
 	AND
 		a.is_approved = false
 	AND 	
-		a.deletedAt IS NULL
+		a.deleted_at IS NULL
 	`
 
 	rows, err := r.db.QueryContext(
@@ -480,7 +482,7 @@ func (r *authenticationRepositoryPostgres) IsTokenHasUsed(ctx context.Context, t
 			AND
 				is_verified = TRUE
 			AND 
-				deletedAt IS NULL
+				deleted_at IS NULL
 		)
 	`
 
@@ -512,7 +514,7 @@ func (r *authenticationRepositoryPostgres) IsApproved(ctx context.Context, email
 			AND
 				is_approved = true
 			AND 
-				deletedAt IS NULL
+				deleted_at IS NULL
 		)
 	`
 
@@ -531,6 +533,76 @@ func (r *authenticationRepositoryPostgres) IsApproved(ctx context.Context, email
 	return isApproved, nil
 }
 
+func (r *authenticationRepositoryPostgres) FindAuthenticationById(ctx context.Context, authenticationId int64) (*entity.Authentication, error) {
+	a := entity.Authentication{}
+	a.Id = authenticationId
+
+	query := `
+		SELECT 
+			email,
+			is_verified,
+			is_approved,
+			role
+		FROM
+			authentications
+		WHERE
+			id = $1
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		authenticationId,
+	).Scan(
+		&a.Email,
+		&a.IsVerified,
+		&a.IsApproved,
+		&a.Role,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.ErrEmailNotRegistered(err)
+		}
+
+		return nil, apperror.NewInternal(err)
+	}
+
+	return &a, nil
+}
+
+func (r *authenticationRepositoryPostgres) DeleteOneAuthenticationById(ctx context.Context, authenticationId int64) error {
+	query := `
+		UPDATE
+			authentications
+		SET 
+			deleted_at = NOW() , updated_at = NOW()
+		WHERE
+			id = $1
+		AND
+			deleted_at IS NULL
+	`
+
+	res, err := r.db.ExecContext(
+		ctx,
+		query,
+		authenticationId,
+	)
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	if rowsAffected == 0 {
+		return apperror.NewInternal(err)
+	}
+
+	return nil
+}
 
 func (r *authenticationRepositoryPostgres) UpdateAuthenticationPartner(ctx context.Context, body entity.PartnerUpdateRequest, idAuth int64) (*entity.Authentication, error) {
 	authentiaction := entity.Authentication{}
@@ -555,8 +627,6 @@ func (r *authenticationRepositoryPostgres) UpdateAuthenticationPartner(ctx conte
 
 	return &authentiaction, nil
 }
-
-
 
 func (r *authenticationRepositoryPostgres) IsEmailExistUpdatePartner(ctx context.Context, email string, id int64) (int, error) {
 	var count int

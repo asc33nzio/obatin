@@ -24,6 +24,8 @@ type RouterOpt struct {
 	CategoryHandler             *handler.CategoryHandler
 	Middleware                  *middleware.GinMiddleware
 	DoctorSpecializationHandler *handler.DoctorSpecializationHandler
+	UserHandler                 *handler.UserHandler
+	AddressHandler              *handler.AddressHandler
 	PartnerHandler              *handler.PartnerHandler
 }
 
@@ -51,6 +53,12 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	partnerUsecase := usecase.NewPartnerUsecaseImpl(dbStore, config, cryptoHash, jwtAuth, tokenGenerator, cloudinaryUpload, sendEmail)
 	partnerHandler := handler.NewPartnerHandler(partnerUsecase)
 
+	userUsecase := usecase.NewUserUsecaseImpl(dbStore, config, cloudinaryUpload)
+	userHandler := handler.NewUserHandler(userUsecase)
+
+	addressUsecase := usecase.NewAddressUsecaseImpl(dbStore, config)
+	addressHandler := handler.NewAddressHandler(addressUsecase)
+
 	return NewRouter(RouterOpt{
 		Middleware:                  middleware,
 		AuthenticationHandler:       authentiationHandler,
@@ -58,6 +66,8 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 		DoctorSpecializationHandler: doctorSpecializationHandler,
 		CategoryHandler:             categoryHandler,
 		PartnerHandler:              partnerHandler,
+		UserHandler:                 userHandler,
+		AddressHandler:              addressHandler,
 	})
 }
 
@@ -111,5 +121,10 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.GET(appconstant.EndpointGetPartnerList, h.PartnerHandler.GetAllPartner)
 	r.PATCH(appconstant.EndpointUpdatePartner, h.PartnerHandler.UpdateOnePartner)
 	r.GET(appconstant.EndpointGetPartnerById, h.PartnerHandler.GetPartnerDetailById)
+	r.PATCH(appconstant.EndpointUserDetails, h.UserHandler.UpdateUserDetails)
+	r.GET(appconstant.EndpointUserDetails, h.UserHandler.GetUserDetails)
+	r.POST(appconstant.EndpointUserAddress, h.AddressHandler.CreateOneAddress)
+	r.PATCH(appconstant.EndpointUserAddressDetails, h.AddressHandler.UpdateOneAddress)
+	r.DELETE(appconstant.EndpointUserAddressDetails, h.AddressHandler.DeleteOneAddress)
 	return r
 }

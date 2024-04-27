@@ -9,6 +9,7 @@ import (
 
 	"obatin/appconstant"
 	"obatin/apperror"
+	"obatin/constant"
 )
 
 func (m *GinMiddleware) Logger(log *logrus.Logger) func(c *gin.Context) {
@@ -30,14 +31,14 @@ func (m *GinMiddleware) Logger(log *logrus.Logger) func(c *gin.Context) {
 			requestId = ""
 		}
 
-		uid, exist := c.Get(appconstant.TokenUserIdKey)
+		aid, exist := c.Get(constant.AuthenticationIdKey)
 		if !exist {
-			uid = ""
+			aid = ""
 		}
 
 		entry := log.WithFields(logrus.Fields{
 			appconstant.RequestIdKey:        requestId,
-			appconstant.TokenUserIdKey:      uid,
+			constant.AuthenticationIdKey:    aid,
 			appconstant.LoggerLatencyKey:    time.Since(start),
 			appconstant.LoggerMethodKey:     c.Request.Method,
 			appconstant.LoggerStatusCodeKey: statusCode,

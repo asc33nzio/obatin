@@ -16,9 +16,12 @@ const (
 	EndpointGetDoctorSpecialization  = "/doctor-specializations"
 	EndpointGetDoctorPendingApproval = "/doctor-pending-approval"
 	EndpointGetProductDetail         = "/shop/products/:product_slug"
+	EndpointUserDetails              = "/users/:authentication_id"
 	EndpointRefreshToken             = "/auth/refresh-token"
 	EndpointRegisterPartner          = "/auth/register/partners"
 	EndpointGetPartnerList           = "/partners"
 	EndpointUpdatePartner            = "/partners/:id"
-	EndpointGetPartnerById            = "/partners/:id"
+	EndpointGetPartnerById           = "/partners/:id"
+	EndpointUserAddress              = "/users/:authentication_id/addresses"
+	EndpointUserAddressDetails       = "/users/:authentication_id/addresses/:address_id"
 )

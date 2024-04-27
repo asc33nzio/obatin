@@ -22,6 +22,7 @@ const (
 	EmailTypeRejected          = "rejected"
 	EmailTypePasswordTemporary = "temporary"
 	EmailForgotPassword        = "forgot"
+	AvatarImageFormKey         = "avatar"
 	ErrorTokenIsExpired        = "token is expired"
 	HasVerified                = true
 	LogoJSONTag                = "logo"
