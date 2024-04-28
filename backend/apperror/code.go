@@ -12,8 +12,12 @@ const (
 	InvalidPasswordFormat
 	FileUploadedInvalid
 	ErrorSqlNoProductExists
+	UserNotFound
 	InvalidSlug
 	ErrorCategoryNotFound
 	EmailNotVerified
 	ForbiddenAccess
+	ErrPartnerNotExist
+	NoAccessAccountNotVerified
+	AddressNotFound
 )

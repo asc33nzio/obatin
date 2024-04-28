@@ -62,7 +62,7 @@ func (r *refreshTokenRepositoryPostgres) DeleteRefreshTokenAfterExpired(ctx cont
 		UPDATE 
 			refresh_tokens
 		SET 
-			deletedAt = now()
+			deleted_at = now()
 		WHERE 
 			NOW() > expired_at
 	`
@@ -98,7 +98,7 @@ func (r *refreshTokenRepositoryPostgres) IsRefreshTokenValidByToken(ctx context.
 			WHERE
 				token = $1
 			AND
-				deletedAt IS NULL
+				deleted_at IS NULL
 		)
 	`
 
@@ -132,7 +132,7 @@ func (r *refreshTokenRepositoryPostgres) IsRefreshTokenValidByEmail(ctx context.
 			WHERE
 				a.email = $1
 			AND
-				rt.deletedAt IS NULL
+				rt.deleted_at IS NULL
 		)
 	`
 
@@ -166,7 +166,7 @@ func (r *refreshTokenRepositoryPostgres) GetByEmail(ctx context.Context, email s
 	WHERE
 		a.email = $1
 	AND
-		rt.deletedAt IS NULL
+		rt.deleted_at IS NULL
 	`
 
 	err := r.db.QueryRowContext(

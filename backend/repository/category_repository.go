@@ -135,13 +135,13 @@ func (r *categoryRepositoryPostgres) DeleteOneCategoryById(ctx context.Context, 
         UPDATE
             categories
 		SET
-		    deletedAt = NOW(), updatedAt = NOW()
+		    deleted_at = NOW(), updated_at = NOW()
         WHERE
             id = $1
 		OR
 			parent_id = $1	
 		AND 
-			deletedat IS NULL
+			deleted_at IS NULL
             `
 	res, err := r.db.ExecContext(ctx, q, id)
 	if err != nil {
@@ -164,11 +164,11 @@ func (r *categoryRepositoryPostgres) DeleteProductCategoryByCategoryId(ctx conte
 	UPDATE
 		products_categories
 	SET
-		deletedAt = NOW(), updatedAt = NOW()
+		deleted_at = NOW(), updated_at = NOW()
 	WHERE
 		category_id = $1	
 	AND 
-		deletedat IS NULL
+		deleted_at IS NULL
 		`
 	res, err := r.db.ExecContext(ctx, q, id)
 	if err != nil {

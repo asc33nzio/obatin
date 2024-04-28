@@ -17,6 +17,8 @@ export const DashboardPageContentContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
+  padding-top: 50px;
+
   width: 100vw;
   height: 95%;
 `;

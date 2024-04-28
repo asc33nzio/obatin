@@ -117,11 +117,20 @@ func ErrInvalidPassword(err error) *AppError {
 	}
 }
 
-func ErrFileUploadInvalid(err error) *AppError {
+func ErrFileCertificateUploadInvalid(err error) *AppError {
 	return &AppError{
 		code:    FileUploadedInvalid,
 		err:     err,
-		message: FileUploadedInvalidMsg,
+		message: FileCertificateUploadedInvalidMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrUserNotFound(err error) *AppError {
+	return &AppError{
+		code:    UserNotFound,
+		err:     err,
+		message: UserNotFoundMsg,
 		stack:   debug.Stack(),
 	}
 }
@@ -153,6 +162,15 @@ func ErrForbiddenAccess(err error) *AppError {
 	}
 }
 
+func ErrNoAccessAccountNotVerified(err error) *AppError {
+	return &AppError{
+		code:    NoAccessAccountNotVerified,
+		err:     err,
+		message: NoAccessAccountNotVerifiedMsg,
+		stack:   debug.Stack(),
+	}
+}
+
 func ErrAccountNotApproved(err error) *AppError {
 	return &AppError{
 		code:    EmailNotVerified,
@@ -175,7 +193,25 @@ func ErrTokenHasBeenUsedBefore(err error) *AppError {
 	return &AppError{
 		code:    InvalidReq,
 		err:     err,
-		message: TokenHasBeenUsedBefore,
+		message: TokenHasBeenUsedBeforeMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrPartnerAlreadyExist(err error) *AppError {
+	return &AppError{
+		code:    EmailAlreadyRegistered,
+		err:     err,
+		message: PartnerAlreadyExistMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrFileLogoUploadInvalid(err error) *AppError {
+	return &AppError{
+		code:    FileUploadedInvalid,
+		err:     err,
+		message: FileLogoUploadedInvalidMsg,
 		stack:   debug.Stack(),
 	}
 }
@@ -200,18 +236,35 @@ func ErrInvalidSlug(err error) *AppError {
 
 func ErrDuplicateSlug(err error) *AppError {
 	return &AppError{
-        code:    InvalidSlug,
-        err:     err,
-        message: CategorySlugDuplicateInvalidMsg,
-        stack:   debug.Stack(),
-    }
+		code:    InvalidSlug,
+		err:     err,
+		message: CategorySlugDuplicateInvalidMsg,
+		stack:   debug.Stack(),
+	}
 }
 
 func ErrCategoryNotFound(err error) *AppError {
 	return &AppError{
-        code:    ErrorCategoryNotFound,
-        err:     err,
-        message: CategoryNotFoundMsg,
-        stack:   debug.Stack(),
-    }
+		code:    ErrorCategoryNotFound,
+		err:     err,
+		message: CategoryNotFoundMsg,
+		stack:   debug.Stack(),
+	}
+}
+func ErrPartnerNotFound(err error) *AppError {
+	return &AppError{
+		code:    ErrPartnerNotExist,
+		err:     err,
+		message: PartnerNotExistMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrAddressNotFound(err error) *AppError {
+	return &AppError{
+		code:    AddressNotFound,
+		err:     err,
+		message: AddressNotFoundMsg,
+		stack:   debug.Stack(),
+	}
 }

@@ -4,6 +4,7 @@ const (
 	RoleDoctor                 = "doctor"
 	RoleUser                   = "user"
 	RoleAdmin                  = "admin"
+	RoleManager                = "manager"
 	HasApproved                = true
 	HasNotApproved             = false
 	CertificateJSONTag         = "certificate"
@@ -21,5 +22,13 @@ const (
 	EmailTypeRejected          = "rejected"
 	EmailTypePasswordTemporary = "temporary"
 	EmailForgotPassword        = "forgot"
+	AvatarImageFormKey         = "avatar"
 	ErrorTokenIsExpired        = "token is expired"
+	HasVerified                = true
+	LogoJSONTag                = "logo"
+	PasswordJSONTag            = "password"
+	NameJSONTag                = "name"
+	RegexLowerCase             = "[a-z]"
+	RegexUpperCase             = "[A-Z]"
+	RegexDigitCase             = "[0-9]"
 )

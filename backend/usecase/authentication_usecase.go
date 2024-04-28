@@ -62,6 +62,16 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 	ur := u.repoStore.AuthenticationRepository()
 	rt := u.repoStore.RefreshTokenRepository()
 
+	isPasswordValid := appvalidator.IsValidPassword(uReq.Password)
+	if !isPasswordValid {
+		return nil, apperror.ErrInvalidPassword(apperror.ErrStlInvalidPassword)
+	}
+
+	isValidEmailFormat := appvalidator.IsValidEmail(uReq.Email)
+	if !isValidEmailFormat {
+		return nil, apperror.ErrInvalidEmail(apperror.ErrStlInvalidEmail)
+	}
+
 	authentication, err := ur.FindAuthenticationByEmail(ctx, uReq.Email)
 	if err != nil {
 		return nil, err
@@ -73,7 +83,12 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 	}
 
 	token, err := u.jwtAuth.CreateAndSign(
-		util.JWTPayload{AuthenticationId: authentication.Id, Role: authentication.Role},
+		util.JWTPayload{
+			AuthenticationId: authentication.Id,
+			Role:             authentication.Role,
+			IsVerified:       authentication.IsVerified,
+			IsApproved:       authentication.IsApproved,
+		},
 		u.config.JwtLoginExp(),
 		u.config.JwtSecret(),
 	)
@@ -98,7 +113,10 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 			return nil, err
 		}
 		randomRefreshTokenJWT, err := u.jwtAuth.CreateAndSign(
-			util.JWTPayload{RandomToken: randomRefreshToken, Role: authentication.Role, AuthenticationId: authentication.Id},
+			util.JWTPayload{
+				RandomToken:      randomRefreshToken,
+				Role:             authentication.Role,
+				AuthenticationId: authentication.Id},
 			u.config.JwtRefreshTokenExpired(),
 			u.config.JwtSecret(),
 		)
@@ -125,7 +143,10 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 		return nil, err
 	}
 	existingRefreshTokenJWT, err := u.jwtAuth.CreateAndSign(
-		util.JWTPayload{RandomToken: refreshToken.RefreshToken},
+		util.JWTPayload{
+			RandomToken:      refreshToken.RefreshToken,
+			Role:             authentication.Role,
+			AuthenticationId: authentication.Id},
 		u.config.JwtRefreshTokenExpired(),
 		u.config.JwtSecret(),
 	)
@@ -660,6 +681,7 @@ func (u *authentictionUsecaseImpl) GetPendingDoctorApproval(ctx context.Context)
 
 func (u *authentictionUsecaseImpl) GenerateRefreshToken(ctx context.Context, refreshToken string) (*entity.AuthenticationToken, error) {
 	rt := u.repoStore.RefreshTokenRepository()
+	ar := u.repoStore.AuthenticationRepository()
 
 	claims, err := u.jwtAuth.ParseAndVerify(refreshToken, u.config.JwtSecret())
 	if err != nil {
@@ -675,8 +697,18 @@ func (u *authentictionUsecaseImpl) GenerateRefreshToken(ctx context.Context, ref
 		return nil, apperror.ErrTokenHasExpired(nil)
 	}
 
+	authentication, err := ar.FindAuthenticationById(ctx, claims.Payload.AuthenticationId)
+	if err != nil {
+		return nil, err
+	}
+
 	newAccessToken, err := u.jwtAuth.CreateAndSign(
-		util.JWTPayload{AuthenticationId: claims.Payload.AuthenticationId, Role: claims.Payload.Role},
+		util.JWTPayload{
+			AuthenticationId: authentication.Id,
+			IsVerified:       authentication.IsVerified,
+			IsApproved:       authentication.IsApproved,
+			Role:             authentication.Role,
+		},
 		u.config.JwtLoginExp(),
 		u.config.JwtSecret(),
 	)

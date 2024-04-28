@@ -30,12 +30,18 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusUnauthorized
 	case ForbiddenAccess:
 		return http.StatusForbidden
-	case ErrorSqlNoProductExists: 
+	case ErrorSqlNoProductExists:
 		return http.StatusNotFound
+	case UserNotFound:
+		return http.StatusNotFound
+	case NoAccessAccountNotVerified:
+		return http.StatusForbidden
 	case InvalidSlug:
-	    return http.StatusBadRequest
+		return http.StatusBadRequest
 	case ErrorCategoryNotFound:
 		return http.StatusBadRequest
+	case AddressNotFound:
+		return http.StatusNotFound
 	default:
 		return http.StatusInternalServerError
 	}

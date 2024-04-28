@@ -5,16 +5,15 @@ import (
 	"strings"
 )
 
-func IsValidFileUploaded(size int, extension string) bool {
-	return size < constant.MaximumSizeFileUploaded && CheckExtension(extension)
+func IsValidCertificateFileUploaded(size int, extension string) bool {
+	return size < constant.MaximumSizeFileUploaded && CheckCerificateExtension(extension)
 }
 
 func IsValidImageUploaded(size int, extension string) bool {
 	return size < constant.MaximumSizeImageUploaded && CheckImageExtension(extension)
 }
 
-
-func CheckExtension(filename string) bool {
+func CheckCerificateExtension(filename string) bool {
 	parts := strings.Split(filename, ".")
 	extensionIndex := len(parts) - 1
 
@@ -25,8 +24,8 @@ func CheckImageExtension(filename string) bool {
 	parts := strings.Split(filename, ".")
 	extensionIndex := len(parts) - 1
 
-	return parts[extensionIndex] == "jpg" || 
-	parts[extensionIndex] == "png" || 
-	parts[extensionIndex] == "webp" ||
-	parts[extensionIndex] == "svg"
+	return parts[extensionIndex] == "jpg" ||
+		parts[extensionIndex] == "png" ||
+		parts[extensionIndex] == "webp" ||
+		parts[extensionIndex] == "svg"
 }

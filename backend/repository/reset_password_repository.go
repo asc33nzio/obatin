@@ -70,7 +70,7 @@ func (r *resetPasswordRepositoryPostgres) GetByToken(ctx context.Context, token 
 		WHERE 
 			token = $1
 		AND 
-			deletedAt IS NULL 
+			deleted_at IS NULL 
 	`
 
 	err := r.db.QueryRowContext(
@@ -99,7 +99,7 @@ func (r *resetPasswordRepositoryPostgres) DeleteResetPasswordTokenAfterExpired(c
 		UPDATE 
 			reset_password_requests
 		SET 
-			deletedAt = now()
+			deleted_at = now()
 		WHERE 
 			NOW() > expired_at
 	`
@@ -136,7 +136,7 @@ func (r *resetPasswordRepositoryPostgres) IsTokenResetHasUsed(ctx context.Contex
 			WHERE
 				token = $1
 			AND
-				deletedAt IS NOT NULL
+				deleted_at IS NOT NULL
 		)
 	`
 
@@ -166,7 +166,7 @@ func (r *resetPasswordRepositoryPostgres) IsUserStillHaveValidToken(ctx context.
 			WHERE
 				email = $1
 			AND
-				deletedAt IS NULL
+				deleted_at IS NULL
 		)
 	`
 
@@ -191,7 +191,7 @@ func (r *resetPasswordRepositoryPostgres) DeleteResetPasswordTokenAfterUsed(ctx 
 		UPDATE 
 			reset_password_requests
 		SET 
-			deletedAt = now()
+			deleted_at = now()
 		WHERE 
 			token = $1
 	`

@@ -20,10 +20,13 @@ import (
 
 type RouterOpt struct {
 	AuthenticationHandler       *handler.AuthenticationHandler
-	ProductHandler                     *handler.ProductHandler
-	CategoryHandler       *handler.CategoryHandler
+	ProductHandler              *handler.ProductHandler
+	CategoryHandler             *handler.CategoryHandler
 	Middleware                  *middleware.GinMiddleware
 	DoctorSpecializationHandler *handler.DoctorSpecializationHandler
+	UserHandler                 *handler.UserHandler
+	AddressHandler              *handler.AddressHandler
+	PartnerHandler              *handler.PartnerHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -47,12 +50,24 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	categoryUseCase := usecase.NewCategoryUsecaseImpl(dbStore, config, cloudinaryUpload)
 	categoryHandler := handler.NewCategoryHandler(categoryUseCase)
 
+	partnerUsecase := usecase.NewPartnerUsecaseImpl(dbStore, config, cryptoHash, jwtAuth, tokenGenerator, cloudinaryUpload, sendEmail)
+	partnerHandler := handler.NewPartnerHandler(partnerUsecase)
+
+	userUsecase := usecase.NewUserUsecaseImpl(dbStore, config, cloudinaryUpload)
+	userHandler := handler.NewUserHandler(userUsecase)
+
+	addressUsecase := usecase.NewAddressUsecaseImpl(dbStore, config)
+	addressHandler := handler.NewAddressHandler(addressUsecase)
+
 	return NewRouter(RouterOpt{
 		Middleware:                  middleware,
 		AuthenticationHandler:       authentiationHandler,
-		ProductHandler:                     productHandler,
+		ProductHandler:              productHandler,
 		DoctorSpecializationHandler: doctorSpecializationHandler,
-		CategoryHandler:       categoryHandler,
+		CategoryHandler:             categoryHandler,
+		PartnerHandler:              partnerHandler,
+		UserHandler:                 userHandler,
+		AddressHandler:              addressHandler,
 	})
 }
 
@@ -102,5 +117,14 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndpointSendVerifyToEmail, h.AuthenticationHandler.SendVerifyToEmail)
 	r.POST(appconstant.EndpointApproval, h.AuthenticationHandler.UpdateApproval)
 	r.GET(appconstant.EndpointGetDoctorPendingApproval, h.AuthenticationHandler.GetPendingDoctorApproval)
+	r.POST(appconstant.EndpointRegisterPartner, h.PartnerHandler.RegisterPartner)
+	r.GET(appconstant.EndpointGetPartnerList, h.PartnerHandler.GetAllPartner)
+	r.PATCH(appconstant.EndpointUpdatePartner, h.PartnerHandler.UpdateOnePartner)
+	r.GET(appconstant.EndpointGetPartnerById, h.PartnerHandler.GetPartnerDetailById)
+	r.PATCH(appconstant.EndpointUserDetails, h.UserHandler.UpdateUserDetails)
+	r.GET(appconstant.EndpointUserDetails, h.UserHandler.GetUserDetails)
+	r.POST(appconstant.EndpointUserAddress, h.AddressHandler.CreateOneAddress)
+	r.PATCH(appconstant.EndpointUserAddressDetails, h.AddressHandler.UpdateOneAddress)
+	r.DELETE(appconstant.EndpointUserAddressDetails, h.AddressHandler.DeleteOneAddress)
 	return r
 }
