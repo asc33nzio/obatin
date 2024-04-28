@@ -17,8 +17,6 @@ export const DashboardPageContentContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
-  padding-top: 50px;
-
   width: 100vw;
   height: 95%;
 `;
@@ -52,6 +50,18 @@ export const ProfileHeader = styled.div<{ $isDesktopDisplay: boolean }>`
     font-size: 38px;
     background: transparent;
   }
+`;
+
+export const ProfileHeaderButtonsDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+
+  width: 40%;
+  height: 100%;
+
+  gap: 25px;
 `;
 
 export const ProfileContent = styled.section<{ $isDesktopDisplay: boolean }>`

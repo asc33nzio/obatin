@@ -15,6 +15,7 @@ import {
   ProfileContentRight,
   ProfileContentSeparator,
   ProfileHeader,
+  ProfileHeaderButtonsDiv,
   UserDetailDiv,
 } from '@/styles/pages/dashboard/Dashboard.styles';
 import {
@@ -46,10 +47,9 @@ import DatePicker from 'react-date-picker';
 
 const DashboardPage = (): React.ReactElement => {
   const userInfo = useObatinSelector((state) => state?.auth);
-  // const userName = useObatinSelector((state) => state.a);
-  const { isDesktopDisplay } = useClientDisplayResolution();
   // eslint-disable-next-line
   const [userRole, setUserRole] = useState<string>('');
+  const { isDesktopDisplay } = useClientDisplayResolution();
   const [isEditingField, setIsEditingField] = useState<EditProfileStateItf>({
     email: false,
     name: false,
@@ -167,7 +167,8 @@ const DashboardPage = (): React.ReactElement => {
     }));
   };
 
-  const _handleDateChange = (selectedValue: Date) => {
+  // eslint-disable-next-line
+  const handleDateChange = (selectedValue: Date) => {
     const originalValue = userInfo?.birthDate;
 
     if (selectedValue === originalValue) {
@@ -210,13 +211,23 @@ const DashboardPage = (): React.ReactElement => {
         <ProfileContainer $isDesktopDisplay={isDesktopDisplay}>
           <ProfileHeader $isDesktopDisplay={isDesktopDisplay}>
             <h1>Profil</h1>
-            <CustomButton
-              content='Simpan Profil'
-              $bgColor='#cbd5e0'
-              $width='150px'
-              $height='35px'
-              $fontSize='18px'
-            />
+
+            <ProfileHeaderButtonsDiv>
+              <CustomButton
+                content='Sejarah Transaksi'
+                $bgColor='#00B5C0'
+                $width='150px'
+                $height='40px'
+                $fontSize='18px'
+              />
+              <CustomButton
+                content='Simpan Profil'
+                $bgColor='#cbd5e0'
+                $width='150px'
+                $height='40px'
+                $fontSize='18px'
+              />
+            </ProfileHeaderButtonsDiv>
           </ProfileHeader>
 
           <ProfileContent $isDesktopDisplay={isDesktopDisplay}>

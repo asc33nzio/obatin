@@ -4,7 +4,7 @@ import styled from 'styled-components';
 export const SearchContainer = styled.div`
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
 
@@ -14,6 +14,12 @@ export const SearchContainer = styled.div`
   gap: 20px;
   border: 0.5px solid ${COLORS.input_border};
   border-radius: 12px;
+  box-shadow: 2px 3px 5px gray;
+
+  svg {
+    cursor: pointer;
+    object-fit: cover;
+  }
 `;
 
 export const SearchInput = styled.input`
@@ -21,6 +27,8 @@ export const SearchInput = styled.input`
 
   border: none;
   outline: none;
+
+  font-size: 18px;
 `;
 
 export const SearchResultStack = styled.div`

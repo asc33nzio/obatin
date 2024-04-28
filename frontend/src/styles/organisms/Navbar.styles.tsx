@@ -15,6 +15,7 @@ export const NavContainer = styled.div`
 
   padding-left: 50px;
   padding-right: 75px;
+  margin-bottom: 25px;
 
   border-bottom: 0.5px solid ${COLORS.input_border};
 `;

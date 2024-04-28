@@ -299,6 +299,7 @@ const RegisterForm = (): React.ReactElement => {
             validationMessage={emailValidationError}
             onChange={handleEmailInputChange}
             $marBot={0}
+            onKeyDown={(e) => (e.key === 'Enter' ? handleSignUpDoctor() : null)}
           />
           <SpecializationSelect
             title='Spesialisasi'
@@ -324,6 +325,9 @@ const RegisterForm = (): React.ReactElement => {
             validationMessage={emailValidationError}
             onChange={handleEmailInputChange}
             $marBot={10}
+            onKeyDown={(e) =>
+              e.key === 'Enter' ? handleSignUpPatient() : null
+            }
           />
           <PasswordInput
             title='Kata Sandi'
@@ -332,6 +336,9 @@ const RegisterForm = (): React.ReactElement => {
             validationMessage={passwordValidationError}
             $viewBox='0 -2 22 22'
             $viewBoxHide='0 0 22 22'
+            onKeyDown={(e) =>
+              e.key === 'Enter' ? handleSignUpPatient() : null
+            }
           />
         </>
       )}

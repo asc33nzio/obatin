@@ -148,6 +148,7 @@ const LoginForm = (): React.ReactElement => {
         onChange={handleEmailInputChange}
         validationMessage={emailValidationError}
         $marBot={25}
+        onKeyDown={(e) => (e.key === 'Enter' ? handleLogin() : null)}
       />
 
       <PasswordInput
@@ -157,6 +158,7 @@ const LoginForm = (): React.ReactElement => {
         validationMessage={passwordValidationError}
         $viewBox='0 -2 22 22'
         $viewBoxHide='0 0 22 22'
+        onKeyDown={(e) => (e.key === 'Enter' ? handleLogin() : null)}
       />
 
       <RememberAndForgetDiv>
