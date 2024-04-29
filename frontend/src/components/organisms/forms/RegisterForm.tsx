@@ -1,6 +1,7 @@
 'use client';
 import {
   CreateOrLoginSpan,
+  LoaderDiv,
   LoginOrRegisterFormContainer,
   OAuthDiv,
   SectionSeparator,
@@ -17,6 +18,11 @@ import { useUploadValidation } from '@/hooks/useUploadValidation';
 import { setCookie } from 'cookies-next';
 import { DoctorSpecializationsType } from '@/types/registerTypes';
 import { navigateToUserDashboard, navigateToLogin } from '@/app/actions';
+import { PropagateLoader } from 'react-spinners';
+import { useObatinDispatch } from '@/redux/store/store';
+import { setAuthState } from '@/redux/reducers/authSlice';
+import { DecodedJwtItf } from '@/types/jwtTypes';
+import { jwtDecode } from 'jwt-decode';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import CustomButton from '@/components/atoms/button/CustomButton';
@@ -27,6 +33,7 @@ import DoctorICO from '@/assets/auth/DoctorICO';
 import Axios from 'axios';
 
 const RegisterForm = (): React.ReactElement => {
+  const dispatch = useObatinDispatch();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const {
@@ -101,27 +108,71 @@ const RegisterForm = (): React.ReactElement => {
         payload,
       );
 
-      const response = await Axios.post(
+      const autoLoginResponse = await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
         payload,
       );
 
-      const access_token = response?.data?.data?.access_token;
+      const access_token = autoLoginResponse?.data?.data?.access_token;
+      const refresh_token = autoLoginResponse?.data?.data?.refresh_token;
+      const decoded: DecodedJwtItf = jwtDecode(access_token);
+      const userRole = decoded.Payload.role;
+      const authId = decoded.Payload.aid;
+      const isVerified = decoded.Payload.is_verified;
+      const isApproved = decoded.Payload.is_approved;
 
       if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S === undefined) {
         throw new Error('please define access token valid duration env var');
       }
-      const validTokenExpiryMilliseconds: number = parseInt(
+      const validAccessTokenExpiryMilliseconds: number = parseInt(
         process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S,
         10,
       );
+      if (
+        process.env.NEXT_PUBLIC_REFRESH_TOKEN_VALID_DURATION_S === undefined
+      ) {
+        throw new Error('please define refresh token valid duration env var');
+      }
+      const validRefreshTokenExpiryMilliseconds: number = parseInt(
+        process.env.NEXT_PUBLIC_REFRESH_TOKEN_VALID_DURATION_S,
+        10,
+      );
 
-      setCookie('session_token', access_token, {
+      setCookie('access_token', access_token, {
         // httpOnly: true,
         priority: 'high',
         path: '/',
-        maxAge: validTokenExpiryMilliseconds,
+        maxAge: validAccessTokenExpiryMilliseconds,
       });
+
+      setCookie('refresh_token', refresh_token, {
+        // httpOnly: true,
+        priority: 'high',
+        path: '/',
+        maxAge: validRefreshTokenExpiryMilliseconds,
+      });
+
+      const userDetailResponse = await Axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${authId}`,
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+        },
+      );
+
+      const userData = userDetailResponse.data.data;
+      dispatch(
+        setAuthState({
+          aid: authId,
+          email: userData.email,
+          name: userData.name,
+          gender: userData.gender,
+          birthDate: userData.birth_date,
+          role: userRole,
+          avatarUrl: userData.avatar_url,
+          isVerified: isVerified,
+          isApproved: isApproved,
+        }),
+      );
 
       setToast({
         showToast: true,
@@ -141,7 +192,7 @@ const RegisterForm = (): React.ReactElement => {
           ? errorMessage
           : appError
             ? appError
-            : 'Login gagal',
+            : 'Pendaftaran gagal',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
@@ -224,18 +275,6 @@ const RegisterForm = (): React.ReactElement => {
       setIsLoading(false);
     }
   };
-
-  // useEffect(() => {
-  //   const isAuthenticatedCheck = () => {
-  //     const sessionToken = getCookie('session_token');
-  //     if (sessionToken !== undefined) {
-  //       //! check role logic
-  //       navigateToDashboard();
-  //     }
-  //   };
-
-  //   isAuthenticatedCheck();
-  // }, []);
 
   useEffect(() => {
     const getAllSpecializations = async () => {
@@ -344,13 +383,27 @@ const RegisterForm = (): React.ReactElement => {
         </>
       )}
 
-      <CustomButton
-        content='Lanjutkan'
-        onClick={
-          isDoctor ? () => handleSignUpDoctor() : () => handleSignUpPatient()
-        }
-        disabled={isLoading ? true : false}
-      />
+      {isLoading ? (
+        <LoaderDiv>
+          <PropagateLoader
+            color='#dd1b50'
+            speedMultiplier={0.8}
+            size={'18px'}
+            cssOverride={{
+              alignSelf: 'center',
+              justifySelf: 'center',
+            }}
+          />
+        </LoaderDiv>
+      ) : (
+        <CustomButton
+          content='Lanjutkan'
+          onClick={
+            isDoctor ? () => handleSignUpDoctor() : () => handleSignUpPatient()
+          }
+          disabled={isLoading ? true : false}
+        />
+      )}
 
       <SectionSeparator>
         <SeparatorLine />

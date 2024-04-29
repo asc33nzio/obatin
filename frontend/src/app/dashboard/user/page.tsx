@@ -19,36 +19,39 @@ import {
   UserDetailDiv,
 } from '@/styles/pages/dashboard/Dashboard.styles';
 import {
-  DatePickerType,
+  // eslint-disable-next-line
+  EditProfilePayloadItf,
   EditProfileStateItf,
   GenderItf,
 } from '@/types/dashboardTypes';
-// import { getCookie } from 'cookies-next';
-// import { jwtDecode } from 'jwt-decode';
-// import { navigateToLogin } from '../../actions';
 import { useState } from 'react';
-// import { DecodedJwtItf } from '@/types/jwtTypes';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useUploadValidation } from '@/hooks/useUploadValidation';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { useObatinSelector } from '@/redux/store/store';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
 import { debounce } from '@/utils/debounce';
+import { getCookie } from 'cookies-next';
+import { setAuthState } from '@/redux/reducers/authSlice';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
-import PlaceholderAva from '@/assets/PlaceholderAva';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import DatePicker from 'react-date-picker';
+import Axios from 'axios';
+import Image from 'next/image';
+import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
+import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
+import { BounceLoader } from 'react-spinners';
 
 const UserDashboardPage = (): React.ReactElement => {
+  const dispatch = useObatinDispatch();
   const userInfo = useObatinSelector((state) => state?.auth);
-  // eslint-disable-next-line
-  const [userRole, setUserRole] = useState<string>('');
+  const accessToken = getCookie('access_token');
   const { isDesktopDisplay } = useClientDisplayResolution();
   const [isEditingField, setIsEditingField] = useState<EditProfileStateItf>({
     email: false,
@@ -57,6 +60,7 @@ const UserDashboardPage = (): React.ReactElement => {
     confirmPassword: false,
     gender: false,
     birthDate: false,
+    avatar: false,
   });
   const [hasNewValue, setHasNewValue] = useState<EditProfileStateItf>({
     email: false,
@@ -65,6 +69,7 @@ const UserDashboardPage = (): React.ReactElement => {
     confirmPassword: false,
     gender: false,
     birthDate: false,
+    avatar: false,
   });
   const { setToast } = useToast();
   const { openModal } = useModal();
@@ -77,7 +82,6 @@ const UserDashboardPage = (): React.ReactElement => {
     handlePasswordInputChange,
   } = usePasswordValidation();
   const {
-    // eslint-disable-next-line
     userUpload,
     // eslint-disable-next-line
     setUserUpload,
@@ -91,7 +95,8 @@ const UserDashboardPage = (): React.ReactElement => {
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
   const [gender, setGender] = useState<GenderItf>({ isMale: true });
-  const [date, setDate] = useState<DatePickerType>(new Date());
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [date, setDate] = useState<Date>(new Date());
   const currentYear = new Date().getFullYear();
   const dateRangeMin = new Date();
   dateRangeMin.setFullYear(currentYear - 100);
@@ -118,17 +123,6 @@ const UserDashboardPage = (): React.ReactElement => {
     },
     750,
   );
-
-  //! AXIOS PATCH REQUEST
-  // const handleEditChange = (
-  //   prevState: SetStateAction<EditProfileStateItf>,
-  //   field: EditProfileStateItf,
-  // ) => {
-  //   setIsEditingField((prevState) => {
-  //     ...prevState,
-  //     field = true
-  //   });
-  // };
 
   const openPasswordInterface = () => {
     setIsEditingField((prevState) => ({
@@ -171,6 +165,7 @@ const UserDashboardPage = (): React.ReactElement => {
   const handleDateChange = (selectedValue: Date) => {
     const originalValue = userInfo?.birthDate;
 
+    console.log(selectedValue);
     if (selectedValue === originalValue) {
       setToast({
         showToast: true,
@@ -189,19 +184,126 @@ const UserDashboardPage = (): React.ReactElement => {
     }));
   };
 
-  // useEffect(() => {
-  //   const isAuthenticatedCheck = () => {
-  //     const accessToken = getCookie('access_token');
-  //     if (accessToken === undefined) {
-  //       navigateToLogin();
-  //     } else {
-  //       const decoded: DecodedJwtItf = jwtDecode(accessToken);
-  //       setUserRole(decoded.Payload.role);
-  //     }
-  //   };
+  const handleUpdateUserProfile = async () => {
+    setIsLoading(true);
 
-  //   isAuthenticatedCheck();
-  // }, []);
+    if (!userInfo?.isVerified) {
+      setToast({
+        showToast: true,
+        toastMessage: 'Maaf, anda belum melakukan verifikasi akun anda.',
+        toastType: 'warning',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      return;
+    }
+
+    const generalPayload = new FormData();
+    // const passwordPayload: Partial<EditProfilePayloadItf> = {};
+    // const emailPayload: Partial<EditProfilePayloadItf> = {};
+
+    Object.keys(hasNewValue).forEach((key) => {
+      if (hasNewValue[key as keyof EditProfileStateItf]) {
+        switch (key) {
+          case 'email':
+            break;
+          case 'name':
+            generalPayload.append('name', name);
+            break;
+          case 'password':
+            break;
+          case 'confirmPassword':
+            break;
+          case 'gender':
+            generalPayload.append(
+              'gender',
+              gender.isMale ? 'laki-laki' : 'perempuan',
+            );
+            break;
+          case 'birthDate':
+            generalPayload.append('birth_date', date.toString());
+            break;
+          case 'avatar':
+            if (userUpload !== undefined) {
+              generalPayload.append('avatar', userUpload);
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
+    try {
+      const patchProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
+      // const patchPasswordUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
+      // const patchEmailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
+      const userDetailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
+
+      const patchProfileReq = await Axios.patch(
+        patchProfileUrl,
+        generalPayload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+      // const patchPasswordReq = Axios.patch(patchPasswordUrl, passwordPayload, {
+      //   headers: { Authorization: `Bearer ${accessToken}` },
+      // });
+      // const patchEmailReq = Axios.patch(patchEmailUrl, emailPayload, {
+      //   headers: { Authorization: `Bearer ${accessToken}` },
+      // });
+      const getUserDetailReq = await Axios.get(userDetailUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const [_patchProfileRes, getUserDetailRes] = await Promise.all([
+        patchProfileReq,
+        getUserDetailReq,
+      ]);
+
+      const userData = getUserDetailRes.data.data;
+      const oldUserData = userInfo;
+
+      dispatch(
+        setAuthState({
+          aid: oldUserData.aid,
+          email: userData.email,
+          name: userData.name,
+          gender: userData.gender,
+          birthDate: userData.birth_date,
+          role: oldUserData.role,
+          avatarUrl: userData.avatar_url,
+          isVerified: oldUserData.isVerified,
+          isApproved: oldUserData.isApproved,
+        }),
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage: 'Pembaharuan profil sukses',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } catch (error) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: 'Maaf, pembaharuan profil gagal, mohon coba kembali',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <DashboardPageContainer $isDesktopDisplay={isDesktopDisplay}>
@@ -222,10 +324,11 @@ const UserDashboardPage = (): React.ReactElement => {
               />
               <CustomButton
                 content='Simpan Profil'
-                $bgColor='#cbd5e0'
                 $width='150px'
                 $height='40px'
                 $fontSize='18px'
+                disabled={!Object.values(hasNewValue).some((value) => value)}
+                onClick={handleUpdateUserProfile}
               />
             </ProfileHeaderButtonsDiv>
           </ProfileHeader>
@@ -233,7 +336,30 @@ const UserDashboardPage = (): React.ReactElement => {
           <ProfileContent $isDesktopDisplay={isDesktopDisplay}>
             <ProfileContentLeft $isDesktopDisplay={isDesktopDisplay}>
               <ImgBg>
-                <PlaceholderAva />
+                {isLoading ? (
+                  <BounceLoader
+                    size={265}
+                    color='#00b5c0'
+                    style={{
+                      display: 'flex',
+                      backgroundColor: 'transparent',
+                    }}
+                  />
+                ) : (
+                  <Image
+                    width={275}
+                    height={275}
+                    src={
+                      userInfo?.avatarUrl !== ''
+                        ? userInfo.avatarUrl
+                        : userInfo?.gender === 'laki-laki'
+                          ? DefaultMaleAvatar
+                          : DefaultFemaleAvatar
+                    }
+                    alt='avatar'
+                    priority
+                  />
+                )}
               </ImgBg>
 
               <RegularInput
@@ -243,7 +369,15 @@ const UserDashboardPage = (): React.ReactElement => {
                 $width={45}
                 $height={35}
                 validationMessage={userUploadValidationError}
-                onChange={handleImageChange}
+                onChange={(e) => {
+                  handleImageChange(e);
+                  if (!userUploadValidationError) {
+                    setHasNewValue((prevState) => ({
+                      ...prevState,
+                      avatar: true,
+                    }));
+                  }
+                }}
                 $marBot={0}
                 accept='image/*'
               />
@@ -272,17 +406,28 @@ const UserDashboardPage = (): React.ReactElement => {
                     <EditPencilICO
                       isEditSuccessful={hasNewValue.email}
                       onClick={() => {
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          email: false,
+                        }));
+
+                        if (email.trim() === '') {
+                          setToast({
+                            showToast: true,
+                            toastMessage: 'Tidak ada perubahan',
+                            toastType: 'warning',
+                            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+                            orientation: 'center',
+                          });
+                          return;
+                        }
+
                         if (!emailValidationError) {
                           setHasNewValue((prevState) => ({
                             ...prevState,
                             email: true,
                           }));
                         }
-
-                        setIsEditingField((prevState) => ({
-                          ...prevState,
-                          email: false,
-                        }));
                       }}
                     />
                   </>
@@ -328,17 +473,28 @@ const UserDashboardPage = (): React.ReactElement => {
                     <EditPencilICO
                       isEditSuccessful={false}
                       onClick={() => {
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          name: false,
+                        }));
+
+                        if (name.trim() === '') {
+                          setToast({
+                            showToast: true,
+                            toastMessage: 'Tidak ada perubahan',
+                            toastType: 'warning',
+                            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+                            orientation: 'center',
+                          });
+                          return;
+                        }
+
                         if (!nameValidationError) {
                           setHasNewValue((prevState) => ({
                             ...prevState,
                             name: true,
                           }));
                         }
-
-                        setIsEditingField((prevState) => ({
-                          ...prevState,
-                          name: false,
-                        }));
                       }}
                     />
                   </>
@@ -487,6 +643,7 @@ const UserDashboardPage = (): React.ReactElement => {
                       maxDate={dateRangeMax}
                       format='ddMMMMyyy'
                       value={date}
+                      // eslint-disable-next-line
                       // onChange={handleDateChange}
                     />
                     <EditPencilICO

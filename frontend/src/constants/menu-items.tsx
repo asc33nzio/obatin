@@ -2,9 +2,11 @@ import CartICO from '@/assets/icons/CartICO';
 import ConsulICO from '@/assets/icons/ConsulICO';
 import DoctorICO from '@/assets/icons/DoctorICO';
 import HomeICO from '@/assets/icons/HomeICO';
+import LogoutICO from '@/assets/icons/LogoutICO';
 import OrderICO from '@/assets/icons/OrderICO';
 import ProductICO from '@/assets/icons/ProductICO';
 import UserICO from '@/assets/icons/UserICO';
+import logout from '@/utils/logout';
 
 type MenuOption = {
   name: string;
@@ -27,27 +29,32 @@ const MENU_USER: MenuOption[] = [
   {
     name: 'Products',
     icon: ProductICO,
-    url: '/products',
+    url: '/shop/products',
   },
   {
     name: 'Cart',
     icon: CartICO,
-    url: '/products',
+    url: '/shop/products',
   },
   {
     name: 'Order History',
     icon: OrderICO,
-    url: '/home',
+    url: '/',
   },
   {
     name: 'Consultation',
     icon: ConsulICO,
-    url: '/home',
+    url: '/',
   },
   {
     name: 'Doctor',
     icon: DoctorICO,
-    url: '/home',
+    url: '/',
+  },
+  {
+    name: 'Logout',
+    icon: LogoutICO,
+    url: '/auth/login',
   },
 ];
 
@@ -90,6 +97,7 @@ export type MenuItem = {
   id: string;
   depth: number;
   subItems?: MenuItem[];
+  handler?: () => void | undefined;
 };
 
 function makeMenuLevel(options: MenuOption[], depth = 0): MenuItem[] {
@@ -101,6 +109,7 @@ function makeMenuLevel(options: MenuOption[], depth = 0): MenuItem[] {
       option.subItems && option.subItems.length > 0
         ? makeMenuLevel(option.subItems, depth + 1)
         : undefined,
+    handler: option.name === 'Logout' ? logout : undefined,
   }));
 }
 

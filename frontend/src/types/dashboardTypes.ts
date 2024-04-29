@@ -1,5 +1,7 @@
-export type datePickerData = Date | null;
-export type DatePickerType = datePickerData | [datePickerData, datePickerData];
+import { Gender } from '@/types/authTypes';
+
+// export type datePickerData = Date | null;
+// export type DatePickerType = datePickerData | [datePickerData, datePickerData];
 
 export interface EditProfileStateItf {
   email: boolean;
@@ -8,6 +10,17 @@ export interface EditProfileStateItf {
   confirmPassword: boolean;
   gender: boolean;
   birthDate: boolean;
+  avatar: boolean;
+}
+
+export interface EditProfilePayloadItf {
+  email?: string;
+  name?: string;
+  password?: string;
+  confirmPassword?: string;
+  gender?: Gender;
+  birthDate?: Date;
+  avatar?: Blob;
 }
 
 export interface GenderItf {

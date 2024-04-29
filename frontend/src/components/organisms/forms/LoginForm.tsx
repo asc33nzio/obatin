@@ -14,7 +14,6 @@ import {
   navigateToForgotPassword,
   navigateToRegister,
 } from '@/app/actions';
-// import { useEffect } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
@@ -71,10 +70,11 @@ const LoginForm = (): React.ReactElement => {
 
       const access_token = loginResponse?.data?.data?.access_token;
       const refresh_token = loginResponse?.data?.data?.refresh_token;
-
-      const decoded: DecodedJwtItf = jwtDecode(refresh_token);
+      const decoded: DecodedJwtItf = jwtDecode(access_token);
       const userRole = decoded.Payload.role;
       const authId = decoded.Payload.aid;
+      const isVerified = decoded.Payload.is_verified;
+      const isApproved = decoded.Payload.is_approved;
 
       if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S === undefined) {
         throw new Error('please define access token valid duration env var');
@@ -116,20 +116,17 @@ const LoginForm = (): React.ReactElement => {
         );
 
         const userData = userDetailResponse.data.data;
-
-        console.log(userData);
-
         dispatch(
           setAuthState({
+            aid: authId,
             email: userData.email,
             name: userData.name,
             gender: userData.gender,
-            // birthDate: new Date('1970-01-01'),
             birthDate: userData.birth_date,
-            specialization: 'Dokter Kelamin',
-            role: 'user',
-            isVerified: true,
-            isApproved: true,
+            role: userRole,
+            avatarUrl: userData.avatar_url,
+            isVerified: isVerified,
+            isApproved: isApproved,
           }),
         );
 
@@ -145,20 +142,18 @@ const LoginForm = (): React.ReactElement => {
         );
 
         const doctorData = doctorDetailResponse.data.data;
-
-        console.log(doctorData);
-
         dispatch(
           setAuthState({
+            aid: authId,
             email: doctorData.email,
             name: doctorData.name,
             gender: doctorData.gender,
-            // birthDate: new Date('1970-01-01'),
             birthDate: doctorData.birth_date,
-            specialization: 'Dokter Kelamin',
-            role: 'doctor',
-            isVerified: true,
-            isApproved: true,
+            role: userRole,
+            avatarUrl: doctorData.avatar_url,
+            isVerified: isVerified,
+            isApproved: isApproved,
+            specialization: doctorData.specialization,
           }),
         );
 
@@ -188,17 +183,6 @@ const LoginForm = (): React.ReactElement => {
       });
     }
   };
-
-  // useEffect(() => {
-  //   const isAuthenticatedCheck = () => {
-  //     const sessionToken = getCookie('session_token');
-  //     if (sessionToken !== undefined) {
-  //       navigateToUserDashboard();
-  //     }
-  //   };
-
-  //   isAuthenticatedCheck();
-  // }, []);
 
   return (
     <LoginOrRegisterFormContainer $isLoginPage={true}>

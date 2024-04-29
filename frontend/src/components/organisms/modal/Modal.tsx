@@ -9,6 +9,7 @@ import ChangePasswordModalContent from './modalContent/ChangePasswordModalConten
 import CloseICO from '@/assets/icons/CloseICO';
 
 export interface ModalPropsItf {
+  $overlayHeight?: string;
   $containerWidth: string;
   $containerHeight: string;
   $fontSize?: string | undefined;
@@ -22,6 +23,7 @@ const Modal = () => {
   let modalContent: React.ReactElement | null;
   let title: string | null = null;
   let modalProps: ModalPropsItf = {
+    $overlayHeight: '100vh',
     $containerWidth: '500px',
     $containerHeight: '500px',
     $fontSize: '18px',
@@ -34,6 +36,7 @@ const Modal = () => {
       modalContent = <ChangePasswordModalContent />;
       title = 'Tolong konfirmasi sandi anda';
       modalProps = {
+        $overlayHeight: '125vh',
         $containerWidth: '500px',
         $containerHeight: '250px',
       };
@@ -47,7 +50,7 @@ const Modal = () => {
 
   return (
     isOpen && (
-      <ModalOverlay>
+      <ModalOverlay {...modalProps}>
         <ModalContainer {...modalProps}>
           <ModalHeader>
             <h1>{title}</h1>

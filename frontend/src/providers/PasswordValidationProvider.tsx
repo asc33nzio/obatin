@@ -22,6 +22,20 @@ export const PasswordValidationProvider: React.FC<{
       return false;
     }
 
+    if (!/[A-Z]/.test(sanitizedInput)) {
+      setPasswordValidationError(
+        'Kata sandi harus memiliki paling tidak 1 huruf besar',
+      );
+      return false;
+    }
+
+    if (!/\d/.test(sanitizedInput)) {
+      setPasswordValidationError(
+        'Kata sandi harus memiliki paling tidak 1 angka',
+      );
+      return false;
+    }
+
     setPasswordValidationError('');
     return true;
   };

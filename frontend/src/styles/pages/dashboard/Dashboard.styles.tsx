@@ -100,6 +100,7 @@ export const ProfileContentLeft = styled.div<{ $isDesktopDisplay: boolean }>`
 `;
 
 export const ImgBg = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -110,14 +111,15 @@ export const ImgBg = styled.div`
   margin-bottom: 20px;
 
   border-radius: 50%;
+  border: 5px solid #00b5c0;
   box-shadow: 0 0 10px 5px #bdbdbd;
 
-  svg {
+  img {
     object-fit: cover;
     width: 265px;
     height: 265px;
     border-radius: 50%;
-    background-color: red;
+    background: transparent;
   }
 `;
 
