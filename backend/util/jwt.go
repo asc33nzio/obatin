@@ -17,8 +17,8 @@ type JWTPayload struct {
 	AuthenticationId int64  `json:"aid,omitempty"`
 	Role             string `json:"role,omitempty"`
 	RandomToken      string `json:"random_token,omitempty"`
-	IsVerified       bool   `json:"is_verified,omitempty"`
-	IsApproved       bool   `json:"is_approved,omitempty"`
+	IsVerified       bool   `json:"is_verified"`
+	IsApproved       bool   `json:"is_approved"`
 }
 
 type JWTCustomClaims struct {
