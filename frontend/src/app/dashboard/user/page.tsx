@@ -23,11 +23,11 @@ import {
   EditProfileStateItf,
   GenderItf,
 } from '@/types/dashboardTypes';
-import { getCookie } from 'cookies-next';
-import { jwtDecode } from 'jwt-decode';
-import { navigateToLogin } from '../actions';
-import { useEffect, useState } from 'react';
-import { DecodedJwtItf } from '@/types/jwtTypes';
+// import { getCookie } from 'cookies-next';
+// import { jwtDecode } from 'jwt-decode';
+// import { navigateToLogin } from '../../actions';
+import { useState } from 'react';
+// import { DecodedJwtItf } from '@/types/jwtTypes';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useUploadValidation } from '@/hooks/useUploadValidation';
@@ -45,7 +45,7 @@ import PasswordInput from '@/components/atoms/input/PasswordInput';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import DatePicker from 'react-date-picker';
 
-const DashboardPage = (): React.ReactElement => {
+const UserDashboardPage = (): React.ReactElement => {
   const userInfo = useObatinSelector((state) => state?.auth);
   // eslint-disable-next-line
   const [userRole, setUserRole] = useState<string>('');
@@ -189,19 +189,19 @@ const DashboardPage = (): React.ReactElement => {
     }));
   };
 
-  useEffect(() => {
-    const isAuthenticatedCheck = () => {
-      const sessionToken = getCookie('session_token');
-      if (sessionToken === undefined) {
-        navigateToLogin();
-      } else {
-        const decoded: DecodedJwtItf = jwtDecode(sessionToken);
-        setUserRole(decoded.Payload.role);
-      }
-    };
+  // useEffect(() => {
+  //   const isAuthenticatedCheck = () => {
+  //     const accessToken = getCookie('access_token');
+  //     if (accessToken === undefined) {
+  //       navigateToLogin();
+  //     } else {
+  //       const decoded: DecodedJwtItf = jwtDecode(accessToken);
+  //       setUserRole(decoded.Payload.role);
+  //     }
+  //   };
 
-    isAuthenticatedCheck();
-  }, []);
+  //   isAuthenticatedCheck();
+  // }, []);
 
   return (
     <DashboardPageContainer $isDesktopDisplay={isDesktopDisplay}>
@@ -562,4 +562,4 @@ const DashboardPage = (): React.ReactElement => {
   );
 };
 
-export default DashboardPage;
+export default UserDashboardPage;

@@ -21,6 +21,10 @@ export const navigateToHome = async () => {
   redirect('/home');
 };
 
-export const navigateToDashboard = async () => {
-  redirect('/dashboard');
+export const navigateToUserDashboard = async () => {
+  redirect('/dashboard/user');
+};
+
+export const navigateToDoctorDashboard = async () => {
+  redirect('/dashboard/doctor');
 };

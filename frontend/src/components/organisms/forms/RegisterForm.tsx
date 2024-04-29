@@ -14,9 +14,9 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useUploadValidation } from '@/hooks/useUploadValidation';
-import { getCookie, setCookie } from 'cookies-next';
+import { setCookie } from 'cookies-next';
 import { DoctorSpecializationsType } from '@/types/registerTypes';
-import { navigateToDashboard, navigateToLogin } from '@/app/actions';
+import { navigateToUserDashboard, navigateToLogin } from '@/app/actions';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import CustomButton from '@/components/atoms/button/CustomButton';
@@ -131,7 +131,7 @@ const RegisterForm = (): React.ReactElement => {
         orientation: 'center',
       });
 
-      navigateToDashboard();
+      navigateToUserDashboard();
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message;
       const appError = error?.message;
@@ -225,16 +225,17 @@ const RegisterForm = (): React.ReactElement => {
     }
   };
 
-  useEffect(() => {
-    const isAuthenticatedCheck = () => {
-      const sessionToken = getCookie('session_token');
-      if (sessionToken !== undefined) {
-        navigateToDashboard();
-      }
-    };
+  // useEffect(() => {
+  //   const isAuthenticatedCheck = () => {
+  //     const sessionToken = getCookie('session_token');
+  //     if (sessionToken !== undefined) {
+  //       //! check role logic
+  //       navigateToDashboard();
+  //     }
+  //   };
 
-    isAuthenticatedCheck();
-  }, []);
+  //   isAuthenticatedCheck();
+  // }, []);
 
   useEffect(() => {
     const getAllSpecializations = async () => {
