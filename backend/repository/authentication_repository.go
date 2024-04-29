@@ -47,6 +47,7 @@ func (r *authenticationRepositoryPostgres) FindAuthenticationByEmail(ctx context
 		password,
 		token,
 		is_verified,
+		is_approved,
 		role
 	FROM
 		authentications
@@ -64,6 +65,7 @@ func (r *authenticationRepositoryPostgres) FindAuthenticationByEmail(ctx context
 		&AuthenticationId.Password,
 		&AuthenticationId.Token,
 		&AuthenticationId.IsVerified,
+		&AuthenticationId.IsApproved,
 		&AuthenticationId.Role,
 	)
 
