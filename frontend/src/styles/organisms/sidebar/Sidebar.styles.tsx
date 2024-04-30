@@ -14,7 +14,7 @@ export const SidebarContainer = styled.aside<{ $isOpened: boolean }>`
   transition: width 0.5s;
   overflow: hidden;
   color: ${COLORS.primary_text};
-  padding: 40px 0px;
+  padding: 40px 0;
   gap: 20px;
   background-color: white;
 
@@ -27,6 +27,16 @@ export const SidebarContainer = styled.aside<{ $isOpened: boolean }>`
   }
 
   z-index: 10;
+  @media (max-width: 769px) {
+    gap: 0;
+    width: ${(props) => (props.$isOpened ? '60vw' : '0vw')};
+    min-height: 100%;
+  }
+  @media (max-width: 1440px) {
+    gap: 0;
+    width: ${(props) => (props.$isOpened ? '30vw' : '0vw')};
+    min-height: 100%;
+  }
 `;
 
 export const TOP = styled.div`

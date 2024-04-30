@@ -5,6 +5,12 @@ export const Body = styled.div`
   min-width: 100vh;
   padding: 2rem 5rem;
   align-items: center;
+  @media (max-width: 769px) {
+    min-width: 100%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 export const Content = styled.div`
@@ -12,11 +18,25 @@ export const Content = styled.div`
   flex: 1;
 `;
 
+export const CategoryContent = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  @media (max-width: 769px) {
+    align-items: center;
+    width: 80%;
+  }
+`;
+
 export const FiturContainer = styled.div`
   padding: 5rem;
   display: flex;
   justify-content: center;
   gap: 2rem;
+  @media (max-width: 769px) {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 export const Fitur = styled.div`
@@ -29,6 +49,11 @@ export const Fitur = styled.div`
   justify-content: center;
   border-radius: 12px;
   justify-content: space-between;
+  @media (max-width: 769px) {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+  }
 `;
 
 export const Title = styled.h1`
@@ -43,9 +68,13 @@ export const NewSection = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px 0;
+  @media (max-width: 769px) {
+    padding: 0;
+    width: 400px;
+  }
 `;
 
-export const Container = styled.div`
+export const PopularContainer = styled.div`
   width: 100%;
   padding: 20px 5rem;
   display: flex;

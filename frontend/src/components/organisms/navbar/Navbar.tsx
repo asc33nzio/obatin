@@ -2,6 +2,7 @@ import {
   IconContainer,
   Left,
   NavContainer,
+  Right,
 } from '@/styles/organisms/Navbar.styles';
 import { getCookie } from 'cookies-next';
 // import { useObatinSelector } from '@/redux/store/store';
@@ -28,18 +29,18 @@ const Navbar = (): React.ReactElement => {
           </IconContainer>
           <ObatinICO />
         </Left>
-
         <SearchComponent />
-
-        {!isLoggedIn && (
-          <CustomButton
-            content='Login'
-            $width='120px'
-            $height='50px'
-            $fontSize='16px'
-            onClick={() => navigateToLogin()}
-          />
-        )}
+        <Right>
+          {!isLoggedIn && (
+            <CustomButton
+              content='Login'
+              $width='120px'
+              $height='50px'
+              $fontSize='16px'
+              onClick={() => navigateToLogin()}
+            />
+          )}
+        </Right>
       </NavContainer>
 
       <Sidebar />

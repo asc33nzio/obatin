@@ -1,10 +1,10 @@
 'use client';
 import {
-  CategoryContainer,
   Content,
   FilterContainer,
   ProductContent,
   ProductListContainer,
+  CategoryContainer,
 } from '@/styles/pages/product/ProductListPage.styles';
 import {
   Bold,
@@ -15,34 +15,60 @@ import {
 } from '@/styles/pages/product/ProductCard.styles';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Body, Container } from '@/styles/Global.styles';
-import { useFullscreen } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Navbar from '@/components/organisms/navbar/Navbar';
+import CategoryComponent from '@/components/molecules/category/Category';
+import { Inter } from 'next/font/google';
+import FilterComponent from '@/components/atoms/filter/DropdownFIlter';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 const ProductsPage = () => {
   const router = useRouter();
   const [products, setProducts] = useState<ProductType[]>([]);
-  const { ref, toggle } = useFullscreen();
   const [categories, setCategories] = useState<CategoryType[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [classification, setClassification] = useState<string | null>(null);
+  const [orderBy, setOrderBy] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
+        setLoading(true);
         const { data: response } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?`,
+          {
+            params: {
+              limit: 12,
+              page,
+              category: categoryId,
+              sort_by: sortBy,
+              classification: classification,
+              order: orderBy,
+            },
+          },
         );
-        setProducts(response.data);
+
+        setProducts([...response.data]);
+        setLoading(false);
+        console.log(response.data);
       } catch (error) {
         console.error(error);
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [page, categoryId, sortBy, classification, orderBy]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -64,69 +90,60 @@ const ProductsPage = () => {
     router.push(`products/${slug}`);
   };
 
+  const handleLoadMore = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
+
   return (
-    <Container>
+    <Container className={inter.className}>
       <Navbar />
 
       <Body>
         <Content>
           <CategoryContainer>
-            {categories.map((category) => {
-              return (
-                <ul key={category.id}>
-                  <li value={category.category_level}>
-                    <a href={category.category_slug}>{category.name}</a>
-                    {/* <ul>{category.children}</ul> */}
-                  </li>
-                </ul>
-              );
-            })}
+            <CategoryComponent
+              categories={categories}
+              setCategoryId={setCategoryId}
+            />
           </CategoryContainer>
           <ProductContent>
             <FilterContainer>
-              <select>
-                <option value='#'>Nama</option>
-                <option value='#'>Harga</option>
-              </select>
-              <select>
-                <option value='#'>Obat Keras</option>
-                <option value='#'>Obat Bebas</option>
-                <option value='#'>Obat Bebas Terbatas</option>
-                <option value='#'>Non Obat</option>
-              </select>
-              <select>
-                <option value='#'>Rendah ke Tinggi</option>
-                <option value='#'>Tinggi ke Rendah</option>
-              </select>
+              <h2>Products: </h2>
+              <FilterComponent
+                setSortBy={setSortBy}
+                setClassification={setClassification}
+                setOrderBy={setOrderBy}
+              />
             </FilterContainer>
             <ProductListContainer>
-              {products.map((product) => {
-                return (
-                  <ProductCard
-                    key={product.id}
-                    onClick={() => handleProductClicked(product.product_slug)}
-                  >
-                    <Imagecontainer
-                      ref={ref}
-                      src={product.image_url}
-                      alt='banner'
-                      onClick={toggle}
-                    />
-                    <Bold>{product.name}</Bold>
-                    <Smallfont>{product.selling_unit}</Smallfont>
-                    <Price>
-                      Rp{product.min_price} - Rp{product.max_price}
-                    </Price>
-                    <CustomButton
-                      $width='90px'
-                      $height='32px'
-                      content='Add to Cart'
-                      $fontSize='12px'
-                    />
-                  </ProductCard>
-                );
-              })}
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  onClick={() => handleProductClicked(product.product_slug)}
+                >
+                  <Imagecontainer src={product.image_url} alt='banner' />
+                  <Bold>{product.name}</Bold>
+                  <Smallfont>{product.selling_unit}</Smallfont>
+                  <Price>
+                    Rp{product?.min_price.toLocaleString()} - Rp
+                    {product?.max_price.toLocaleString()}
+                  </Price>
+                  <CustomButton
+                    $width='90px'
+                    $height='32px'
+                    content='Add to Cart'
+                    $fontSize='12px'
+                  />
+                </ProductCard>
+              ))}
             </ProductListContainer>
+            <CustomButton
+              onClick={handleLoadMore}
+              disabled={loading}
+              content='load more'
+              $width='150px'
+              $fontSize='18px'
+            />
           </ProductContent>
         </Content>
       </Body>
