@@ -27,6 +27,8 @@ type RouterOpt struct {
 	UserHandler                 *handler.UserHandler
 	AddressHandler              *handler.AddressHandler
 	PartnerHandler              *handler.PartnerHandler
+	MessageHandler              *handler.MessageHandler
+	ChatRoomHandler             *handler.ChatRoomHandler
 	DoctorHandler               *handler.DoctorHandler
 }
 
@@ -60,19 +62,27 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	addressUsecase := usecase.NewAddressUsecaseImpl(dbStore, config)
 	addressHandler := handler.NewAddressHandler(addressUsecase)
 
-	doctorUseCase := usecase.NewDoctorUsecaseImpl(dbStore, config, cloudinaryUpload)
-	doctorHandler := handler.NewDoctorHandler(doctorUseCase)
+	messageUsecase := usecase.NewMessageUsecaseImpl(dbStore, cryptoHash, jwtAuth, config, tokenGenerator, cloudinaryUpload, sendEmail)
+	messageHandler := handler.NewMessageHandler(messageUsecase)
+
+	chatRoomUsecase := usecase.NewChatRoomUsecaseImpl(dbStore, cryptoHash, jwtAuth, config, tokenGenerator, cloudinaryUpload, sendEmail)
+	chatRoomHandler := handler.NewChatRoomHandler(chatRoomUsecase, authenticationUsecase)
+
+	doctorUsecase := usecase.NewDoctorUsecaseImpl(dbStore, config, cloudinaryUpload)
+	doctorHandler := handler.NewDoctorHandler(doctorUsecase)
 
 	return NewRouter(RouterOpt{
 		Middleware:                  middleware,
 		AuthenticationHandler:       authentiationHandler,
 		ProductHandler:              productHandler,
 		DoctorSpecializationHandler: doctorSpecializationHandler,
-		CategoryHandler:                   categoryHandler,
+		CategoryHandler:             categoryHandler,
 		PartnerHandler:              partnerHandler,
 		UserHandler:                 userHandler,
 		AddressHandler:              addressHandler,
 		DoctorHandler:               doctorHandler,
+		MessageHandler:              messageHandler,
+		ChatRoomHandler:             chatRoomHandler,
 	})
 }
 
@@ -136,5 +146,11 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndPointAllCategories, h.CategoryHandler.CreateOneCategory)
 	r.PATCH(appconstant.EndpointUpdateCategory, h.CategoryHandler.UpdateOneCategory)
 	r.DELETE(appconstant.EndpointUpdateCategory, h.CategoryHandler.DeleteOneCategoryBySlug)
+	r.POST(appconstant.EndpointCreateChatRoom, h.ChatRoomHandler.CreateChatRoom)
+	r.POST(appconstant.EndpointCreateMessage, h.MessageHandler.CreateMessage)
+	r.GET(appconstant.EndpointGetAllMessageOnChatRoom, h.ChatRoomHandler.GetAllMessageByChatRoomId)
+	r.PATCH(appconstant.EndpointUpdateIsTyping, h.ChatRoomHandler.UpdateIsTyping)
+	r.GET(appconstant.EndpointGetAllChatRoom, h.ChatRoomHandler.GetListChatRoom)
+	r.DELETE(appconstant.EndpointDeleteChatRoom, h.ChatRoomHandler.DeleteChatRoom)
 	return r
 }

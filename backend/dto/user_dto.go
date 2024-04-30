@@ -75,3 +75,12 @@ func ToGetUserRes(u *entity.User) GetUserRes {
 		Addresses:       addresses,
 	}
 }
+
+type UserListResponse struct {
+	Id               int64  `json:"id"`
+	Name             string `json:"logo_url"`
+	BirthDate        string `json:"birth_date,omitempty"`
+	Gender           string `json:"gender,omitempty"`
+	Avatar           string `json:"avatar,omitempty"`
+	AuthenticationId int64  `json:"authentication_id"`
+}

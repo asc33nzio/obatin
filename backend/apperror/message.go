@@ -14,7 +14,7 @@ const (
 	ImgUploadedInvalidMsg             = "image uploaded can not be more than 500 Kb and type must be jpg, png, svg, or webp"
 	ConfirmPasswordNotMatchMsg        = "confirm password and password should be the same"
 	EmailNotVerifiedMsg               = "you have not verified your account, check your email and verified first"
-	ForbiddenAccessMsg                = "You do not access to do this action"
+	ForbiddenAccessMsg                = "You do not have access to do this action"
 	ProductNotFoundMsg                = "product not found"
 	CategorySlugInvalidMsg            = "category slug already exist"
 	CategorySlugDuplicateInvalidMsg   = "category slug can't be the same as previous"
@@ -31,4 +31,9 @@ const (
 	NoAccessAccountNotVerifiedMsg     = "you don't have access, please verify your account first"
 	TokenHasBeenUsedBefore            = "token has been used before, please make new request"
 	AddressNotFoundMsg                = "address not found"
+	UserNotExistMsg                   = "user not exist"
+	DoctorNotExistMsg                 = "doctor not exist"
+	ChatRoomNotExistMsg               = "chat room not exist"
+	ChatRoomAlreadyExistMsg           = "chat room already exist"
+	ChatRoomAlreadyInactiveMsg        = "chat room already inactive"
 )

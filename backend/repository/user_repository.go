@@ -10,7 +10,7 @@ import (
 
 type UserRepository interface {
 	CreateNewUser(ctx context.Context, authentiactionId int64) error
-	FindAuthByUserId(ctx context.Context, userId int64) (*entity.User, error)
+	FindUserById(ctx context.Context, userId int64) (*entity.User, error)
 	FindUserByAuthId(ctx context.Context, authenticationId int64) (*entity.User, error)
 	FindUserIdByAuthId(ctx context.Context, authenticationId int64) (*int64, error)
 	FindUserDetailsByAuthId(ctx context.Context, authenticationId int64) (*entity.User, error)
@@ -59,13 +59,17 @@ func (r *userRepositoryPostgres) CreateNewUser(ctx context.Context, authentiacti
 	return nil
 }
 
-func (r *userRepositoryPostgres) FindAuthByUserId(ctx context.Context, userId int64) (*entity.User, error) {
+func (r *userRepositoryPostgres) FindUserById(ctx context.Context, userId int64) (*entity.User, error) {
 	user := entity.User{}
 
 	queryFindUser := `
 	SELECT 
-		(id,
-		authentication_id)
+		id,
+		name,
+		birth_date,
+		gender,
+		avatar_url,
+		authentication_id
 	FROM
 		users
 	WHERE
@@ -78,12 +82,16 @@ func (r *userRepositoryPostgres) FindAuthByUserId(ctx context.Context, userId in
 		userId,
 	).Scan(
 		&user.Id,
+		&user.Name,
+		&user.BirthDate,
+		&user.Gender,
+		&user.Avatar,
 		&user.Authentication.Id,
 	)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, apperror.ErrEmailNotRegistered(err)
+			return nil, apperror.ErrUserNotFound(err)
 		}
 
 		return nil, apperror.NewInternal(err)

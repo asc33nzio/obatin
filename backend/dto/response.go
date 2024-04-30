@@ -1,6 +1,9 @@
 package dto
 
-import "obatin/entity"
+import (
+	"obatin/appconstant"
+	"obatin/entity"
+)
 
 type APIResponse struct {
 	Message    string              `json:"message"`
@@ -40,6 +43,26 @@ func ToVerifyRegisterRes(u entity.Authentication) UserVerifiedRes {
 	}
 }
 
+type UserDetailRes struct {
+	Id               int64  `json:"id"`
+	Name             string `json:"name"`
+	Avatar           string `json:"avatar_url"`
+	AuthenticationID int64  `json:"authentication_id"`
+	Birth            string `json:"birth_date"`
+	Gender           string `json:"gender"`
+}
+
+func ToUserDetailRes(u *entity.User) UserDetailRes {
+	return UserDetailRes{
+		Id:               *u.Id,
+		Name:             *u.Name,
+		Avatar:           *u.Avatar,
+		AuthenticationID: u.Authentication.Id,
+		Birth:            u.BirthDate.Format(appconstant.RFC3339TimeFormat),
+		Gender:           *u.Gender,
+	}
+}
+
 type MediaDto struct {
 	StatusCode int                    `json:"statusCode"`
 	Message    string                 `json:"message"`
@@ -73,7 +96,7 @@ func ToGetAllSpecializationsRes(specializations []entity.DoctorSpecialization) [
 type OneDoctorPendingApprovalRes struct {
 	AuthenticationID          int    `json:"authentication_id"`
 	Email                     string `json:"email"`
-	Cerificate                string `json:"ceritificate_url"`
+	Certificate               string `json:"ceritificate_url"`
 	SpecializationName        string `json:"specialization_name"`
 	SpecializationDescription string `json:"specialization_description"`
 }
@@ -85,11 +108,74 @@ func ToGetAllDoctorPendingApprovalRes(pendingApprovals []entity.Doctor) []OneDoc
 		res = append(res, OneDoctorPendingApprovalRes{
 			AuthenticationID:          int(pa.AuthenticationID),
 			Email:                     pa.Email,
-			Cerificate:                pa.Certificate,
+			Certificate:               pa.Certificate,
 			SpecializationName:        pa.SpecializationName,
 			SpecializationDescription: pa.SpecializationDescription,
 		})
 	}
 
 	return res
+}
+
+type OneMessageRes struct {
+	Id        int64  `json:"id"`
+	Message   string `json:"message"`
+	CreatedAt string `json:"created_at"`
+	Sender    string `json:"sender"`
+}
+
+func ToGetAllMessageInChatRoom(messages []entity.Message) []OneMessageRes {
+	res := []OneMessageRes{}
+
+	for _, ds := range messages {
+		res = append(res, OneMessageRes{
+			Id:        ds.Id,
+			Message:   ds.Message,
+			CreatedAt: ds.CreatedAt,
+			Sender:    ds.Sender,
+		})
+	}
+
+	return res
+}
+
+type OneChatRoomRes struct {
+	Id                  int64   `json:"chat_room_id"`
+	UserId              int64   `json:"user_id"`
+	DoctorId            int64   `json:"doctor_id,omitempty"`
+	DoctorName          string  `json:"doctor_name,omitempty"`
+	UserName            string  `json:"user_name,omitempty"`
+	LastMessage         *string `json:"last_message,omitempty"`
+	DoctorAvatar        string  `json:"avatar_url_doctor,omitempty"`
+	UserAvatar          string  `json:"avatar_url_user,omitempty"`
+	DoctorSpcialization string  `json:"doctor_specialization,omitempty"`
+	IsActive            bool    `json:"is_active"`
+}
+
+func ToGetAllChatRoomRes(chatRooms []entity.ChatRoom) []OneChatRoomRes {
+	res := []OneChatRoomRes{}
+
+	for _, pa := range chatRooms {
+		res = append(res, OneChatRoomRes{
+			Id:                  pa.Id,
+			UserId:              pa.UserId,
+			DoctorId:            pa.DoctorId,
+			DoctorName:          pa.DoctorName,
+			UserName:            pa.UserName,
+			LastMessage:         pa.LastMessage,
+			DoctorAvatar:        pa.AvatarDoctor,
+			UserAvatar:          pa.AvatarUser,
+			DoctorSpcialization: pa.DoctorSpecialization,
+			IsActive:            pa.IsActive,
+		})
+	}
+
+	return res
+}
+
+type OneChatRoom struct {
+	Id      int64                `json:"chat_room_id"`
+	Message []OneMessageRes      `json:"message"`
+	Doctor  DoctorDetailResponse `json:"doctor,omitempty"`
+	User    UserDetailRes        `json:"user,omitempty"`
 }

@@ -15,6 +15,7 @@ type DoctorRepository interface {
 	GetDoctorList(ctx context.Context, params entity.DoctorFilter) (*entity.DoctorListPage, error)
 	FindDoctorDetailById(ctx context.Context, id int64) (*entity.DoctorDetail, error)
 	UpdateOneDoctor(ctx context.Context, body entity.DoctorUpdateRequest, id int64) (*entity.DoctorDetail, error)
+	FindDoctorByAuthId(ctx context.Context, authId int64) (*entity.Doctor, error)
 }
 
 type doctorRepositoryPostgres struct {
@@ -34,7 +35,9 @@ func (r *doctorRepositoryPostgres) CreateNewDoctor(ctx context.Context, authenti
 				authentication_id, 
 				certificate_url, 
 				doctor_specialization_id)
-		VALUES ($1, $2, $3)
+		VALUES ($1,
+			 	$2, 
+				$3)
 	`
 
 	res, err := r.db.ExecContext(
@@ -89,6 +92,7 @@ func (r *doctorRepositoryPostgres) GetDoctorList(ctx context.Context, params ent
             `)
 	queryParams, paramsData := ConvertDoctorQueryParamstoSql(params)
 	sb.WriteString(queryParams)
+
 	data = append(data, paramsData...)
 	queryDataCount.WriteString(fmt.Sprintf(` SELECT COUNT (*) FROM ( %v )`, sb.String()))
 	err := r.db.QueryRowContext(ctx, queryDataCount.String(), data...).Scan(&rowsCount)
@@ -185,4 +189,51 @@ func (r *doctorRepositoryPostgres) UpdateOneDoctor(ctx context.Context, body ent
 
 	return &doctor, nil
 
+}
+
+func (r *doctorRepositoryPostgres) FindDoctorByAuthId(ctx context.Context, authId int64) (*entity.Doctor, error) {
+	doctor := entity.Doctor{}
+
+	queryFindUser := `
+	SELECT 
+		id,
+		name,
+		avatar_url,
+		is_online,
+		experience_years,
+		certificate_url,
+		fee,
+		opening_time,
+		operational_hours
+	FROM
+		doctors
+	WHERE
+		authentication_id = $1
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		queryFindUser,
+		authId,
+	).Scan(
+		&doctor.Id,
+		&doctor.Name,
+		&doctor.Avatar,
+		&doctor.IsOnline,
+		&doctor.Experiences,
+		&doctor.Certificate,
+		&doctor.Fee,
+		&doctor.Opening,
+		&doctor.OperationalHours,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.ErrDoctorNotFound(err)
+		}
+
+		return nil, apperror.NewInternal(err)
+	}
+
+	return &doctor, nil
 }

@@ -27,6 +27,8 @@ type AuthenticationUsecase interface {
 	ResendVerificationEmail(ctx context.Context, email string) error
 	GetPendingDoctorApproval(ctx context.Context, params entity.Pagination) (*entity.DoctorApprovalPage, error)
 	GenerateRefreshToken(ctx context.Context, refreshToken string) (*entity.AuthenticationToken, error)
+	GetDoctorById(ctx context.Context, doctorId int64) (*entity.DoctorDetail, error)
+	GetUserById(ctx context.Context, userId int64) (*entity.User, error)
 }
 
 type authentictionUsecaseImpl struct {
@@ -62,6 +64,7 @@ func NewAuthenticationUsecaseImpl(
 func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authentication) (*entity.AuthenticationToken, error) {
 	ur := u.repoStore.AuthenticationRepository()
 	rt := u.repoStore.RefreshTokenRepository()
+	dr := u.repoStore.DoctorRepository()
 
 	isPasswordValid := appvalidator.IsValidPassword(uReq.Password)
 	if !isPasswordValid {
@@ -96,6 +99,24 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 
 	if err != nil {
 		return nil, apperror.NewInternal(err)
+	}
+
+	claims, err := u.jwtAuth.ParseAndVerify(token, u.config.JwtSecret())
+	if err != nil {
+		return nil, apperror.ErrInvalidToken(err)
+	}
+	if claims.Payload.Role == constant.RoleDoctor {
+		doctor, err := dr.FindDoctorByAuthId(ctx, claims.Payload.AuthenticationId)
+		if err != nil {
+			return nil, err
+		}
+		onlineStatus := appconstant.DoctorOnlineTrue
+		_, err = dr.UpdateOneDoctor(ctx, entity.DoctorUpdateRequest{
+			IsOnline: &onlineStatus,
+		}, doctor.Id)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	err = rt.DeleteRefreshTokenAfterExpired(ctx)
@@ -743,5 +764,29 @@ func (u *authentictionUsecaseImpl) GenerateRefreshToken(ctx context.Context, ref
 	}
 
 	return &authenticationToken, nil
+
+}
+
+func (u *authentictionUsecaseImpl) GetDoctorById(ctx context.Context, doctorId int64) (*entity.DoctorDetail, error) {
+	dr := u.repoStore.DoctorRepository()
+
+	doctor, err := dr.FindDoctorDetailById(ctx, doctorId)
+	if err != nil {
+		return nil, err
+	}
+
+	return doctor, nil
+
+}
+
+func (u *authentictionUsecaseImpl) GetUserById(ctx context.Context, userId int64) (*entity.User, error) {
+	ur := u.repoStore.UserRepository()
+
+	user, err := ur.FindUserById(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 
 }
