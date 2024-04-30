@@ -37,12 +37,11 @@ func (h *CategoryHandler) GetAllCategory(ctx *gin.Context) {
 
 func checkAdmin(ctx *gin.Context) bool {
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+	if role != constant.RoleAdmin || role == "" {
 		return false
 	}
-	if role != constant.RoleAdmin {
-		ctx.Error(apperror.ErrForbiddenAccess(nil))
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
 		return false
 	}
 	return true
@@ -52,6 +51,7 @@ func (h *CategoryHandler) CreateOneCategory(ctx *gin.Context) {
 
 	isAdmin := checkAdmin(ctx)
 	if !isAdmin {
+		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
 
@@ -94,6 +94,7 @@ func (h *CategoryHandler) UpdateOneCategory(ctx *gin.Context) {
 
 	isAdmin := checkAdmin(ctx)
 	if !isAdmin {
+		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
 
@@ -146,6 +147,7 @@ func (h *CategoryHandler) DeleteOneCategoryBySlug(ctx *gin.Context) {
 
 	isAdmin := checkAdmin(ctx)
 	if !isAdmin {
+		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
 

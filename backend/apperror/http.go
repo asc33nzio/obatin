@@ -40,6 +40,8 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusBadRequest
 	case ErrorCategoryNotFound:
 		return http.StatusBadRequest
+	case ErrorDoctorNotFound:
+		return http.StatusNotFound
 	case AddressNotFound:
 		return http.StatusNotFound
 	default:

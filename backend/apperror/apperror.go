@@ -268,3 +268,12 @@ func ErrAddressNotFound(err error) *AppError {
 		stack:   debug.Stack(),
 	}
 }
+
+func ErrDoctorNotFound(err error) *AppError {
+	return &AppError{
+		code:    ErrorDoctorNotFound,
+		err:     err,
+		message: DoctorNotFoundMsg,
+		stack:   debug.Stack(),
+	}
+}

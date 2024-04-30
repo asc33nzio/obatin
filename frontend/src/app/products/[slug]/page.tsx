@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Body, Container } from '@/styles/Global.styles';
 import { ProductType } from '@/types/Product';
-import Sidebar from '@/components/organisms/sidebar/Sidebar';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import Footer from '@/components/organisms/footer/Footer';
 import {
@@ -20,7 +19,6 @@ const ProductDetailPage = () => {
   const pathname = usePathname();
   const product_slug = pathname.split('/').pop();
   const [product, setProduct] = useState<ProductType | null>(null);
-  const [isOpened, setOpened] = useState(false);
   const [quantity, setQuantity] = useState<number>(1);
   const [isClicked, setIsClicked] = useState<boolean>(false);
 
@@ -42,10 +40,6 @@ const ProductDetailPage = () => {
     }
   }, [product_slug]);
 
-  const toggleDrawer = () => {
-    setOpened((prev) => !prev);
-  };
-
   const handleAddToChart = () => {
     setIsClicked(true);
   };
@@ -66,9 +60,8 @@ const ProductDetailPage = () => {
 
   return (
     <Container>
-      <Sidebar toggleDrawer={toggleDrawer} isOpened={isOpened} />
+      <Navbar />
       <Body>
-        <Navbar isOpened={isOpened} toggleDrawer={toggleDrawer} />
         <ProductDetailContainer>
           <Image
             width={500}
@@ -76,7 +69,6 @@ const ProductDetailPage = () => {
             src={product?.image_url}
             alt={product?.product_slug}
           />
-          {/* <Image src={product?.image_url} alt={product?.product_slug} /> */}
           <ProductDetail>
             <h1>{product?.name}</h1>
             <Price>
@@ -95,8 +87,8 @@ const ProductDetailPage = () => {
             ) : (
               <ButtonAdd>
                 <CustomButton
-                  content='+'
-                  onClick={handleAdd}
+                  content='-'
+                  onClick={handleSubtract}
                   $width='80px'
                   $height='30px'
                   $fontSize='18px'
@@ -106,8 +98,8 @@ const ProductDetailPage = () => {
                 />
                 <p>{quantity}</p>
                 <CustomButton
-                  content='-'
-                  onClick={handleSubtract}
+                  content='+'
+                  onClick={handleAdd}
                   $width='80px'
                   $height='30px'
                   $fontSize='18px'

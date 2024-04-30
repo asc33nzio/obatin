@@ -7,7 +7,6 @@ export const Imagecontainer = styled.img`
 
 export const ProductCard = styled.a`
   width: 270px;
-  height: 330px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -19,6 +18,8 @@ export const ProductCard = styled.a`
   color: ${COLORS.primary_text};
   text-align: center;
   text-decoration: none;
+  gap: 5px;
+
   &:hover {
     zoom: 101%;
     border: 1px solid ${COLORS.primary_color};

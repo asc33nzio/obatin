@@ -5,6 +5,7 @@ const (
 
 	SortByName = "name"
 	SortByPrice = "price"
+	SortByExperience = "experience"
 
 	OrderAscending = "asc"
 	OrderDescending = "desc"

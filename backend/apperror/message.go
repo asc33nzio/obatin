@@ -19,6 +19,7 @@ const (
 	CategorySlugInvalidMsg            = "category slug already exist"
 	CategorySlugDuplicateInvalidMsg   = "category slug can't be the same as previous"
 	CategoryNotFoundMsg               = "category not found"
+	DoctorNotFoundMsg                 = "doctor not found"
 	EmailHasNotApprovedMsg            = "you must wait until admin approved your account"
 	TokenHasExpiredMsg                = "token has expired"
 	UserStillHaveValidTokenMsg        = "you can not make this request, you stil have valid token"

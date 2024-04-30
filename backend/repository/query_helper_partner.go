@@ -64,7 +64,7 @@ func convertUpdatePartnerQueryParamstoSql(params entity.PartnerUpdateRequest, id
 	}
 	query.WriteString(
 		fmt.Sprintf(`
-		, updatedAt = NOW()
+		, updated_at = NOW()
 	WHERE 
 		id = $%d
 	RETURNING
@@ -95,7 +95,7 @@ func convertUpdateAuthenticationPartnerQueryParamstoSql(params entity.PartnerUpd
 	}
 	query.WriteString(
 		fmt.Sprintf(`
-		, updatedAt = NOW()
+		, updated_at = NOW()
 	WHERE 
 		id = $%d
 	RETURNING

@@ -34,3 +34,25 @@ export const DropdownButton = styled.button`
     display: inline-block;
   }
 `;
+
+export const FilterContainer = styled.div`
+  display: flex;
+  gap: 20px;
+`;
+
+export const FilterButtonStyle = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: ${COLORS.primary_color};
+  width: 150px;
+  height: max-content;
+  button {
+    padding: 15px;
+    background-color: ${COLORS.primary_color};
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+  }
+`;
