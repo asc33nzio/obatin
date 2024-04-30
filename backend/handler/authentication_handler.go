@@ -206,16 +206,20 @@ func (h *AuthenticationHandler) SendVerifyForgotPassword(ctx *gin.Context) {
 }
 
 func (h *AuthenticationHandler) GetPendingDoctorApproval(ctx *gin.Context) {
-	doctorPendingApproval, err := h.userUsecase.GetPendingDoctorApproval(ctx)
+	paginationQuery := dto.PaginationReq{}
+
+	paginationParams := paginationQuery.ToPaginationEntity()
+	doctorPendingApproval, err := h.userUsecase.GetPendingDoctorApproval(ctx, paginationParams)
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	res := dto.ToGetAllDoctorPendingApprovalRes(doctorPendingApproval)
+	res := dto.ToGetAllDoctorPendingApprovalRes(doctorPendingApproval.Doctors)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseGetAllPendingDoctorApproval,
-		Data:    res,
+		Message:    constant.ResponseGetAllPendingDoctorApproval,
+		Pagination: (*dto.PaginationResponse)(&doctorPendingApproval.Pagination),
+		Data:       res,
 	})
 }
 

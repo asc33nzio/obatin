@@ -15,6 +15,7 @@ const (
 	UserNotFound
 	InvalidSlug
 	ErrorCategoryNotFound
+	ErrorDoctorNotFound
 	EmailNotVerified
 	ForbiddenAccess
 	ErrPartnerNotExist

@@ -2,6 +2,8 @@ package appconstant
 
 const (
 	DefaultProductLimit = 10
+	DefaultMinPage      = 1
+	DefaultMinLimit     = 1
 	MaxLevelWithChild   = 2
 	CategoryLevel1Int   = 1
 	CategoryLevel2Int   = 2

@@ -10,6 +10,7 @@ const (
 	CertificateJSONTag         = "certificate"
 	SpecializationIdJSONTag    = "doctor_specialization_id"
 	ImageUrlFormKey            = "image"
+	AvatarURLFormKey           = "avatar"
 	EmailJSONTag               = "email"
 	TokenQueryParam            = "token"
 	ApproveQueryParam          = "approve"

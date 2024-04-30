@@ -30,11 +30,11 @@ func NewProductUsecaseImpl(
 
 func (u *productUsecaseImpl) GetAllProducts(ctx context.Context, params entity.ProductFilter) (*entity.ProductListPage, error) {
 	pr := u.repoStore.ProductRepository()
-	if params.Limit < 1 {
+	if params.Limit < appconstant.DefaultMinLimit {
 		params.Limit = appconstant.DefaultProductLimit
 	}
-	if params.Page < 1 {
-		params.Page = 1
+	if params.Page < appconstant.DefaultMinPage {
+		params.Page = appconstant.DefaultMinPage
 	}
 
 	res, err := pr.GetProductsList(ctx, params)
@@ -49,7 +49,7 @@ func (u *productUsecaseImpl) GetAllProducts(ctx context.Context, params entity.P
 		TotalRecords: int64(res.TotalRows),
 	}
 	if res.Pagination.TotalRecords-(res.Pagination.PageCount*int64(params.Limit)) > 0 {
-		res.Pagination.PageCount = int64(res.Pagination.PageCount) + 1
+		res.Pagination.PageCount = int64(res.Pagination.PageCount) + appconstant.DefaultMinPage
 	}
 
 	return res, nil

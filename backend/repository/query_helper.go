@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"log"
 	"obatin/constant"
 	"obatin/entity"
 	"strings"
@@ -70,19 +71,104 @@ func convertUpdateCategoryQueryParamstoSql(params entity.CategoryUpdateBody, slu
 	return query.String(), args
 }
 
+func convertUpdateDoctorQueryParamstoSql(params entity.DoctorUpdateRequest, id int64) (string, []interface{}) {
+	var query strings.Builder
+	var args []interface{}
+	var countParams = constant.StartingParamsCount
+	if params.Name != nil {
+		query.WriteString(fmt.Sprintf("name = $%d ", countParams))
+		args = append(args, *params.Name)
+		countParams++
+	}
+	if params.AvatarUrl != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("avatar_url = $%d ", countParams))
+		args = append(args, *params.AvatarUrl)
+		countParams++
+	}
+	if params.IsOnline != nil {
+		query.WriteString(fmt.Sprintf("is_online = $%d ", countParams))
+		args = append(args, *params.IsOnline)
+		countParams++
+	}
+	if params.Experiences != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("experience_years = $%d ", countParams))
+		args = append(args, *params.Experiences)
+		countParams++
+	}
+
+	if params.Fee != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("fee = $%d ", countParams))
+		args = append(args, *params.Fee)
+		countParams++
+	}
+
+	if params.Opening != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("opening_time = $%d ", countParams))
+		args = append(args, *params.Opening)
+		countParams++
+	}
+	if *params.OperationalHours != "" {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("operational_hours = $%d ", countParams))
+		args = append(args, *params.OperationalHours)
+		countParams++
+	}
+	if *params.OperationalDays != "" {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		log.Println(*params.OperationalDays)
+		query.WriteString(fmt.Sprintf("operational_days = $%d ", countParams))
+		args = append(args, *params.OperationalDays)
+		countParams++
+	}
+	query.WriteString(
+		fmt.Sprintf(`
+		, updated_at = NOW()
+	WHERE 
+		id = $%d
+	RETURNING
+	id, name, avatar_url, is_online, experience_years, certificate_url, 
+	fee, opening_time, operational_hours, operational_days
+	`, countParams))
+
+	args = append(args, id)
+	countParams++
+	return query.String(), args
+}
+
 func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
 	var countParams = constant.StartingParamsCount
-
+	if params.Category != "" || params.Search != "" || params.Classification != nil {
+		query.WriteString(" WHERE ")
+	}
 	if params.Category != "" {
-		query.WriteString(fmt.Sprintf(` WHERE pc.category_id = $%v`, countParams))
+		query.WriteString(fmt.Sprintf(` pc.category_id = $%v`, countParams))
 		filters = append(filters, params.Category)
 		countParams++
 	}
 
 	if params.Search != "" {
-		query.WriteString(fmt.Sprintf(` AND (p.name ILIKE '%%' ||$%v|| '%%' `, countParams))
+		if countParams > constant.StartingParamsCount {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` (p.name ILIKE '%%' ||$%v|| '%%' `, countParams))
 		query.WriteString(fmt.Sprintf(` OR p.generic_name ILIKE '%%' ||$%v|| '%%' `, countParams))
 		query.WriteString(fmt.Sprintf(` OR p.content ILIKE '%%' ||$%v|| '%%' `, countParams))
 		query.WriteString(fmt.Sprintf(` OR p.description ILIKE '%%' ||$%v|| '%%' )`, countParams))
@@ -91,10 +177,15 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 	}
 
 	if params.Classification != nil {
-		query.WriteString(fmt.Sprintf(` AND p.classification = $%v `, countParams))
+		if countParams > constant.StartingParamsCount {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` p.classification = $%v `, countParams))
 		filters = append(filters, &params.Classification)
 		countParams++
 	}
+
+	query.WriteString(` AND p.deleted_at IS NULL `)
 
 	if params.SortBy != nil {
 		if *params.SortBy == constant.SortByName {
@@ -119,24 +210,90 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 
 }
 
-func convertPaginationParamsToSql(params entity.ProductFilter, paramsCount int) (string, []interface{}) {
+func ConvertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interface{}) {
+	var query strings.Builder
+	var filters []interface{}
+	var countParams = constant.StartingParamsCount
+	if params.Specialization != nil || params.Search != "" || params.OnlineOnly != nil {
+		query.WriteString(" WHERE ")
+	}
+
+	if params.Search != "" {
+		query.WriteString(fmt.Sprintf(` (d.name ILIKE '%%' ||$%v|| '%%' `, countParams))
+		query.WriteString(fmt.Sprintf(` OR sp.name ILIKE '%%' ||$%v|| '%%' `, countParams))
+		query.WriteString(fmt.Sprintf(` OR sp.description ILIKE '%%' ||$%v|| '%%' ) `, countParams))
+		filters = append(filters, params.Search)
+		countParams++
+	}
+
+	if params.OnlineOnly != nil {
+		if *params.OnlineOnly {
+			if countParams > 1 {
+				query.WriteString(",")
+			}
+			if countParams > constant.StartingParamsCount {
+				query.WriteString(` AND `)
+			}
+			query.WriteString(fmt.Sprintf(` d.is_online = $%v `, countParams))
+			filters = append(filters, params.OnlineOnly)
+			countParams++
+		}
+	}
+
+	if params.Specialization != nil {
+		if countParams > constant.StartingParamsCount {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` sp.slug = $%v `, countParams))
+		filters = append(filters, &params.Specialization)
+		countParams++
+	}
+
+	query.WriteString(` AND d.deleted_at IS NULL `)
+
+	if params.SortBy != nil {
+		if *params.SortBy == constant.SortByName {
+			query.WriteString(` ORDER BY d.name `)
+		} else if *params.SortBy == constant.SortByPrice {
+			query.WriteString(" ORDER BY d.fee ")
+		} else if *params.SortBy == constant.SortByExperience {
+			query.WriteString(" ORDER BY d.experience_years ")
+		}
+	}
+
+	if params.Order != nil {
+		if params.SortBy == nil {
+			query.WriteString(` ORDER BY d.id `)
+		}
+		switch order := *params.Order; order {
+		case constant.OrderAscending:
+			query.WriteString(`ASC`)
+		case constant.OrderDescending:
+			query.WriteString(`DESC`)
+		}
+	}
+	return query.String(), filters
+
+}
+
+func convertPaginationParamsToSql(limit int, page int, paramsCount int) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
 	var countParams = paramsCount
 
-	if params.Limit != 0 {
+	if limit != 0 {
 		query.WriteString(fmt.Sprintf(` LIMIT $%v`, countParams))
-		filters = append(filters, params.Limit)
+		filters = append(filters, limit)
 		countParams++
 	}
 
-	if params.Page != 0 {
+	if page != 0 {
 		setLimit := 0
-		if params.Limit != 0 {
-			setLimit = params.Limit
+		if limit != 0 {
+			setLimit = limit
 		}
 		query.WriteString(fmt.Sprintf(` OFFSET $%v`, countParams))
-		filters = append(filters, (params.Page-1)*setLimit)
+		filters = append(filters, (page-1)*setLimit)
 		countParams++
 	}
 
