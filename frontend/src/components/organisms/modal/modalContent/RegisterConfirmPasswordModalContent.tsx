@@ -4,12 +4,14 @@ import {
 } from '@/styles/organisms/modal/modalContent/PasswordModalContent.styles';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
+import { useEventEmitter } from '@/hooks/useEventEmitter';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 
-const ChangePasswordModalContent = (): React.ReactElement => {
+const RegisterConfirmPasswordModalContent = (): React.ReactElement => {
+  const emitter = useEventEmitter();
   const { setToast } = useToast();
   const { closeModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
@@ -34,10 +36,12 @@ const ChangePasswordModalContent = (): React.ReactElement => {
           $fontSize='22px'
           $bgColor='#de161c'
           onClick={() => {
+            emitter.emit('close-modal-fail');
             closeModal();
+
             setToast({
               showToast: true,
-              toastMessage: 'Tidak ada perubahan',
+              toastMessage: 'Pendaftaran dibatalkan',
               toastType: 'warning',
               resolution: isDesktopDisplay ? 'desktop' : 'mobile',
               orientation: 'center',
@@ -45,13 +49,15 @@ const ChangePasswordModalContent = (): React.ReactElement => {
           }}
         />
         <CustomButton
-          content='Konfirmasi'
+          content='Lanjutkan'
           $width='150px'
           $height='50px'
           $fontSize='22px'
           onClick={() => {
             if (confirmPasswordValidationError) {
+              emitter.emit('close-modal-fail');
               closeModal();
+
               setToast({
                 showToast: true,
                 toastMessage: 'Cek kembali kata sandi anda',
@@ -62,15 +68,8 @@ const ChangePasswordModalContent = (): React.ReactElement => {
               return;
             }
 
+            emitter.emit('close-modal-ok');
             closeModal();
-            setToast({
-              showToast: true,
-              toastMessage:
-                'Kata sandi tersimpan. Klik simpan profil untuk menyelesaikan pengubahan',
-              toastType: 'ok',
-              resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-              orientation: 'center',
-            });
           }}
         />
       </PasswordModalButtonsContainer>
@@ -78,4 +77,4 @@ const ChangePasswordModalContent = (): React.ReactElement => {
   );
 };
 
-export default ChangePasswordModalContent;
+export default RegisterConfirmPasswordModalContent;

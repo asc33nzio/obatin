@@ -1,15 +1,25 @@
-interface decodedSessionTokenPayloadItf {
-  role: string;
-  uid: number;
+type UserRoles = 'user' | 'doctor' | 'partner' | 'admin';
+
+interface decodedAccessTokenPayloadItf {
+  aid: number;
+  role: UserRoles;
+  is_verified: boolean;
+  is_approved: boolean;
+  random_token?: string;
 }
 
-interface decodedSessionTokenRegisteredClaimsItf {
+interface decodedAccessTokenRegisteredClaimsItf {
+  iss: string;
   exp: number;
   iat: number;
-  iss: string;
 }
 
 export interface DecodedJwtItf {
-  Payload: decodedSessionTokenPayloadItf;
-  RegisteredClaims: decodedSessionTokenRegisteredClaimsItf;
+  Payload: decodedAccessTokenPayloadItf;
+  RegisteredClaims: decodedAccessTokenRegisteredClaimsItf;
+}
+
+export interface StandardDecodedJwtItf {
+  header: decodedAccessTokenPayloadItf | null;
+  payload: DecodedJwtItf | null;
 }

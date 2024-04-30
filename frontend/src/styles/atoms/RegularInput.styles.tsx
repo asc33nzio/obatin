@@ -54,13 +54,15 @@ export const RegularCustomInput = styled.input<{
 
 export const CustomUploadButton = styled.button<{
   $hasError?: boolean;
+  $isSet?: boolean;
 }>`
   cursor: pointer;
   position: relative;
   width: 100%;
   height: 100%;
   z-index: 1;
-  background-color: ${({ $hasError }) => ($hasError ? '#e04146' : '#b3e5fc')};
+  background-color: ${({ $hasError, $isSet }) =>
+    $hasError ? '#e04146' : $isSet ? '#53BC38' : '#b3e5fc'};
   border: none;
   outline: none;
 

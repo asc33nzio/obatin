@@ -3,14 +3,16 @@ import { AuthReduxItf } from '@/types/authTypes';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: AuthReduxItf = {
+  aid: 0,
   email: '',
   name: '',
   gender: 'laki-laki',
   birthDate: undefined,
-  specialization: null,
   role: 'user',
   isVerified: false,
   isApproved: false,
+  avatarUrl: '',
+  specialization: null,
 };
 
 export const authSlice = createSlice({
@@ -18,14 +20,18 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     setAuthState: (state, action: PayloadAction<AuthReduxItf>) => {
+      state.aid = action.payload.aid;
       state.email = action.payload.email;
       state.name = action.payload.name;
       state.gender = action.payload.gender;
       state.birthDate = action.payload.birthDate;
-      state.specialization = action.payload.specialization;
       state.role = action.payload.role;
       state.isVerified = action.payload.isVerified;
+      state.avatarUrl = action.payload.avatarUrl;
       state.isApproved = action.payload.isApproved;
+      if (action.payload.specialization) {
+        state.specialization = action.payload.specialization;
+      }
     },
   },
 });

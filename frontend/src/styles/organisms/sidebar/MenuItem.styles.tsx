@@ -1,7 +1,7 @@
 import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
-export const MenuItemContainer = styled.a<{ $depth: number }>`
+export const MenuItemContainer = styled.div<{ $depth: number }>`
   display: flex;
   flex-direction: row;
   font-size: 20px;
