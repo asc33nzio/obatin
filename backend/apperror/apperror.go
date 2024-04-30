@@ -251,6 +251,7 @@ func ErrCategoryNotFound(err error) *AppError {
 		stack:   debug.Stack(),
 	}
 }
+
 func ErrPartnerNotFound(err error) *AppError {
 	return &AppError{
 		code:    ErrPartnerNotExist,
@@ -273,7 +274,34 @@ func ErrDoctorNotFound(err error) *AppError {
 	return &AppError{
 		code:    ErrorDoctorNotFound,
 		err:     err,
-		message: DoctorNotFoundMsg,
+		message: DoctorNotExistMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrChatRoomNotFound(err error) *AppError {
+	return &AppError{
+		code:    ErrorChatRoomNotFound,
+		err:     err,
+		message: ChatRoomNotExistMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrChatRoomAlreadyExist(err error) *AppError {
+	return &AppError{
+		code:    ErrorChatRoomAlreadyExist,
+		err:     err,
+		message: ChatRoomAlreadyExistMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrChatRoomAlreadyInactive(err error) *AppError {
+	return &AppError{
+		code:    ErrorChatRoomAlreadyInactive,
+		err:     err,
+		message: ChatRoomAlreadyInactiveMsg,
 		stack:   debug.Stack(),
 	}
 }

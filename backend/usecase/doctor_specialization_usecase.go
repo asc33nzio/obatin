@@ -9,7 +9,7 @@ import (
 )
 
 type DoctorSpecializationUsecase interface {
-	GetAll(ctx context.Context) ([]entity.DoctorSpecialization, error) 
+	GetAll(ctx context.Context) ([]entity.DoctorSpecialization, error)
 }
 
 type doctorSpecializationUsecaseImpl struct {

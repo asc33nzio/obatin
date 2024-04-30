@@ -49,6 +49,22 @@ type IdUriParam struct {
 	Id string `uri:"doctor_id" binding:"required"`
 }
 
+type MessageReq struct {
+	Message    string `json:"message" binding:"required"`
+	ChatRoomId int64  `json:"chat_room_id" binding:"required"`
+}
+
+type ChatRoomReq struct {
+	DoctorId int64 `json:"doctor_id" binding:"required"`
+}
+
+type UpdateIsTypingReq struct {
+	ChatRoomId int64 `json:"chat_room_id" binding:"required"`
+	UserId     int64 `json:"user_id,omitempty"`
+	DoctorId   int64 `json:"doctor_id,omitempty"`
+	IsTyping   *bool `json:"is_typing" binding:"required"`
+}
+
 func (u UserLoginReq) ToUser() entity.Authentication {
 	return entity.Authentication{
 		Email:    u.Email,
@@ -94,9 +110,30 @@ func (u PartnerRegisterReq) ToPartner() entity.Partner {
 	}
 }
 
+func (u MessageReq) ToMessage() entity.Message {
+	return entity.Message{
+		Message:    u.Message,
+		ChatRoomId: u.ChatRoomId,
+	}
+}
+
+func (u ChatRoomReq) ToChatRoom() entity.ChatRoom {
+	return entity.ChatRoom{
+		DoctorId: u.DoctorId,
+	}
+}
+
+func (u UpdateIsTypingReq) ToUpdateIsTyping() entity.ChatRoom {
+	return entity.ChatRoom{
+		DoctorId: u.DoctorId,
+		UserId:   u.UserId,
+		IsTyping: *u.IsTyping,
+	}
+}
+
 func (r PaginationReq) ToPaginationEntity() entity.Pagination {
 	return entity.Pagination{
 		Page:  r.Page,
-        Limit: r.Limit,
+		Limit: r.Limit,
 	}
 }

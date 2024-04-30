@@ -13,6 +13,7 @@ type Authentication struct {
 	Certificate      multipart.File
 	ConfirmPassword  string
 	SpecializationID int64
+	IsOnline         bool
 }
 
 type Pagination struct {

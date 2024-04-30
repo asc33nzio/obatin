@@ -105,7 +105,6 @@ func (h *PartnerHandler) UpdateOnePartner(ctx *gin.Context) {
 		return
 	}
 
-
 	file, FileHeader, err := ctx.Request.FormFile(constant.LogoJSONTag)
 	if file != nil {
 		if err != nil {
@@ -140,7 +139,6 @@ func (h *PartnerHandler) GetPartnerDetailById(ctx *gin.Context) {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
 	}
-
 
 	partner, err := h.partnerUsecase.GetPartnerById(ctx, idParam.Id)
 	if err != nil {

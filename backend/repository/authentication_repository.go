@@ -551,7 +551,6 @@ func (r *authenticationRepositoryPostgres) IsApproved(ctx context.Context, email
 
 	return isApproved, nil
 }
-
 func (r *authenticationRepositoryPostgres) FindAuthenticationById(ctx context.Context, authenticationId int64) (*entity.Authentication, error) {
 	a := entity.Authentication{}
 	a.Id = authenticationId

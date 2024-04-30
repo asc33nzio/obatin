@@ -15,10 +15,14 @@ const (
 	UserNotFound
 	InvalidSlug
 	ErrorCategoryNotFound
-	ErrorDoctorNotFound
 	EmailNotVerified
 	ForbiddenAccess
 	ErrPartnerNotExist
 	NoAccessAccountNotVerified
 	AddressNotFound
+	ErrorUserNotFound
+	ErrorDoctorNotFound
+	ErrorChatRoomNotFound
+	ErrorChatRoomAlreadyExist
+	ErrorChatRoomAlreadyInactive
 )

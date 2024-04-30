@@ -32,4 +32,6 @@ const (
 	RegexLowerCase             = "[a-z]"
 	RegexUpperCase             = "[A-Z]"
 	RegexDigitCase             = "[0-9]"
+	IsOnline                   = true
+	IsNotOnline                = false
 )
