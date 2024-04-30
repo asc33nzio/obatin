@@ -16,8 +16,8 @@ import Sidebar from '../sidebar/Sidebar';
 const Navbar = (): React.ReactElement => {
   const { isOpened, toggleDrawer } = useNavbar();
   // const userInfo = useObatinSelector((state) => state?.auth);
-  const sessionToken = getCookie('session_token');
-  const isLoggedIn = sessionToken !== undefined;
+  const accessToken = getCookie('access_token');
+  const isLoggedIn = accessToken !== undefined;
 
   return (
     <>

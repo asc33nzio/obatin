@@ -10,4 +10,8 @@ export interface ModalContextItf {
   toggleModal: ToggleModalFunction;
 }
 
-export type ModalType = 'confirm-password' | '';
+export type ModalType =
+  | 'confirm-password'
+  | 'confirm-password-register'
+  | 'add-address'
+  | '';

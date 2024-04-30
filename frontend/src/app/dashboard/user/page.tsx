@@ -2,6 +2,7 @@
 import '@/styles/pages/dashboard/datePicker.css';
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
+import 'moment/locale/id';
 import {
   AddressContainer,
   AddressHeader,
@@ -35,6 +36,7 @@ import { useToast } from '@/hooks/useToast';
 import { debounce } from '@/utils/debounce';
 import { getCookie } from 'cookies-next';
 import { setAuthState } from '@/redux/reducers/authSlice';
+import { BounceLoader } from 'react-spinners';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
@@ -46,7 +48,8 @@ import Axios from 'axios';
 import Image from 'next/image';
 import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
 import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
-import { BounceLoader } from 'react-spinners';
+import moment from 'moment';
+moment.locale('id');
 
 const UserDashboardPage = (): React.ReactElement => {
   const dispatch = useObatinDispatch();
@@ -81,22 +84,16 @@ const UserDashboardPage = (): React.ReactElement => {
     confirmPasswordValidationError,
     handlePasswordInputChange,
   } = usePasswordValidation();
-  const {
-    userUpload,
-    // eslint-disable-next-line
-    setUserUpload,
-    userUploadValidationError,
-    // eslint-disable-next-line
-    setUserUploadValidationError,
-    // eslint-disable-next-line
-    validateImageUpload,
-    handleImageChange,
-  } = useUploadValidation();
+  const { userUpload, userUploadValidationError, handleImageChange } =
+    useUploadValidation();
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
   const [gender, setGender] = useState<GenderItf>({ isMale: true });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [date, setDate] = useState<Date>(new Date());
+
+  type ValuePiece = Date | null;
+  type Value = ValuePiece | [ValuePiece, ValuePiece];
+  const [date, setDate] = useState<Value>(new Date());
   const currentYear = new Date().getFullYear();
   const dateRangeMin = new Date();
   dateRangeMin.setFullYear(currentYear - 100);
@@ -161,12 +158,12 @@ const UserDashboardPage = (): React.ReactElement => {
     }));
   };
 
-  // eslint-disable-next-line
-  const handleDateChange = (selectedValue: Date) => {
+  const handleDateChange = (value: Value) => {
     const originalValue = userInfo?.birthDate;
 
-    console.log(selectedValue);
-    if (selectedValue === originalValue) {
+    if (!value) return;
+
+    if (value === originalValue) {
       setToast({
         showToast: true,
         toastMessage: 'Tidak ada perubahan',
@@ -177,7 +174,7 @@ const UserDashboardPage = (): React.ReactElement => {
       return;
     }
 
-    setDate(selectedValue);
+    setDate(value);
     setHasNewValue((prevState) => ({
       ...prevState,
       birthDate: true,
@@ -221,7 +218,10 @@ const UserDashboardPage = (): React.ReactElement => {
             );
             break;
           case 'birthDate':
-            generalPayload.append('birth_date', date.toString());
+            if (date && date instanceof Date) {
+              const formattedDate = moment(date).format().split('T')[0];
+              generalPayload.append('birth_date', formattedDate);
+            }
             break;
           case 'avatar':
             if (userUpload !== undefined) {
@@ -291,6 +291,8 @@ const UserDashboardPage = (): React.ReactElement => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
+
+      handleResetStates();
     } catch (error) {
       console.error(error);
       setToast({
@@ -303,6 +305,28 @@ const UserDashboardPage = (): React.ReactElement => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleResetStates = () => {
+    setIsEditingField({
+      email: false,
+      name: false,
+      password: false,
+      confirmPassword: false,
+      gender: false,
+      birthDate: false,
+      avatar: false,
+    });
+
+    setHasNewValue({
+      email: false,
+      name: false,
+      password: false,
+      confirmPassword: false,
+      gender: false,
+      birthDate: false,
+      avatar: false,
+    });
   };
 
   return (
@@ -369,6 +393,7 @@ const UserDashboardPage = (): React.ReactElement => {
                 $width={45}
                 $height={35}
                 validationMessage={userUploadValidationError}
+                $isSet={userUpload !== undefined}
                 onChange={(e) => {
                   handleImageChange(e);
                   if (!userUploadValidationError) {
@@ -643,8 +668,7 @@ const UserDashboardPage = (): React.ReactElement => {
                       maxDate={dateRangeMax}
                       format='ddMMMMyyy'
                       value={date}
-                      // eslint-disable-next-line
-                      // onChange={handleDateChange}
+                      onChange={handleDateChange}
                     />
                     <EditPencilICO
                       isEditSuccessful={false}
@@ -659,15 +683,12 @@ const UserDashboardPage = (): React.ReactElement => {
                 ) : (
                   <>
                     <span>
-                      {hasNewValue.birthDate
-                        ? date
-                            ?.toLocaleString()
-                            .split(',')?.[0]
-                            .replaceAll('/', '-')
-                        : userInfo?.birthDate
-                          ? userInfo?.birthDate
-                              ?.toLocaleString()
-                              ?.split('T')?.[0]
+                      {hasNewValue.birthDate && date instanceof Date
+                        ? moment(date).format('dddd, Do MMMM YYYY')
+                        : userInfo?.birthDate && date instanceof Date
+                          ? moment(userInfo?.birthDate).format(
+                              'dddd, Do MMMM YYYY',
+                            )
                           : '-'}
                     </span>
                     <EditPencilICO
@@ -695,6 +716,7 @@ const UserDashboardPage = (): React.ReactElement => {
               $width='150px'
               $height='35px'
               $fontSize='18px'
+              onClick={() => openModal('add-address')}
             />
           </AddressHeader>
 

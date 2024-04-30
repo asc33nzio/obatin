@@ -15,6 +15,8 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useUploadValidation } from '@/hooks/useUploadValidation';
+import { useEventEmitter } from '@/hooks/useEventEmitter';
+import { useModal } from '@/hooks/useModal';
 import { setCookie } from 'cookies-next';
 import { DoctorSpecializationsType } from '@/types/registerTypes';
 import { navigateToUserDashboard, navigateToLogin } from '@/app/actions';
@@ -33,8 +35,10 @@ import DoctorICO from '@/assets/auth/DoctorICO';
 import Axios from 'axios';
 
 const RegisterForm = (): React.ReactElement => {
+  const emitter = useEventEmitter();
   const dispatch = useObatinDispatch();
   const { setToast } = useToast();
+  const { openModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const {
     email,
@@ -102,7 +106,27 @@ const RegisterForm = (): React.ReactElement => {
       password: password,
     };
 
+    const performModalAction = async () => {
+      return new Promise<boolean>((resolve) => {
+        openModal('confirm-password-register');
+
+        emitter.once('close-modal-fail', () => {
+          resolve(false);
+        });
+
+        emitter.once('close-modal-ok', () => {
+          resolve(true);
+        });
+      });
+    };
+
     try {
+      setIsLoading(true);
+
+      const validPasswordConfirmation = await performModalAction();
+      if (!validPasswordConfirmation)
+        throw new Error('Konfirmasi salah, mohon cek kembali');
+
       await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register/users`,
         payload,
@@ -197,6 +221,8 @@ const RegisterForm = (): React.ReactElement => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 

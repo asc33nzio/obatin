@@ -5,6 +5,7 @@ import { ModalProvider } from './ModalProvider';
 import { ToastProvider } from './ToastProvider';
 import { NavbarProvider } from './NavbarProvider';
 import ReduxProvider from './ReduxProvider';
+import { EventEmitterProvider } from './EventEmitterProvider';
 
 export function Providers({
   children,
@@ -12,18 +13,20 @@ export function Providers({
   children: React.ReactNode;
 }>) {
   return (
-    <ReduxProvider>
-      <ClientDisplayResolutionProvider>
-        <NavbarProvider>
-          <ModalProvider>
-            <ToastProvider>
-              <PasswordValidationProvider>
-                {children}
-              </PasswordValidationProvider>
-            </ToastProvider>
-          </ModalProvider>
-        </NavbarProvider>
-      </ClientDisplayResolutionProvider>
-    </ReduxProvider>
+    <ClientDisplayResolutionProvider>
+      <ReduxProvider>
+        <EventEmitterProvider>
+          <NavbarProvider>
+            <ModalProvider>
+              <ToastProvider>
+                <PasswordValidationProvider>
+                  {children}
+                </PasswordValidationProvider>
+              </ToastProvider>
+            </ModalProvider>
+          </NavbarProvider>
+        </EventEmitterProvider>
+      </ReduxProvider>
+    </ClientDisplayResolutionProvider>
   );
 }

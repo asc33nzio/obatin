@@ -1,6 +1,7 @@
 'use client';
 import {
   CreateOrLoginSpan,
+  LoaderDiv,
   LoginOrRegisterFormContainer,
   OAuthDiv,
   RememberAndForgetDiv,
@@ -18,11 +19,13 @@ import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
-import { setCookie } from 'cookies-next';
 import { useObatinDispatch } from '@/redux/store/store';
+import { useState } from 'react';
+import { setCookie } from 'cookies-next';
 import { setAuthState } from '@/redux/reducers/authSlice';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedJwtItf } from '@/types/jwtTypes';
+import { PropagateLoader } from 'react-spinners';
 import Axios from 'axios';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
@@ -41,6 +44,7 @@ const LoginForm = (): React.ReactElement => {
     passwordValidationError,
     handlePasswordInputChange,
   } = usePasswordValidation();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleLogin = async () => {
     const isValidEmail = validateEmail(email);
@@ -63,6 +67,7 @@ const LoginForm = (): React.ReactElement => {
     };
 
     try {
+      setIsLoading(true);
       const loginResponse = await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
         loginPayload,
@@ -181,6 +186,8 @@ const LoginForm = (): React.ReactElement => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -221,7 +228,25 @@ const LoginForm = (): React.ReactElement => {
         <u onClick={() => navigateToForgotPassword()}>Lupa Kata Sandi?</u>
       </RememberAndForgetDiv>
 
-      <CustomButton content='Log In' onClick={handleLogin} />
+      {isLoading ? (
+        <LoaderDiv>
+          <PropagateLoader
+            color='#dd1b50'
+            speedMultiplier={0.8}
+            size={'18px'}
+            cssOverride={{
+              alignSelf: 'center',
+              justifySelf: 'center',
+            }}
+          />
+        </LoaderDiv>
+      ) : (
+        <CustomButton
+          content='Log In'
+          onClick={handleLogin}
+          disabled={isLoading}
+        />
+      )}
 
       <SectionSeparator>
         <SeparatorLine />

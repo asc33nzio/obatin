@@ -1,12 +1,15 @@
 'use client';
-import { useModal } from '@/hooks/useModal';
 import {
   ModalContainer,
   ModalOverlay,
   ModalHeader,
 } from '@/styles/organisms/modal/Modal.styles';
+import { useEventEmitter } from '@/hooks/useEventEmitter';
+import { useModal } from '@/hooks/useModal';
 import ChangePasswordModalContent from './modalContent/ChangePasswordModalContent';
 import CloseICO from '@/assets/icons/CloseICO';
+import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmPasswordModalContent';
+import AddAddressModalContent from './modalContent/AddAddressModalContent';
 
 export interface ModalPropsItf {
   $overlayHeight?: string;
@@ -19,6 +22,12 @@ export interface ModalPropsItf {
 
 const Modal = () => {
   const { isOpen, modalType, closeModal } = useModal();
+  const emitter = useEventEmitter();
+
+  const handleModalClose = () => {
+    emitter.emit('close-modal-fail');
+    closeModal();
+  };
 
   let modalContent: React.ReactElement | null;
   let title: string | null = null;
@@ -42,6 +51,26 @@ const Modal = () => {
       };
       break;
 
+    case 'confirm-password-register':
+      modalContent = <RegisterConfirmPasswordModalContent />;
+      title = 'Tolong konfirmasi sandi anda';
+      modalProps = {
+        $overlayHeight: '100vh',
+        $containerWidth: '500px',
+        $containerHeight: '250px',
+      };
+      break;
+
+    case 'add-address':
+      modalContent = <AddAddressModalContent />;
+      title = 'Pastikan alamat pengirimanmu sesuai';
+      modalProps = {
+        $overlayHeight: '100vh',
+        $containerWidth: '500px',
+        $containerHeight: '250px',
+      };
+      break;
+
     default:
       modalContent = null;
       title = null;
@@ -54,7 +83,7 @@ const Modal = () => {
         <ModalContainer {...modalProps}>
           <ModalHeader>
             <h1>{title}</h1>
-            <CloseICO onClick={closeModal} />
+            <CloseICO onClick={handleModalClose} />
           </ModalHeader>
           {modalContent}
         </ModalContainer>

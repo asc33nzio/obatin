@@ -37,7 +37,7 @@ export const useUploadValidation = () => {
 
     const allowedExtenstions = [
       'image/jpg',
-      // 'image/jpeg',
+      //! 'image/jpeg',
       'image/png',
       'image/webp',
     ];
