@@ -37,9 +37,8 @@ export const useUploadValidation = () => {
 
     const allowedExtenstions = [
       'image/jpg',
-      'image/jpeg,',
+      //! 'image/jpeg',
       'image/png',
-      'image/svg+xml',
       'image/webp',
     ];
 
@@ -52,7 +51,7 @@ export const useUploadValidation = () => {
 
     if (!validExtension) {
       setUserUploadValidationError(
-        'Format gambar salah. Hanya boleh mengunggah .JPG .JPEG .PNG .SVG .WEBP',
+        'Format gambar salah. Hanya boleh mengunggah .JPG .PNG .WEBP',
       );
       return false;
     }

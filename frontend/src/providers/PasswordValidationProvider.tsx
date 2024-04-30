@@ -22,6 +22,20 @@ export const PasswordValidationProvider: React.FC<{
       return false;
     }
 
+    if (!/[A-Z]/.test(sanitizedInput)) {
+      setPasswordValidationError(
+        'Kata sandi harus memiliki paling tidak 1 huruf besar',
+      );
+      return false;
+    }
+
+    if (!/\d/.test(sanitizedInput)) {
+      setPasswordValidationError(
+        'Kata sandi harus memiliki paling tidak 1 angka',
+      );
+      return false;
+    }
+
     setPasswordValidationError('');
     return true;
   };
@@ -51,7 +65,7 @@ export const PasswordValidationProvider: React.FC<{
         setPassword(event.target.value);
       }
     },
-    300,
+    200,
   );
 
   const handleConfirmPasswordInputChange = debounce(
@@ -60,7 +74,7 @@ export const PasswordValidationProvider: React.FC<{
         setConfirmPassword(event.target.value);
       }
     },
-    300,
+    200,
   );
 
   const contextValue: PasswordValidationItf = {

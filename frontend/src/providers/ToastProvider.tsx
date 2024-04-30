@@ -27,7 +27,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
           ...prevState,
           showToast: false,
         }));
-      }, 3000);
+      }, 2000);
     }
 
     return () => clearTimeout(timeoutId);

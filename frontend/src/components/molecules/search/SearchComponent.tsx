@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/useToast';
 import { debounce } from '@/utils/debounce';
 import Axios from 'axios';
 import Image from 'next/image';
+import MagnifyBlueICO from '@/assets/icons/MagnifyBlueICO';
 
 interface CompactProductItf {
   id: number;
@@ -70,6 +71,8 @@ const Search = (): React.ReactElement => {
 
   return (
     <SearchContainer>
+      <MagnifyBlueICO />
+
       <SearchInput
         placeholder='Search Product'
         onFocus={() => setIsSearchFocused(true)}
@@ -126,10 +129,16 @@ const Search = (): React.ReactElement => {
                 e.preventDefault();
               }}
             >
-              <span style={{ textAlign: 'center' }}>
-                Lihat {totalHit} produk terkait &quot;
-                {search.charAt(0).toUpperCase() + search.slice(1)}&quot;
-              </span>
+              {search.length !== 0 ? (
+                <span style={{ textAlign: 'center' }}>
+                  Lihat {totalHit} produk terkait &quot;
+                  {search.charAt(0).toUpperCase() + search.slice(1)}&quot;
+                </span>
+              ) : search.length === 0 ? (
+                <span style={{ textAlign: 'center' }}>
+                  Lihat semua produk di ObatIn
+                </span>
+              ) : null}
             </ExploreMore>
           )}
         </SearchResultStack>

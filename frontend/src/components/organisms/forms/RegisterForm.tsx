@@ -1,6 +1,7 @@
 'use client';
 import {
   CreateOrLoginSpan,
+  LoaderDiv,
   LoginOrRegisterFormContainer,
   OAuthDiv,
   SectionSeparator,
@@ -14,9 +15,16 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useUploadValidation } from '@/hooks/useUploadValidation';
-import { getCookie, setCookie } from 'cookies-next';
+import { useEventEmitter } from '@/hooks/useEventEmitter';
+import { useModal } from '@/hooks/useModal';
+import { setCookie } from 'cookies-next';
 import { DoctorSpecializationsType } from '@/types/registerTypes';
-import { navigateToDashboard, navigateToLogin } from '@/app/actions';
+import { navigateToUserDashboard, navigateToLogin } from '@/app/actions';
+import { PropagateLoader } from 'react-spinners';
+import { useObatinDispatch } from '@/redux/store/store';
+import { setAuthState } from '@/redux/reducers/authSlice';
+import { DecodedJwtItf } from '@/types/jwtTypes';
+import { jwtDecode } from 'jwt-decode';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import CustomButton from '@/components/atoms/button/CustomButton';
@@ -27,7 +35,10 @@ import DoctorICO from '@/assets/auth/DoctorICO';
 import Axios from 'axios';
 
 const RegisterForm = (): React.ReactElement => {
+  const emitter = useEventEmitter();
+  const dispatch = useObatinDispatch();
   const { setToast } = useToast();
+  const { openModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const {
     email,
@@ -95,33 +106,97 @@ const RegisterForm = (): React.ReactElement => {
       password: password,
     };
 
+    const performModalAction = async () => {
+      return new Promise<boolean>((resolve) => {
+        openModal('confirm-password-register');
+
+        emitter.once('close-modal-fail', () => {
+          resolve(false);
+        });
+
+        emitter.once('close-modal-ok', () => {
+          resolve(true);
+        });
+      });
+    };
+
     try {
+      setIsLoading(true);
+
+      const validPasswordConfirmation = await performModalAction();
+      if (!validPasswordConfirmation)
+        throw new Error('Konfirmasi salah, mohon cek kembali');
+
       await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/register/users`,
         payload,
       );
 
-      const response = await Axios.post(
+      const autoLoginResponse = await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
         payload,
       );
 
-      const access_token = response?.data?.data?.access_token;
+      const access_token = autoLoginResponse?.data?.data?.access_token;
+      const refresh_token = autoLoginResponse?.data?.data?.refresh_token;
+      const decoded: DecodedJwtItf = jwtDecode(access_token);
+      const userRole = decoded.Payload.role;
+      const authId = decoded.Payload.aid;
+      const isVerified = decoded.Payload.is_verified;
+      const isApproved = decoded.Payload.is_approved;
 
       if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S === undefined) {
         throw new Error('please define access token valid duration env var');
       }
-      const validTokenExpiryMilliseconds: number = parseInt(
+      const validAccessTokenExpiryMilliseconds: number = parseInt(
         process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S,
         10,
       );
+      if (
+        process.env.NEXT_PUBLIC_REFRESH_TOKEN_VALID_DURATION_S === undefined
+      ) {
+        throw new Error('please define refresh token valid duration env var');
+      }
+      const validRefreshTokenExpiryMilliseconds: number = parseInt(
+        process.env.NEXT_PUBLIC_REFRESH_TOKEN_VALID_DURATION_S,
+        10,
+      );
 
-      setCookie('session_token', access_token, {
+      setCookie('access_token', access_token, {
         // httpOnly: true,
         priority: 'high',
         path: '/',
-        maxAge: validTokenExpiryMilliseconds,
+        maxAge: validAccessTokenExpiryMilliseconds,
       });
+
+      setCookie('refresh_token', refresh_token, {
+        // httpOnly: true,
+        priority: 'high',
+        path: '/',
+        maxAge: validRefreshTokenExpiryMilliseconds,
+      });
+
+      const userDetailResponse = await Axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${authId}`,
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+        },
+      );
+
+      const userData = userDetailResponse.data.data;
+      dispatch(
+        setAuthState({
+          aid: authId,
+          email: userData.email,
+          name: userData.name,
+          gender: userData.gender,
+          birthDate: userData.birth_date,
+          role: userRole,
+          avatarUrl: userData.avatar_url,
+          isVerified: isVerified,
+          isApproved: isApproved,
+        }),
+      );
 
       setToast({
         showToast: true,
@@ -131,7 +206,7 @@ const RegisterForm = (): React.ReactElement => {
         orientation: 'center',
       });
 
-      navigateToDashboard();
+      navigateToUserDashboard();
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message;
       const appError = error?.message;
@@ -141,11 +216,13 @@ const RegisterForm = (): React.ReactElement => {
           ? errorMessage
           : appError
             ? appError
-            : 'Login gagal',
+            : 'Pendaftaran gagal',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -226,17 +303,6 @@ const RegisterForm = (): React.ReactElement => {
   };
 
   useEffect(() => {
-    const isAuthenticatedCheck = () => {
-      const sessionToken = getCookie('session_token');
-      if (sessionToken !== undefined) {
-        navigateToDashboard();
-      }
-    };
-
-    isAuthenticatedCheck();
-  }, []);
-
-  useEffect(() => {
     const getAllSpecializations = async () => {
       try {
         const response = await Axios.get(
@@ -299,6 +365,7 @@ const RegisterForm = (): React.ReactElement => {
             validationMessage={emailValidationError}
             onChange={handleEmailInputChange}
             $marBot={0}
+            onKeyDown={(e) => (e.key === 'Enter' ? handleSignUpDoctor() : null)}
           />
           <SpecializationSelect
             title='Spesialisasi'
@@ -324,6 +391,9 @@ const RegisterForm = (): React.ReactElement => {
             validationMessage={emailValidationError}
             onChange={handleEmailInputChange}
             $marBot={10}
+            onKeyDown={(e) =>
+              e.key === 'Enter' ? handleSignUpPatient() : null
+            }
           />
           <PasswordInput
             title='Kata Sandi'
@@ -332,17 +402,34 @@ const RegisterForm = (): React.ReactElement => {
             validationMessage={passwordValidationError}
             $viewBox='0 -2 22 22'
             $viewBoxHide='0 0 22 22'
+            onKeyDown={(e) =>
+              e.key === 'Enter' ? handleSignUpPatient() : null
+            }
           />
         </>
       )}
 
-      <CustomButton
-        content='Lanjutkan'
-        onClick={
-          isDoctor ? () => handleSignUpDoctor() : () => handleSignUpPatient()
-        }
-        disabled={isLoading ? true : false}
-      />
+      {isLoading ? (
+        <LoaderDiv>
+          <PropagateLoader
+            color='#dd1b50'
+            speedMultiplier={0.8}
+            size={'18px'}
+            cssOverride={{
+              alignSelf: 'center',
+              justifySelf: 'center',
+            }}
+          />
+        </LoaderDiv>
+      ) : (
+        <CustomButton
+          content='Lanjutkan'
+          onClick={
+            isDoctor ? () => handleSignUpDoctor() : () => handleSignUpPatient()
+          }
+          disabled={isLoading ? true : false}
+        />
+      )}
 
       <SectionSeparator>
         <SeparatorLine />

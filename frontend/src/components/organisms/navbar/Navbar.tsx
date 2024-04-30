@@ -3,7 +3,8 @@ import {
   Left,
   NavContainer,
 } from '@/styles/organisms/Navbar.styles';
-import { useObatinSelector } from '@/redux/store/store';
+import { getCookie } from 'cookies-next';
+// import { useObatinSelector } from '@/redux/store/store';
 import { Menu, ChevronLeft } from '@styled-icons/material';
 import { useNavbar } from '@/hooks/useNavbar';
 import { navigateToLogin } from '@/app/actions';
@@ -14,8 +15,9 @@ import Sidebar from '../sidebar/Sidebar';
 
 const Navbar = (): React.ReactElement => {
   const { isOpened, toggleDrawer } = useNavbar();
-  const userInfo = useObatinSelector((state) => state?.auth);
-  const isLoggedIn = userInfo?.name !== '';
+  // const userInfo = useObatinSelector((state) => state?.auth);
+  const accessToken = getCookie('access_token');
+  const isLoggedIn = accessToken !== undefined;
 
   return (
     <>

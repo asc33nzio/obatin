@@ -14,7 +14,7 @@ type MenuItemProps = {
 };
 
 export default function MenuItem({
-  menuItem: { name, icon: Icon, url, depth, subItems },
+  menuItem: { name, icon: Icon, url, depth, subItems, handler },
 }: MenuItemProps) {
   const [isExpanded, toggleExpanded] = useState(false);
 
@@ -22,13 +22,17 @@ export default function MenuItem({
   const selected = router === url;
   const isNested = subItems && subItems?.length > 0;
 
-  const onClick = () => {
+  const handleSidebarToggle = () => {
     toggleExpanded((prev) => !prev);
   };
 
   return (
     <>
-      <MenuItemContainer className={selected ? 'selected' : ''} $depth={depth}>
+      <MenuItemContainer
+        className={selected ? 'selected' : ''}
+        $depth={depth}
+        onClick={handler}
+      >
         <Link href={url} passHref>
           <MenuItems>
             <Icon />
@@ -36,7 +40,10 @@ export default function MenuItem({
           </MenuItems>
         </Link>
         {isNested ? (
-          <ExpandIcon isExpanded={isExpanded} handleClick={onClick} />
+          <ExpandIcon
+            isExpanded={isExpanded}
+            handleClick={handleSidebarToggle}
+          />
         ) : null}
       </MenuItemContainer>
       {isExpanded && isNested ? <MenuItemsList options={subItems} /> : null}

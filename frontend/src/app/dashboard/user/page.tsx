@@ -2,6 +2,7 @@
 import '@/styles/pages/dashboard/datePicker.css';
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
+import 'moment/locale/id';
 import {
   AddressContainer,
   AddressHeader,
@@ -15,41 +16,46 @@ import {
   ProfileContentRight,
   ProfileContentSeparator,
   ProfileHeader,
+  ProfileHeaderButtonsDiv,
   UserDetailDiv,
 } from '@/styles/pages/dashboard/Dashboard.styles';
 import {
-  DatePickerType,
+  // eslint-disable-next-line
+  EditProfilePayloadItf,
   EditProfileStateItf,
   GenderItf,
 } from '@/types/dashboardTypes';
-import { getCookie } from 'cookies-next';
-import { jwtDecode } from 'jwt-decode';
-import { navigateToLogin } from '../actions';
-import { useEffect, useState } from 'react';
-import { DecodedJwtItf } from '@/types/jwtTypes';
+import { useState } from 'react';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useUploadValidation } from '@/hooks/useUploadValidation';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { useObatinSelector } from '@/redux/store/store';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
 import { debounce } from '@/utils/debounce';
+import { getCookie } from 'cookies-next';
+import { setAuthState } from '@/redux/reducers/authSlice';
+import { BounceLoader } from 'react-spinners';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
-import PlaceholderAva from '@/assets/PlaceholderAva';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import DatePicker from 'react-date-picker';
+import Axios from 'axios';
+import Image from 'next/image';
+import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
+import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
+import moment from 'moment';
+moment.locale('id');
 
-const DashboardPage = (): React.ReactElement => {
+const UserDashboardPage = (): React.ReactElement => {
+  const dispatch = useObatinDispatch();
   const userInfo = useObatinSelector((state) => state?.auth);
-  // const userName = useObatinSelector((state) => state.a);
+  const accessToken = getCookie('access_token');
   const { isDesktopDisplay } = useClientDisplayResolution();
-  // eslint-disable-next-line
-  const [userRole, setUserRole] = useState<string>('');
   const [isEditingField, setIsEditingField] = useState<EditProfileStateItf>({
     email: false,
     name: false,
@@ -57,6 +63,7 @@ const DashboardPage = (): React.ReactElement => {
     confirmPassword: false,
     gender: false,
     birthDate: false,
+    avatar: false,
   });
   const [hasNewValue, setHasNewValue] = useState<EditProfileStateItf>({
     email: false,
@@ -65,6 +72,7 @@ const DashboardPage = (): React.ReactElement => {
     confirmPassword: false,
     gender: false,
     birthDate: false,
+    avatar: false,
   });
   const { setToast } = useToast();
   const { openModal } = useModal();
@@ -76,22 +84,16 @@ const DashboardPage = (): React.ReactElement => {
     confirmPasswordValidationError,
     handlePasswordInputChange,
   } = usePasswordValidation();
-  const {
-    // eslint-disable-next-line
-    userUpload,
-    // eslint-disable-next-line
-    setUserUpload,
-    userUploadValidationError,
-    // eslint-disable-next-line
-    setUserUploadValidationError,
-    // eslint-disable-next-line
-    validateImageUpload,
-    handleImageChange,
-  } = useUploadValidation();
+  const { userUpload, userUploadValidationError, handleImageChange } =
+    useUploadValidation();
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
   const [gender, setGender] = useState<GenderItf>({ isMale: true });
-  const [date, setDate] = useState<DatePickerType>(new Date());
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  type ValuePiece = Date | null;
+  type Value = ValuePiece | [ValuePiece, ValuePiece];
+  const [date, setDate] = useState<Value>(new Date());
   const currentYear = new Date().getFullYear();
   const dateRangeMin = new Date();
   dateRangeMin.setFullYear(currentYear - 100);
@@ -118,17 +120,6 @@ const DashboardPage = (): React.ReactElement => {
     },
     750,
   );
-
-  //! AXIOS PATCH REQUEST
-  // const handleEditChange = (
-  //   prevState: SetStateAction<EditProfileStateItf>,
-  //   field: EditProfileStateItf,
-  // ) => {
-  //   setIsEditingField((prevState) => {
-  //     ...prevState,
-  //     field = true
-  //   });
-  // };
 
   const openPasswordInterface = () => {
     setIsEditingField((prevState) => ({
@@ -167,10 +158,12 @@ const DashboardPage = (): React.ReactElement => {
     }));
   };
 
-  const _handleDateChange = (selectedValue: Date) => {
+  const handleDateChange = (value: Value) => {
     const originalValue = userInfo?.birthDate;
 
-    if (selectedValue === originalValue) {
+    if (!value) return;
+
+    if (value === originalValue) {
       setToast({
         showToast: true,
         toastMessage: 'Tidak ada perubahan',
@@ -181,26 +174,160 @@ const DashboardPage = (): React.ReactElement => {
       return;
     }
 
-    setDate(selectedValue);
+    setDate(value);
     setHasNewValue((prevState) => ({
       ...prevState,
       birthDate: true,
     }));
   };
 
-  useEffect(() => {
-    const isAuthenticatedCheck = () => {
-      const sessionToken = getCookie('session_token');
-      if (sessionToken === undefined) {
-        navigateToLogin();
-      } else {
-        const decoded: DecodedJwtItf = jwtDecode(sessionToken);
-        setUserRole(decoded.Payload.role);
-      }
-    };
+  const handleUpdateUserProfile = async () => {
+    setIsLoading(true);
 
-    isAuthenticatedCheck();
-  }, []);
+    if (!userInfo?.isVerified) {
+      setToast({
+        showToast: true,
+        toastMessage: 'Maaf, anda belum melakukan verifikasi akun anda.',
+        toastType: 'warning',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      return;
+    }
+
+    const generalPayload = new FormData();
+    // const passwordPayload: Partial<EditProfilePayloadItf> = {};
+    // const emailPayload: Partial<EditProfilePayloadItf> = {};
+
+    Object.keys(hasNewValue).forEach((key) => {
+      if (hasNewValue[key as keyof EditProfileStateItf]) {
+        switch (key) {
+          case 'email':
+            break;
+          case 'name':
+            generalPayload.append('name', name);
+            break;
+          case 'password':
+            break;
+          case 'confirmPassword':
+            break;
+          case 'gender':
+            generalPayload.append(
+              'gender',
+              gender.isMale ? 'laki-laki' : 'perempuan',
+            );
+            break;
+          case 'birthDate':
+            if (date && date instanceof Date) {
+              const formattedDate = moment(date).format().split('T')[0];
+              generalPayload.append('birth_date', formattedDate);
+            }
+            break;
+          case 'avatar':
+            if (userUpload !== undefined) {
+              generalPayload.append('avatar', userUpload);
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
+    try {
+      const patchProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
+      // const patchPasswordUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
+      // const patchEmailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
+      const userDetailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
+
+      const patchProfileReq = await Axios.patch(
+        patchProfileUrl,
+        generalPayload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+      // const patchPasswordReq = Axios.patch(patchPasswordUrl, passwordPayload, {
+      //   headers: { Authorization: `Bearer ${accessToken}` },
+      // });
+      // const patchEmailReq = Axios.patch(patchEmailUrl, emailPayload, {
+      //   headers: { Authorization: `Bearer ${accessToken}` },
+      // });
+      const getUserDetailReq = await Axios.get(userDetailUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const [_patchProfileRes, getUserDetailRes] = await Promise.all([
+        patchProfileReq,
+        getUserDetailReq,
+      ]);
+
+      const userData = getUserDetailRes.data.data;
+      const oldUserData = userInfo;
+
+      dispatch(
+        setAuthState({
+          aid: oldUserData.aid,
+          email: userData.email,
+          name: userData.name,
+          gender: userData.gender,
+          birthDate: userData.birth_date,
+          role: oldUserData.role,
+          avatarUrl: userData.avatar_url,
+          isVerified: oldUserData.isVerified,
+          isApproved: oldUserData.isApproved,
+        }),
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage: 'Pembaharuan profil sukses',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+
+      handleResetStates();
+    } catch (error) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: 'Maaf, pembaharuan profil gagal, mohon coba kembali',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetStates = () => {
+    setIsEditingField({
+      email: false,
+      name: false,
+      password: false,
+      confirmPassword: false,
+      gender: false,
+      birthDate: false,
+      avatar: false,
+    });
+
+    setHasNewValue({
+      email: false,
+      name: false,
+      password: false,
+      confirmPassword: false,
+      gender: false,
+      birthDate: false,
+      avatar: false,
+    });
+  };
 
   return (
     <DashboardPageContainer $isDesktopDisplay={isDesktopDisplay}>
@@ -210,19 +337,53 @@ const DashboardPage = (): React.ReactElement => {
         <ProfileContainer $isDesktopDisplay={isDesktopDisplay}>
           <ProfileHeader $isDesktopDisplay={isDesktopDisplay}>
             <h1>Profil</h1>
-            <CustomButton
-              content='Simpan Profil'
-              $bgColor='#cbd5e0'
-              $width='150px'
-              $height='35px'
-              $fontSize='18px'
-            />
+
+            <ProfileHeaderButtonsDiv>
+              <CustomButton
+                content='Sejarah Transaksi'
+                $bgColor='#00B5C0'
+                $width='150px'
+                $height='40px'
+                $fontSize='18px'
+              />
+              <CustomButton
+                content='Simpan Profil'
+                $width='150px'
+                $height='40px'
+                $fontSize='18px'
+                disabled={!Object.values(hasNewValue).some((value) => value)}
+                onClick={handleUpdateUserProfile}
+              />
+            </ProfileHeaderButtonsDiv>
           </ProfileHeader>
 
           <ProfileContent $isDesktopDisplay={isDesktopDisplay}>
             <ProfileContentLeft $isDesktopDisplay={isDesktopDisplay}>
               <ImgBg>
-                <PlaceholderAva />
+                {isLoading ? (
+                  <BounceLoader
+                    size={265}
+                    color='#00b5c0'
+                    style={{
+                      display: 'flex',
+                      backgroundColor: 'transparent',
+                    }}
+                  />
+                ) : (
+                  <Image
+                    width={275}
+                    height={275}
+                    src={
+                      userInfo?.avatarUrl !== ''
+                        ? userInfo.avatarUrl
+                        : userInfo?.gender === 'laki-laki'
+                          ? DefaultMaleAvatar
+                          : DefaultFemaleAvatar
+                    }
+                    alt='avatar'
+                    priority
+                  />
+                )}
               </ImgBg>
 
               <RegularInput
@@ -232,7 +393,16 @@ const DashboardPage = (): React.ReactElement => {
                 $width={45}
                 $height={35}
                 validationMessage={userUploadValidationError}
-                onChange={handleImageChange}
+                $isSet={userUpload !== undefined}
+                onChange={(e) => {
+                  handleImageChange(e);
+                  if (!userUploadValidationError) {
+                    setHasNewValue((prevState) => ({
+                      ...prevState,
+                      avatar: true,
+                    }));
+                  }
+                }}
                 $marBot={0}
                 accept='image/*'
               />
@@ -261,17 +431,28 @@ const DashboardPage = (): React.ReactElement => {
                     <EditPencilICO
                       isEditSuccessful={hasNewValue.email}
                       onClick={() => {
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          email: false,
+                        }));
+
+                        if (email.trim() === '') {
+                          setToast({
+                            showToast: true,
+                            toastMessage: 'Tidak ada perubahan',
+                            toastType: 'warning',
+                            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+                            orientation: 'center',
+                          });
+                          return;
+                        }
+
                         if (!emailValidationError) {
                           setHasNewValue((prevState) => ({
                             ...prevState,
                             email: true,
                           }));
                         }
-
-                        setIsEditingField((prevState) => ({
-                          ...prevState,
-                          email: false,
-                        }));
                       }}
                     />
                   </>
@@ -317,17 +498,28 @@ const DashboardPage = (): React.ReactElement => {
                     <EditPencilICO
                       isEditSuccessful={false}
                       onClick={() => {
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          name: false,
+                        }));
+
+                        if (name.trim() === '') {
+                          setToast({
+                            showToast: true,
+                            toastMessage: 'Tidak ada perubahan',
+                            toastType: 'warning',
+                            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+                            orientation: 'center',
+                          });
+                          return;
+                        }
+
                         if (!nameValidationError) {
                           setHasNewValue((prevState) => ({
                             ...prevState,
                             name: true,
                           }));
                         }
-
-                        setIsEditingField((prevState) => ({
-                          ...prevState,
-                          name: false,
-                        }));
                       }}
                     />
                   </>
@@ -476,7 +668,7 @@ const DashboardPage = (): React.ReactElement => {
                       maxDate={dateRangeMax}
                       format='ddMMMMyyy'
                       value={date}
-                      // onChange={handleDateChange}
+                      onChange={handleDateChange}
                     />
                     <EditPencilICO
                       isEditSuccessful={false}
@@ -491,15 +683,12 @@ const DashboardPage = (): React.ReactElement => {
                 ) : (
                   <>
                     <span>
-                      {hasNewValue.birthDate
-                        ? date
-                            ?.toLocaleString()
-                            .split(',')?.[0]
-                            .replaceAll('/', '-')
-                        : userInfo?.birthDate
-                          ? userInfo?.birthDate
-                              ?.toLocaleString()
-                              ?.split('T')?.[0]
+                      {hasNewValue.birthDate && date instanceof Date
+                        ? moment(date).format('dddd, Do MMMM YYYY')
+                        : userInfo?.birthDate && date instanceof Date
+                          ? moment(userInfo?.birthDate).format(
+                              'dddd, Do MMMM YYYY',
+                            )
                           : '-'}
                     </span>
                     <EditPencilICO
@@ -527,6 +716,7 @@ const DashboardPage = (): React.ReactElement => {
               $width='150px'
               $height='35px'
               $fontSize='18px'
+              onClick={() => openModal('add-address')}
             />
           </AddressHeader>
 
@@ -551,4 +741,4 @@ const DashboardPage = (): React.ReactElement => {
   );
 };
 
-export default DashboardPage;
+export default UserDashboardPage;
