@@ -56,7 +56,7 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 	if len(data) > 0 {
 		paramsCount = len(data) + 1
 	}
-	paginationParams, paginationData := convertPaginationParamsToSql(params, paramsCount)
+	paginationParams, paginationData := convertPaginationParamsToSql(params.Limit, params.Page, paramsCount)
 	sb.WriteString(paginationParams)
 	data = append(data, paginationData...)
 	rows, err := r.db.QueryContext(ctx, sb.String(), data...)

@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/appvalidator"
 	"obatin/config"
@@ -24,7 +25,7 @@ type AuthenticationUsecase interface {
 	UpdateApproval(ctx context.Context, authenticationId int, isApprove bool) error
 	SendEmailForgotPasssword(ctx context.Context, uReq entity.Authentication) error
 	ResendVerificationEmail(ctx context.Context, email string) error
-	GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error)
+	GetPendingDoctorApproval(ctx context.Context, params entity.Pagination) (*entity.DoctorApprovalPage, error)
 	GenerateRefreshToken(ctx context.Context, refreshToken string) (*entity.AuthenticationToken, error)
 }
 
@@ -661,8 +662,15 @@ func (u *authentictionUsecaseImpl) ResendVerificationEmail(ctx context.Context, 
 	return apperror.ErrEmailNotVerified(apperror.ErrStlEmailNotVerified)
 }
 
-func (u *authentictionUsecaseImpl) GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error) {
+func (u *authentictionUsecaseImpl) GetPendingDoctorApproval(ctx context.Context, params entity.Pagination) (*entity.DoctorApprovalPage, error) {
 	drr := u.repoStore.AuthenticationRepository()
+	if params.Limit < appconstant.DefaultMinLimit {
+		params.Limit = appconstant.DefaultProductLimit
+	}
+	if params.Page < appconstant.DefaultMinPage {
+		params.Page = appconstant.DefaultMinPage
+	}
+
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
@@ -672,10 +680,24 @@ func (u *authentictionUsecaseImpl) GetPendingDoctorApproval(ctx context.Context)
 		return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 
-	doctorPendingApproval, err := drr.GetPendingDoctorApproval(ctx)
+	doctorPendingApproval, err := drr.GetPendingDoctorApproval(ctx, params)
 	if err != nil {
 		return nil, apperror.NewInternal(err)
 	}
+
+	doctorPendingApproval.Pagination = entity.PaginationResponse{
+		Page:         params.Page,
+		PageCount:    int64(doctorPendingApproval.TotalRows) / int64(params.Limit),
+		Limit:        params.Limit,
+		TotalRecords: int64(doctorPendingApproval.TotalRows),
+	}
+	if doctorPendingApproval.Pagination.PageCount < appconstant.DefaultMinPage {
+		doctorPendingApproval.Pagination.PageCount = appconstant.DefaultMinPage
+	}
+	if doctorPendingApproval.Pagination.TotalRecords-(doctorPendingApproval.Pagination.PageCount*int64(params.Limit)) > 0 {
+		doctorPendingApproval.Pagination.PageCount = int64(doctorPendingApproval.Pagination.PageCount) + appconstant.DefaultMinPage
+	}
+
 	return doctorPendingApproval, nil
 }
 

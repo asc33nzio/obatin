@@ -27,6 +27,7 @@ type RouterOpt struct {
 	UserHandler                 *handler.UserHandler
 	AddressHandler              *handler.AddressHandler
 	PartnerHandler              *handler.PartnerHandler
+	DoctorHandler               *handler.DoctorHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -59,15 +60,19 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	addressUsecase := usecase.NewAddressUsecaseImpl(dbStore, config)
 	addressHandler := handler.NewAddressHandler(addressUsecase)
 
+	doctorUseCase := usecase.NewDoctorUsecaseImpl(dbStore, config, cloudinaryUpload)
+	doctorHandler := handler.NewDoctorHandler(doctorUseCase)
+
 	return NewRouter(RouterOpt{
 		Middleware:                  middleware,
 		AuthenticationHandler:       authentiationHandler,
 		ProductHandler:              productHandler,
 		DoctorSpecializationHandler: doctorSpecializationHandler,
-		CategoryHandler:             categoryHandler,
+		CategoryHandler:                   categoryHandler,
 		PartnerHandler:              partnerHandler,
 		UserHandler:                 userHandler,
 		AddressHandler:              addressHandler,
+		DoctorHandler:               doctorHandler,
 	})
 }
 
@@ -101,19 +106,21 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndpointRegisterDoctor, h.AuthenticationHandler.RegisterDoctor)
 	r.POST(appconstant.EndpointRegisterUser, h.AuthenticationHandler.RegisterUser)
 	r.POST(appconstant.EndpointVerify, h.AuthenticationHandler.VerifyEmail)
-	r.POST(appconstant.EndPointAllCategories, h.CategoryHandler.CreateOneCategory)
-	r.PATCH(appconstant.EndpointUpdateCategory, h.CategoryHandler.UpdateOneCategory)
-	r.DELETE(appconstant.EndpointUpdateCategory, h.CategoryHandler.DeleteOneCategoryBySlug)
 
 	r.GET(appconstant.EndpointGetProductsList, h.ProductHandler.GetAllProducts)
 	r.GET(appconstant.EndpointGetProductDetail, h.ProductHandler.GetProductDetailBySlug)
 	r.GET(appconstant.EndPointAllCategories, h.CategoryHandler.GetAllCategory)
+	r.GET(appconstant.EndpointGetDoctorList, h.DoctorHandler.GetAllDoctor)
+	r.GET(appconstant.EndpointGetDoctorDetailUser, h.DoctorHandler.GetDoctorDetailbyId)
 	r.PATCH(appconstant.EndpointUpdatePassword, h.AuthenticationHandler.UpdatePassword)
 	r.POST(appconstant.EndpointForgotPassword, h.AuthenticationHandler.SendVerifyForgotPassword)
 	r.GET(appconstant.EndpointGetDoctorSpecialization, h.DoctorSpecializationHandler.GetAll)
 	r.POST(appconstant.EndpointRefreshToken, h.AuthenticationHandler.GetRefreshToken)
 
 	r.Use(h.Middleware.JWTAuth)
+
+	r.PATCH(appconstant.EndpointGetDoctorDetail, h.DoctorHandler.UpdateOneDoctor)
+	r.GET(appconstant.EndpointGetDoctorDetail, h.DoctorHandler.GetDoctorDetailbyId)
 	r.POST(appconstant.EndpointSendVerifyToEmail, h.AuthenticationHandler.SendVerifyToEmail)
 	r.POST(appconstant.EndpointApproval, h.AuthenticationHandler.UpdateApproval)
 	r.GET(appconstant.EndpointGetDoctorPendingApproval, h.AuthenticationHandler.GetPendingDoctorApproval)
@@ -126,5 +133,8 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndpointUserAddress, h.AddressHandler.CreateOneAddress)
 	r.PATCH(appconstant.EndpointUserAddressDetails, h.AddressHandler.UpdateOneAddress)
 	r.DELETE(appconstant.EndpointUserAddressDetails, h.AddressHandler.DeleteOneAddress)
+	r.POST(appconstant.EndPointAllCategories, h.CategoryHandler.CreateOneCategory)
+	r.PATCH(appconstant.EndpointUpdateCategory, h.CategoryHandler.UpdateOneCategory)
+	r.DELETE(appconstant.EndpointUpdateCategory, h.CategoryHandler.DeleteOneCategoryBySlug)
 	return r
 }

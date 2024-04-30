@@ -26,6 +26,11 @@ type DoctorRegisterReq struct {
 	SpecializationId int64 `form:"doctor_specialization_id" binding:"required"`
 }
 
+type PaginationReq struct {
+	Page  int `form:"page" binding:"omitempty,min=1"`
+	Limit int `form:"limit" binding:"omitempty,min=1,max=25"`
+}
+
 type UpdatePasswordReq struct {
 	Email           string `json:"email"`
 	Password        string `json:"password"`
@@ -38,6 +43,10 @@ type PartnerRegisterReq struct {
 	Password string `form:"password" binding:"required"`
 	Logo     multipart.File
 	Name     string `form:"name" binding:"required"`
+}
+
+type IdUriParam struct {
+	Id string `uri:"doctor_id" binding:"required"`
 }
 
 func (u UserLoginReq) ToUser() entity.Authentication {
@@ -78,9 +87,16 @@ func (u UpdatePasswordReq) ToEmail() entity.Authentication {
 
 func (u PartnerRegisterReq) ToPartner() entity.Partner {
 	return entity.Partner{
-		Email: u.Email,
+		Email:    u.Email,
 		Password: u.Password,
-		Logo: u.Logo,
-		Name: u.Name,
+		Logo:     u.Logo,
+		Name:     u.Name,
+	}
+}
+
+func (r PaginationReq) ToPaginationEntity() entity.Pagination {
+	return entity.Pagination{
+		Page:  r.Page,
+        Limit: r.Limit,
 	}
 }

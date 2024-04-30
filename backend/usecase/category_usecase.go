@@ -161,11 +161,13 @@ func (u *categoryUsecaseImpl) DeleteOneCategoryBySlug(ctx context.Context, slug 
 		return apperror.ErrCategoryNotFound(nil)
 	}
 	_, err = u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
-		err = cr.DeleteOneCategoryById(ctx, category.Id)
+		cRs := rs.CategoryRepository()
+		
+		err = cRs.DeleteOneCategoryById(ctx, category.Id)
 		if err != nil {
 			return nil, err
 		}
-		err = cr.DeleteProductCategoryByCategoryId(ctx, category.Id)
+		err = cRs.DeleteProductCategoryByCategoryId(ctx, category.Id)
 		if err != nil {
 			return nil, err
 		}

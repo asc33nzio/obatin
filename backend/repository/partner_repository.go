@@ -71,7 +71,7 @@ func (r *partnerRepositoryPostgres) IsPartnerExist(ctx context.Context, name str
 			WHERE 
 				name = $1
 			AND 
-				deletedAt IS NULL
+				deleted_at IS NULL
 		)
 	`
 
@@ -103,7 +103,7 @@ func (r *partnerRepositoryPostgres) GetPartnerList(ctx context.Context, params e
 		FROM 
 			partners p 
 		WHERE
-			p.deletedAt IS NULL
+			p.deleted_at IS NULL
 	`)
 	
 	queryParams, paramsData := convertPartnerQueryParamstoSql(params)
@@ -215,7 +215,7 @@ func (r *partnerRepositoryPostgres) FindPartnerById(ctx context.Context, id int6
 		WHERE
 			p.id = $1
 		AND
-		    p.deletedAt IS NULL
+		    p.deleted_at IS NULL
 
 	`
 	err := r.db.QueryRowContext(ctx, q, id).Scan(

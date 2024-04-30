@@ -3,7 +3,9 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"obatin/apperror"
+	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -18,7 +20,7 @@ type AuthenticationRepository interface {
 	UpdateApproval(ctx context.Context, authId int, isApprove bool) (*entity.Authentication, error)
 	GetById(ctx context.Context, authId int) (*entity.Authentication, error)
 	IsVerified(ctx context.Context, email string) (bool, error)
-	GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error)
+	GetPendingDoctorApproval(ctx context.Context, params entity.Pagination) (*entity.DoctorApprovalPage, error)
 	IsTokenHasUsed(ctx context.Context, token string) (bool, error)
 	IsApproved(ctx context.Context, email string) (bool, error)
 	UpdateAuthenticationPartner(ctx context.Context, body entity.PartnerUpdateRequest, idAuth int64) (*entity.Authentication, error)
@@ -411,8 +413,12 @@ func (r *authenticationRepositoryPostgres) IsVerified(ctx context.Context, email
 	return isVerified, nil
 }
 
-func (r *authenticationRepositoryPostgres) GetPendingDoctorApproval(ctx context.Context) ([]entity.Doctor, error) {
+func (r *authenticationRepositoryPostgres) GetPendingDoctorApproval(ctx context.Context, params entity.Pagination) (*entity.DoctorApprovalPage, error) {
 	doctors := []entity.Doctor{}
+	rowsCount := 0
+	paramsCount := constant.StartingParamsCount
+	var queryDataCount strings.Builder
+	var queryPage strings.Builder
 
 	queryGetPendingDoctorApproval := `
 	SELECT 
@@ -438,10 +444,18 @@ func (r *authenticationRepositoryPostgres) GetPendingDoctorApproval(ctx context.
 	AND 	
 		a.deleted_at IS NULL
 	`
-
+	queryDataCount.WriteString(fmt.Sprintf(` SELECT COUNT (*) FROM ( %v )`, queryGetPendingDoctorApproval))
+	err := r.db.QueryRowContext(ctx, queryDataCount.String()).Scan(&rowsCount)
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+	queryPage.WriteString(queryGetPendingDoctorApproval)
+	paginationParams, paginationData := convertPaginationParamsToSql(params.Limit, params.Page, paramsCount)
+	queryPage.WriteString(paginationParams)
 	rows, err := r.db.QueryContext(
 		ctx,
-		queryGetPendingDoctorApproval,
+		queryPage.String(),
+		paginationData...,
 	)
 
 	if err != nil {
@@ -468,7 +482,10 @@ func (r *authenticationRepositoryPostgres) GetPendingDoctorApproval(ctx context.
 		return nil, apperror.NewInternal(err)
 	}
 
-	return doctors, nil
+	return &entity.DoctorApprovalPage{
+		Doctors: doctors,
+		TotalRows: rowsCount,
+	}, nil
 }
 
 func (r *authenticationRepositoryPostgres) IsTokenHasUsed(ctx context.Context, token string) (bool, error) {

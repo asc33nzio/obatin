@@ -14,3 +14,8 @@ type Authentication struct {
 	ConfirmPassword  string
 	SpecializationID int64
 }
+
+type Pagination struct {
+	Page  int
+	Limit int
+}
