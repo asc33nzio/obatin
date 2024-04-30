@@ -1,7 +1,7 @@
 import {
   PasswordModalButtonsContainer,
   PasswordModalContentContainer,
-} from '@/styles/organisms/modal/modalContent/ChangePasswordModalContent.styles';
+} from '@/styles/organisms/modal/modalContent/PasswordModalContent.styles';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
 import { useEventEmitter } from '@/hooks/useEventEmitter';

@@ -63,11 +63,11 @@ const Modal = () => {
 
     case 'add-address':
       modalContent = <AddAddressModalContent />;
-      title = 'Pastikan alamat pengirimanmu sesuai';
+      title = 'Tambahkan Alamat';
       modalProps = {
-        $overlayHeight: '100vh',
+        $overlayHeight: '125vh',
         $containerWidth: '500px',
-        $containerHeight: '250px',
+        $containerHeight: '500px',
       };
       break;
 
