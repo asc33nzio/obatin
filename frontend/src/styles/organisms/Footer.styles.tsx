@@ -11,12 +11,22 @@ export const FooterContainer = styled.div<{ $resolution: string }>`
   align-items: center;
   border-top: 1px solid ${COLORS.input_border};
   padding: 2rem 5rem;
+  @media (max-width: 769px) {
+    gap: 20px;
+    padding: 2rem;
+  }
 `;
 
 export const Top = styled.nav`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  @media (max-width: 769px) {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: left;
+  }
 `;
 
 export const Sitemap = styled.nav`
@@ -33,6 +43,10 @@ export const Sitemap = styled.nav`
         color: ${COLORS.primary_text};
       }
     }
+  }
+  @media (max-width: 769px) {
+    display: flex;
+    flex-direction: column;
   }
 `;
 

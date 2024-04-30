@@ -4,7 +4,6 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import {
   Body,
-  Container,
   NewSection,
   Fitur,
   FiturContainer,
@@ -13,10 +12,11 @@ import {
   ProductCard,
   Bold,
   Smallfont,
-  Content,
+  PopularContainer,
+  CategoryContent,
 } from '@/styles/pages/homepage/Homepage.styles';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Product } from '@/types/Product';
+import { ProductType } from '@/types/Product';
 import { Keyboard, Mousewheel, Navigation, Pagination } from 'swiper/modules';
 import { CSSProperties } from 'styled-components';
 import Navbar from '../../organisms/navbar/Navbar';
@@ -26,6 +26,9 @@ import Image from 'next/image';
 import toko from '@/assets/homepage/Pharmacist-pana 1.svg';
 import konsul from '@/assets/homepage/Researching-amico 1(1).svg';
 import CustomButton from '@/components/atoms/button/CustomButton';
+import { Container } from '@/styles/Global.styles';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const CategoryImg = [
   'https://d2qjkwm11akmwu.cloudfront.net/categories/42753_12-4-2023_9-48-50.png',
@@ -47,11 +50,27 @@ const CategoryImg = [
 ];
 
 const Homepage = (): React.ReactElement => {
+  const [products, setProducts] = useState<ProductType[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: response } = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?limit=5`,
+        );
+        setProducts((prevProducts) => [...prevProducts, ...response.data]);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <>
-      <Navbar />
-
-      <Content>
+      <Container>
+        <Navbar />
         <Body>
           <Banner />
           <FiturContainer>
@@ -66,7 +85,7 @@ const Homepage = (): React.ReactElement => {
           </FiturContainer>
           <NewSection>
             <Title>KATEGORI</Title>
-            <Container>
+            <CategoryContent>
               <Swiper
                 cssMode={true}
                 navigation={true}
@@ -76,10 +95,10 @@ const Homepage = (): React.ReactElement => {
                 modules={[Navigation, Pagination, Mousewheel, Keyboard]}
                 breakpoints={{
                   320: {
-                    slidesPerView: 2,
+                    slidesPerView: 1,
                   },
                   630: {
-                    slidesPerView: 3,
+                    slidesPerView: 2,
                   },
                   1400: {
                     slidesPerView: 7,
@@ -89,6 +108,7 @@ const Homepage = (): React.ReactElement => {
                   {
                     '--swiper-pagination-color': '#00B5C0',
                     '--swiper-navigation-color': '#00B5C0',
+                    '--align-content': 'center',
                   } as CSSProperties
                 }
               >
@@ -100,18 +120,18 @@ const Homepage = (): React.ReactElement => {
                   );
                 })}
               </Swiper>
-            </Container>
+            </CategoryContent>
           </NewSection>
           <NewSection>
             <Title>POPULAR</Title>
-            <Container>
-              {Product.map((product, i) => {
+            <PopularContainer>
+              {products.map((product, i) => {
                 return (
                   <ProductCard key={i}>
-                    <Imagecontainer src={product.image} alt='banner' />
+                    <Imagecontainer src={product.image_url} alt='banner' />
                     <Bold>{product.name}</Bold>
-                    <Smallfont>{product.size}</Smallfont>
-                    <p>{product.price}</p>
+                    <Smallfont>{product.selling_unit}</Smallfont>
+                    <p>{product.min_price}</p>
                     <CustomButton
                       $width='90px'
                       $height='32px'
@@ -121,10 +141,10 @@ const Homepage = (): React.ReactElement => {
                   </ProductCard>
                 );
               })}
-            </Container>
+            </PopularContainer>
           </NewSection>
         </Body>
-      </Content>
+      </Container>
 
       <Footer />
     </>
