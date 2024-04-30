@@ -193,7 +193,7 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 	if countParams == constant.StartingParamsCount {
 		query.WriteString(` WHERE `)
 	}
-	query.WriteString(` AND p.deleted_at IS NULL `)
+	query.WriteString(` p.deleted_at IS NULL `)
 
 	if params.SortBy != nil {
 		if *params.SortBy == constant.SortByName {
