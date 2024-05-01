@@ -61,3 +61,28 @@ export const Right = styled.div`
     display: none;
   }
 `;
+
+export const ImgBg = styled.div`
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+
+  border-radius: 50%;
+  border: 5px solid #00b5c0;
+  box-shadow: 0 0 10px 5px #bdbdbd;
+
+  img {
+    object-fit: cover;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: transparent;
+  }
+`;

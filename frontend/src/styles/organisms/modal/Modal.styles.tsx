@@ -32,6 +32,8 @@ export const ModalContainer = styled.div<ModalPropsItf>`
 
   width: ${({ $containerWidth }) => $containerWidth};
   height: ${({ $containerHeight }) => $containerHeight};
+  background-color: ${({ $containerBgColor }) =>
+    $containerBgColor ? $containerBgColor : '#ffffff'};
 
   z-index: 20;
 `;

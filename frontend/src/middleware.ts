@@ -1,12 +1,7 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { StandardDecodedJwtItf } from './types/jwtTypes';
 import { cookies } from 'next/headers';
 import { decodeJWT } from './utils/decodeJWT';
-
-export const config = {
-  matcher: ['/:path*'],
-};
 
 //! Route group definitions
 const publicRoutes = ['/', '/shop'];
@@ -20,6 +15,8 @@ const userOnlyRoutes = ['/dashboard/user', 'dashboard/transactions'];
 const doctorOnlyRoutes = ['/dashboard/doctor'];
 
 export default async function middleware(request: NextRequest) {
+  const response = NextResponse.next();
+
   //! Redirect URL definitions
   const redirectToLogin = new URL(
     '/auth/login',
@@ -38,6 +35,7 @@ export default async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(path);
+
   // eslint-disable-next-line
   const isPublicRoute = publicRoutes.includes(path);
   const isAuthRoute = authRoutes.includes(path);
@@ -52,7 +50,6 @@ export default async function middleware(request: NextRequest) {
 
   const userSessionCredentials: StandardDecodedJwtItf =
     await decodeJWT(accessCookie);
-
   // eslint-disable-next-line
   const authId = userSessionCredentials?.payload?.Payload?.aid;
   const userRole = userSessionCredentials?.payload?.Payload?.role;
@@ -102,7 +99,9 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectToDoctorDashboard);
   }
 
-  //! All checks passed, continue request
-  const response = NextResponse.next();
   return response;
 }
+
+export const config = {
+  matcher: ['/:path*'],
+};

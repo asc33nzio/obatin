@@ -15,9 +15,9 @@ export interface ModalPropsItf {
   $overlayHeight?: string;
   $containerWidth: string;
   $containerHeight: string;
+  $containerBgColor?: string;
   $fontSize?: string | undefined;
   $color?: string | undefined;
-  $bgColor?: string | undefined;
 }
 
 const Modal = () => {
@@ -35,9 +35,9 @@ const Modal = () => {
     $overlayHeight: '100vh',
     $containerWidth: '500px',
     $containerHeight: '500px',
+    $containerBgColor: '#ffffff',
     $fontSize: '18px',
     $color: '#4a5568',
-    $bgColor: 'white',
   };
 
   switch (modalType) {
@@ -66,8 +66,8 @@ const Modal = () => {
       title = 'Tambahkan Alamat';
       modalProps = {
         $overlayHeight: '125vh',
-        $containerWidth: '500px',
-        $containerHeight: '500px',
+        $containerWidth: '650px',
+        $containerHeight: '850px',
       };
       break;
 

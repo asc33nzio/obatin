@@ -1,5 +1,5 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { AuthReduxItf } from '@/types/authTypes';
+import { AuthReduxItf } from '@/types/reduxTypes';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: AuthReduxItf = {
@@ -13,6 +13,8 @@ const initialState: AuthReduxItf = {
   isApproved: false,
   avatarUrl: '',
   specialization: null,
+  activeAddressId: null,
+  addresses: [],
 };
 
 export const authSlice = createSlice({
@@ -31,6 +33,12 @@ export const authSlice = createSlice({
       state.isApproved = action.payload.isApproved;
       if (action.payload.specialization) {
         state.specialization = action.payload.specialization;
+      }
+      if (action.payload.activeAddressId) {
+        state.activeAddressId = action.payload.activeAddressId;
+      }
+      if (action.payload.addresses) {
+        state.addresses = action.payload.addresses;
       }
     },
   },

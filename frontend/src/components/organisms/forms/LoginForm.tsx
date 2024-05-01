@@ -132,6 +132,8 @@ const LoginForm = (): React.ReactElement => {
             avatarUrl: userData.avatar_url,
             isVerified: isVerified,
             isApproved: isApproved,
+            activeAddressId: userData.active_address_id,
+            addresses: userData.addresses,
           }),
         );
 

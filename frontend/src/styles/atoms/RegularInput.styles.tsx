@@ -24,11 +24,12 @@ export const RegularInputContainer = styled.div<{
 
 export const RegularCustomInput = styled.input<{
   $hasError?: boolean;
+  $disabled?: boolean;
 }>`
   width: 100%;
   height: 50%;
 
-  background-color: #f7fafc;
+  background-color: ${({ $disabled }) => ($disabled ? '#918d8d' : '#f7fafc')};
   color: #4a5568;
   border: ${({ $hasError }) =>
     $hasError ? '1px solid #e04146' : '1px solid #d0d9e3'};
@@ -38,7 +39,7 @@ export const RegularCustomInput = styled.input<{
   font-size: 17px;
 
   &::placeholder {
-    color: #949fb3;
+    color: ${({ $disabled }) => ($disabled ? '#ffffff' : '#949fb3')};
     font-size: 18px;
   }
 

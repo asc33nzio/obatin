@@ -179,22 +179,25 @@ export const UserDetailDiv = styled.div`
 `;
 
 export const AddressContainer = styled.div<{ $isDesktopDisplay: boolean }>`
-  display: flex;
+  display: block;
   flex-direction: column;
   align-items: center;
 
   width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
-  height: 40%;
+  height: 45%;
 
-  overflow-y: auto;
+  overflow-y: scroll;
 `;
 
 export const AddressHeader = styled.div`
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 
+  background-color: #ffffff;
   width: 100%;
   height: 15%;
   padding-left: 15px;
@@ -207,6 +210,8 @@ export const AddressHeader = styled.div`
     font-size: 38px;
     background: transparent;
   }
+
+  z-index: 1;
 `;
 
 export const GenderSelect = styled.select`

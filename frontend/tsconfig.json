@@ -28,6 +28,6 @@
     ".next/types/**/*.ts",
     "server.js",
     "src/contexts/passwordValidationContext.ts"
-  ],
+, "src/app/config.js"  ],
   "exclude": ["node_modules"]
 }

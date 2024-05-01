@@ -262,7 +262,8 @@ const UserDashboardPage = (): React.ReactElement => {
         },
       });
 
-      const [_patchProfileRes, getUserDetailRes] = await Promise.all([
+      // eslint-disable-next-line
+      const [patchProfileRes, getUserDetailRes] = await Promise.all([
         patchProfileReq,
         getUserDetailReq,
       ]);
@@ -281,6 +282,8 @@ const UserDashboardPage = (): React.ReactElement => {
           avatarUrl: userData.avatar_url,
           isVerified: oldUserData.isVerified,
           isApproved: oldUserData.isApproved,
+          activeAddressId: oldUserData.activeAddressId,
+          addresses: oldUserData.addresses,
         }),
       );
 
@@ -393,7 +396,7 @@ const UserDashboardPage = (): React.ReactElement => {
                 $width={45}
                 $height={35}
                 validationMessage={userUploadValidationError}
-                $isSet={userUpload !== undefined}
+                $isSet={hasNewValue.avatar}
                 onChange={(e) => {
                   handleImageChange(e);
                   if (!userUploadValidationError) {
@@ -709,7 +712,7 @@ const UserDashboardPage = (): React.ReactElement => {
 
         <AddressContainer $isDesktopDisplay={isDesktopDisplay}>
           <AddressHeader>
-            <h1>Address</h1>
+            <h1>Alamat</h1>
             <CustomButton
               content='Tambah Alamat'
               $bgColor='#00B5C0'
@@ -720,21 +723,19 @@ const UserDashboardPage = (): React.ReactElement => {
             />
           </AddressHeader>
 
-          <AddressCard
-            isMainAddress={true}
-            alias='Sopo Del Tower'
-            details='Jl. Foo Bar'
-          />
-          <AddressCard
-            isMainAddress={false}
-            alias='Sopo Del Tower'
-            details='Jl. Foo Bar'
-          />
-          <AddressCard
-            isMainAddress={false}
-            alias='Sopo Del Tower'
-            details='Jl. Foo Bar'
-          />
+          {userInfo?.addresses?.map((address, index) => {
+            let fullAddress = address.detail;
+            fullAddress += `, ${address.city.province.name}, ${address.city.type} ${address.city.name}, ${address.city.postal_code}`;
+            return (
+              <AddressCard
+                $id={address.id === null ? 0 : address.id}
+                key={`userAddressCard${index}`}
+                isMainAddress={userInfo?.activeAddressId === address.id}
+                alias={address.alias}
+                details={fullAddress}
+              />
+            );
+          })}
         </AddressContainer>
       </DashboardPageContentContainer>
     </DashboardPageContainer>
