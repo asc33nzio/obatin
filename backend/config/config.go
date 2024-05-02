@@ -8,30 +8,30 @@ import (
 )
 
 type Config struct {
-	dbUrl                  string
-	jwtIss                 string
-	jwtLoginExp            int
-	jwtSecret              string
-	serverPort             string
-	hashCost               int
-	defaultPassword        string
-	appMailPassword        string
-	defaultEndpoint        string
-	emailUsernameSender    string
-	emailHostSender        string
-	emailPortSender        string
-	cloudinaryCloudName    string
-	cloudinaryAPIKey       string
-	cloudinaryAPISecret    string
-	cloudinaryUploadFolder string
-	cloudinaryURL          string
-	tokenLength            int
-	randomTokenLength      int
-	verificationLinkBase   string
-	jwtVerifyDoctorExp     int
-	jwtVerifyUserExp       int
-	jwtRefreshTokenExp     int
-	jwtForgotPasswordExp   int
+	dbUrl                   string
+	jwtIss                  string
+	jwtLoginExp             int
+	jwtSecret               string
+	serverPort              string
+	hashCost                int
+	defaultPassword         string
+	appMailPassword         string
+	defaultEndpointFrontend string
+	emailUsernameSender     string
+	emailHostSender         string
+	emailPortSender         string
+	cloudinaryCloudName     string
+	cloudinaryAPIKey        string
+	cloudinaryAPISecret     string
+	cloudinaryUploadFolder  string
+	cloudinaryURL           string
+	tokenLength             int
+	randomTokenLength       int
+	verificationLinkBase    string
+	jwtVerifyDoctorExp      int
+	jwtVerifyUserExp        int
+	jwtRefreshTokenExp      int
+	jwtForgotPasswordExp    int
 }
 
 func NewConfig() (*Config, error) {
@@ -86,7 +86,7 @@ func NewConfig() (*Config, error) {
 	jwtSecret := os.Getenv("JWT_SECRET_KEY")
 	serverPort := os.Getenv("SERVER_PORT")
 	appMailPassword := os.Getenv("DEFAULT_GMAIL_APP_PASSWORD")
-	defaultEndpoint := os.Getenv("DEFAULT_ENDPOINT")
+	defaultEndpointFrontend := os.Getenv("DEFAULT_ENDPOINT_FRONTEND")
 	emailUsernameSender := os.Getenv("DEFAULT_USERNAME_EMAIL")
 	emailHostSender := os.Getenv("DEFAULT_HOST_EMAIL")
 	emailPortSender := os.Getenv("DEFAULT_PORT_EMAIL")
@@ -98,29 +98,29 @@ func NewConfig() (*Config, error) {
 	verificationLinkBase := os.Getenv("VERIFICATION_LINK_BASE")
 
 	return &Config{
-		dbUrl:                  dbUrl,
-		jwtIss:                 jwtIss,
-		jwtLoginExp:            jwtLoginExp,
-		jwtSecret:              jwtSecret,
-		serverPort:             serverPort,
-		hashCost:               hashCost,
-		appMailPassword:        appMailPassword,
-		defaultEndpoint:        defaultEndpoint,
-		emailUsernameSender:    emailUsernameSender,
-		emailHostSender:        emailHostSender,
-		emailPortSender:        emailPortSender,
-		cloudinaryCloudName:    cloudinaryCloudName,
-		cloudinaryAPIKey:       cloudinaryAPIKey,
-		cloudinaryAPISecret:    cloudinaryAPISecret,
-		cloudinaryUploadFolder: cloudinaryUploadFolder,
-		cloudinaryURL:          cloudinaryURL,
-		tokenLength:            tokenLength,
-		randomTokenLength:      randomTokenLength,
-		verificationLinkBase:   verificationLinkBase,
-		jwtVerifyDoctorExp:     jwtVerifyDoctorExp,
-		jwtVerifyUserExp:       jwtVerifyUserExp,
-		jwtRefreshTokenExp:     jwtRefreshTokenExp,
-		jwtForgotPasswordExp:   jwtForgotPasswordExp,
+		dbUrl:                   dbUrl,
+		jwtIss:                  jwtIss,
+		jwtLoginExp:             jwtLoginExp,
+		jwtSecret:               jwtSecret,
+		serverPort:              serverPort,
+		hashCost:                hashCost,
+		appMailPassword:         appMailPassword,
+		defaultEndpointFrontend: defaultEndpointFrontend,
+		emailUsernameSender:     emailUsernameSender,
+		emailHostSender:         emailHostSender,
+		emailPortSender:         emailPortSender,
+		cloudinaryCloudName:     cloudinaryCloudName,
+		cloudinaryAPIKey:        cloudinaryAPIKey,
+		cloudinaryAPISecret:     cloudinaryAPISecret,
+		cloudinaryUploadFolder:  cloudinaryUploadFolder,
+		cloudinaryURL:           cloudinaryURL,
+		tokenLength:             tokenLength,
+		randomTokenLength:       randomTokenLength,
+		verificationLinkBase:    verificationLinkBase,
+		jwtVerifyDoctorExp:      jwtVerifyDoctorExp,
+		jwtVerifyUserExp:        jwtVerifyUserExp,
+		jwtRefreshTokenExp:      jwtRefreshTokenExp,
+		jwtForgotPasswordExp:    jwtForgotPasswordExp,
 	}, nil
 }
 
@@ -156,8 +156,8 @@ func (c *Config) AppMailPassword() string {
 	return c.appMailPassword
 }
 
-func (c *Config) DefaultEndpoint() string {
-	return c.defaultEndpoint
+func (c *Config) DefaultEndpointFrontend() string {
+	return c.defaultEndpointFrontend
 }
 
 func (c *Config) EmailUsernameSender() string {

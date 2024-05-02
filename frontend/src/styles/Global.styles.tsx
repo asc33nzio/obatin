@@ -2,6 +2,9 @@ import styled from 'styled-components';
 
 export const Body = styled.div`
   align-items: center;
+  @media (max-width: 768px) {
+    padding: 0;
+  }
 `;
 
 export const Container = styled.div`

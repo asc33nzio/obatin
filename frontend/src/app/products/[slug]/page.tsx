@@ -110,34 +110,48 @@ const ProductDetailPage = () => {
               </ButtonAdd>
             )}
 
-            <div>
-              <h2>Deskripsi</h2>
-              <p>{product?.description}</p>
-            </div>
-            <div>
-              <h2>Komposisi / Isi</h2>
-              <p>{product?.content}</p>
-            </div>
-            <div>
-              <h2>Dosis</h2>
-              <p>{product?.dosage}</p>
-            </div>
-            <div>
-              <h2>Aturan Pakai</h2>
-              <p>{product?.how_to_use}</p>
-            </div>
-            <div>
-              <h2>Perhatian</h2>
-              <p>{product?.warning}</p>
-            </div>
-            <div>
-              <h2>Kontra Indikasi</h2>
-              <p>{product?.contraindication}</p>
-            </div>
-            <div>
-              <h2>Kemasan</h2>
-              <p>{product?.packaging}</p>
-            </div>
+            {product?.description && (
+              <div>
+                <h2>Deskripsi</h2>
+                <p>{product?.description}</p>
+              </div>
+            )}
+            {product?.content && (
+              <div>
+                <h2>Komposisi / Isi</h2>
+                <p>{product?.content}</p>
+              </div>
+            )}
+            {product?.dosage && (
+              <div>
+                <h2>Dosis</h2>
+                <p>{product?.dosage}</p>
+              </div>
+            )}
+            {product?.how_to_use && (
+              <div>
+                <h2>Aturan Pakai</h2>
+                <p>{product?.how_to_use}</p>
+              </div>
+            )}
+            {product?.warning && (
+              <div>
+                <h2>Perhatian</h2>
+                <p>{product?.warning}</p>
+              </div>
+            )}
+            {product?.contraindication && (
+              <div>
+                <h2>Kontra Indikasi</h2>
+                <p>{product?.contraindication}</p>
+              </div>
+            )}
+            {product?.packaging && (
+              <div>
+                <h2>Kemasan</h2>
+                <p>{product?.packaging}</p>
+              </div>
+            )}
           </ProductDetail>
         </ProductDetailContainer>
         <Footer />

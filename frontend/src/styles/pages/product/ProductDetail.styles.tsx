@@ -16,6 +16,14 @@ export const ProductDetailContainer = styled.div`
   @media (max-width: 1440px) {
     flex-direction: column;
   }
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    align-items: center;
+    img {
+      width: 300px;
+      height: 300px;
+    }
+  }
 `;
 
 export const ProductDetail = styled.div`

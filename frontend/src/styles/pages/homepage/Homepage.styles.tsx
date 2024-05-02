@@ -11,6 +11,12 @@ export const Body = styled.div`
     display: flex;
     flex-direction: column;
   }
+  @media (max-width: 769px) {
+    min-width: 100%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 export const Content = styled.div`
@@ -22,9 +28,22 @@ export const CategoryContent = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
-  @media (max-width: 769px) {
+  align-items: center;
+  img {
+    margin: 10px;
+  }
+  @media (max-width: 1440px) {
+    width: 100%;
+    img {
+      margin: 10px 15px;
+    }
+  }
+  @media (max-width: 768px) {
     align-items: center;
     width: 80%;
+    img {
+      margin: 10px 50px;
+    }
   }
 `;
 
@@ -33,6 +52,10 @@ export const FiturContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 2rem;
+  @media (max-width: 769px) {
+    display: flex;
+    flex-direction: column;
+  }
   @media (max-width: 769px) {
     display: flex;
     flex-direction: column;
@@ -49,6 +72,11 @@ export const Fitur = styled.div`
   justify-content: center;
   border-radius: 12px;
   justify-content: space-between;
+  @media (max-width: 769px) {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+  }
   @media (max-width: 769px) {
     display: flex;
     flex-direction: column;
@@ -72,17 +100,26 @@ export const NewSection = styled.div`
     padding: 0;
     width: 400px;
   }
+  @media (max-width: 769px) {
+    padding: 0;
+    width: 400px;
+  }
 `;
 
 export const PopularContainer = styled.div`
   width: 100%;
-  padding: 20px 5rem;
+  padding: 1rem 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
   align-items: center;
   justify-content: space-between;
   align-content: center;
+  @media (max-width: 1440px) {
+    padding: 1rem 5rem;
+  }
+  @media (max-width: 768px) {
+    align-items: center;
+  }
 `;
 
 export const Imagecontainer = styled.img`

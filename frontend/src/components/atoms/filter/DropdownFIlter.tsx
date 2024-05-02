@@ -1,11 +1,12 @@
 import { useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import CustomButton from '../button/CustomButton';
+
 import {
   FilterButtonStyle,
   FilterContainer,
 } from '@/styles/atoms/DropdownFilter.styles';
-import CustomButton from '../button/CustomButton';
 
 const FilterComponent = ({
   setSortBy,
@@ -21,49 +22,34 @@ const FilterComponent = ({
   const newParams = new URLSearchParams(searchParams.toString());
   const pathname = usePathname();
 
-  const handleSortBy = useCallback(
-    (sortBy: string) => {
-      const currentSort = newParams.get('sort_by');
-      if (currentSort === sortBy) {
-        newParams.delete('sort_by');
-      } else {
-        newParams.set('sort_by', sortBy);
-      }
-      router.push(pathname + '?' + createQueryString('sort_by', `${sortBy}`));
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleFilter = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+
+      return params.toString();
     },
-    // eslint-disable-next-line
-    [router, newParams],
+    [searchParams],
   );
 
-  const handleClassification = useCallback(
-    (classification: string) => {
-      const currentClassification = newParams.get('classification');
-      if (currentClassification === classification) {
-        newParams.delete('classification');
+  const handleFilterClicked = useCallback(
+    (name: string, value: string) => {
+      const currentFilter = newParams.get(name);
+      if (currentFilter === value) {
+        newParams.delete(name);
       } else {
-        newParams.set('classification', classification);
+        newParams.set(name, value);
       }
-      router.push(
-        pathname +
-          '?' +
-          createQueryString('classification', `${classification}`),
-      );
+      router.push(pathname + '?' + createQueryString(name, `${value}`));
     },
     // eslint-disable-next-line
-    [router, newParams],
-  );
 
-  const handleOrder = useCallback(
-    (order: string) => {
-      const currentOrder = newParams.get('order');
-      if (currentOrder === order) {
-        newParams.delete('order');
-      } else {
-        newParams.set('order', order);
-      }
-      router.push(pathname + '?' + createQueryString('order', `${order}`));
-    },
-    // eslint-disable-next-line
     [router, newParams],
   );
 
@@ -80,101 +66,128 @@ const FilterComponent = ({
   };
 
   const handleClearClicked = () => {
+    newParams.delete('sort_by');
+    newParams.delete('classification');
+    newParams.delete('order');
     setSortBy(null);
     setClassification(null);
     setOrderBy(null);
+
+    const queryString = newParams.toString();
+    router.push(`${pathname}${queryString ? `?${queryString}` : ''}`);
   };
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams],
-  );
 
   return (
     <FilterContainer>
       <FilterButtonStyle>
-        <button
-          onClick={() => {
-            handleSortBy('name');
-            handleSortByClicked('name');
-          }}
-        >
-          Nama
-        </button>
-        <button
-          onClick={() => {
-            handleSortBy('price');
-            handleSortByClicked('price');
-          }}
-        >
-          Harga
-        </button>
+        <CustomButton
+          content='Sort By'
+          onClick={toggleFilter}
+          $fontSize='16px'
+        />
+        {isOpen && (
+          <div>
+            <button
+              onClick={() => {
+                handleFilterClicked('sort_by', 'name');
+                handleSortByClicked('name');
+              }}
+            >
+              Nama
+            </button>
+            <button
+              onClick={() => {
+                handleFilterClicked('sort_by', 'price');
+                handleSortByClicked('price');
+              }}
+            >
+              Harga
+            </button>
+          </div>
+        )}
       </FilterButtonStyle>
 
       <FilterButtonStyle>
-        <button
-          onClick={() => {
-            handleClassification('obat_keras');
-            handleClassificationClicked('obat_keras');
-          }}
-        >
-          Obat Keras
-        </button>
-        <button
-          onClick={() => {
-            handleClassification('obat_bebas');
-            handleClassificationClicked('obat_bebas');
-          }}
-        >
-          Obat Bebas
-        </button>
-        <button
-          onClick={() => {
-            handleClassification('obat_bebas_terbatas');
-            handleClassificationClicked('obat_bebas_terbatas');
-          }}
-        >
-          Obat Bebas Terbatas
-        </button>
-        <button
-          onClick={() => {
-            handleClassification('non_obat');
-            handleClassificationClicked('non_obat');
-          }}
-        >
-          Non Obat
-        </button>
+        <CustomButton
+          content='Classification'
+          onClick={toggleFilter}
+          $fontSize='16px'
+        />
+        {isOpen && (
+          <div>
+            <button
+              onClick={() => {
+                handleFilterClicked('classification', 'obat_keras');
+                handleClassificationClicked('obat_keras');
+              }}
+            >
+              Obat Keras
+            </button>
+            <button
+              onClick={() => {
+                handleFilterClicked('classification', 'obat_bebas');
+                handleClassificationClicked('obat_bebas');
+              }}
+            >
+              Obat Bebas
+            </button>
+            <button
+              onClick={() => {
+                handleFilterClicked('classification', 'obat_bebas_terbatas');
+                handleClassificationClicked('obat_bebas_terbatas');
+              }}
+            >
+              Obat Bebas Terbatas
+            </button>
+            <button
+              onClick={() => {
+                handleFilterClicked('classification', 'non_obat');
+                handleClassificationClicked('non_obat');
+              }}
+            >
+              Non Obat
+            </button>
+          </div>
+        )}
       </FilterButtonStyle>
 
       <FilterButtonStyle>
-        <button
-          onClick={() => {
-            handleOrder('asc');
-            handleOrderClicked('asc');
-          }}
-        >
-          Dari bawah ke atas
-        </button>
-        <button
-          onClick={() => {
-            handleOrder('desc');
-            handleOrderClicked('desc');
-          }}
-        >
-          Dari atas ke bawah
-        </button>
+        <CustomButton
+          content='Order By'
+          onClick={toggleFilter}
+          $fontSize='16px'
+        />
+        {isOpen && (
+          <div>
+            <button
+              onClick={() => {
+                handleFilterClicked('order', 'asc');
+                handleOrderClicked('asc');
+              }}
+            >
+              Dari bawah ke atas
+            </button>
+            <button
+              onClick={() => {
+                handleFilterClicked('order', 'desc');
+                handleOrderClicked('desc');
+              }}
+            >
+              Dari atas ke bawah
+            </button>
+          </div>
+        )}
       </FilterButtonStyle>
+
       <CustomButton
-        content='hapus filter'
+        content='Clear Filter'
         $width='150px'
         $height='50px'
         $fontSize='16px'
-        onClick={() => handleClearClicked}
+        onClick={() => {
+          handleClearClicked();
+          toggleFilter();
+        }}
       />
     </FilterContainer>
   );
