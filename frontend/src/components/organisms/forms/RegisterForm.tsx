@@ -381,6 +381,7 @@ const RegisterForm = (): React.ReactElement => {
             onChange={handlePdfChange}
             $marBot={15}
             accept='image/*,.pdf'
+            $isSet={userUpload !== undefined}
           />
         </>
       ) : (

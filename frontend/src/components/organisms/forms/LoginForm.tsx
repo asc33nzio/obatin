@@ -11,9 +11,9 @@ import {
 } from '@/styles/pages/auth/Auth.styles';
 import {
   navigateToUserDashboard,
-  navigateToDoctorDashboard,
   navigateToForgotPassword,
   navigateToRegister,
+  navigateToLogin,
 } from '@/app/actions';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
@@ -154,9 +154,9 @@ const LoginForm = (): React.ReactElement => {
             aid: authId,
             email: doctorData.email,
             name: doctorData.name,
-            gender: doctorData.gender,
+            gender: 'laki-laki',
             birthDate: doctorData.birth_date,
-            role: userRole,
+            role: 'doctor',
             avatarUrl: doctorData.avatar_url,
             isVerified: isVerified,
             isApproved: isApproved,
@@ -164,7 +164,14 @@ const LoginForm = (): React.ReactElement => {
           }),
         );
 
-        navigateToDoctorDashboard();
+        setToast({
+          showToast: true,
+          toastMessage: 'Silahkan cek e-mail anda untuk mendapatkan kata sandi',
+          toastType: 'ok',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        navigateToLogin();
       }
 
       setToast({

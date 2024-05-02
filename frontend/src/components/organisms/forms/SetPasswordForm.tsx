@@ -8,7 +8,7 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
-import { navigateToHome } from '@/app/actions';
+import { navigateToDoctorDashboard } from '@/app/actions';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import GoogleICO from '@/assets/icons/GoogleICO';
@@ -27,7 +27,7 @@ const SetPasswordForm = (): React.ReactElement => {
     handleConfirmPasswordInputChange,
   } = usePasswordValidation();
 
-  const handleSignUp = () => {
+  const handleSetNewPassword = () => {
     const isValidPassword = validatePassword(password);
     const isValidConfimPassword = validateConfirmPassword(confirmPassword);
 
@@ -42,16 +42,25 @@ const SetPasswordForm = (): React.ReactElement => {
       return;
     }
 
-    //? POST request
-
-    setToast({
-      showToast: true,
-      toastMessage: 'Berhasil mendaftar',
-      toastType: 'ok',
-      resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-      orientation: 'center',
-    });
-    navigateToHome();
+    try {
+      setToast({
+        showToast: true,
+        toastMessage: 'Berhasil mendaftar',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      navigateToDoctorDashboard();
+    } catch (error) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: 'Gagal mengatur kata sandi',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    }
   };
 
   return (
@@ -74,7 +83,7 @@ const SetPasswordForm = (): React.ReactElement => {
         $viewBox='0 -2 22 22'
       />
 
-      <CustomButton content='Daftar' onClick={handleSignUp} />
+      <CustomButton content='Ubah Sandi' onClick={handleSetNewPassword} />
 
       <SectionSeparator>
         <SeparatorLine />
