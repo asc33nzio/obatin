@@ -2,6 +2,7 @@ import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
 export const NavContainer = styled.div`
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -16,8 +17,8 @@ export const NavContainer = styled.div`
   padding-left: 50px;
   padding-right: 75px;
   margin-bottom: 25px;
-
   border-bottom: 0.5px solid ${COLORS.input_border};
+
   @media (max-width: 1440px) {
     width: 100%;
     gap: 20px;
@@ -92,4 +93,60 @@ export const ImgBg = styled.div`
     border-radius: 50%;
     background: transparent;
   }
+`;
+
+export const VerifyPopup = styled.div<{ $isPopupOpen: boolean }>`
+  position: absolute;
+  display: ${({ $isPopupOpen }) => ($isPopupOpen ? 'flex' : 'none')};
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  top: 125px;
+  left: 0;
+  right: 0;
+  padding-left: 250px;
+  padding-right: 100px;
+  width: 100%;
+  height: 25px;
+  background-color: rgba(255, 0, 0, 0.5);
+
+  p {
+    font-size: 12px;
+    color: #ffffff;
+    font-weight: 550;
+    background-color: transparent;
+    width: 100%;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+
+    u {
+      cursor: pointer;
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      color: #ffffff;
+      font-weight: 500;
+      background-color: transparent;
+    }
+  }
+
+  svg {
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+
+    :hover {
+      circle {
+        transition: fill 1s ease;
+        fill: #00b5c0;
+      }
+    }
+  }
+  z-index: 50;
 `;

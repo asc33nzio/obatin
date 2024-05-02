@@ -22,7 +22,7 @@ export const navigateToOnboarding = async () => {
 };
 
 export const navigateToHome = async () => {
-  redirect('/home');
+  redirect('/');
 };
 
 export const navigateToUserDashboard = async () => {

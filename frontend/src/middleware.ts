@@ -7,7 +7,7 @@ import { decodeJWT } from './utils/decodeJWT';
 const publicRoutes = ['/', '/shop'];
 const authRoutes = ['/auth/login', '/auth/register'];
 const protectedRoutes = [
-  '/dashboard/user/',
+  '/dashboard/user',
   '/dashboard/user/transactions',
   '/dashboard/doctor',
 ];

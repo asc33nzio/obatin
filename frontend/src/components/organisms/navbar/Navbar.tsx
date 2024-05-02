@@ -4,58 +4,95 @@ import {
   Left,
   NavContainer,
   Right,
+  VerifyPopup,
 } from '@/styles/organisms/Navbar.styles';
-import { getCookie } from 'cookies-next';
-import { useObatinSelector } from '@/redux/store/store';
-import { Menu, ChevronLeft } from '@styled-icons/material';
-import { useNavbar } from '@/hooks/useNavbar';
 import {
   navigateToDoctorDashboard,
   navigateToLogin,
   navigateToUserDashboard,
 } from '@/app/actions';
-import { StandardDecodedJwtItf, UserRoles } from '@/types/jwtTypes';
-import { decodeJWT } from '@/utils/decodeJWT';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useObatinSelector } from '@/redux/store/store';
+import { Menu, ChevronLeft } from '@styled-icons/material';
+import { getCookie } from 'cookies-next';
 import { useEffect, useState } from 'react';
+import { useNavbar } from '@/hooks/useNavbar';
+import { decodeJWTSync } from '@/utils/decodeJWT';
+import { useToast } from '@/hooks/useToast';
 import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
 import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
+import DefaultDoctorAvatar from '@/assets/DefaultDoctorAvatar.svg';
 import ObatinICO from '@/assets/icons/ObatinICO';
 import SearchComponent from '../../molecules/search/SearchComponent';
 import CustomButton from '../../atoms/button/CustomButton';
 import Sidebar from '../sidebar/Sidebar';
 import Image from 'next/image';
+import Axios from 'axios';
+import ClosePopupICO from '@/assets/icons/ClosePopupICO';
 
 const Navbar = (): React.ReactElement => {
-  const { isOpened, toggleDrawer } = useNavbar();
-  const [aid, setAid] = useState<number>(0);
-  const [userRole, setUserRole] = useState<UserRoles>('user');
+  const { isOpened, toggleDrawer, isPopupOpened, setIsPopupOpened } =
+    useNavbar();
+  const { setToast } = useToast();
+  const { isDesktopDisplay } = useClientDisplayResolution();
   const userInfo = useObatinSelector((state) => state?.auth);
-  const doctorInfo = useObatinSelector((state) => state?.authDoctor);
   const userGender = useObatinSelector((state) => state?.auth?.gender);
   const avatarUrlUser = useObatinSelector((state) => state?.auth?.avatarUrl);
   const avatarUrlDoctor = useObatinSelector(
     (state) => state?.authDoctor?.avatarUrl,
   );
   const accessToken = getCookie('access_token');
+  const userSessionCredentials = decodeJWTSync(accessToken?.toString());
+  const userRole = userSessionCredentials?.payload?.Payload?.role;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const handleReverify = async () => {
+    try {
+      setIsLoading(true);
+      setToast({
+        showToast: true,
+        toastMessage: 'Mohon menunggu sejenak',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+
+      await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify/mail`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage: 'E-mail verifikasi telah dikirim, cek e-mail anda',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } catch (error) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: 'Maaf, mohon coba kembali',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const getUserInfo = async () => {
-      const userSessionCredentials: StandardDecodedJwtItf =
-        await decodeJWT(accessToken);
-
-      const authId = userSessionCredentials?.payload?.Payload?.aid;
-      const userRole = userSessionCredentials?.payload?.Payload?.role;
-
-      if (authId) setAid(authId);
-      if (userRole) setUserRole(userRole);
-
-      console.log(userInfo);
-      console.log(doctorInfo);
-    };
-
-    getUserInfo();
-    // eslint-disable-next-line
-  }, [accessToken]);
+    setIsPopupOpened(
+      userRole === 'user' && !userInfo?.isVerified ? true : false,
+    );
+  }, []);
 
   return (
     <>
@@ -70,7 +107,7 @@ const Navbar = (): React.ReactElement => {
         <SearchComponent />
 
         <Right>
-          {aid ? (
+          {accessToken === undefined ? (
             <CustomButton
               content='Login'
               $width='120px'
@@ -86,9 +123,11 @@ const Navbar = (): React.ReactElement => {
                     ? avatarUrlUser
                     : userRole === 'doctor' && avatarUrlDoctor
                       ? avatarUrlDoctor
-                      : userGender === 'perempuan'
+                      : userRole === 'user' && userGender === 'perempuan'
                         ? DefaultFemaleAvatar
-                        : DefaultMaleAvatar
+                        : userRole === 'user' && userGender === 'laki-laki'
+                          ? DefaultMaleAvatar
+                          : DefaultDoctorAvatar
                 }
                 alt='avatar'
                 width={75}
@@ -103,6 +142,18 @@ const Navbar = (): React.ReactElement => {
           )}
         </Right>
       </NavContainer>
+
+      <VerifyPopup $isPopupOpen={isPopupOpened}>
+        <p>
+          Selamat datang di ObatIn. Segera lakukan verifikasi e-mail agar anda
+          dapat mengakses semua layanan kami.
+          <u onClick={handleReverify}>Klik disini</u> bila belum menerima
+          e-mail. Salam sehat dan terima kasih
+        </p>
+        <ClosePopupICO
+          onClick={!isLoading ? () => setIsPopupOpened(false) : () => {}}
+        />
+      </VerifyPopup>
 
       <Sidebar />
     </>

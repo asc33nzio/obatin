@@ -6,9 +6,10 @@ export const DashboardPageContainer = styled.div<{
   display: flex;
   flex-direction: column;
 
-  width: 99vw;
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '170vh' : '200vh')};
+  width: 100vw;
   max-width: 100vw;
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '115vh' : '200vh')};
+
   overflow-x: hidden;
 `;
 

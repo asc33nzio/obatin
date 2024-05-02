@@ -6,27 +6,22 @@ import NavbarContext from '@/contexts/navbarContext';
 export const NavbarProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [navbarState, setNavbarState] = useState<NavbarItf>({
-    isOpened: false,
-    toggleDrawer: () => {},
-  });
+  const [isOpened, setIsOpened] = useState(false);
+  const [isPopupOpened, setIsPopupOpened] = useState(false);
 
-  const toggleDrawer: NavbarItf['toggleDrawer'] = () => {
-    setNavbarState((prevState) => ({
-      ...prevState,
-      isOpened: !prevState.isOpened,
-    }));
+  const toggleDrawer = () => {
+    setIsOpened(!isOpened);
   };
 
-  const { isOpened } = navbarState;
+  const contextValue: NavbarItf = {
+    isOpened,
+    toggleDrawer,
+    isPopupOpened,
+    setIsPopupOpened,
+  };
 
   return (
-    <NavbarContext.Provider
-      value={{
-        isOpened,
-        toggleDrawer,
-      }}
-    >
+    <NavbarContext.Provider value={contextValue}>
       {children}
     </NavbarContext.Provider>
   );

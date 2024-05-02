@@ -19,7 +19,7 @@ export const ModalOverlay = styled.div<ModalPropsItf>`
   background: rgba(128, 128, 128, 0.5);
   backdrop-filter: blur(4px);
 
-  z-index: 15;
+  z-index: 20001;
 `;
 
 export const ModalContainer = styled.div<ModalPropsItf>`
@@ -35,7 +35,7 @@ export const ModalContainer = styled.div<ModalPropsItf>`
   background-color: ${({ $containerBgColor }) =>
     $containerBgColor ? $containerBgColor : '#ffffff'};
 
-  z-index: 20;
+  z-index: 20002;
 `;
 
 export const ModalHeader = styled.div`

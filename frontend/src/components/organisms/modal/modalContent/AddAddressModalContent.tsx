@@ -273,8 +273,19 @@ const AddAddressModalContent = (): React.ReactElement => {
         orientation: 'center',
       });
       closeModal();
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.error(error);
+      if (error?.response?.request?.status === 403) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Tolong lakukan verifikasi e-mail terlebih dahulu',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
+
       setToast({
         showToast: true,
         toastMessage: 'Alamat anda belum sesuai, mohon cek kembali',

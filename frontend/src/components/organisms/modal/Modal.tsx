@@ -66,7 +66,7 @@ const Modal = () => {
       modalContent = <AddAddressModalContent />;
       title = 'Tambahkan Alamat';
       modalProps = {
-        $overlayHeight: '115vh',
+        $overlayHeight: '170vh',
         $containerWidth: '650px',
         $containerHeight: '850px',
       };
@@ -76,7 +76,7 @@ const Modal = () => {
       modalContent = <UpdateAddressModalContent />;
       title = 'Ubah Informasi Alamat';
       modalProps = {
-        $overlayHeight: '115vh',
+        $overlayHeight: '170vh',
         $containerWidth: '650px',
         $containerHeight: '850px',
       };

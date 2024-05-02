@@ -80,6 +80,7 @@ const UserDashboardPage = (): React.ReactElement => {
     useEmailValidation();
   const {
     password,
+    validatePassword,
     passwordValidationError,
     confirmPasswordValidationError,
     handlePasswordInputChange,
@@ -129,6 +130,8 @@ const UserDashboardPage = (): React.ReactElement => {
   };
 
   const openConfirmPasswordInterface = () => {
+    if (!validatePassword(password)) return;
+
     if (password && !passwordValidationError) {
       openModal('confirm-password');
     }
