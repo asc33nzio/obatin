@@ -29,7 +29,7 @@ interface CityItf {
   postal_code: string;
 }
 
-const AddAddressModalContent = (): React.ReactElement => {
+const UpdateAddressModalContent = (): React.ReactElement => {
   const provinces = useObatinSelector((state) => state?.provinces?.provinces);
   const userInfo = useObatinSelector((state) => state?.auth);
   const dispatch = useObatinDispatch();
@@ -58,10 +58,25 @@ const AddAddressModalContent = (): React.ReactElement => {
   const aid = useObatinSelector((state) => state?.auth?.aid);
   const openCageApiUrl = process.env.NEXT_PUBLIC_OPENCAGE_API_URL;
   const rajaOngkirBaseUrl = process.env.NEXT_PUBLIC_RAJAONGKIR_API_URL;
+  const proposedUpdateAddressId = sessionStorage.getItem('puID');
+  const defaultAddress = userInfo?.addresses?.find((address) => {
+    if (proposedUpdateAddressId !== null) {
+      return address.id === parseInt(proposedUpdateAddressId, 10);
+    }
+  });
+  const defaultAddressId = defaultAddress?.id;
+  const defaultProvinceId = defaultAddress?.city?.province?.id;
+  const defaultCityId = defaultAddress?.city?.id;
+  const defaultLatitude = defaultAddress?.latitude;
+  const defaultLongitude = defaultAddress?.longitude;
+  const [hasUserChangedProvince, setHasUserChangedProvince] =
+    useState<boolean>(false);
+  const [hasUserChangedCity, setHasUserChangedCity] = useState<boolean>(false);
 
   const fetchProvinces = async () => {
     try {
       setIsProvinceLoading(true);
+      setHasUserChangedProvince(true);
       const response = await Axios.get(`${rajaOngkirBaseUrl}/province`);
 
       const provinces: ObatinProvinceItf[] = response?.data?.map(
@@ -146,9 +161,11 @@ const AddAddressModalContent = (): React.ReactElement => {
       (province) => province.province_name === selectedProvinceName,
     );
     if (selectedProvinceName === '__RESET__') {
+      setHasUserChangedProvince(true);
       setChosenProvinceId('');
     }
     if (selectedProvince) {
+      setHasUserChangedProvince(true);
       setChosenProvinceId(selectedProvince.province_id);
       setChosenProvinceName(selectedProvince.province_name);
     }
@@ -159,9 +176,11 @@ const AddAddressModalContent = (): React.ReactElement => {
       (city) => city.city_name === selectedCityName,
     );
     if (selectedCityName === '__RESET__') {
+      setHasUserChangedCity(true);
       setChosenCityId('');
     }
     if (selectedCity) {
+      setHasUserChangedCity(true);
       setChosenCityId(selectedCity.city_id);
       setChosenCityName(selectedCity.city_name);
     }
@@ -201,13 +220,15 @@ const AddAddressModalContent = (): React.ReactElement => {
   const handleAddressChange = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       if (validateAddress(event.target.value)) {
+        setHasUserChangedProvince(true);
+        setHasUserChangedCity(true);
         setAddress(event.target.value);
       }
     },
-    1500,
+    1000,
   );
 
-  const handleAddAddress = async () => {
+  const handleUpdateAddress = async () => {
     let isValidPayload = true;
     if (!validateAlias(alias)) isValidPayload = false;
     if (!validateAddress(address)) isValidPayload = false;
@@ -233,8 +254,8 @@ const AddAddressModalContent = (): React.ReactElement => {
     };
 
     try {
-      await Axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${aid}/addresses`,
+      await Axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${aid}/addresses/${defaultAddressId}`,
         payload,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
@@ -267,11 +288,13 @@ const AddAddressModalContent = (): React.ReactElement => {
 
       setToast({
         showToast: true,
-        toastMessage: 'Alamat anda berhasil disimpan',
+        toastMessage: 'Alamat anda berhasil diperbaharui',
         toastType: 'ok',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
+
+      sessionStorage.removeItem('puID');
       closeModal();
     } catch (error) {
       console.log(error);
@@ -315,9 +338,47 @@ const AddAddressModalContent = (): React.ReactElement => {
   }, [chosenProvinceName, chosenCityName, address]);
 
   useEffect(() => {
+    if (defaultProvinceId && !hasUserChangedProvince) {
+      const defaultProvince = provinces.find(
+        (province) => parseInt(province.province_id, 10) === defaultProvinceId,
+      );
+      if (defaultProvince) {
+        setChosenProvinceId(defaultProvince.province_id);
+        setChosenProvinceName(defaultProvince.province_name);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultProvinceId, provinces]);
+
+  useEffect(() => {
+    if (defaultCityId && !hasUserChangedCity) {
+      const defaultCity = cities.find(
+        (city) => parseInt(city.city_id, 10) === defaultCityId,
+      );
+      if (defaultCity) {
+        setChosenCityId(defaultCity.city_id);
+        setChosenCityName(defaultCity.city_name);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultCityId, cities]);
+
+  useEffect(() => {
     if (chosenProvinceName && !isNaN(lng)) {
-      let latitude = lat || -6.175372;
-      let longitude = lng || 106.827194;
+      let latitude =
+        defaultLatitude !== undefined &&
+        defaultLatitude !== null &&
+        !hasUserChangedProvince &&
+        !hasUserChangedCity
+          ? parseFloat(defaultLatitude)
+          : lat || -6.175372;
+      let longitude =
+        defaultLongitude !== undefined &&
+        defaultLongitude !== null &&
+        !hasUserChangedProvince &&
+        !hasUserChangedCity
+          ? parseFloat(defaultLongitude)
+          : lng || 106.827194;
 
       const map = L.map('map').setView([latitude, longitude], 16);
 
@@ -356,6 +417,9 @@ const AddAddressModalContent = (): React.ReactElement => {
       <RegularInput
         title='Nama tempat'
         placeholder='Masukkan nama tempat'
+        defaultValue={
+          defaultAddress?.alias !== null ? defaultAddress?.alias : ''
+        }
         $height={75}
         $marBot={0}
         validationMessage={aliasValidationError}
@@ -377,6 +441,9 @@ const AddAddressModalContent = (): React.ReactElement => {
             $title='Provinsi'
             $onOptionChange={handleProvinceChange}
             $disabled={chosenCityId !== ''}
+            $defaultSelected={
+              !hasUserChangedProvince ? chosenProvinceName : null
+            }
           />
         )}
 
@@ -396,6 +463,7 @@ const AddAddressModalContent = (): React.ReactElement => {
             }
             $onOptionChange={handleCityChange}
             $disabled={chosenProvinceId === ''}
+            $defaultSelected={!hasUserChangedCity ? chosenCityName : null}
           />
         )}
       </ProvinceCityDiv>
@@ -411,6 +479,9 @@ const AddAddressModalContent = (): React.ReactElement => {
         }
         $height={75}
         $marBot={0}
+        defaultValue={
+          defaultAddress?.detail !== null ? defaultAddress?.detail : ''
+        }
         validationMessage={addressValidationError}
         onChange={handleAddressChange}
         $disabled={!chosenCityName}
@@ -454,11 +525,11 @@ const AddAddressModalContent = (): React.ReactElement => {
           $width='150px'
           $height='50px'
           $fontSize='22px'
-          onClick={handleAddAddress}
+          onClick={handleUpdateAddress}
         />
       </AddAddressModalButtonsContainer>
     </AddAddressModalContentContainer>
   );
 };
 
-export default AddAddressModalContent;
+export default UpdateAddressModalContent;

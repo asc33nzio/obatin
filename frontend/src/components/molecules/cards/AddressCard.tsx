@@ -1,3 +1,4 @@
+import 'primereact/resources/themes/lara-light-cyan/theme.css';
 import {
   AddressCardContainer,
   AddressCardLeftSection,
@@ -9,8 +10,10 @@ import {
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { getCookie } from 'cookies-next';
 import { useToast } from '@/hooks/useToast';
+import { useModal } from '@/hooks/useModal';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { setAuthState } from '@/redux/reducers/authSlice';
+import { InputSwitch } from 'primereact/inputswitch';
 import Axios from 'axios';
 import DeleteICO from '@/assets/dashboard/DeleteICO';
 import EditICO from '@/assets/dashboard/EditICO';
@@ -22,14 +25,21 @@ const AddressCard = (props: {
   details: string | null;
 }): React.ReactElement => {
   const { setToast } = useToast();
+  const { openModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const dispatch = useObatinDispatch();
   const userInfo = useObatinSelector((state) => state?.auth);
   const accessToken = getCookie('access_token');
 
+  const handleOpenUpdateInterface = () => {
+    sessionStorage.setItem('puID', props?.$id.toString());
+    openModal('update-address');
+  };
+
   const handleDelete = async () => {
     try {
-      if (props.isMainAddress) throw new Error(`Main address can't be deleted`);
+      if (userInfo.activeAddressId === props.$id)
+        throw new Error(`Main address can't be deleted`);
 
       await Axios.delete(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}/addresses/${props.$id}`,
@@ -83,12 +93,73 @@ const AddressCard = (props: {
     }
   };
 
+  const handleSetMainAddress = async () => {
+    try {
+      if (props.isMainAddress)
+        throw new Error(`Current address is already the main address`);
+
+      const payload = new FormData();
+      payload.append('active_address_id', props.$id?.toString());
+
+      await Axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      );
+
+      const userDetailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
+      const getNewUserDetailReq = await Axios.get(userDetailUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const newUserData = getNewUserDetailReq.data.data;
+
+      dispatch(
+        setAuthState({
+          aid: userInfo.aid,
+          email: userInfo.email,
+          name: userInfo.name,
+          gender: userInfo.gender,
+          birthDate: userInfo.birthDate,
+          role: userInfo.role,
+          avatarUrl: userInfo.avatarUrl,
+          isVerified: userInfo.isVerified,
+          isApproved: userInfo.isApproved,
+          activeAddressId: newUserData.active_address_id,
+          addresses: newUserData.addresses,
+        }),
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage: `Sukses merubah ${props.alias} menjadi alamat utama`,
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } catch (error: any) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: error.message
+          ? `${props.alias} sudah menjadi alamat utama`
+          : `Gagal merubah ${props.alias} menjadi alamat utama`,
+        toastType: props.isMainAddress ? 'warning' : 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    }
+  };
+
   return (
     <AddressCardContainer>
       <AddressCardLeftSection>
         <AddressCardHeader>
           <h1>{props.alias}</h1>
-          {props.isMainAddress && (
+          {userInfo.activeAddressId === props.$id && (
             <IsMainAddressBadge>UTAMA</IsMainAddressBadge>
           )}
         </AddressCardHeader>
@@ -98,7 +169,11 @@ const AddressCard = (props: {
 
       <AddressCardRightSection>
         <DeleteICO onClick={handleDelete} />
-        <EditICO />
+        <EditICO onClick={handleOpenUpdateInterface} />
+        <InputSwitch
+          checked={userInfo.activeAddressId === props.$id}
+          onChange={handleSetMainAddress}
+        />
       </AddressCardRightSection>
     </AddressCardContainer>
   );

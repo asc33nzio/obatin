@@ -10,6 +10,7 @@ interface CustomSelectItf {
   $options: Array<any>;
   $onOptionChange: Function;
   $disabled: boolean;
+  $defaultSelected?: string | null;
 }
 
 const CustomSelect = ({
@@ -17,6 +18,7 @@ const CustomSelect = ({
   $options = [],
   $onOptionChange = () => {},
   $disabled = false,
+  $defaultSelected = '',
 }: CustomSelectItf): React.ReactElement => {
   const [isCustomSelectOpen, setIsCustomSelectOpen] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -40,7 +42,12 @@ const CustomSelect = ({
       }
       $disabled={$disabled}
     >
-      {selectedOption || $title}
+      {$defaultSelected
+        ? $defaultSelected
+        : selectedOption
+          ? selectedOption
+          : $title}
+      {/* {selectedOption || $defaultSelected || $title} */}
 
       <CustomSelectStyle $isOpen={isCustomSelectOpen}>
         <CustomOption key='resetOption' onClick={() => handleReset()}>

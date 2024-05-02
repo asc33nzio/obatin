@@ -1,4 +1,8 @@
-const EditICO = (): React.ReactElement => {
+interface EditICOItf {
+  onClick: () => void;
+}
+
+const EditICO: React.FC<EditICOItf> = (props: { onClick: Function }) => {
   return (
     <svg
       width='38'
@@ -6,6 +10,7 @@ const EditICO = (): React.ReactElement => {
       viewBox='0 0 38 38'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
+      onClick={() => props.onClick()}
     >
       <rect
         x='0.5'

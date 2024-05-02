@@ -8,7 +8,7 @@ export const DashboardPageContainer = styled.div<{
 
   width: 99vw;
   max-width: 100vw;
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '125vh' : '200vh')};
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '115vh' : '200vh')};
   overflow-x: hidden;
 `;
 
@@ -17,10 +17,9 @@ export const DashboardPageContentContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
-  padding-top: 50px;
-
   width: 100vw;
-  height: 95%;
+  height: 90%;
+  overflow-y: hidden;
 `;
 
 export const ProfileContainer = styled.div<{ $isDesktopDisplay: boolean }>`

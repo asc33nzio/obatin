@@ -1,7 +1,7 @@
 import { deleteCookie } from 'cookies-next';
 
 const logout = () => {
-  localStorage.clear();
+  sessionStorage.removeItem('auth');
   deleteCookie('access_token');
   deleteCookie('refresh_token');
 };

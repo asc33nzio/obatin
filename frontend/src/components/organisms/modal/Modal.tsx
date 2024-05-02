@@ -10,6 +10,7 @@ import ChangePasswordModalContent from './modalContent/ChangePasswordModalConten
 import CloseICO from '@/assets/icons/CloseICO';
 import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmPasswordModalContent';
 import AddAddressModalContent from './modalContent/AddAddressModalContent';
+import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
 
 export interface ModalPropsItf {
   $overlayHeight?: string;
@@ -65,7 +66,17 @@ const Modal = () => {
       modalContent = <AddAddressModalContent />;
       title = 'Tambahkan Alamat';
       modalProps = {
-        $overlayHeight: '125vh',
+        $overlayHeight: '115vh',
+        $containerWidth: '650px',
+        $containerHeight: '850px',
+      };
+      break;
+
+    case 'update-address':
+      modalContent = <UpdateAddressModalContent />;
+      title = 'Ubah Informasi Alamat';
+      modalProps = {
+        $overlayHeight: '115vh',
         $containerWidth: '650px',
         $containerHeight: '850px',
       };
