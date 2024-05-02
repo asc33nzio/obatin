@@ -18,6 +18,10 @@ export const NavContainer = styled.div`
   margin-bottom: 25px;
 
   border-bottom: 0.5px solid ${COLORS.input_border};
+  @media (max-width: 1440px) {
+    width: 100%;
+    gap: 20px;
+  }
   @media (max-width: 769px) {
     width: 100%;
     padding: 0 0 20px 0;
@@ -41,6 +45,9 @@ export const Left = styled.div`
 
     width: 50%;
     height: 100%;
+  }
+  @media (max-width: 769px) {
+    padding: 0;
   }
   @media (max-width: 769px) {
     padding: 0;
