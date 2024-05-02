@@ -240,9 +240,10 @@ func (u *authentictionUsecaseImpl) RegisterDoctor(ctx context.Context, uReq enti
 		emailParamsRegisterDoctor := util.EmailParams{
 			ToEmail:          user.Email,
 			VerificationLink: "",
-			IsAccepted:       false,
+			IsAccepted:       constant.IsNotAccepted,
 			DefaultPassword:  defaultPassword,
-			IsForgotPassword: false,
+			IsForgotPassword: constant.IsNotForgotPassword,
+			IsReverified:     constant.IsNotReverified,
 		}
 
 		err = u.sendEmail.SendVerificationEmail(emailParamsRegisterDoctor)
@@ -338,20 +339,9 @@ func (u *authentictionUsecaseImpl) VerifyEmail(ctx context.Context, token string
 		return apperror.ErrInvalidToken(nil)
 	}
 
-	user, err := ur.VerifyEmail(ctx, claims.Payload.RandomToken)
+	_, err = ur.VerifyEmail(ctx, claims.Payload.RandomToken)
 	if err != nil {
 		return err
-	}
-
-	if user.Role == constant.RoleDoctor {
-		err = u.SendEmailForgotPasssword(ctx, entity.Authentication{
-			Email: user.Email,
-		})
-		if err != nil {
-			return err
-		}
-
-		return nil
 	}
 
 	return nil
@@ -359,6 +349,10 @@ func (u *authentictionUsecaseImpl) VerifyEmail(ctx context.Context, token string
 
 func (u *authentictionUsecaseImpl) SendVerificationEmail(ctx context.Context) error {
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if !ok {
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
+	}
+	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
@@ -370,7 +364,7 @@ func (u *authentictionUsecaseImpl) SendVerificationEmail(ctx context.Context) er
 	}
 
 	tokenJWT, err := u.jwtAuth.CreateAndSign(
-		util.JWTPayload{RandomToken: token},
+		util.JWTPayload{RandomToken: token, Role: authenticationRole},
 		u.config.JwtVerifyUserExpired(),
 		u.config.JwtSecret(),
 	)
@@ -383,14 +377,15 @@ func (u *authentictionUsecaseImpl) SendVerificationEmail(ctx context.Context) er
 		return err
 	}
 
-	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpoint(), u.config.VerificationLinkBase(), tokenJWT)
+	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.VerificationLinkBase(), tokenJWT)
 
 	emailParamsVerificationEmail := util.EmailParams{
 		ToEmail:          authentication.Email,
 		VerificationLink: verificationLink,
-		IsAccepted:       true,
+		IsAccepted:       constant.IsAccepted,
 		DefaultPassword:  "",
-		IsForgotPassword: false,
+		IsForgotPassword: constant.IsNotForgotPassword,
+		IsReverified:     constant.IsNotReverified,
 	}
 	err = u.sendEmail.SendVerificationEmail(emailParamsVerificationEmail)
 	if err != nil {
@@ -496,14 +491,15 @@ func (u *authentictionUsecaseImpl) UpdateApproval(ctx context.Context, authentic
 
 	authentication, err := ar.UpdateToken(ctx, token, int(authenticationId))
 	if err != nil {
-		verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpoint(), u.config.VerificationLinkBase(), tokenJWT)
+		verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.VerificationLinkBase(), tokenJWT)
 
 		emailParamsApprovalRejected := util.EmailParams{
 			ToEmail:          foundUser.Email,
 			VerificationLink: verificationLink,
-			IsAccepted:       false,
+			IsAccepted:       constant.IsNotAccepted,
 			DefaultPassword:  "",
-			IsForgotPassword: false,
+			IsForgotPassword: constant.IsNotForgotPassword,
+			IsReverified:     constant.IsNotReverified,
 		}
 		err = u.sendEmail.SendVerificationEmail(emailParamsApprovalRejected)
 		if err != nil {
@@ -512,14 +508,15 @@ func (u *authentictionUsecaseImpl) UpdateApproval(ctx context.Context, authentic
 		return apperror.NewInternal(err)
 	}
 
-	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpoint(), u.config.VerificationLinkBase(), tokenJWT)
+	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.VerificationLinkBase(), tokenJWT)
 
 	emailParamsApprovalAccepted := util.EmailParams{
 		ToEmail:          authentication.Email,
 		VerificationLink: verificationLink,
-		IsAccepted:       true,
+		IsAccepted:       constant.IsAccepted,
 		DefaultPassword:  "",
-		IsForgotPassword: false,
+		IsForgotPassword: constant.IsNotForgotPassword,
+		IsReverified:     constant.IsNotReverified,
 	}
 	err = u.sendEmail.SendVerificationEmail(emailParamsApprovalAccepted)
 	if err != nil {
@@ -592,13 +589,14 @@ func (u *authentictionUsecaseImpl) SendEmailForgotPasssword(ctx context.Context,
 			return err
 		}
 
-		verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpoint(), u.config.VerificationLinkBase(), tokenJWT)
+		verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.VerificationLinkBase(), tokenJWT)
 		emailParamsResetPassword := util.EmailParams{
 			ToEmail:          uReq.Email,
 			VerificationLink: verificationLink,
-			IsAccepted:       true,
+			IsAccepted:       constant.IsAccepted,
 			DefaultPassword:  "",
-			IsForgotPassword: true,
+			IsForgotPassword: constant.IsForgotPassword,
+			IsReverified:     constant.IsNotReverified,
 		}
 		err = u.sendEmail.SendVerificationEmail(emailParamsResetPassword)
 		if err != nil {
@@ -628,14 +626,15 @@ func (u *authentictionUsecaseImpl) SendEmailForgotPasssword(ctx context.Context,
 		return err
 	}
 
-	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpoint(), u.config.VerificationLinkBase(), tokenJWT)
+	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.VerificationLinkBase(), tokenJWT)
 
 	emailParamsResetPassword := util.EmailParams{
 		ToEmail:          uReq.Email,
 		VerificationLink: verificationLink,
-		IsAccepted:       true,
+		IsAccepted:       constant.IsAccepted,
 		DefaultPassword:  "",
-		IsForgotPassword: true,
+		IsForgotPassword: constant.IsForgotPassword,
+		IsReverified:     constant.IsNotReverified,
 	}
 	err = u.sendEmail.SendVerificationEmail(emailParamsResetPassword)
 	if err != nil {
@@ -658,7 +657,7 @@ func (u *authentictionUsecaseImpl) ResendVerificationEmail(ctx context.Context, 
 		return err
 	}
 	tokenJWT, err := u.jwtAuth.CreateAndSign(
-		util.JWTPayload{RandomToken: token},
+		util.JWTPayload{RandomToken: token, Role: user.Role},
 		u.config.JwtVerifyUserExpired(),
 		u.config.JwtSecret(),
 	)
@@ -670,14 +669,15 @@ func (u *authentictionUsecaseImpl) ResendVerificationEmail(ctx context.Context, 
 		return err
 	}
 
-	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpoint(), u.config.VerificationLinkBase(), tokenJWT)
+	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.VerificationLinkBase(), tokenJWT)
 
 	emailParamsResendVerification := util.EmailParams{
 		ToEmail:          authentication.Email,
 		VerificationLink: verificationLink,
-		IsAccepted:       true,
+		IsAccepted:       constant.IsAccepted,
 		DefaultPassword:  "",
-		IsForgotPassword: false,
+		IsForgotPassword: constant.IsNotForgotPassword,
+		IsReverified:     constant.IsReverified,
 	}
 
 	err = u.sendEmail.SendVerificationEmail(emailParamsResendVerification)

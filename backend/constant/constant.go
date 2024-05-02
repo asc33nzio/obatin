@@ -23,6 +23,7 @@ const (
 	EmailTypeRejected          = "rejected"
 	EmailTypePasswordTemporary = "temporary"
 	EmailForgotPassword        = "forgot"
+	EmailReverifyAccount       = "reverify"
 	AvatarImageFormKey         = "avatar"
 	ErrorTokenIsExpired        = "token is expired"
 	HasVerified                = true
@@ -34,4 +35,10 @@ const (
 	RegexDigitCase             = "[0-9]"
 	IsOnline                   = true
 	IsNotOnline                = false
+	IsAccepted                 = true
+	IsNotAccepted              = false
+	IsReverified               = true
+	IsNotReverified            = false
+	IsForgotPassword           = true
+	IsNotForgotPassword        = false
 )

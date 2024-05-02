@@ -286,7 +286,7 @@ func (r *authenticationRepositoryPostgres) UpdateApproval(ctx context.Context, a
 		UPDATE 
 			authentications
 		SET 
-			is_approved = $2,
+			is_approved = $2
 		WHERE 
 			id = $1 
 		AND 
