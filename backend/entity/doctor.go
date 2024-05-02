@@ -9,7 +9,6 @@ type Doctor struct {
 	Specialization            int64
 	Name                      string
 	Avatar                    string
-	IsOnline                  bool
 	Experiences               int
 	Certificate               string
 	Fee                       int64
@@ -20,6 +19,7 @@ type Doctor struct {
 	SpecializationName        string
 	SpecializationDescription string
 	Email                     string
+	IsOnline                  bool
 }
 
 type DoctorDetail struct {
@@ -47,6 +47,20 @@ type DoctorList struct {
 	Opening          string
 	OperationalHours string
 	OperationalDays  string
+}
+
+type DoctorProfile struct {
+	SpecializationName string
+	Email              string
+	Name               string
+	Avatar             string
+	IsOnline           bool
+	Experiences        int
+	Certificate        string
+	Fee                int64
+	Opening            string
+	OperationalHours   string
+	OperationalDays    string
 }
 
 type DoctorUpdateRequest struct {

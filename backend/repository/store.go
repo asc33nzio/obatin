@@ -19,6 +19,8 @@ type RepoStore interface {
 	RefreshTokenRepository() RefreshTokenRepository
 	PartnerRepository() PartnerRepository
 	AddressRepository() AddressRepository
+	ChatRoomRepository() ChatRoomRepository
+	MessageRepository() MessageRepository
 }
 
 type dbStore struct {
@@ -113,6 +115,18 @@ func (s *dbStore) PartnerRepository() PartnerRepository {
 }
 func (s *dbStore) AddressRepository() AddressRepository {
 	return &addressRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) ChatRoomRepository() ChatRoomRepository {
+	return &chatRoomRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) MessageRepository() MessageRepository {
+	return &messageRepositoryPostgres{
 		db: s.querier,
 	}
 }

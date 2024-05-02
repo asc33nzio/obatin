@@ -105,7 +105,7 @@ func (r *partnerRepositoryPostgres) GetPartnerList(ctx context.Context, params e
 		WHERE
 			p.deleted_at IS NULL
 	`)
-	
+
 	queryParams, paramsData := convertPartnerQueryParamstoSql(params)
 	sb.WriteString(queryParams)
 	data = append(data, paramsData...)

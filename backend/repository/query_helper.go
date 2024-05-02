@@ -2,7 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"log"
 	"obatin/constant"
 	"obatin/entity"
 	"strings"
@@ -119,23 +118,27 @@ func convertUpdateDoctorQueryParamstoSql(params entity.DoctorUpdateRequest, id i
 		args = append(args, *params.Opening)
 		countParams++
 	}
-	if *params.OperationalHours != "" {
-		if countParams > 1 {
-			query.WriteString(",")
+	if params.OperationalHours != nil {
+		if *params.OperationalHours != "" {
+			if countParams > 1 {
+				query.WriteString(",")
+			}
+			query.WriteString(fmt.Sprintf("operational_hours = $%d ", countParams))
+			args = append(args, *params.OperationalHours)
+			countParams++
 		}
-		query.WriteString(fmt.Sprintf("operational_hours = $%d ", countParams))
-		args = append(args, *params.OperationalHours)
-		countParams++
 	}
-	if *params.OperationalDays != "" {
-		if countParams > 1 {
-			query.WriteString(",")
+	if params.OperationalDays != nil {
+		if *params.OperationalDays != "" {
+			if countParams > 1 {
+				query.WriteString(",")
+			}
+			query.WriteString(fmt.Sprintf("operational_days = $%d ", countParams))
+			args = append(args, *params.OperationalDays)
+			countParams++
 		}
-		log.Println(*params.OperationalDays)
-		query.WriteString(fmt.Sprintf("operational_days = $%d ", countParams))
-		args = append(args, *params.OperationalDays)
-		countParams++
 	}
+
 	query.WriteString(
 		fmt.Sprintf(`
 		, updated_at = NOW()
@@ -184,8 +187,13 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 		filters = append(filters, &params.Classification)
 		countParams++
 	}
-
-	query.WriteString(` AND p.deleted_at IS NULL `)
+	if countParams > constant.StartingParamsCount {
+		query.WriteString(` AND `)
+	}
+	if countParams == constant.StartingParamsCount {
+		query.WriteString(` WHERE `)
+	}
+	query.WriteString(` p.deleted_at IS NULL `)
 
 	if params.SortBy != nil {
 		if *params.SortBy == constant.SortByName {
@@ -248,8 +256,13 @@ func ConvertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interf
 		filters = append(filters, &params.Specialization)
 		countParams++
 	}
-
-	query.WriteString(` AND d.deleted_at IS NULL `)
+	if countParams > constant.StartingParamsCount {
+		query.WriteString(` AND `)
+	}
+	if countParams == constant.StartingParamsCount {
+		query.WriteString(` WHERE `)
+	}
+	query.WriteString(` d.deleted_at IS NULL `)
 
 	if params.SortBy != nil {
 		if *params.SortBy == constant.SortByName {

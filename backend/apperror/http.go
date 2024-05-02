@@ -40,6 +40,14 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusBadRequest
 	case ErrorCategoryNotFound:
 		return http.StatusBadRequest
+	case ErrorUserNotFound:
+		return http.StatusBadRequest
+	case ErrorChatRoomNotFound:
+		return http.StatusBadRequest
+	case ErrorChatRoomAlreadyExist:
+		return http.StatusConflict
+	case ErrorChatRoomAlreadyInactive:
+		return http.StatusBadRequest
 	case ErrorDoctorNotFound:
 		return http.StatusNotFound
 	case AddressNotFound:

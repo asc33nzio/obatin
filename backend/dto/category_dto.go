@@ -28,11 +28,11 @@ type CategorySlugParam struct {
 }
 
 type CategoryUpdateRequest struct {
-	Name     *string         `form:"name" binding:"omitempty"`
-	Slug     *string         `form:"category_slug" binding:"omitempty"`
-	ParentId *int64          `form:"parent_id" binding:"omitempty"`
-	HasChild *bool           `form:"has_child" binding:"omitempty"`
-	Level    *int            `form:"level" binding:"omitempty,min=1,max=3"`
+	Name     *string `form:"name" binding:"omitempty"`
+	Slug     *string `form:"category_slug" binding:"omitempty"`
+	ParentId *int64  `form:"parent_id" binding:"omitempty"`
+	HasChild *bool   `form:"has_child" binding:"omitempty"`
+	Level    *int    `form:"level" binding:"omitempty,min=1,max=3"`
 }
 
 func ToCategoryResponse(c *entity.Category) CategoryResponse {
@@ -66,8 +66,8 @@ func (c CategoryUpdateRequest) ToCategoryUpdateBodyEntity(image multipart.File) 
 		HasChild: c.HasChild,
 		Level:    c.Level,
 	}
-	if image!= nil {
-        res.ImageUrl = &image
-    }
+	if image != nil {
+		res.ImageUrl = &image
+	}
 	return res
 }

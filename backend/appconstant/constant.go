@@ -9,5 +9,7 @@ const (
 	CategoryLevel2Int   = 2
 	CategoryLevel3Int   = 3
 	DefaultPartnerLimit = 10
+	DefaultDoctorLimit  = 10
+	DoctorOnlineTrue    = true
 	RFC3339TimeFormat   = "2006-01-02"
 )

@@ -44,6 +44,20 @@ type DoctorDetailResponse struct {
 	OperationalDays    string `json:"operational_days"`
 }
 
+type DoctorProfileResponse struct {
+	SpecializationName string   `json:"specialization,omitempty"`
+	Email              string   `json:"email"`
+	Name               string   `json:"name"`
+	Avatar             string   `json:"avatar_url"`
+	IsOnline           bool     `json:"is_online"`
+	Experiences        int      `json:"experiences"`
+	Certificate        string   `json:"certificate"`
+	Fee                int64    `json:"fee"`
+	Opening            string   `json:"opening_time"`
+	OperationalHours   string   `json:"operational_hours"`
+	OperationalDays    []string `json:"operational_days"`
+}
+
 type DoctorUpdateRequest struct {
 	Name             *string `form:"name" binding:"omitempty"`
 	IsOnline         *bool   `form:"is_online" binding:"omitempty"`
@@ -139,5 +153,25 @@ func (d DoctorFilter) ToDoctorFilterEntity() entity.DoctorFilter {
 		Order:          d.Order,
 		Page:           d.Page,
 		Limit:          d.Limit,
+	}
+}
+
+func ToDoctorProfileResponse(doctor *entity.Doctor) DoctorProfileResponse {
+	operationalDays := doctor.OperationalDays
+	operationalDays = strings.Replace(operationalDays, "{", "", -1)
+	operationalDays = strings.Replace(operationalDays, "}", "", -1)
+	operationalDaysSlice := strings.Split(operationalDays, ",")
+	return DoctorProfileResponse{
+		SpecializationName: doctor.SpecializationName,
+		Email:              doctor.Email,
+		Name:               doctor.Name,
+		Avatar:             doctor.Avatar,
+		IsOnline:           doctor.IsOnline,
+		Experiences:        doctor.Experiences,
+		Certificate:        doctor.Certificate,
+		Fee:                doctor.Fee,
+		Opening:            doctor.Opening,
+		OperationalHours:   doctor.OperationalHours,
+		OperationalDays:    operationalDaysSlice,
 	}
 }
