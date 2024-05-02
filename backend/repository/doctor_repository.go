@@ -206,13 +206,18 @@ func (r *doctorRepositoryPostgres) FindDoctorByAuthId(ctx context.Context, authI
 		d.opening_time,
 		d.operational_hours,
 		d.operational_days,
-		a.email
+		a.email,
+		sp.name
 	FROM
 		doctors d 
 	JOIN
 		authentications a
 	ON
 		a.id = d.authentication_id
+	JOIN
+		doctor_specializations sp
+	ON
+		d.doctor_specialization_id = sp.id
 	WHERE
 		authentication_id = $1
 	`
@@ -233,6 +238,7 @@ func (r *doctorRepositoryPostgres) FindDoctorByAuthId(ctx context.Context, authI
 		&doctor.OperationalHours,
 		&doctor.OperationalDays,
 		&doctor.Email,
+		&doctor.SpecializationName,
 	)
 
 	if err != nil {

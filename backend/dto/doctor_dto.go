@@ -45,9 +45,9 @@ type DoctorDetailResponse struct {
 }
 
 type DoctorProfileResponse struct {
-	SpecializationName string   `json:"specialization,omitempty"`
 	Email              string   `json:"email"`
 	Name               string   `json:"name"`
+	SpecializationName string   `json:"specialization,omitempty"`
 	Avatar             string   `json:"avatar_url"`
 	IsOnline           bool     `json:"is_online"`
 	Experiences        int      `json:"experiences"`
