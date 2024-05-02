@@ -33,9 +33,26 @@ export interface AuthReduxItf {
   isVerified: boolean;
   isApproved: boolean;
   avatarUrl: string;
-  specialization?: string | undefined | null;
   activeAddressId?: number | null;
   addresses?: Array<AddressApiItf>;
+}
+
+export interface AuthDoctorReduxItf {
+  aid: number;
+  email: string;
+  name: string;
+  role: Role;
+  isVerified: boolean;
+  isApproved: boolean;
+  avatarUrl: string;
+  specialization: string;
+  isOnline: boolean;
+  experience: number;
+  certificate: string;
+  fee: number;
+  openingTime: string;
+  operationalHours: string;
+  operationalDays: Array<string>;
 }
 
 export interface RajaOngkirProvinceItf {

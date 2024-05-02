@@ -276,7 +276,7 @@ const RegisterForm = (): React.ReactElement => {
 
       setToast({
         showToast: true,
-        toastMessage: 'Berhasil mendaftar. Tolong cek e-mail anda',
+        toastMessage: 'Silahkan cek e-mail anda untuk mendapatkan kata sandi',
         toastType: 'ok',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',

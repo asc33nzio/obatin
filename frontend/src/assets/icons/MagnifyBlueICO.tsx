@@ -1,4 +1,4 @@
-const MagnifyBlueICO: React.FC<MagnifyBlueICOProps> = () => {
+const MagnifyBlueICO: React.FC = () => {
   return (
     <svg
       width='32'

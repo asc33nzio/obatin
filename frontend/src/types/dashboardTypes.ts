@@ -1,4 +1,4 @@
-import { Gender } from '@/types/authTypes';
+import { Gender } from './reduxTypes';
 
 // export type datePickerData = Date | null;
 // export type DatePickerType = datePickerData | [datePickerData, datePickerData];

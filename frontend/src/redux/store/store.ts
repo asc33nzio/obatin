@@ -2,6 +2,7 @@ import { useDispatch, TypedUseSelectorHook, useSelector } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import { authReducer } from '@/redux/reducers/authSlice';
+import { authDoctorReducer } from '../reducers/authDoctorSlice';
 import { provincesReducer } from '../reducers/provincesSlice';
 import { encryptTransform } from 'redux-persist-transform-encrypt';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
@@ -47,6 +48,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  authDoctor: authDoctorReducer,
   provinces: provincesReducer,
 });
 
@@ -66,6 +68,7 @@ export const persistor = persistStore(store);
 export const createPreloadedState = (customState: Partial<RootState>) => {
   return {
     auth: { ...store.getState().auth, ...customState.auth },
+    authDoctor: { ...store.getState().authDoctor, ...customState.authDoctor },
     provinces: { ...store.getState().provinces, ...customState.provinces },
   };
 };

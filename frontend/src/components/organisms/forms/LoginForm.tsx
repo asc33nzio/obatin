@@ -11,9 +11,9 @@ import {
 } from '@/styles/pages/auth/Auth.styles';
 import {
   navigateToUserDashboard,
+  navigateToDoctorDashboard,
   navigateToForgotPassword,
   navigateToRegister,
-  navigateToLogin,
 } from '@/app/actions';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
@@ -23,6 +23,7 @@ import { useObatinDispatch } from '@/redux/store/store';
 import { useState } from 'react';
 import { setCookie } from 'cookies-next';
 import { setAuthState } from '@/redux/reducers/authSlice';
+import { setAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedJwtItf } from '@/types/jwtTypes';
 import { PropagateLoader } from 'react-spinners';
@@ -78,6 +79,7 @@ const LoginForm = (): React.ReactElement => {
       const decoded: DecodedJwtItf = jwtDecode(access_token);
       const userRole = decoded.Payload.role;
       const authId = decoded.Payload.aid;
+
       const isVerified = decoded.Payload.is_verified;
       const isApproved = decoded.Payload.is_approved;
 
@@ -142,7 +144,7 @@ const LoginForm = (): React.ReactElement => {
 
       if (userRole === 'doctor') {
         const doctorDetailResponse = await Axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/${authId}`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/details`,
           {
             headers: { Authorization: `Bearer ${access_token}` },
           },
@@ -150,28 +152,26 @@ const LoginForm = (): React.ReactElement => {
 
         const doctorData = doctorDetailResponse.data.data;
         dispatch(
-          setAuthState({
+          setAuthDoctorState({
             aid: authId,
             email: doctorData.email,
             name: doctorData.name,
-            gender: 'laki-laki',
-            birthDate: doctorData.birth_date,
             role: 'doctor',
-            avatarUrl: doctorData.avatar_url,
             isVerified: isVerified,
             isApproved: isApproved,
+            avatarUrl: doctorData.avatar_url,
             specialization: doctorData.specialization,
+            isOnline: doctorData.is_online,
+            experience: doctorData.experience,
+            certificate: doctorData.certificate,
+            fee: doctorData.fee,
+            openingTime: doctorData.opening_time,
+            operationalHours: doctorData.operational_hours,
+            operationalDays: doctorData.operational_days,
           }),
         );
 
-        setToast({
-          showToast: true,
-          toastMessage: 'Silahkan cek e-mail anda untuk mendapatkan kata sandi',
-          toastType: 'ok',
-          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-          orientation: 'center',
-        });
-        navigateToLogin();
+        navigateToDoctorDashboard();
       }
 
       setToast({

@@ -7,17 +7,19 @@ import { decodeJWT } from './utils/decodeJWT';
 const publicRoutes = ['/', '/shop'];
 const authRoutes = ['/auth/login', '/auth/register'];
 const protectedRoutes = [
-  '/dashboard/user',
-  'dashboard/user/transactions',
-  'dashboard/doctor',
+  '/dashboard/user/',
+  '/dashboard/user/transactions',
+  '/dashboard/doctor',
 ];
-const userOnlyRoutes = ['/dashboard/user', 'dashboard/transactions'];
+const userOnlyRoutes = ['/dashboard/user', '/dashboard/user/transactions'];
 const doctorOnlyRoutes = ['/dashboard/doctor'];
 
 export default async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   //! Redirect URL definitions
+  // const redirectToHome = new URL('/', request.nextUrl.href).toString();
+
   const redirectToLogin = new URL(
     '/auth/login',
     request.nextUrl.href,
@@ -35,7 +37,6 @@ export default async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(path);
-
   // eslint-disable-next-line
   const isPublicRoute = publicRoutes.includes(path);
   const isAuthRoute = authRoutes.includes(path);
