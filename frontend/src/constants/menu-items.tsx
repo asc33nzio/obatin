@@ -29,12 +29,12 @@ const MENU_USER: MenuOption[] = [
   {
     name: 'Products',
     icon: ProductICO,
-    url: '/shop/products',
+    url: '/products',
   },
   {
     name: 'Cart',
     icon: CartICO,
-    url: '/shop/products',
+    url: '/shop/cart',
   },
   {
     name: 'Order History',

@@ -20,6 +20,12 @@ export const SearchContainer = styled.div`
     cursor: pointer;
     object-fit: cover;
   }
+  @media (max-width: 1440px) {
+    width: 60vh;
+  }
+  @media (max-width: 768px) {
+    width: 45vh;
+  }
 `;
 
 export const SearchInput = styled.input`

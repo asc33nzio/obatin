@@ -105,10 +105,13 @@ const ProductsPage = () => {
               categories={categories}
               setCategoryId={setCategoryId}
             />
+            <CategoryComponent
+              categories={categories}
+              setCategoryId={setCategoryId}
+            />
           </CategoryContainer>
           <ProductContent>
             <FilterContainer>
-              <h2>Products: </h2>
               <FilterComponent
                 setSortBy={setSortBy}
                 setClassification={setClassification}
@@ -136,7 +139,34 @@ const ProductsPage = () => {
                   />
                 </ProductCard>
               ))}
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  onClick={() => handleProductClicked(product.product_slug)}
+                >
+                  <Imagecontainer src={product.image_url} alt='banner' />
+                  <Bold>{product.name}</Bold>
+                  <Smallfont>{product.selling_unit}</Smallfont>
+                  <Price>
+                    Rp{product?.min_price.toLocaleString()} - Rp
+                    {product?.max_price.toLocaleString()}
+                  </Price>
+                  <CustomButton
+                    $width='90px'
+                    $height='32px'
+                    content='Add to Cart'
+                    $fontSize='12px'
+                  />
+                </ProductCard>
+              ))}
             </ProductListContainer>
+            <CustomButton
+              onClick={handleLoadMore}
+              disabled={loading}
+              content='load more'
+              $width='150px'
+              $fontSize='18px'
+            />
             <CustomButton
               onClick={handleLoadMore}
               disabled={loading}

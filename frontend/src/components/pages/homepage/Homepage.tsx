@@ -1,17 +1,12 @@
 'use client';
 import 'swiper/css';
-import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import {
   Body,
   NewSection,
   Fitur,
   FiturContainer,
-  Imagecontainer,
   Title,
-  ProductCard,
-  Bold,
-  Smallfont,
   PopularContainer,
   CategoryContent,
 } from '@/styles/pages/homepage/Homepage.styles';
@@ -29,6 +24,15 @@ import CustomButton from '@/components/atoms/button/CustomButton';
 import { Container } from '@/styles/Global.styles';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ProductListContainer } from '@/styles/pages/product/ProductListPage.styles';
+import { useRouter } from 'next/navigation';
+import {
+  Bold,
+  Imagecontainer,
+  Price,
+  ProductCard,
+  Smallfont,
+} from '@/styles/pages/product/ProductCard.styles';
 
 const CategoryImg = [
   'https://d2qjkwm11akmwu.cloudfront.net/categories/42753_12-4-2023_9-48-50.png',
@@ -51,6 +55,7 @@ const CategoryImg = [
 
 const Homepage = (): React.ReactElement => {
   const [products, setProducts] = useState<ProductType[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,7 +63,7 @@ const Homepage = (): React.ReactElement => {
         const { data: response } = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?limit=5`,
         );
-        setProducts((prevProducts) => [...prevProducts, ...response.data]);
+        setProducts(() => [...response.data]);
       } catch (error) {
         console.error(error);
       }
@@ -67,83 +72,97 @@ const Homepage = (): React.ReactElement => {
     fetchData();
   }, []);
 
+  const handleProductClicked = (slug: string) => {
+    router.push(`products/${slug}`);
+  };
+
   return (
     <>
       <Container>
         <Navbar />
-        <Body>
-          <Banner />
-          <FiturContainer>
-            <Fitur>
-              <Image priority src={konsul} alt='obatin' height={150} />
-              <p>Konsultasi Dokter</p>
-            </Fitur>
-            <Fitur>
-              <Image priority src={toko} alt='obatin' height={150} />
-              <p>Toko Kesehatan</p>
-            </Fitur>
-          </FiturContainer>
-          <NewSection>
-            <Title>KATEGORI</Title>
-            <CategoryContent>
-              <Swiper
-                cssMode={true}
-                navigation={true}
-                pagination={true}
-                scrollbar={true}
-                mousewheel={true}
-                modules={[Navigation, Pagination, Mousewheel, Keyboard]}
-                breakpoints={{
-                  320: {
-                    slidesPerView: 1,
-                  },
-                  630: {
-                    slidesPerView: 2,
-                  },
-                  1400: {
-                    slidesPerView: 7,
-                  },
-                }}
-                style={
-                  {
-                    '--swiper-pagination-color': '#00B5C0',
-                    '--swiper-navigation-color': '#00B5C0',
-                    '--align-content': 'center',
-                  } as CSSProperties
-                }
-              >
-                {CategoryImg.map((image, i) => {
-                  return (
-                    <SwiperSlide key={i} style={{ padding: '2rem' }}>
-                      <Imagecontainer src={image} alt='banner' />
-                    </SwiperSlide>
-                  );
-                })}
-              </Swiper>
-            </CategoryContent>
-          </NewSection>
-          <NewSection>
-            <Title>POPULAR</Title>
-            <PopularContainer>
-              {products.map((product, i) => {
-                return (
-                  <ProductCard key={i}>
-                    <Imagecontainer src={product.image_url} alt='banner' />
-                    <Bold>{product.name}</Bold>
-                    <Smallfont>{product.selling_unit}</Smallfont>
-                    <p>{product.min_price}</p>
-                    <CustomButton
-                      $width='90px'
-                      $height='32px'
-                      content='Add to Cart'
-                      $fontSize='12px'
-                    />
-                  </ProductCard>
-                );
-              })}
-            </PopularContainer>
-          </NewSection>
-        </Body>
+        <Container>
+          <Body>
+            <Banner />
+            <FiturContainer>
+              <Fitur>
+                <Image priority src={konsul} alt='obatin' height={150} />
+                <p>Konsultasi Dokter</p>
+              </Fitur>
+              <Fitur>
+                <Image priority src={toko} alt='obatin' height={150} />
+                <p>Toko Kesehatan</p>
+              </Fitur>
+            </FiturContainer>
+            <NewSection>
+              <Title>KATEGORI</Title>
+              <CategoryContent>
+                <CategoryContent>
+                  <Swiper
+                    cssMode={true}
+                    navigation={true}
+                    pagination={true}
+                    scrollbar={true}
+                    mousewheel={true}
+                    modules={[Navigation, Pagination, Mousewheel, Keyboard]}
+                    breakpoints={{
+                      320: {
+                        slidesPerView: 1,
+                      },
+                      768: {
+                        slidesPerView: 3,
+                      },
+                      1400: {
+                        slidesPerView: 7,
+                      },
+                    }}
+                    style={
+                      {
+                        '--swiper-pagination-color': '#00B5C0',
+                        '--swiper-navigation-color': '#00B5C0',
+                        '--align-content': 'center',
+                      } as CSSProperties
+                    }
+                  >
+                    {CategoryImg.map((image, i) => {
+                      return (
+                        <SwiperSlide key={i} style={{ padding: '2rem' }}>
+                          <Imagecontainer src={image} alt='banner' />
+                        </SwiperSlide>
+                      );
+                    })}
+                  </Swiper>
+                </CategoryContent>
+              </CategoryContent>
+            </NewSection>
+            <NewSection>
+              <Title>POPULAR</Title>
+              <PopularContainer>
+                <ProductListContainer>
+                  {products.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      onClick={() => handleProductClicked(product.product_slug)}
+                    >
+                      <Imagecontainer src={product.image_url} alt='banner' />
+                      <Bold>{product.name}</Bold>
+                      <Smallfont>{product.selling_unit}</Smallfont>
+                      <Price>
+                        Rp{product?.min_price.toLocaleString()} - Rp
+                        {product?.max_price.toLocaleString()}
+                      </Price>
+                      <CustomButton
+                        $width='90px'
+                        $height='32px'
+                        content='Add to Cart'
+                        $fontSize='12px'
+                      />
+                    </ProductCard>
+                  ))}
+                </ProductListContainer>
+              </PopularContainer>
+            </NewSection>
+          </Body>
+        </Container>
       </Container>
 
       <Footer />
