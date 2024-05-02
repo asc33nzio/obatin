@@ -19,7 +19,7 @@ const (
 	EndpointUserDetails              = "/users/:authentication_id"
 	EndpointGetDoctorList            = "/doctors"
 	EndpointGetDoctorDetail          = "/doctors/:doctor_id"
-	EndpointGetDoctorDetailUser      = "/public/doctors/:doctor_id"
+	EndpointGetDoctorProfileDetail   = "/doctors/details"
 	EndpointRefreshToken             = "/auth/refresh-token"
 	EndpointRegisterPartner          = "/auth/register/partners"
 	EndpointGetPartnerList           = "/partners"

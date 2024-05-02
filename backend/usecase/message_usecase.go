@@ -98,6 +98,10 @@ func (u *messageUsecaseImpl) CreateMessage(ctx context.Context, mReq entity.Mess
 	if err != nil {
 		return apperror.ErrInvalidReq(nil)
 	}
+	err = crr.UpdateChatRoomUpdatedAtByID(ctx, chatRoom.Id)
+	if err != nil {
+		return apperror.ErrInvalidReq(nil)
+	}
 
 	return nil
 }

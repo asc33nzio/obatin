@@ -121,7 +121,6 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.GET(appconstant.EndpointGetProductDetail, h.ProductHandler.GetProductDetailBySlug)
 	r.GET(appconstant.EndPointAllCategories, h.CategoryHandler.GetAllCategory)
 	r.GET(appconstant.EndpointGetDoctorList, h.DoctorHandler.GetAllDoctor)
-	r.GET(appconstant.EndpointGetDoctorDetailUser, h.DoctorHandler.GetDoctorDetailbyId)
 	r.PATCH(appconstant.EndpointUpdatePassword, h.AuthenticationHandler.UpdatePassword)
 	r.POST(appconstant.EndpointForgotPassword, h.AuthenticationHandler.SendVerifyForgotPassword)
 	r.GET(appconstant.EndpointGetDoctorSpecialization, h.DoctorSpecializationHandler.GetAll)
@@ -130,7 +129,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.Use(h.Middleware.JWTAuth)
 
 	r.PATCH(appconstant.EndpointGetDoctorDetail, h.DoctorHandler.UpdateOneDoctor)
-	r.GET(appconstant.EndpointGetDoctorDetail, h.DoctorHandler.GetDoctorDetailbyId)
+	r.GET(appconstant.EndpointGetDoctorProfileDetail, h.DoctorHandler.GetDoctorDetailbyAuthId)
 	r.POST(appconstant.EndpointSendVerifyToEmail, h.AuthenticationHandler.SendVerifyToEmail)
 	r.POST(appconstant.EndpointApproval, h.AuthenticationHandler.UpdateApproval)
 	r.GET(appconstant.EndpointGetDoctorPendingApproval, h.AuthenticationHandler.GetPendingDoctorApproval)

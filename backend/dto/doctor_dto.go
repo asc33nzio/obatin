@@ -37,11 +37,25 @@ type DoctorDetailResponse struct {
 	Avatar             string `json:"avatar_url"`
 	IsOnline           bool   `json:"is_online"`
 	Experiences        int    `json:"experiences"`
-	Certificate        string `json:"certificate,omitempty"`
+	Certificate        string `json:"certificate"`
 	Fee                int64  `json:"fee"`
 	Opening            string `json:"opening_time"`
 	OperationalHours   string `json:"operational_hours"`
 	OperationalDays    string `json:"operational_days"`
+}
+
+type DoctorProfileResponse struct {
+	SpecializationName string   `json:"specialization,omitempty"`
+	Email              string   `json:"email"`
+	Name               string   `json:"name"`
+	Avatar             string   `json:"avatar_url"`
+	IsOnline           bool     `json:"is_online"`
+	Experiences        int      `json:"experiences"`
+	Certificate        string   `json:"certificate"`
+	Fee                int64    `json:"fee"`
+	Opening            string   `json:"opening_time"`
+	OperationalHours   string   `json:"operational_hours"`
+	OperationalDays    []string `json:"operational_days"`
 }
 
 type DoctorUpdateRequest struct {
@@ -142,38 +156,22 @@ func (d DoctorFilter) ToDoctorFilterEntity() entity.DoctorFilter {
 	}
 }
 
-type DoctorListResponseChat struct {
-	Id                        int64  `json:"id"`
-	AuthenticationId          int64  `json:"authentication_id"`
-	Name                      string `json:"name"`
-	Avatar                    string `json:"avatar_url,omitempty"`
-	IsOnline                  bool   `json:"is_online,omitempty"`
-	Experiences               int    `json:"experiences,omitempty"`
-	Certificate               string `json:"certificate_url,omitempty"`
-	Fee                       int64  `json:"fee,omitempty"`
-	Opening                   string `json:"opening_time,omitempty"`
-	OperationalHours          string `json:"operational_hours,omitempty"`
-	OperationalDays           string `json:"operational_days,omitempty"`
-	Specializations           int64  `json:"doctor_specialization_id,omitempty"`
-	SpecializationName        string `json:"doctor_specialization_name,omitempty"`
-	SpecializationDescription string `json:"doctor_specialization_description,omitempty"`
-}
-
-func ToDoctorDetailRes(u *entity.Doctor) DoctorListResponseChat {
-	return DoctorListResponseChat{
-		Id:                        u.Id,
-		AuthenticationId:          u.AuthenticationID,
-		Name:                      u.Name,
-		Avatar:                    u.Avatar,
-		IsOnline:                  u.IsOnline,
-		Experiences:               u.Experiences,
-		Certificate:               u.Certificate,
-		Fee:                       u.Fee,
-		Opening:                   u.Opening,
-		OperationalHours:          u.OperationalHours,
-		OperationalDays:           u.OperationalDays,
-		Specializations:           u.Specialization,
-		SpecializationName:        u.SpecializationName,
-		SpecializationDescription: u.SpecializationDescription,
+func ToDoctorProfileResponse(doctor *entity.Doctor) DoctorProfileResponse {
+	operationalDays := doctor.OperationalDays
+	operationalDays = strings.Replace(operationalDays, "{", "", -1)
+	operationalDays = strings.Replace(operationalDays, "}", "", -1)
+	operationalDaysSlice := strings.Split(operationalDays, ",")
+	return DoctorProfileResponse{
+		SpecializationName: doctor.SpecializationName,
+		Email:              doctor.Email,
+		Name:               doctor.Name,
+		Avatar:             doctor.Avatar,
+		IsOnline:           doctor.IsOnline,
+		Experiences:        doctor.Experiences,
+		Certificate:        doctor.Certificate,
+		Fee:                doctor.Fee,
+		Opening:            doctor.Opening,
+		OperationalHours:   doctor.OperationalHours,
+		OperationalDays:    operationalDaysSlice,
 	}
 }

@@ -196,17 +196,23 @@ func (r *doctorRepositoryPostgres) FindDoctorByAuthId(ctx context.Context, authI
 
 	queryFindUser := `
 	SELECT 
-		id,
-		name,
-		avatar_url,
-		is_online,
-		experience_years,
-		certificate_url,
-		fee,
-		opening_time,
-		operational_hours
+		d.id,
+		d.name,
+		d.avatar_url,
+		d.is_online,
+		d.experience_years,
+		d.certificate_url,
+		d.fee,
+		d.opening_time,
+		d.operational_hours,
+		d.operational_days,
+		a.email
 	FROM
-		doctors
+		doctors d 
+	JOIN
+		authentications a
+	ON
+		a.id = d.authentication_id
 	WHERE
 		authentication_id = $1
 	`
@@ -225,13 +231,14 @@ func (r *doctorRepositoryPostgres) FindDoctorByAuthId(ctx context.Context, authI
 		&doctor.Fee,
 		&doctor.Opening,
 		&doctor.OperationalHours,
+		&doctor.OperationalDays,
+		&doctor.Email,
 	)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, apperror.ErrDoctorNotFound(err)
 		}
-
 		return nil, apperror.NewInternal(err)
 	}
 

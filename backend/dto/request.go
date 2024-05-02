@@ -45,10 +45,6 @@ type PartnerRegisterReq struct {
 	Name     string `form:"name" binding:"required"`
 }
 
-type IdUriParam struct {
-	Id string `uri:"doctor_id" binding:"required"`
-}
-
 type MessageReq struct {
 	Message    string `json:"message" binding:"required"`
 	ChatRoomId int64  `json:"chat_room_id" binding:"required"`
