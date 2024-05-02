@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
 	"obatin/constant"
@@ -14,7 +15,7 @@ type ChatRoomUsecase interface {
 	CreateChatRoom(ctx context.Context, uReq entity.ChatRoom) error
 	GetAllChatRoomMessageById(ctx context.Context, chatRoomId int64) ([]entity.Message, error)
 	UpdateIsTyping(ctx context.Context, crReq entity.ChatRoom, chatRoomId int64) error
-	GetAllMessage(ctx context.Context) ([]entity.ChatRoom, error)
+	GetAllChatRoom(ctx context.Context, params entity.Pagination) (*entity.ChatRoomListPage, error)
 	GetChatRoomById(ctx context.Context, chatRoomId int64) (*entity.ChatRoom, error)
 	DeleteChatRoom(ctx context.Context, chatRoomId int64) error
 }
@@ -202,10 +203,18 @@ func (u *chatRoomUsecaseImpl) UpdateIsTyping(ctx context.Context, crReq entity.C
 	return nil
 }
 
-func (u *chatRoomUsecaseImpl) GetAllMessage(ctx context.Context) ([]entity.ChatRoom, error) {
+func (u *chatRoomUsecaseImpl) GetAllChatRoom(ctx context.Context, params entity.Pagination) (*entity.ChatRoomListPage, error) {
 	crr := u.repoStore.ChatRoomRepository()
 	dr := u.repoStore.DoctorRepository()
 	ur := u.repoStore.UserRepository()
+	allMessage := entity.ChatRoomListPage{}
+	if params.Limit < appconstant.DefaultMinLimit {
+		params.Limit = appconstant.DefaultProductLimit
+	}
+	if params.Page < appconstant.DefaultMinPage {
+		params.Page = appconstant.DefaultMinPage
+	}
+
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
@@ -216,21 +225,30 @@ func (u *chatRoomUsecaseImpl) GetAllMessage(ctx context.Context) ([]entity.ChatR
 		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
-	err := crr.DeleteChatRoomAfterExpired(ctx)
-	if err != nil {
-		return nil, apperror.NewInternal(err)
-	}
 
 	if authenticationRole == constant.RoleDoctor {
+		
 		doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)
 		if err != nil {
 			return nil, err
 		}
-		allMessage, err := crr.GetAllMessageForDoctor(ctx, doctor.Id)
+
+		err = crr.UpdateChatRoomValidByUserId(ctx, doctor.Id, false)
+		if err != nil {
+			return nil, apperror.NewInternal(err)
+		}
+
+		allDoctorMessage, err := crr.GetAllMessageForDoctor(ctx, doctor.Id, params)
 		if err != nil {
 			return nil, err
 		}
-		return allMessage, nil
+		allMessage.ChatRooms = allDoctorMessage.ChatRooms
+		allMessage.Pagination = entity.PaginationResponse{
+			Page:         params.Page,
+			PageCount:    int64(allDoctorMessage.TotalRows) / int64(params.Limit),
+			Limit:        params.Limit,
+			TotalRecords: int64(allDoctorMessage.TotalRows),
+		}
 	}
 
 	if authenticationRole == constant.RoleUser {
@@ -238,14 +256,32 @@ func (u *chatRoomUsecaseImpl) GetAllMessage(ctx context.Context) ([]entity.ChatR
 		if err != nil {
 			return nil, err
 		}
-		allMessage, err := crr.GetAllMessageForUser(ctx, *user.Id)
+
+		err = crr.UpdateChatRoomValidByUserId(ctx, *user.Id, false)
+		if err != nil {
+			return nil, apperror.NewInternal(err)
+		}
+
+		allUserMessage, err := crr.GetAllMessageForUser(ctx, *user.Id, params)
 		if err != nil {
 			return nil, err
 		}
-		return allMessage, nil
+		allMessage.ChatRooms = allUserMessage.ChatRooms
+		allMessage.Pagination = entity.PaginationResponse{
+			Page:         params.Page,
+			PageCount:    int64(allUserMessage.TotalRows) / int64(params.Limit),
+			Limit:        params.Limit,
+			TotalRecords: int64(allUserMessage.TotalRows),
+		}
 	}
 
-	return nil, nil
+	if allMessage.Pagination.PageCount < appconstant.DefaultMinPage {
+		allMessage.Pagination.PageCount = appconstant.DefaultMinPage
+	}
+	if allMessage.Pagination.TotalRecords-(allMessage.Pagination.PageCount*int64(params.Limit)) > 0 {
+		allMessage.Pagination.PageCount = int64(allMessage.Pagination.PageCount) + appconstant.DefaultMinPage
+	}
+	return &allMessage, nil
 }
 
 func (u *chatRoomUsecaseImpl) GetChatRoomById(ctx context.Context, chatRoomId int64) (*entity.ChatRoom, error) {

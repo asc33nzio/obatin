@@ -12,7 +12,7 @@ import (
 )
 
 type DoctorUsecase interface {
-	GetOneById(ctx context.Context, id int64) (*entity.DoctorDetail, error)
+	GetOneByAuthId(ctx context.Context, id int64) (*entity.Doctor, error)
 	GetDoctorList(ctx context.Context, params entity.DoctorFilter) (*entity.DoctorListPage, error)
 	UpdateOneDoctor(ctx context.Context, body entity.DoctorUpdateRequest, id int64) (*entity.DoctorDetail, error)
 }
@@ -35,14 +35,14 @@ func NewDoctorUsecaseImpl(
 	}
 }
 
-func (u *doctorUsecaseImpl) GetOneById(ctx context.Context, id int64) (*entity.DoctorDetail, error) {
+func (u *doctorUsecaseImpl) GetOneByAuthId(ctx context.Context, id int64) (*entity.Doctor, error) {
 	dRep := u.repoStore.DoctorRepository()
 
-	specialization, err := dRep.FindDoctorDetailById(ctx, id)
+	doctor, err := dRep.FindDoctorByAuthId(ctx, id)
 	if err != nil {
 		return nil, apperror.NewInternal(err)
 	}
-	return specialization, nil
+	return doctor, nil
 }
 
 func (u *doctorUsecaseImpl) GetDoctorList(ctx context.Context, params entity.DoctorFilter) (*entity.DoctorListPage, error) {

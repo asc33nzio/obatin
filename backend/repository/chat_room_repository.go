@@ -3,8 +3,11 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"obatin/apperror"
+	"obatin/constant"
 	"obatin/entity"
+	"strings"
 )
 
 type ChatRoomRepository interface {
@@ -12,11 +15,13 @@ type ChatRoomRepository interface {
 	FindChatRoomByID(ctx context.Context, chatRoomId int64) (*entity.ChatRoom, error)
 	UpdateDoctorIsTypingByDoctorId(ctx context.Context, u entity.ChatRoom) error
 	UpdateUserIsTypingByUserId(ctx context.Context, u entity.ChatRoom) error
-	GetAllMessageForDoctor(ctx context.Context, doctorId int64) ([]entity.ChatRoom, error)
-	GetAllMessageForUser(ctx context.Context, userId int64) ([]entity.ChatRoom, error)
+	GetAllMessageForDoctor(ctx context.Context, doctorId int64, params entity.Pagination) (*entity.ChatRoomListPage, error)
+	GetAllMessageForUser(ctx context.Context, userId int64, params entity.Pagination) (*entity.ChatRoomListPage, error)
 	IsChatRoomExist(ctx context.Context, userId int64, doctorId int64) (bool, error)
 	DeleteChatRoomById(ctx context.Context, chatRoomId int64) error
+	UpdateChatRoomValidByUserId(ctx context.Context, userId int64, isUser bool) error
 	DeleteChatRoomAfterExpired(ctx context.Context) error
+	UpdateChatRoomUpdatedAtByID(ctx context.Context, chatRoomId int64) error
 }
 
 type chatRoomRepositoryPostgres struct {
@@ -156,10 +161,15 @@ func (r *chatRoomRepositoryPostgres) UpdateDoctorIsTypingByDoctorId(ctx context.
 	return nil
 }
 
-func (r *chatRoomRepositoryPostgres) GetAllMessageForDoctor(ctx context.Context, doctorId int64) ([]entity.ChatRoom, error) {
+func (r *chatRoomRepositoryPostgres) GetAllMessageForDoctor(ctx context.Context, doctorId int64, params entity.Pagination) (*entity.ChatRoomListPage, error) {
 	chatRooms := []entity.ChatRoom{}
+	rowsCount := 0
+	paramsCount := constant.StartingParamsCount
+	var queryDataCount strings.Builder
+	var queryPage strings.Builder
+	var data []interface{}
 
-	q := `
+	queryGetAllMessage := `
 	SELECT 
     	cr.id,     
     	cr.user_id,
@@ -191,8 +201,25 @@ func (r *chatRoomRepositoryPostgres) GetAllMessageForDoctor(ctx context.Context,
     	cr.doctor_id = $1
 	AND
     	cr.deleted_at IS null
+	ORDER BY
+		cr.is_active DESC,
+		cr.updated_at DESC
 	`
-	rows, err := r.db.QueryContext(ctx, q, doctorId)
+	data = append(data, doctorId)
+	queryDataCount.WriteString(fmt.Sprintf(` SELECT COUNT (*) FROM ( %v )`, queryGetAllMessage))
+	err := r.db.QueryRowContext(ctx, queryDataCount.String(), data...).Scan(&rowsCount)
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+	queryPage.WriteString(queryGetAllMessage)
+	paginationParams, paginationData := convertPaginationParamsToSql(params.Limit, params.Page, paramsCount+1)
+	queryPage.WriteString(paginationParams)
+	data = append(data, paginationData...)
+	rows, err := r.db.QueryContext(
+		ctx,
+		queryPage.String(),
+		data...,
+	)
 
 	if err != nil {
 		return nil, apperror.NewInternal(err)
@@ -220,13 +247,21 @@ func (r *chatRoomRepositoryPostgres) GetAllMessageForDoctor(ctx context.Context,
 		return nil, apperror.NewInternal(err)
 	}
 
-	return chatRooms, nil
+	return &entity.ChatRoomListPage{
+		ChatRooms: chatRooms,
+		TotalRows: rowsCount,
+	}, nil
 }
 
-func (r *chatRoomRepositoryPostgres) GetAllMessageForUser(ctx context.Context, userId int64) ([]entity.ChatRoom, error) {
+func (r *chatRoomRepositoryPostgres) GetAllMessageForUser(ctx context.Context, userId int64, params entity.Pagination) (*entity.ChatRoomListPage, error) {
 	chatRooms := []entity.ChatRoom{}
+	rowsCount := 0
+	paramsCount := constant.StartingParamsCount
+	var queryDataCount strings.Builder
+	var queryPage strings.Builder
+	var data []interface{}
 
-	q := `
+	queryGetAllMessage := `
 	SELECT 
     	cr.id,     
     	cr.user_id,
@@ -263,8 +298,26 @@ func (r *chatRoomRepositoryPostgres) GetAllMessageForUser(ctx context.Context, u
     	cr.user_id = $1
 	AND
     	cr.deleted_at IS null
+	ORDER BY
+		cr.is_active DESC,
+		cr.updated_at DESC
 	`
-	rows, err := r.db.QueryContext(ctx, q, userId)
+	data = append(data, userId)
+	queryDataCount.WriteString(fmt.Sprintf(` SELECT COUNT (*) FROM ( %v )`, queryGetAllMessage))
+	err := r.db.QueryRowContext(ctx, queryDataCount.String(), data...).Scan(&rowsCount)
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+	queryPage.WriteString(queryGetAllMessage)
+
+	paginationParams, paginationData := convertPaginationParamsToSql(params.Limit, params.Page, paramsCount+1)
+	queryPage.WriteString(paginationParams)
+	data = append(data, paginationData...)
+	rows, err := r.db.QueryContext(
+		ctx,
+		queryPage.String(),
+		data...,
+	)
 
 	if err != nil {
 		return nil, apperror.NewInternal(err)
@@ -293,7 +346,10 @@ func (r *chatRoomRepositoryPostgres) GetAllMessageForUser(ctx context.Context, u
 		return nil, apperror.NewInternal(err)
 	}
 
-	return chatRooms, nil
+	return &entity.ChatRoomListPage{
+		ChatRooms: chatRooms,
+		TotalRows: rowsCount,
+	}, nil
 }
 
 func (r *chatRoomRepositoryPostgres) IsChatRoomExist(ctx context.Context, userId int64, doctorId int64) (bool, error) {
@@ -382,6 +438,75 @@ func (r *chatRoomRepositoryPostgres) DeleteChatRoomAfterExpired(ctx context.Cont
 
 	if rowsAffected == 0 {
 		return nil
+	}
+
+	return nil
+}
+
+func (r *chatRoomRepositoryPostgres) UpdateChatRoomValidByUserId(ctx context.Context, userId int64, isUser bool) error {
+	var query strings.Builder
+
+	query.WriteString(`
+	UPDATE 
+		chat_rooms
+	SET 
+		is_active = false, updated_at = NOW()
+	WHERE 
+	`)
+	if !isUser {
+		query.WriteString(" user_id = $1 ")
+	} else {
+		query.WriteString(" doctor_id = $1 ")
+	}
+
+	query.WriteString("AND NOW() > expired_at AND is_active = true")
+	res, err := r.db.ExecContext(
+		ctx,
+		query.String(),
+		userId)
+
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	if rowsAffected == 0 {
+		return nil
+	}
+
+	return nil
+}
+
+func (r *chatRoomRepositoryPostgres) UpdateChatRoomUpdatedAtByID(ctx context.Context, chatRoomId int64) error {
+	query := `
+	UPDATE 
+		chat_rooms
+	SET 
+		updated_at = NOW()
+	WHERE 
+		id = $1
+`
+
+	res, err := r.db.ExecContext(
+		ctx,
+		query,
+		chatRoomId)
+
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	if rowsAffected == 0 {
+		return apperror.NewInternal(err)
 	}
 
 	return nil

@@ -15,3 +15,9 @@ type ChatRoom struct {
 	AvatarUser    string
 	DoctorSpecialization string
 }
+
+type ChatRoomListPage struct {
+	ChatRooms   []ChatRoom
+	TotalRows  int
+	Pagination PaginationResponse
+}

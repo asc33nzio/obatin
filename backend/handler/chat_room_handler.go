@@ -74,7 +74,7 @@ func (h *ChatRoomHandler) GetAllMessageByChatRoomId(ctx *gin.Context) {
 		return
 	}
 	doctor.Certificate = ""
-	
+
 	res := dto.ToGetAllMessageInChatRoom(allMessage)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseGetAllMessageInOneChatRoomMsg,
@@ -117,15 +117,19 @@ func (h *ChatRoomHandler) UpdateIsTyping(ctx *gin.Context) {
 }
 
 func (h *ChatRoomHandler) GetListChatRoom(ctx *gin.Context) {
-	messageChatRoom, err := h.chatRoomUsecase.GetAllMessage(ctx)
+	paginationQuery := dto.PaginationReq{}
+
+	paginationParams := paginationQuery.ToPaginationEntity()
+	messageChatRoom, err := h.chatRoomUsecase.GetAllChatRoom(ctx, paginationParams)
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	res := dto.ToGetAllChatRoomRes(messageChatRoom)
+	res := dto.ToGetAllChatRoomRes(messageChatRoom.ChatRooms)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseGetAllChatRoomMsg,
+		Pagination: (*dto.PaginationResponse)(&messageChatRoom.Pagination),
 		Data:    res,
 	})
 }

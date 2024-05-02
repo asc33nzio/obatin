@@ -49,6 +49,20 @@ type DoctorList struct {
 	OperationalDays  string
 }
 
+type DoctorProfile struct {
+	SpecializationName string
+	Email              string
+	Name               string
+	Avatar             string
+	IsOnline           bool
+	Experiences        int
+	Certificate        string
+	Fee                int64
+	Opening            string
+	OperationalHours   string
+	OperationalDays    string
+}
+
 type DoctorUpdateRequest struct {
 	Name             *string
 	AvatarFile       *multipart.File

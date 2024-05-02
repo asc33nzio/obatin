@@ -207,7 +207,12 @@ func (u *authentictionUsecaseImpl) RegisterDoctor(ctx context.Context, uReq enti
 		if err != nil {
 			return nil, err
 		}
-
+		for !appvalidator.IsValidPassword(defaultPassword) {
+			defaultPassword, err = u.tokenGenerator.GetRandomToken(u.config.RandomTokenLength())
+			if err != nil {
+				return nil, err
+			}
+		}
 		hashedPass, err := u.cryptoHash.HashPassword(defaultPassword, u.config.HashCost())
 		if err != nil {
 			return nil, apperror.NewInternal(err)

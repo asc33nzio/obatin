@@ -22,33 +22,29 @@ func NewDoctorHandler(doctorUseCase usecase.DoctorUsecase) *DoctorHandler {
 	}
 }
 
-func (h *DoctorHandler) GetDoctorDetailbyId(ctx *gin.Context) {
-	var idParam dto.IdUriParam
-	err := ctx.ShouldBindUri(&idParam)
-	if err != nil {
-		ctx.Error(apperror.ErrInvalidReq(err))
+func (h *DoctorHandler) GetDoctorDetailbyAuthId(ctx *gin.Context) {
+
+	isDoctor := checkDoctor(ctx)
+
+	if !isDoctor {
+		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
-	doctorId, err := strconv.Atoi(idParam.Id)
-	if err != nil {
-		ctx.Error(apperror.ErrInvalidSlug(nil))
+	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		return
 	}
 
-	doctor, err := h.doctorUseCase.GetOneById(ctx, int64(doctorId))
+	doctor, err := h.doctorUseCase.GetOneByAuthId(ctx, int64(authenticationId))
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	isDoctor := checkDoctor(ctx)
-	isAdmin := checkAdmin(ctx)
-	if !isDoctor && !isAdmin {
-		doctor.Certificate = ""
-	}
-
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseOkMsg,
-		Data:    dto.ToDoctorDetailResponse(doctor),
+		Data:    dto.ToDoctorProfileResponse(doctor),
 	})
 }
 
