@@ -137,7 +137,7 @@ func (h *AuthenticationHandler) VerifyEmail(ctx *gin.Context) {
 	})
 }
 
-func (h *AuthenticationHandler) UpdatePassword(ctx *gin.Context) {
+func (h *AuthenticationHandler) UpdatePasswordByToken(ctx *gin.Context) {
 	token := ctx.Query(constant.TokenQueryParam)
 	body := dto.UpdatePasswordReq{}
 
@@ -147,7 +147,26 @@ func (h *AuthenticationHandler) UpdatePassword(ctx *gin.Context) {
 		return
 	}
 
-	err = h.userUsecase.UpdatePassword(ctx, body.ToPassword(), token)
+	err = h.userUsecase.UpdatePasswordWithToken(ctx, body.ToPassword(), token)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseUpdatePasswordMsg,
+	})
+}
+
+func (h *AuthenticationHandler) UpdatePasswordByAuth(ctx *gin.Context) {
+	body := dto.UpdateProfilePasswordReq{}
+	err := ctx.ShouldBindJSON(&body)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+
+	err = h.userUsecase.UpdatePassword(ctx, body.ToUpdatePassword())
 	if err != nil {
 		ctx.Error(err)
 		return

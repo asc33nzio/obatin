@@ -25,4 +25,5 @@ const (
 	ErrorChatRoomNotFound
 	ErrorChatRoomAlreadyExist
 	ErrorChatRoomAlreadyInactive
+	ErrorInvalidSameAsPrevUpdatePass
 )
