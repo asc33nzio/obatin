@@ -36,4 +36,5 @@ const (
 	ChatRoomNotExistMsg               = "chat room not exist"
 	ChatRoomAlreadyExistMsg           = "chat room already exist"
 	ChatRoomAlreadyInactiveMsg        = "chat room already inactive"
+	ErrStlSameasPrevPass              = "new password can't be the same as old password"
 )

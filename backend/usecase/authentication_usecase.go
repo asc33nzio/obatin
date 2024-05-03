@@ -21,7 +21,8 @@ type AuthenticationUsecase interface {
 	VerifyEmail(ctx context.Context, token string) error
 	RegisterUser(ctx context.Context, uReq entity.Authentication) error
 	SendVerificationEmail(ctx context.Context) error
-	UpdatePassword(ctx context.Context, uReq entity.Authentication, token string) error
+	UpdatePasswordWithToken(ctx context.Context, uReq entity.Authentication, token string) error
+	UpdatePassword(ctx context.Context, updateReq entity.UpdatePassword) error
 	UpdateApproval(ctx context.Context, authenticationId int, isApprove bool) error
 	SendEmailForgotPasssword(ctx context.Context, uReq entity.Authentication) error
 	ResendVerificationEmail(ctx context.Context, email string) error
@@ -395,7 +396,7 @@ func (u *authentictionUsecaseImpl) SendVerificationEmail(ctx context.Context) er
 	return nil
 }
 
-func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, uReq entity.Authentication, token string) error {
+func (u *authentictionUsecaseImpl) UpdatePasswordWithToken(ctx context.Context, uReq entity.Authentication, token string) error {
 	ur := u.repoStore.AuthenticationRepository()
 	rpr := u.repoStore.ResetPasswordRepository()
 
@@ -441,12 +442,56 @@ func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, uReq enti
 
 	uReq.Password = string(hashedPass)
 
-	_, err = ur.UpdatePassword(ctx, uReq.Password, resetPassword.Email)
+	_, err = ur.UpdatePasswordByEmail(ctx, uReq.Password, resetPassword.Email)
 	if err != nil {
 		return err
 	}
 
 	err = rpr.DeleteResetPasswordTokenAfterUsed(ctx, claims.Payload.RandomToken)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, updateReq entity.UpdatePassword) error {
+	ar := u.repoStore.AuthenticationRepository()
+
+	authId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if !ok {
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
+	}
+
+	if updateReq.NewPassword == updateReq.OldPassword {
+		return apperror.ErrInvalidSameUpdatedPassword(nil)
+	}
+
+	authProfile, err := ar.FindAuthenticationById(ctx, int64(authId))
+	if err != nil {
+		return err
+	}
+	profilePass, err := ar.FindAuthenticationByEmail(ctx, authProfile.Email)
+	if err != nil {
+		return err
+	}
+
+	err = u.cryptoHash.CheckPassword(updateReq.OldPassword, []byte(profilePass.Password))
+	if err != nil {
+		return apperror.ErrWrongPassword(apperror.ErrStlInvalidPassword)
+	}
+
+	isPasswordValid := appvalidator.IsValidPassword(updateReq.NewPassword)
+	if !isPasswordValid {
+		return apperror.ErrInvalidPassword(apperror.ErrStlInvalidPassword)
+	}
+
+	hashedPass, err := u.cryptoHash.HashPassword(updateReq.NewPassword, u.config.HashCost())
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	_, err = ar.UpdatePasswordByEmail(ctx, string(hashedPass), authProfile.Email)
 	if err != nil {
 		return err
 	}

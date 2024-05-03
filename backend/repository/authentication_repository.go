@@ -16,7 +16,7 @@ type AuthenticationRepository interface {
 	CreateOne(ctx context.Context, u entity.Authentication) (*entity.Authentication, error)
 	VerifyEmail(ctx context.Context, token string) (*entity.Authentication, error)
 	UpdateToken(ctx context.Context, token string, userId int) (*entity.Authentication, error)
-	UpdatePassword(ctx context.Context, password string, token string) (*entity.Authentication, error)
+	UpdatePasswordByEmail(ctx context.Context, password string, email string) (*entity.Authentication, error)
 	UpdateApproval(ctx context.Context, authId int, isApprove bool) (*entity.Authentication, error)
 	GetById(ctx context.Context, authId int) (*entity.Authentication, error)
 	IsVerified(ctx context.Context, email string) (bool, error)
@@ -56,7 +56,6 @@ func (r *authenticationRepositoryPostgres) FindAuthenticationByEmail(ctx context
 	WHERE
 		email = $1
 	`
-
 	err := r.db.QueryRowContext(
 		ctx,
 		queryFindAuthentication,
@@ -73,9 +72,9 @@ func (r *authenticationRepositoryPostgres) FindAuthenticationByEmail(ctx context
 
 	if err != nil {
 		if err == sql.ErrNoRows {
+
 			return nil, apperror.ErrEmailNotRegistered(err)
 		}
-
 		return nil, apperror.NewInternal(err)
 	}
 
@@ -232,7 +231,7 @@ func (r *authenticationRepositoryPostgres) UpdateToken(ctx context.Context, toke
 	}, nil
 }
 
-func (r *authenticationRepositoryPostgres) UpdatePassword(ctx context.Context, password string, email string) (*entity.Authentication, error) {
+func (r *authenticationRepositoryPostgres) UpdatePasswordByEmail(ctx context.Context, password string, email string) (*entity.Authentication, error) {
 	user := entity.Authentication{}
 
 	queryUpdatePassword := `
@@ -262,7 +261,6 @@ func (r *authenticationRepositoryPostgres) UpdatePassword(ctx context.Context, p
 		&user.Id,
 		&user.Email,
 	)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, apperror.ErrEmailNotRegistered(err)
@@ -483,7 +481,7 @@ func (r *authenticationRepositoryPostgres) GetPendingDoctorApproval(ctx context.
 	}
 
 	return &entity.DoctorApprovalPage{
-		Doctors: doctors,
+		Doctors:   doctors,
 		TotalRows: rowsCount,
 	}, nil
 }

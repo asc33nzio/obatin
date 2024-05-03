@@ -52,6 +52,8 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusNotFound
 	case AddressNotFound:
 		return http.StatusNotFound
+	case ErrorInvalidSameAsPrevUpdatePass:
+		return http.StatusBadRequest
 	default:
 		return http.StatusInternalServerError
 	}
