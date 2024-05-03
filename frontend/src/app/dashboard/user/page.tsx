@@ -19,12 +19,7 @@ import {
   ProfileHeaderButtonsDiv,
   UserDetailDiv,
 } from '@/styles/pages/dashboard/Dashboard.styles';
-import {
-  // eslint-disable-next-line
-  EditProfilePayloadItf,
-  EditProfileStateItf,
-  GenderItf,
-} from '@/types/dashboardTypes';
+import { EditProfileStateItf, GenderItf } from '@/types/dashboardTypes';
 import { useState } from 'react';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
@@ -226,7 +221,6 @@ const UserDashboardPage = (): React.ReactElement => {
     }
 
     const generalPayload = new FormData();
-    // const passwordPayload: Partial<EditProfilePayloadItf> = {};
     // const emailPayload: Partial<EditProfilePayloadItf> = {};
 
     Object.keys(hasNewValue).forEach((key) => {
@@ -266,7 +260,6 @@ const UserDashboardPage = (): React.ReactElement => {
 
     try {
       const patchProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
-      // const patchPasswordUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
       // const patchEmailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
       const userDetailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
 
@@ -280,12 +273,7 @@ const UserDashboardPage = (): React.ReactElement => {
           },
         },
       );
-      // const patchPasswordReq = Axios.patch(patchPasswordUrl, passwordPayload, {
-      //   headers: { Authorization: `Bearer ${accessToken}` },
-      // });
-      // const patchEmailReq = Axios.patch(patchEmailUrl, emailPayload, {
-      //   headers: { Authorization: `Bearer ${accessToken}` },
-      // });
+
       const getUserDetailReq = await Axios.get(userDetailUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
