@@ -37,4 +37,8 @@ const (
 	ChatRoomAlreadyExistMsg           = "chat room already exist"
 	ChatRoomAlreadyInactiveMsg        = "chat room already inactive"
 	ErrStlSameasPrevPass              = "new password can't be the same as old password"
+	PrescriptionRequiredMsg           = "prescription required"
+	PrescriptionNotExistMsg           = "prescription does not exist"
+	PrescriptionItemNotExistMsg       = "product does not exist in prescription"
+	NoNearbyPharmacyProductMsg        = "there are no nearby pharmacy that has the product"
 )

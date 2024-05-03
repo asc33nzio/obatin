@@ -52,6 +52,14 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusNotFound
 	case AddressNotFound:
 		return http.StatusNotFound
+	case PrescriptionRequired:
+		return http.StatusBadRequest
+	case PrescriptionNotExist:
+		return http.StatusNotFound
+	case PrescriptionItemNotExist:
+		return http.StatusNotFound
+	case NoNearbyPharmacyProduct:
+		return http.StatusNotFound
 	case ErrorInvalidSameAsPrevUpdatePass:
 		return http.StatusBadRequest
 	default:

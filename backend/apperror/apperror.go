@@ -1,6 +1,7 @@
 package apperror
 
 import (
+	"fmt"
 	"runtime/debug"
 )
 
@@ -24,7 +25,7 @@ func NewProductNotFound(err error) *AppError {
 	return &AppError{
 		code:    ErrorSqlNoProductExists,
 		err:     err,
-		message: InternalErrMsg,
+		message: ProductNotFoundMsg,
 		stack:   debug.Stack(),
 	}
 }
@@ -311,6 +312,42 @@ func ErrInvalidSameUpdatedPassword(err error) *AppError {
 		code:    ErrorInvalidSameAsPrevUpdatePass,
 		err:     err,
 		message: ErrStlSameasPrevPass,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrPrescriptionRequired(err error, productId int64) *AppError {
+	return &AppError{
+		code:    PrescriptionRequired,
+		err:     err,
+		message: PrescriptionRequiredMsg + fmt.Sprintf(" for product id %v", productId),
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrPrescriptionNotExist(err error) *AppError {
+	return &AppError{
+		code:    PrescriptionNotExist,
+		err:     err,
+		message: PrescriptionNotExistMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrPrescriptionItemNotExist(err error) *AppError {
+	return &AppError{
+		code:    PrescriptionItemNotExist,
+		err:     err,
+		message: PrescriptionItemNotExistMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrNoNearbyPharmacyProduct(err error, productId int64) *AppError {
+	return &AppError{
+		code:    NoNearbyPharmacyProduct,
+		err:     err,
+		message: NoNearbyPharmacyProductMsg + fmt.Sprintf(" for product id %v", productId),
 		stack:   debug.Stack(),
 	}
 }

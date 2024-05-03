@@ -21,6 +21,10 @@ type RepoStore interface {
 	AddressRepository() AddressRepository
 	ChatRoomRepository() ChatRoomRepository
 	MessageRepository() MessageRepository
+	CartRepository() CartRepository
+	PrescriptionRepository() PrescriptionRepository
+	PrescriptionItemRepository() PrescriptionItemRepository
+	PharmacyProductRepository() PharmacyProductRepository
 }
 
 type dbStore struct {
@@ -113,6 +117,7 @@ func (s *dbStore) PartnerRepository() PartnerRepository {
 		db: s.querier,
 	}
 }
+
 func (s *dbStore) AddressRepository() AddressRepository {
 	return &addressRepositoryPostgres{
 		db: s.querier,
@@ -127,6 +132,30 @@ func (s *dbStore) ChatRoomRepository() ChatRoomRepository {
 
 func (s *dbStore) MessageRepository() MessageRepository {
 	return &messageRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) CartRepository() CartRepository {
+	return &cartRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) PrescriptionRepository() PrescriptionRepository {
+	return &prescriptionRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) PrescriptionItemRepository() PrescriptionItemRepository {
+	return &prescriptionItemRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) PharmacyProductRepository() PharmacyProductRepository {
+	return &pharmacyProductRepositoryPostgres{
 		db: s.querier,
 	}
 }

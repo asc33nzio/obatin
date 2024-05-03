@@ -51,7 +51,7 @@ func (r *refreshTokenRepositoryPostgres) CreateNewRefreshToken(ctx context.Conte
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -81,7 +81,7 @@ func (r *refreshTokenRepositoryPostgres) DeleteRefreshTokenAfterExpired(ctx cont
 	}
 
 	if rowsAffected == 0 {
-		return nil
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil

@@ -26,4 +26,8 @@ const (
 	ErrorChatRoomAlreadyExist
 	ErrorChatRoomAlreadyInactive
 	ErrorInvalidSameAsPrevUpdatePass
+	PrescriptionRequired
+	PrescriptionNotExist
+	PrescriptionItemNotExist
+	NoNearbyPharmacyProduct
 )

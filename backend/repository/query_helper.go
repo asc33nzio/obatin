@@ -423,3 +423,29 @@ func convertUpdateAddressToSql(a entity.Address) (string, []interface{}) {
 	args = append(args, a.UserId)
 	return query.String(), args
 }
+
+func prescriptionItemsBulkInsertQuery(cp *entity.CreatePrescription) (string, []interface{}) {
+	var sb strings.Builder
+	var args []interface{}
+	var counter int
+	sb.WriteString(
+		`INSERT INTO
+			prescription_items(prescription_id,product_id,amount)
+		VALUES`,
+	)
+
+	for _, pItem := range cp.Items {
+		if counter > 0 {
+			sb.WriteString(" , ")
+		}
+
+		input := fmt.Sprintf("($%d, $%d, $%d)", len(args)+1, len(args)+2, len(args)+3)
+		args = append(args, cp.Id)
+		args = append(args, pItem.Product.Id)
+		args = append(args, pItem.Amount)
+		sb.WriteString(input)
+		counter += 1
+	}
+
+	return sb.String(), args
+}

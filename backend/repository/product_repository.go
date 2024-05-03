@@ -13,6 +13,8 @@ import (
 type ProductRepository interface {
 	GetProductsList(ctx context.Context, params entity.ProductFilter) (*entity.ProductListPage, error)
 	FindProductDetailBySlug(ctx context.Context, slug string) (*entity.ProductDetail, error)
+	IsProductExistById(ctx context.Context, productId int64) (bool, error)
+	IsPrescriptionRequired(ctx context.Context, productId int64) (bool, error)
 }
 
 type productRepositoryPostgres struct {
@@ -167,4 +169,68 @@ func (r *productRepositoryPostgres) FindProductDetailBySlug(ctx context.Context,
 	}
 
 	return &res, nil
+}
+
+func (r *productRepositoryPostgres) IsProductExistById(ctx context.Context, productId int64) (bool, error) {
+	var isExist bool
+	query := `
+		SELECT EXISTS (
+			SELECT 
+				1 	
+			FROM 
+				products 
+			WHERE 
+				id = $1
+			AND
+				is_active = true
+			AND 
+				deleted_at IS NULL
+		)
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		productId,
+	).Scan(
+		&isExist,
+	)
+	if err != nil {
+		return false, apperror.NewInternal(err)
+	}
+
+	return isExist, nil
+}
+
+func (r *productRepositoryPostgres) IsPrescriptionRequired(ctx context.Context, productId int64) (bool, error) {
+	var isExist bool
+	query := `
+		SELECT EXISTS (
+			SELECT 
+				1 	
+			FROM 
+				products 
+			WHERE 
+				id = $1
+			AND
+				is_active = true
+			AND
+				is_prescription_required = true
+			AND 
+				deleted_at IS NULL
+		)
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		productId,
+	).Scan(
+		&isExist,
+	)
+	if err != nil {
+		return false, apperror.NewInternal(err)
+	}
+
+	return isExist, nil
 }
