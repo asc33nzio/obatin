@@ -47,7 +47,7 @@ export interface AuthDoctorReduxItf {
   avatarUrl: string;
   specialization: string;
   isOnline: boolean;
-  experience: number;
+  experiences: number;
   certificate: string;
   fee: number;
   openingTime: string;

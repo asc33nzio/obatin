@@ -48,6 +48,17 @@ const Navbar = (): React.ReactElement => {
 
   const handleReverify = async () => {
     try {
+      if (isLoading) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Sedang diproses, mohon menunggu',
+          toastType: 'warning',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
+
       setIsLoading(true);
       setToast({
         showToast: true,
@@ -105,7 +116,7 @@ const Navbar = (): React.ReactElement => {
           <ObatinICO />
         </Left>
 
-        <SearchComponent />
+        {userRole === 'user' && <SearchComponent />}
 
         <Right>
           {accessToken === undefined ? (

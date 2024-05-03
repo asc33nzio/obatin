@@ -6,7 +6,20 @@ export const DashboardPageContainer = styled.div<{
   display: flex;
   flex-direction: column;
 
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '170vh' : '200vh')};
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '135vh' : '200vh')};
+  width: 100vw;
+  max-width: 100vw;
+
+  overflow-x: hidden;
+`;
+
+export const DoctorDashboardPageContainer = styled.div<{
+  $isDesktopDisplay: boolean;
+}>`
+  display: flex;
+  flex-direction: column;
+
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '100vh' : '200vh')};
   width: 100vw;
   max-width: 100vw;
 
@@ -19,7 +32,7 @@ export const DashboardPageContentContainer = styled.div`
   align-items: center;
 
   width: 100vw;
-  height: 90%;
+  height: 83%;
   overflow-y: hidden;
 `;
 
@@ -30,6 +43,20 @@ export const ProfileContainer = styled.div<{ $isDesktopDisplay: boolean }>`
 
   width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
   height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '40%' : '100%')};
+  gap: 10px;
+
+  margin-bottom: 100px;
+`;
+
+export const DoctorProfileContainer = styled.div<{
+  $isDesktopDisplay: boolean;
+}>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '100%')};
   gap: 10px;
 
   margin-bottom: 100px;
@@ -227,4 +254,39 @@ export const GenderSelect = styled.select`
   font-size: 17px;
 
   cursor: pointer;
+`;
+
+export const DoctorProgressContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 45%;
+`;
+
+export const ContentSubcontainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 50%;
+  height: 100%;
+
+  p {
+    font-size: 24px;
+    text-align: center;
+    color: #00b5c0;
+    width: 100%;
+    height: 50%;
+
+    u {
+      cursor: pointer;
+      font-size: 24px;
+      color: #00b5c0;
+      font-weight: 500;
+    }
+  }
 `;

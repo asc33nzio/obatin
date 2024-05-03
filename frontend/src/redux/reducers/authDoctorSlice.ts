@@ -12,7 +12,7 @@ const initialState: AuthDoctorReduxItf = {
   avatarUrl: '',
   specialization: '',
   isOnline: false,
-  experience: 0,
+  experiences: 0,
   certificate: '',
   fee: 0,
   openingTime: '',
@@ -34,7 +34,7 @@ export const authDoctorSlice = createSlice({
       state.avatarUrl = action.payload.avatarUrl;
       state.specialization = action.payload.specialization;
       state.isOnline = action.payload.isOnline;
-      state.experience = action.payload.experience;
+      state.experiences = action.payload.experiences;
       state.certificate = action.payload.certificate;
       state.fee = action.payload.fee;
       state.openingTime = action.payload.openingTime;
@@ -51,7 +51,7 @@ export const authDoctorSlice = createSlice({
       state.avatarUrl = '';
       state.specialization = '';
       state.isOnline = false;
-      state.experience = 0;
+      state.experiences = 0;
       state.certificate = '';
       state.fee = 0;
       state.openingTime = '';

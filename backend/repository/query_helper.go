@@ -143,11 +143,19 @@ func convertUpdateDoctorQueryParamstoSql(params entity.DoctorUpdateRequest, id i
 		fmt.Sprintf(`
 		, updated_at = NOW()
 	WHERE 
-		id = $%d
+		authentication_id = $%d
 	RETURNING
-	id, name, avatar_url, is_online, experience_years, certificate_url, 
-	fee, opening_time, operational_hours, operational_days
-	`, countParams))
+		id,
+		name,
+		avatar_url,
+		is_online,
+		experience_years,
+		certificate_url,
+		fee,
+		opening_time,
+		operational_hours,
+		operational_days
+		`, countParams))
 
 	args = append(args, id)
 	countParams++

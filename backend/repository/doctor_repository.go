@@ -14,6 +14,7 @@ type DoctorRepository interface {
 	CreateNewDoctor(ctx context.Context, authentiactionId int64, certificate string, doctorSpecializationId int) error
 	GetDoctorList(ctx context.Context, params entity.DoctorFilter) (*entity.DoctorListPage, error)
 	FindDoctorDetailById(ctx context.Context, id int64) (*entity.DoctorDetail, error)
+	FindDoctorDetailByAuthIdRedacted(ctx context.Context, id int64) (*entity.DoctorDetail, error)
 	UpdateOneDoctor(ctx context.Context, body entity.DoctorUpdateRequest, id int64) (*entity.DoctorDetail, error)
 	FindDoctorByAuthId(ctx context.Context, authId int64) (*entity.Doctor, error)
 }
@@ -135,8 +136,17 @@ func (r *doctorRepositoryPostgres) FindDoctorDetailById(ctx context.Context, id 
 
 	q := `
 		SELECT
-			d.id, sp.name, d.name, d.avatar_url, d.is_online, d.experience_years, d.certificate_url, 
-			d.fee, d.opening_time, d.operational_hours, d.operational_days
+			d.id,
+			sp.name,
+			d.name,
+			d.avatar_url,
+			d.is_online,
+			d.experience_years,
+			d.certificate_url,
+			d.fee,
+			d.opening_time,
+			d.operational_hours,
+			d.operational_days
 		FROM 
 			doctors d
 		JOIN
@@ -150,11 +160,82 @@ func (r *doctorRepositoryPostgres) FindDoctorDetailById(ctx context.Context, id 
 		
 	`
 
-	err := r.db.QueryRowContext(ctx, q, id).Scan(&res.Id, &res.SpecializationName, &res.Name, &res.Avatar, &res.IsOnline,
-		&res.Experiences, &res.Certificate, &res.Fee, &res.Opening, &res.OperationalHours, &res.OperationalDays)
+	err := r.db.QueryRowContext(
+		ctx,
+		q,
+		id,
+	).Scan(&res.Id,
+		&res.SpecializationName,
+		&res.Name,
+		&res.Avatar,
+		&res.IsOnline,
+		&res.Experiences,
+		&res.Certificate,
+		&res.Fee,
+		&res.Opening,
+		&res.OperationalHours,
+		&res.OperationalDays)
 
 	if err != nil {
 
+		if err == sql.ErrNoRows {
+			return nil, apperror.NewProductNotFound(err)
+		}
+
+		return nil, apperror.NewInternal(err)
+	}
+
+	return &res, nil
+}
+
+func (r *doctorRepositoryPostgres) FindDoctorDetailByAuthIdRedacted(ctx context.Context, id int64) (*entity.DoctorDetail, error) {
+	res := entity.DoctorDetail{}
+
+	q := `
+		SELECT
+			d.id,
+			sp.name,
+			d.name,
+			d.avatar_url,
+			d.is_online,
+			d.experience_years,
+			d.certificate_url,
+			d.fee,
+			d.opening_time,
+			d.operational_hours,
+			d.operational_days
+		FROM 
+			doctors d
+		JOIN
+			authentications a
+		ON
+			a.id = d.authentication_id
+		JOIN
+			doctor_specializations sp
+		ON
+			d.doctor_specialization_id = sp.id
+		WHERE
+			authentication_id = $1
+		
+	`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		q,
+		id,
+	).Scan(&res.Id,
+		&res.SpecializationName,
+		&res.Name,
+		&res.Avatar,
+		&res.IsOnline,
+		&res.Experiences,
+		&res.Certificate,
+		&res.Fee,
+		&res.Opening,
+		&res.OperationalHours,
+		&res.OperationalDays)
+
+	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, apperror.NewProductNotFound(err)
 		}
@@ -179,16 +260,26 @@ func (r *doctorRepositoryPostgres) UpdateOneDoctor(ctx context.Context, body ent
 	queryParams, paramsData := convertUpdateDoctorQueryParamstoSql(body, id)
 	q.WriteString(queryParams)
 	data = append(data, paramsData...)
-	err := r.db.QueryRowContext(ctx, q.String(), data...).
-		Scan(&doctor.Id, &doctor.Name, &doctor.Avatar, &doctor.IsOnline, &doctor.Experiences, &doctor.Certificate, &doctor.Fee,
-			&doctor.Opening, &doctor.OperationalHours, &doctor.OperationalDays)
+	err := r.db.QueryRowContext(
+		ctx,
+		q.String(),
+		data...,
+	).Scan(&doctor.Id,
+		&doctor.Name,
+		&doctor.Avatar,
+		&doctor.IsOnline,
+		&doctor.Experiences,
+		&doctor.Certificate,
+		&doctor.Fee,
+		&doctor.Opening,
+		&doctor.OperationalHours,
+		&doctor.OperationalDays)
 
 	if err != nil {
 		return nil, apperror.NewInternal(err)
 	}
 
 	return &doctor, nil
-
 }
 
 func (r *doctorRepositoryPostgres) FindDoctorByAuthId(ctx context.Context, authId int64) (*entity.Doctor, error) {

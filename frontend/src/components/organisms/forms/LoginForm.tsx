@@ -162,7 +162,7 @@ const LoginForm = (): React.ReactElement => {
             avatarUrl: doctorData.avatar_url,
             specialization: doctorData.specialization,
             isOnline: doctorData.is_online,
-            experience: doctorData.experience,
+            experiences: doctorData.experiences,
             certificate: doctorData.certificate,
             fee: doctorData.fee,
             openingTime: doctorData.opening_time,
