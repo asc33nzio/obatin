@@ -226,6 +226,11 @@ func (h *AuthenticationHandler) SendVerifyForgotPassword(ctx *gin.Context) {
 
 func (h *AuthenticationHandler) GetPendingDoctorApproval(ctx *gin.Context) {
 	paginationQuery := dto.PaginationReq{}
+	err := ctx.ShouldBindQuery(&paginationQuery)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
 
 	paginationParams := paginationQuery.ToPaginationEntity()
 	doctorPendingApproval, err := h.userUsecase.GetPendingDoctorApproval(ctx, paginationParams)

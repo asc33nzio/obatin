@@ -54,6 +54,7 @@ func (u *chatRoomUsecaseImpl) CreateChatRoom(ctx context.Context, crReq entity.C
 	crr := u.repoStore.ChatRoomRepository()
 	dr := u.repoStore.DoctorRepository()
 	ur := u.repoStore.UserRepository()
+	ar := u.repoStore.AuthenticationRepository()
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
@@ -72,6 +73,13 @@ func (u *chatRoomUsecaseImpl) CreateChatRoom(ctx context.Context, crReq entity.C
 	user, err := ur.FindUserByAuthId(ctx, authenticationId)
 	if err != nil {
 		return err
+	}
+	auth, err := ar.FindAuthenticationById(ctx, authenticationId)
+	if err != nil {
+		return err
+	}
+	if !auth.IsVerified {
+		return apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 
 	crReq.UserId = *user.Id
@@ -108,10 +116,18 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoomMessageById(ctx context.Context, cha
 	dr := u.repoStore.DoctorRepository()
 	mr := u.repoStore.MessageRepository()
 	crr := u.repoStore.ChatRoomRepository()
+	ar := u.repoStore.AuthenticationRepository()
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
+	}
+	auth, err := ar.FindAuthenticationById(ctx, authenticationId)
+	if err != nil {
+		return nil, err
+	}
+	if !auth.IsVerified {
+		return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
@@ -156,6 +172,7 @@ func (u *chatRoomUsecaseImpl) UpdateIsTyping(ctx context.Context, crReq entity.C
 	crr := u.repoStore.ChatRoomRepository()
 	ur := u.repoStore.UserRepository()
 	dr := u.repoStore.DoctorRepository()
+	ar := u.repoStore.AuthenticationRepository()
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
@@ -167,7 +184,15 @@ func (u *chatRoomUsecaseImpl) UpdateIsTyping(ctx context.Context, crReq entity.C
 		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
-	_, err := crr.FindChatRoomByID(ctx, chatRoomId)
+	auth, err := ar.FindAuthenticationById(ctx, authenticationId)
+	if err != nil {
+		return err
+	}
+	if !auth.IsVerified {
+		return apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
+	}
+
+	_, err = crr.FindChatRoomByID(ctx, chatRoomId)
 	if err != nil {
 		return apperror.ErrChatRoomNotFound(nil)
 	}
@@ -207,6 +232,8 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoom(ctx context.Context, params entity.
 	crr := u.repoStore.ChatRoomRepository()
 	dr := u.repoStore.DoctorRepository()
 	ur := u.repoStore.UserRepository()
+	ar := u.repoStore.AuthenticationRepository()
+
 	allMessage := entity.ChatRoomListPage{}
 	if params.Limit < appconstant.DefaultMinLimit {
 		params.Limit = appconstant.DefaultProductLimit
@@ -225,9 +252,16 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoom(ctx context.Context, params entity.
 		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
+	auth, err := ar.FindAuthenticationById(ctx, authenticationId)
+	if err != nil {
+		return nil, err
+	}
+	if !auth.IsVerified {
+		return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
+	}
 
 	if authenticationRole == constant.RoleDoctor {
-		
+
 		doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)
 		if err != nil {
 			return nil, err

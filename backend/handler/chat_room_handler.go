@@ -118,6 +118,11 @@ func (h *ChatRoomHandler) UpdateIsTyping(ctx *gin.Context) {
 
 func (h *ChatRoomHandler) GetListChatRoom(ctx *gin.Context) {
 	paginationQuery := dto.PaginationReq{}
+	err := ctx.ShouldBindQuery(&paginationQuery)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
 
 	paginationParams := paginationQuery.ToPaginationEntity()
 	messageChatRoom, err := h.chatRoomUsecase.GetAllChatRoom(ctx, paginationParams)
@@ -128,9 +133,9 @@ func (h *ChatRoomHandler) GetListChatRoom(ctx *gin.Context) {
 
 	res := dto.ToGetAllChatRoomRes(messageChatRoom.ChatRooms)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseGetAllChatRoomMsg,
+		Message:    constant.ResponseGetAllChatRoomMsg,
 		Pagination: (*dto.PaginationResponse)(&messageChatRoom.Pagination),
-		Data:    res,
+		Data:       res,
 	})
 }
 
