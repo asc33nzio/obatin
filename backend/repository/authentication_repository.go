@@ -614,7 +614,7 @@ func (r *authenticationRepositoryPostgres) DeleteOneAuthenticationById(ctx conte
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil

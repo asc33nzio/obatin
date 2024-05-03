@@ -47,7 +47,7 @@ func (r *messageRepositoryPostgres) CreateMessage(ctx context.Context, mReq enti
 		return apperror.ErrInvalidReq(err)
 	}
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil

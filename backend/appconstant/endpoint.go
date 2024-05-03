@@ -33,4 +33,8 @@ const (
 	EndpointGetAllMessageOnChatRoom  = "/chat-room/:id"
 	EndpointUpdateIsTyping           = "/chat-room/:id"
 	EndpointDeleteChatRoom           = "/chat-room/:id"
+	EndpointCart                     = "/shop/cart"
+	EndpointCartCheckout             = "/shop/cart/checkout"
+	EndpointCartDelete               = "/shop/cart/item"
+	EndpointPrescription             = "/prescriptions"
 )
