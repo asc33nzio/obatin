@@ -92,6 +92,7 @@ const Navbar = (): React.ReactElement => {
     setIsPopupOpened(
       userRole === 'user' && !userInfo?.isVerified ? true : false,
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
