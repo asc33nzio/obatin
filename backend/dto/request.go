@@ -38,6 +38,11 @@ type UpdatePasswordReq struct {
 	ConfirmPassword string `json:"confirm_password"`
 }
 
+type UpdateProfilePasswordReq struct {
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
+}
+
 type PartnerRegisterReq struct {
 	Email    string `form:"email" binding:"required"`
 	Password string `form:"password" binding:"required"`
@@ -88,6 +93,13 @@ func (u UpdatePasswordReq) ToPassword() entity.Authentication {
 	return entity.Authentication{
 		Password:        u.Password,
 		ConfirmPassword: u.ConfirmPassword,
+	}
+}
+
+func (u UpdateProfilePasswordReq) ToUpdatePassword() entity.UpdatePassword {
+	return entity.UpdatePassword{
+		OldPassword: u.OldPassword,
+		NewPassword: u.NewPassword,
 	}
 }
 

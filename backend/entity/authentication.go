@@ -20,3 +20,8 @@ type Pagination struct {
 	Page  int
 	Limit int
 }
+
+type UpdatePassword struct {
+	OldPassword string
+	NewPassword string
+}

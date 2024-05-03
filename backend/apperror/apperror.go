@@ -305,3 +305,12 @@ func ErrChatRoomAlreadyInactive(err error) *AppError {
 		stack:   debug.Stack(),
 	}
 }
+
+func ErrInvalidSameUpdatedPassword(err error) *AppError {
+	return &AppError{
+		code:    ErrorInvalidSameAsPrevUpdatePass,
+		err:     err,
+		message: ErrStlSameasPrevPass,
+		stack:   debug.Stack(),
+	}
+}
