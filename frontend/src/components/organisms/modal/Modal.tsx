@@ -44,11 +44,11 @@ const Modal = () => {
   switch (modalType) {
     case 'confirm-password':
       modalContent = <ChangePasswordModalContent />;
-      title = 'Tolong konfirmasi sandi anda';
+      title = 'Tolong konfirmasi sandi baru anda';
       modalProps = {
         $overlayHeight: '125vh',
         $containerWidth: '500px',
-        $containerHeight: '250px',
+        $containerHeight: '325px',
       };
       break;
 

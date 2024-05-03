@@ -9,12 +9,8 @@ export const navigateToRegister = async () => {
   redirect('/auth/register');
 };
 
-export const navigateToSetPassword = async () => {
-  redirect('/auth/register/onboarding/');
-};
-
 export const navigateToForgotPassword = async () => {
-  redirect('/auth/forgot-password');
+  redirect('/auth/forgot');
 };
 
 export const navigateToOnboarding = async () => {

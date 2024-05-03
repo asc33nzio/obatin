@@ -260,7 +260,7 @@ const AddAddressModalContent = (): React.ReactElement => {
           avatarUrl: userInfo.avatarUrl,
           isVerified: userInfo.isVerified,
           isApproved: userInfo.isApproved,
-          activeAddressId: userInfo.activeAddressId,
+          activeAddressId: newUserData.active_address_id,
           addresses: newUserData.addresses,
         }),
       );

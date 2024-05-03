@@ -634,7 +634,7 @@ func (u *authentictionUsecaseImpl) SendEmailForgotPasssword(ctx context.Context,
 			return err
 		}
 
-		verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.VerificationLinkBase(), tokenJWT)
+		verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.ResetLinkBase(), tokenJWT)
 		emailParamsResetPassword := util.EmailParams{
 			ToEmail:          uReq.Email,
 			VerificationLink: verificationLink,
@@ -671,7 +671,7 @@ func (u *authentictionUsecaseImpl) SendEmailForgotPasssword(ctx context.Context,
 		return err
 	}
 
-	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.VerificationLinkBase(), tokenJWT)
+	verificationLink := fmt.Sprintf("%s%s%s", u.config.DefaultEndpointFrontend(), u.config.ResetLinkBase(), tokenJWT)
 
 	emailParamsResetPassword := util.EmailParams{
 		ToEmail:          uReq.Email,

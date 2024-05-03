@@ -15,10 +15,10 @@ import CustomButton from '@/components/atoms/button/CustomButton';
 
 const VerifyPage = () => {
   const searchParams = useSearchParams();
-  const { setToast } = useToast();
   const dispatch = useObatinDispatch();
+  const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  const [count, setCount] = useState<number>(10);
+  const [count, setCount] = useState<number>(5);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSuccessful, setIsSuccessful] = useState<boolean>(false);
   const token = searchParams.get('token');
