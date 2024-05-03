@@ -56,13 +56,14 @@ type ManufacturerResponse struct {
 }
 
 type ProductListResponse struct {
-	Id          int64  `json:"id"`
-	Name        string `json:"name"`
-	Slug        string `json:"product_slug"`
-	SellingUnit string `json:"selling_unit"`
-	MinPrice    int    `json:"min_price"`
-	MaxPrice    int    `json:"max_price"`
-	ImageUrl    string `json:"image_url"`
+	Id                     int64  `json:"id"`
+	Name                   string `json:"name"`
+	Slug                   string `json:"product_slug"`
+	SellingUnit            string `json:"selling_unit"`
+	MinPrice               int    `json:"min_price"`
+	MaxPrice               int    `json:"max_price"`
+	ImageUrl               string `json:"image_url"`
+	IsPrescriptionRequired bool   `json:"is_prescription_required"`
 }
 
 type ProductListPageResponse struct {
@@ -122,13 +123,14 @@ func ToProductListResponse(products *entity.ProductListPage) []ProductListRespon
 	response := []ProductListResponse{}
 	for _, values := range products.Products {
 		response = append(response, ProductListResponse{
-			Id:          values.Id,
-			Name:        values.Name,
-			Slug:        values.Slug,
-			SellingUnit: values.SellingUnit,
-			MinPrice:    values.MinPrice,
-			MaxPrice:    values.MaxPrice,
-			ImageUrl:    values.ImageUrl,
+			Id:                     values.Id,
+			Name:                   values.Name,
+			Slug:                   values.Slug,
+			SellingUnit:            values.SellingUnit,
+			MinPrice:               values.MinPrice,
+			MaxPrice:               values.MaxPrice,
+			ImageUrl:               values.ImageUrl,
+			IsPrescriptionRequired: values.IsPrescriptionRequired,
 		})
 	}
 	return response

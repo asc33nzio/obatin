@@ -10,6 +10,7 @@ type ProductList struct {
 	MinPrice    int
 	MaxPrice    int
 	ImageUrl    string
+	IsPrescriptionRequired bool
 }
 
 type ProductDetail struct {

@@ -35,7 +35,7 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 
 	sb.WriteString(`
 		SELECT DISTINCT 
-			p.id, p.name, p.product_slug, p.selling_unit, p.min_price, p.max_price, p.image_url 
+			p.id, p.name, p.product_slug, p.selling_unit, p.min_price, p.max_price, p.image_url, p.is_prescription_required 
 		FROM 
 			products p 
 		JOIN 
@@ -69,7 +69,7 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 	for rows.Next() {
 		product := entity.ProductList{}
 		err := rows.Scan(&product.Id, &product.Name, &product.Slug, &product.SellingUnit,
-			&product.MinPrice, &product.MaxPrice, &product.ImageUrl)
+			&product.MinPrice, &product.MaxPrice, &product.ImageUrl, &product.IsPrescriptionRequired)
 		if err != nil {
 			return nil, apperror.NewInternal(err)
 		}
