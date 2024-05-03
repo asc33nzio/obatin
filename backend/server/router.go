@@ -121,7 +121,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.GET(appconstant.EndpointGetProductDetail, h.ProductHandler.GetProductDetailBySlug)
 	r.GET(appconstant.EndPointAllCategories, h.CategoryHandler.GetAllCategory)
 	r.GET(appconstant.EndpointGetDoctorList, h.DoctorHandler.GetAllDoctor)
-	r.PATCH(appconstant.EndpointForgotPassword, h.AuthenticationHandler.UpdatePasswordByToken)
+	r.PATCH(appconstant.EndpointResetPassword, h.AuthenticationHandler.UpdatePasswordByToken)
 	r.POST(appconstant.EndpointForgotPassword, h.AuthenticationHandler.SendVerifyForgotPassword)
 	r.GET(appconstant.EndpointGetDoctorSpecialization, h.DoctorSpecializationHandler.GetAll)
 	r.POST(appconstant.EndpointRefreshToken, h.AuthenticationHandler.GetRefreshToken)
