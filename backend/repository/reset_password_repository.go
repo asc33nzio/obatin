@@ -119,7 +119,7 @@ func (r *resetPasswordRepositoryPostgres) DeleteResetPasswordTokenAfterExpired(c
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(apperror.ErrStlNotFound)
+		return nil
 	}
 
 	return nil

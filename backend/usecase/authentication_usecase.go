@@ -120,7 +120,7 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 		}
 	}
 
-	err = rt.DeleteRefreshTokenAfterExpired(ctx)
+	err = rt.DeleteRefreshTokenAfterExpiredByAuthId(ctx, authentication.Id)
 	if err != nil {
 		return nil, apperror.NewInternal(err)
 	}
@@ -148,7 +148,7 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 			return nil, apperror.NewInternal(err)
 		}
 
-		err = rt.CreateNewRefreshToken(ctx, randomRefreshToken, int(authentication.Id))
+		err = rt.CreateNewRefreshToken(ctx, randomRefreshToken, authentication.Id)
 		if err != nil {
 			return nil, apperror.NewInternal(err)
 		}
