@@ -45,62 +45,70 @@ func NewMessageUsecaseImpl(
 }
 
 func (u *messageUsecaseImpl) CreateMessage(ctx context.Context, mReq entity.Message) error {
-	mr := u.repoStore.MessageRepository()
-	ur := u.repoStore.UserRepository()
-	dr := u.repoStore.DoctorRepository()
-	crr := u.repoStore.ChatRoomRepository()
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if !ok {
-		return apperror.NewInternal(apperror.ErrInterfaceCasting)
-	}
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
-	if !ok {
-		return apperror.NewInternal(apperror.ErrInterfaceCasting)
-	}
+	_, err := u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
+		mr := rs.MessageRepository()
+		ur := rs.UserRepository()
+		dr := rs.DoctorRepository()
+		crr := rs.ChatRoomRepository()
 
-	err := crr.DeleteChatRoomAfterExpired(ctx)
-	if err != nil {
-		return apperror.NewInternal(err)
-	}
+		authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+		if !ok {
+			return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
+		}
+		authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+		if !ok {
+			return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
+		}
 
-	chatRoom, err := crr.FindChatRoomByID(ctx, mReq.ChatRoomId)
+		err := crr.DeleteChatRoomAfterExpiredById(ctx, mReq.ChatRoomId)
+		if err != nil {
+			return nil, apperror.NewInternal(err)
+		}
+
+		chatRoom, err := crr.FindChatRoomByID(ctx, mReq.ChatRoomId)
+		if err != nil {
+			return nil, err
+		}
+
+		if !chatRoom.IsActive {
+			return nil, apperror.ErrChatRoomAlreadyInactive(nil)
+		}
+
+		if authenticationRole == constant.RoleDoctor {
+			doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)
+			if err != nil {
+				return nil, err
+			}
+
+			if chatRoom.DoctorId != doctor.Id {
+				return nil, apperror.ErrForbiddenAccess(nil)
+			}
+		}
+
+		if authenticationRole == constant.RoleUser {
+			user, err := ur.FindUserByAuthId(ctx, authenticationId)
+			if err != nil {
+				return nil, err
+			}
+			if chatRoom.UserId != *user.Id {
+				return nil, apperror.ErrForbiddenAccess(nil)
+			}
+		}
+
+		mReq.Sender = authenticationRole
+		err = mr.CreateMessage(ctx, mReq)
+		if err != nil {
+			return nil, apperror.ErrInvalidReq(nil)
+		}
+		err = crr.UpdateChatRoomUpdatedAtByID(ctx, chatRoom.Id)
+		if err != nil {
+			return nil, apperror.ErrInvalidReq(nil)
+		}
+
+		return nil, nil
+	})
 	if err != nil {
 		return err
-	}
-
-	if !chatRoom.IsActive {
-		return apperror.ErrChatRoomAlreadyInactive(nil)
-	}
-
-	if authenticationRole == constant.RoleDoctor {
-		doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)
-		if err != nil {
-			return err
-		}
-
-		if chatRoom.DoctorId != doctor.Id {
-			return apperror.ErrForbiddenAccess(nil)
-		}
-	}
-
-	if authenticationRole == constant.RoleUser {
-		user, err := ur.FindUserByAuthId(ctx, authenticationId)
-		if err != nil {
-			return err
-		}
-		if chatRoom.UserId != *user.Id {
-			return apperror.ErrForbiddenAccess(nil)
-		}
-	}
-
-	mReq.Sender = authenticationRole
-	err = mr.CreateMessage(ctx, mReq)
-	if err != nil {
-		return apperror.ErrInvalidReq(nil)
-	}
-	err = crr.UpdateChatRoomUpdatedAtByID(ctx, chatRoom.Id)
-	if err != nil {
-		return apperror.ErrInvalidReq(nil)
 	}
 
 	return nil
