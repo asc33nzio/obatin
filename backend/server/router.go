@@ -30,6 +30,8 @@ type RouterOpt struct {
 	MessageHandler              *handler.MessageHandler
 	ChatRoomHandler             *handler.ChatRoomHandler
 	DoctorHandler               *handler.DoctorHandler
+	CartHandler                 *handler.CartHandler
+	PrescriptionHandler         *handler.PrescriptionHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -71,6 +73,12 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	doctorUsecase := usecase.NewDoctorUsecaseImpl(dbStore, config, cloudinaryUpload)
 	doctorHandler := handler.NewDoctorHandler(doctorUsecase)
 
+	cartUsecase := usecase.NewCartUsecaseImpl(dbStore, config)
+	cartHandler := handler.NewCartHandler(cartUsecase)
+
+	prescriptionUsecase := usecase.NewPrescriptionUsecaseImpl(dbStore, config)
+	prescriptionHandler := handler.NewPrescriptionHandler(prescriptionUsecase)
+
 	return NewRouter(RouterOpt{
 		Middleware:                  middleware,
 		AuthenticationHandler:       authentiationHandler,
@@ -83,6 +91,8 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 		DoctorHandler:               doctorHandler,
 		MessageHandler:              messageHandler,
 		ChatRoomHandler:             chatRoomHandler,
+		CartHandler:                 cartHandler,
+		PrescriptionHandler:         prescriptionHandler,
 	})
 }
 
@@ -152,5 +162,10 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.PATCH(appconstant.EndpointUpdateIsTyping, h.ChatRoomHandler.UpdateIsTyping)
 	r.GET(appconstant.EndpointGetAllChatRoom, h.ChatRoomHandler.GetListChatRoom)
 	r.DELETE(appconstant.EndpointDeleteChatRoom, h.ChatRoomHandler.DeleteChatRoom)
+	r.POST(appconstant.EndpointCart, h.CartHandler.Bulk)
+	r.GET(appconstant.EndpointCart, h.CartHandler.GetCartDetails)
+	r.PUT(appconstant.EndpointCart, h.CartHandler.UpdateOneCartItemQuantity)
+	r.DELETE(appconstant.EndpointCartDelete, h.CartHandler.DeleteOneCartItem)
+	r.POST(appconstant.EndpointPrescription, h.PrescriptionHandler.CreatePrescription)
 	return r
 }

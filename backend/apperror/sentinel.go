@@ -13,4 +13,6 @@ var (
 	ErrStlEmailNotVerified        = errors.New("email has not been verified")
 	ErrStlForbiddenAccess         = errors.New("you do not have access")
 	ErrStlAccountHasNotApproved   = errors.New("you should wait approval by admin")
+	ErrStlNotFound                = errors.New("not found")
+	ErrStlBadRequest              = errors.New("bad request")
 )

@@ -29,4 +29,8 @@ const (
 	ResponseGetAllChatRoomMsg             = "succesfully get all chat room"
 	ResponseDeleteChatRoomMsg             = "succesfully delete a chat room"
 	ResponseDeleteMessageMsg              = "succesfully delete a message"
+	ResponseCartUpdatedMsg                = "cart updated successfully"
+	ResponseCartCheckoutMsg               = "cart checkout successfully"
+	ResponseCartItemDeletedMsg            = "cart item deleted successfully"
+	ResponsePrescriptionCreatedMsg        = "prescription created successfully"
 )

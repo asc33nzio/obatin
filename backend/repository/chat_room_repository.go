@@ -93,7 +93,7 @@ func (r *chatRoomRepositoryPostgres) CreateOne(ctx context.Context, u entity.Cha
 		return apperror.NewInternal(err)
 	}
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -124,7 +124,7 @@ func (r *chatRoomRepositoryPostgres) UpdateUserIsTypingByUserId(ctx context.Cont
 		return apperror.NewInternal(err)
 	}
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -155,7 +155,7 @@ func (r *chatRoomRepositoryPostgres) UpdateDoctorIsTypingByDoctorId(ctx context.
 		return apperror.NewInternal(err)
 	}
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -407,7 +407,7 @@ func (r *chatRoomRepositoryPostgres) DeleteChatRoomById(ctx context.Context, cha
 		return apperror.NewInternal(err)
 	}
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -437,7 +437,7 @@ func (r *chatRoomRepositoryPostgres) DeleteChatRoomAfterExpired(ctx context.Cont
 	}
 
 	if rowsAffected == 0 {
-		return nil
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -475,7 +475,7 @@ func (r *chatRoomRepositoryPostgres) UpdateChatRoomValidByUserId(ctx context.Con
 	}
 
 	if rowsAffected == 0 {
-		return nil
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -506,7 +506,7 @@ func (r *chatRoomRepositoryPostgres) UpdateChatRoomUpdatedAtByID(ctx context.Con
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil

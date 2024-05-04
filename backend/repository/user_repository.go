@@ -53,7 +53,7 @@ func (r *userRepositoryPostgres) CreateNewUser(ctx context.Context, authentiacti
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -292,7 +292,7 @@ func (r *userRepositoryPostgres) UpdateOneUserDetails(ctx context.Context, userU
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -389,7 +389,7 @@ func (r *userRepositoryPostgres) RemoveActiveAddressId(ctx context.Context, auth
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -422,7 +422,7 @@ func (r *userRepositoryPostgres) DeleteOneUserByAuthId(ctx context.Context, auth
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
