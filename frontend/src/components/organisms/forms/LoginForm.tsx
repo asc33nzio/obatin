@@ -83,35 +83,16 @@ const LoginForm = (): React.ReactElement => {
       const isVerified = decoded.Payload.is_verified;
       const isApproved = decoded.Payload.is_approved;
 
-      if (process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S === undefined) {
-        throw new Error('please define access token valid duration env var');
-      }
-      const validAccessTokenExpiryMilliseconds: number = parseInt(
-        process.env.NEXT_PUBLIC_ACCESS_TOKEN_VALID_DURATION_S,
-        10,
-      );
-      if (
-        process.env.NEXT_PUBLIC_REFRESH_TOKEN_VALID_DURATION_S === undefined
-      ) {
-        throw new Error('please define refresh token valid duration env var');
-      }
-      const validRefreshTokenExpiryMilliseconds: number = parseInt(
-        process.env.NEXT_PUBLIC_REFRESH_TOKEN_VALID_DURATION_S,
-        10,
-      );
-
       setCookie('access_token', access_token, {
         // httpOnly: true,
         priority: 'high',
         path: '/',
-        maxAge: validAccessTokenExpiryMilliseconds,
       });
 
       setCookie('refresh_token', refresh_token, {
         // httpOnly: true,
         priority: 'high',
         path: '/',
-        maxAge: validRefreshTokenExpiryMilliseconds,
       });
 
       if (userRole === 'user') {
