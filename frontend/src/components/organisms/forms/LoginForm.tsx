@@ -23,6 +23,7 @@ import { useObatinDispatch } from '@/redux/store/store';
 import { useState } from 'react';
 import { setCookie } from 'cookies-next';
 import { setAuthState } from '@/redux/reducers/authSlice';
+import { setAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedJwtItf } from '@/types/jwtTypes';
 import { PropagateLoader } from 'react-spinners';
@@ -78,6 +79,7 @@ const LoginForm = (): React.ReactElement => {
       const decoded: DecodedJwtItf = jwtDecode(access_token);
       const userRole = decoded.Payload.role;
       const authId = decoded.Payload.aid;
+
       const isVerified = decoded.Payload.is_verified;
       const isApproved = decoded.Payload.is_approved;
 
@@ -132,6 +134,8 @@ const LoginForm = (): React.ReactElement => {
             avatarUrl: userData.avatar_url,
             isVerified: isVerified,
             isApproved: isApproved,
+            activeAddressId: userData.active_address_id,
+            addresses: userData.addresses,
           }),
         );
 
@@ -140,7 +144,7 @@ const LoginForm = (): React.ReactElement => {
 
       if (userRole === 'doctor') {
         const doctorDetailResponse = await Axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/${authId}`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/details`,
           {
             headers: { Authorization: `Bearer ${access_token}` },
           },
@@ -148,17 +152,22 @@ const LoginForm = (): React.ReactElement => {
 
         const doctorData = doctorDetailResponse.data.data;
         dispatch(
-          setAuthState({
+          setAuthDoctorState({
             aid: authId,
             email: doctorData.email,
             name: doctorData.name,
-            gender: doctorData.gender,
-            birthDate: doctorData.birth_date,
-            role: userRole,
-            avatarUrl: doctorData.avatar_url,
+            role: 'doctor',
             isVerified: isVerified,
             isApproved: isApproved,
+            avatarUrl: doctorData.avatar_url,
             specialization: doctorData.specialization,
+            isOnline: doctorData.is_online,
+            experiences: doctorData.experiences,
+            certificate: doctorData.certificate,
+            fee: doctorData.fee,
+            openingTime: doctorData.opening_time,
+            operationalHours: doctorData.operational_hours,
+            operationalDays: doctorData.operational_days,
           }),
         );
 

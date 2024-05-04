@@ -28,6 +28,7 @@ type Config struct {
 	tokenLength             int
 	randomTokenLength       int
 	verificationLinkBase    string
+	resetLinkBase           string
 	jwtVerifyDoctorExp      int
 	jwtVerifyUserExp        int
 	jwtRefreshTokenExp      int
@@ -96,6 +97,7 @@ func NewConfig() (*Config, error) {
 	cloudinaryUploadFolder := os.Getenv("CLOUDINARY_UPLOAD_FOLDER")
 	cloudinaryURL := os.Getenv("CLOUDINARY_URL")
 	verificationLinkBase := os.Getenv("VERIFICATION_LINK_BASE")
+	resetLinkBase := os.Getenv("RESET_LINK_BASE")
 
 	return &Config{
 		dbUrl:                   dbUrl,
@@ -117,6 +119,7 @@ func NewConfig() (*Config, error) {
 		tokenLength:             tokenLength,
 		randomTokenLength:       randomTokenLength,
 		verificationLinkBase:    verificationLinkBase,
+		resetLinkBase:           resetLinkBase,
 		jwtVerifyDoctorExp:      jwtVerifyDoctorExp,
 		jwtVerifyUserExp:        jwtVerifyUserExp,
 		jwtRefreshTokenExp:      jwtRefreshTokenExp,
@@ -202,6 +205,10 @@ func (c *Config) RandomTokenLength() int {
 
 func (c *Config) VerificationLinkBase() string {
 	return c.verificationLinkBase
+}
+
+func (c *Config) ResetLinkBase() string {
+	return c.resetLinkBase
 }
 
 func (c *Config) JwtVerifyDoctorExpired() int {

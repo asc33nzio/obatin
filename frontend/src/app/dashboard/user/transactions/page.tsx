@@ -7,8 +7,8 @@ import {
   TxHistoryContentContainer,
   TxHistoryPageContainer,
 } from '@/styles/pages/dashboard/transactions/Transactions.styles';
-import Navbar from '@/components/organisms/navbar/Navbar';
 import { useState } from 'react';
+import Navbar from '@/components/organisms/navbar/Navbar';
 
 interface TxFilterItf {
   all: boolean;

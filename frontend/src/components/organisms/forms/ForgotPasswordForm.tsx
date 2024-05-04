@@ -7,9 +7,8 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
-import { navigateToDashboard, navigateToLogin } from '@/app/actions';
-import { useEffect, useState } from 'react';
-import { getCookie } from 'cookies-next';
+import { navigateToLogin } from '@/app/actions';
+import { useState } from 'react';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
@@ -43,7 +42,7 @@ const ForgotPasswordForm = (): React.ReactElement => {
     try {
       setIsLoading(true);
       await Axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/forgot-password`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/forgot`,
         payload,
       );
 
@@ -57,10 +56,21 @@ const ForgotPasswordForm = (): React.ReactElement => {
       navigateToLogin();
     } catch (error: any) {
       const errMsg = error?.response?.data?.message;
+      if (errMsg) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Tolong lakukan verifikasi e-mail terlebih dahulu',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        navigateToLogin();
+        return;
+      }
       setToast({
         showToast: true,
-        toastMessage: errMsg ? errMsg : 'Gagal. Cek kembali e-mail anda',
-        toastType: 'ok',
+        toastMessage: 'Gagal. Cek kembali e-mail anda',
+        toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
@@ -68,17 +78,6 @@ const ForgotPasswordForm = (): React.ReactElement => {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    const isAuthenticatedCheck = () => {
-      const sessionToken = getCookie('session_token');
-      if (sessionToken !== undefined) {
-        navigateToDashboard();
-      }
-    };
-
-    isAuthenticatedCheck();
-  }, []);
 
   return (
     <LoginOrRegisterFormContainer $isLoginPage={true}>

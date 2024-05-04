@@ -75,7 +75,7 @@ func (u *doctorUsecaseImpl) GetDoctorList(ctx context.Context, params entity.Doc
 func (u *doctorUsecaseImpl) UpdateOneDoctor(ctx context.Context, body entity.DoctorUpdateRequest, id int64) (*entity.DoctorDetail, error) {
 	dr := u.repoStore.DoctorRepository()
 
-	doctor, err := dr.FindDoctorDetailById(ctx, id)
+	doctor, err := dr.FindDoctorDetailByAuthIdRedacted(ctx, id)
 	if doctor == nil {
 		return nil, apperror.ErrDoctorNotFound(nil)
 	}

@@ -7,7 +7,7 @@ export const PasswordModalContentContainer = styled.div`
   justify-content: center;
 
   width: 100%;
-  height: 200px;
+  height: 100%;
 `;
 
 export const PasswordModalButtonsContainer = styled.div`

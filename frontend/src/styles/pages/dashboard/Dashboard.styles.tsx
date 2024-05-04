@@ -6,9 +6,23 @@ export const DashboardPageContainer = styled.div<{
   display: flex;
   flex-direction: column;
 
-  width: 99vw;
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '135vh' : '200vh')};
+  width: 100vw;
   max-width: 100vw;
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '125vh' : '200vh')};
+
+  overflow-x: hidden;
+`;
+
+export const DoctorDashboardPageContainer = styled.div<{
+  $isDesktopDisplay: boolean;
+}>`
+  display: flex;
+  flex-direction: column;
+
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '100vh' : '200vh')};
+  width: 100vw;
+  max-width: 100vw;
+
   overflow-x: hidden;
 `;
 
@@ -17,10 +31,9 @@ export const DashboardPageContentContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
-  padding-top: 50px;
-
   width: 100vw;
-  height: 95%;
+  height: 83%;
+  overflow-y: hidden;
 `;
 
 export const ProfileContainer = styled.div<{ $isDesktopDisplay: boolean }>`
@@ -30,6 +43,20 @@ export const ProfileContainer = styled.div<{ $isDesktopDisplay: boolean }>`
 
   width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
   height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '40%' : '100%')};
+  gap: 10px;
+
+  margin-bottom: 100px;
+`;
+
+export const DoctorProfileContainer = styled.div<{
+  $isDesktopDisplay: boolean;
+}>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '100%')};
   gap: 10px;
 
   margin-bottom: 100px;
@@ -179,22 +206,25 @@ export const UserDetailDiv = styled.div`
 `;
 
 export const AddressContainer = styled.div<{ $isDesktopDisplay: boolean }>`
-  display: flex;
+  display: block;
   flex-direction: column;
   align-items: center;
 
   width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
-  height: 40%;
+  height: 45%;
 
-  overflow-y: auto;
+  overflow-y: scroll;
 `;
 
 export const AddressHeader = styled.div`
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 
+  background-color: #ffffff;
   width: 100%;
   height: 15%;
   padding-left: 15px;
@@ -207,6 +237,8 @@ export const AddressHeader = styled.div`
     font-size: 38px;
     background: transparent;
   }
+
+  z-index: 1;
 `;
 
 export const GenderSelect = styled.select`
@@ -222,4 +254,39 @@ export const GenderSelect = styled.select`
   font-size: 17px;
 
   cursor: pointer;
+`;
+
+export const DoctorProgressContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 45%;
+`;
+
+export const ContentSubcontainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 50%;
+  height: 100%;
+
+  p {
+    font-size: 24px;
+    text-align: center;
+    color: #00b5c0;
+    width: 100%;
+    height: 50%;
+
+    u {
+      cursor: pointer;
+      font-size: 24px;
+      color: #00b5c0;
+      font-weight: 500;
+    }
+  }
 `;

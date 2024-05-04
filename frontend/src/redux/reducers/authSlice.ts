@@ -1,5 +1,5 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { AuthReduxItf } from '@/types/authTypes';
+import { AuthReduxItf } from '@/types/reduxTypes';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: AuthReduxItf = {
@@ -12,7 +12,8 @@ const initialState: AuthReduxItf = {
   isVerified: false,
   isApproved: false,
   avatarUrl: '',
-  specialization: null,
+  activeAddressId: null,
+  addresses: [],
 };
 
 export const authSlice = createSlice({
@@ -27,14 +28,30 @@ export const authSlice = createSlice({
       state.birthDate = action.payload.birthDate;
       state.role = action.payload.role;
       state.isVerified = action.payload.isVerified;
-      state.avatarUrl = action.payload.avatarUrl;
       state.isApproved = action.payload.isApproved;
-      if (action.payload.specialization) {
-        state.specialization = action.payload.specialization;
+      state.avatarUrl = action.payload.avatarUrl;
+      if (action.payload.activeAddressId) {
+        state.activeAddressId = action.payload.activeAddressId;
       }
+      if (action.payload.addresses) {
+        state.addresses = action.payload.addresses;
+      }
+    },
+    resetAuthState: (state) => {
+      state.aid = 0;
+      state.email = '';
+      state.name = '';
+      state.gender = 'laki-laki';
+      state.birthDate = undefined;
+      state.role = 'user';
+      state.isVerified = false;
+      state.isApproved = false;
+      state.avatarUrl = '';
+      state.activeAddressId = null;
+      state.addresses = [];
     },
   },
 });
 
-export const { setAuthState } = authSlice.actions;
+export const { setAuthState, resetAuthState } = authSlice.actions;
 export const authReducer = authSlice.reducer;
