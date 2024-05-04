@@ -34,7 +34,7 @@ export const StyledToastContainer = styled.div<{ $orientation?: string }>`
     }
   }
 
-  z-index: 5;
+  z-index: 100001;
 `;
 
 export const StyledToast = styled.div<{ $type: string; $resolution: string }>`
@@ -71,5 +71,5 @@ export const StyledToast = styled.div<{ $type: string; $resolution: string }>`
   font-size: 24px;
   font-weight: 500;
 
-  z-index: 10;
+  z-index: 100002;
 `;

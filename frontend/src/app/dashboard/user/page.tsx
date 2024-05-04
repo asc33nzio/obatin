@@ -19,12 +19,7 @@ import {
   ProfileHeaderButtonsDiv,
   UserDetailDiv,
 } from '@/styles/pages/dashboard/Dashboard.styles';
-import {
-  // eslint-disable-next-line
-  EditProfilePayloadItf,
-  EditProfileStateItf,
-  GenderItf,
-} from '@/types/dashboardTypes';
+import { EditProfileStateItf, GenderItf } from '@/types/dashboardTypes';
 import { useState } from 'react';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
@@ -80,6 +75,7 @@ const UserDashboardPage = (): React.ReactElement => {
     useEmailValidation();
   const {
     password,
+    validatePassword,
     passwordValidationError,
     confirmPasswordValidationError,
     handlePasswordInputChange,
@@ -90,6 +86,8 @@ const UserDashboardPage = (): React.ReactElement => {
   const [nameValidationError, setNameValidationError] = useState<string>('');
   const [gender, setGender] = useState<GenderItf>({ isMale: true });
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isInitialPassCheckLoading, setIsInitialPassCheckLoading] =
+    useState<boolean>(false);
 
   type ValuePiece = Date | null;
   type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -121,23 +119,50 @@ const UserDashboardPage = (): React.ReactElement => {
     750,
   );
 
-  const openPasswordInterface = () => {
+  const openPasswordInterface = async () => {
     setIsEditingField((prevState) => ({
       ...prevState,
       password: true,
     }));
   };
 
-  const openConfirmPasswordInterface = () => {
+  const openConfirmPasswordInterface = async () => {
+    if (!validatePassword(password)) return;
+
+    const payload = {
+      email: userInfo?.email,
+      password: password,
+    };
+
+    try {
+      setIsInitialPassCheckLoading(true);
+      await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
+        payload,
+      );
+    } catch (error: any) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: 'Kata sandi lama anda salah',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      return;
+    } finally {
+      setIsInitialPassCheckLoading(false);
+
+      setIsEditingField((prevState) => ({
+        ...prevState,
+        password: false,
+        confirmPassword: true,
+      }));
+    }
+
     if (password && !passwordValidationError) {
       openModal('confirm-password');
     }
-
-    setIsEditingField((prevState) => ({
-      ...prevState,
-      password: false,
-      confirmPassword: true,
-    }));
   };
 
   const closePasswordInterface = () => {
@@ -196,7 +221,6 @@ const UserDashboardPage = (): React.ReactElement => {
     }
 
     const generalPayload = new FormData();
-    // const passwordPayload: Partial<EditProfilePayloadItf> = {};
     // const emailPayload: Partial<EditProfilePayloadItf> = {};
 
     Object.keys(hasNewValue).forEach((key) => {
@@ -236,7 +260,6 @@ const UserDashboardPage = (): React.ReactElement => {
 
     try {
       const patchProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
-      // const patchPasswordUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
       // const patchEmailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
       const userDetailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
 
@@ -250,19 +273,15 @@ const UserDashboardPage = (): React.ReactElement => {
           },
         },
       );
-      // const patchPasswordReq = Axios.patch(patchPasswordUrl, passwordPayload, {
-      //   headers: { Authorization: `Bearer ${accessToken}` },
-      // });
-      // const patchEmailReq = Axios.patch(patchEmailUrl, emailPayload, {
-      //   headers: { Authorization: `Bearer ${accessToken}` },
-      // });
+
       const getUserDetailReq = await Axios.get(userDetailUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
-      const [_patchProfileRes, getUserDetailRes] = await Promise.all([
+      // eslint-disable-next-line
+      const [patchProfileRes, getUserDetailRes] = await Promise.all([
         patchProfileReq,
         getUserDetailReq,
       ]);
@@ -281,6 +300,8 @@ const UserDashboardPage = (): React.ReactElement => {
           avatarUrl: userData.avatar_url,
           isVerified: oldUserData.isVerified,
           isApproved: oldUserData.isApproved,
+          activeAddressId: oldUserData.activeAddressId,
+          addresses: oldUserData.addresses,
         }),
       );
 
@@ -393,7 +414,7 @@ const UserDashboardPage = (): React.ReactElement => {
                 $width={45}
                 $height={35}
                 validationMessage={userUploadValidationError}
-                $isSet={userUpload !== undefined}
+                $isSet={hasNewValue.avatar}
                 onChange={(e) => {
                   handleImageChange(e);
                   if (!userUploadValidationError) {
@@ -569,14 +590,18 @@ const UserDashboardPage = (): React.ReactElement => {
                       validationMessage={passwordValidationError}
                       onChange={handlePasswordInputChange}
                       title=''
-                      placeholder=''
+                      placeholder='Masukkan kata sandi lama anda'
                       $height={60}
                       $viewBox='0 0 22 22'
                       $viewBoxHide='0 2 22 22'
                     />
                     <EditPencilICO
                       isEditSuccessful={false}
-                      onClick={() => openConfirmPasswordInterface()}
+                      onClick={
+                        isInitialPassCheckLoading
+                          ? () => {}
+                          : () => openConfirmPasswordInterface()
+                      }
                     />
                   </>
                 ) : (
@@ -709,7 +734,7 @@ const UserDashboardPage = (): React.ReactElement => {
 
         <AddressContainer $isDesktopDisplay={isDesktopDisplay}>
           <AddressHeader>
-            <h1>Address</h1>
+            <h1>Alamat</h1>
             <CustomButton
               content='Tambah Alamat'
               $bgColor='#00B5C0'
@@ -720,21 +745,20 @@ const UserDashboardPage = (): React.ReactElement => {
             />
           </AddressHeader>
 
-          <AddressCard
-            isMainAddress={true}
-            alias='Sopo Del Tower'
-            details='Jl. Foo Bar'
-          />
-          <AddressCard
-            isMainAddress={false}
-            alias='Sopo Del Tower'
-            details='Jl. Foo Bar'
-          />
-          <AddressCard
-            isMainAddress={false}
-            alias='Sopo Del Tower'
-            details='Jl. Foo Bar'
-          />
+          {userInfo?.addresses?.map((address, index) => {
+            if (!address.alias) return;
+            let fullAddress = address.detail;
+            fullAddress += `, ${address.city.province.name}, ${address.city.type} ${address.city.name}, ${address.city.postal_code}`;
+            return (
+              <AddressCard
+                $id={address.id === null ? 0 : address.id}
+                key={`userAddressCard${index}`}
+                isMainAddress={userInfo?.activeAddressId === address.id}
+                alias={address.alias}
+                details={fullAddress}
+              />
+            );
+          })}
         </AddressContainer>
       </DashboardPageContentContainer>
     </DashboardPageContainer>

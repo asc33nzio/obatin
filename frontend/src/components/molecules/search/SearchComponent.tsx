@@ -115,7 +115,13 @@ const Search = (): React.ReactElement => {
                 objectFit='cover'
               />
               <h1>{product.name}</h1>
-              <span style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>
+              <span
+                style={{
+                  fontSize: '12px',
+                  whiteSpace: 'nowrap',
+                  color: '#ffffff',
+                }}
+              >
                 Tersedia dari <br />
                 Rp.{' '}
                 {Math.floor(product.min_price / 1000).toLocaleString('id-ID')}K

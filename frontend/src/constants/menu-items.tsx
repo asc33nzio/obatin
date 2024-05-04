@@ -6,7 +6,6 @@ import LogoutICO from '@/assets/icons/LogoutICO';
 import OrderICO from '@/assets/icons/OrderICO';
 import ProductICO from '@/assets/icons/ProductICO';
 import UserICO from '@/assets/icons/UserICO';
-import logout from '@/utils/logout';
 
 type MenuOption = {
   name: string;
@@ -90,6 +89,7 @@ const MENU_USER: MenuOption[] = [
 //     url: '/home',
 //   },
 // ];
+
 export type MenuItem = {
   name: string;
   icon: React.ComponentType;
@@ -97,7 +97,6 @@ export type MenuItem = {
   id: string;
   depth: number;
   subItems?: MenuItem[];
-  handler?: () => void | undefined;
 };
 
 function makeMenuLevel(options: MenuOption[], depth = 0): MenuItem[] {
@@ -109,7 +108,6 @@ function makeMenuLevel(options: MenuOption[], depth = 0): MenuItem[] {
       option.subItems && option.subItems.length > 0
         ? makeMenuLevel(option.subItems, depth + 1)
         : undefined,
-    handler: option.name === 'Logout' ? logout : undefined,
   }));
 }
 

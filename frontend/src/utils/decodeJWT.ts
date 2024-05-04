@@ -19,3 +19,23 @@ export const decodeJWT = async (
     payload,
   };
 };
+
+export const decodeJWTSync = (
+  token: string | undefined,
+): StandardDecodedJwtItf => {
+  if (token === undefined) {
+    return {
+      header: null,
+      payload: null,
+    };
+  }
+
+  const [headerEncoded, payloadEncoded] = token.split('.');
+  const header = JSON.parse(atob(headerEncoded));
+  const payload = JSON.parse(atob(payloadEncoded));
+
+  return {
+    header,
+    payload,
+  };
+};

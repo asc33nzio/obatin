@@ -12,6 +12,8 @@ export interface ModalContextItf {
 
 export type ModalType =
   | 'confirm-password'
+  | 'confirm-password-doctor'
   | 'confirm-password-register'
   | 'add-address'
+  | 'update-address'
   | '';

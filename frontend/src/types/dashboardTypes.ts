@@ -1,4 +1,4 @@
-import { Gender } from '@/types/authTypes';
+import { Gender } from './reduxTypes';
 
 // export type datePickerData = Date | null;
 // export type DatePickerType = datePickerData | [datePickerData, datePickerData];
@@ -10,6 +10,14 @@ export interface EditProfileStateItf {
   confirmPassword: boolean;
   gender: boolean;
   birthDate: boolean;
+  avatar: boolean;
+}
+
+export interface EditProfileDoctorStateItf {
+  email: boolean;
+  name: boolean;
+  password: boolean;
+  confirmPassword: boolean;
   avatar: boolean;
 }
 

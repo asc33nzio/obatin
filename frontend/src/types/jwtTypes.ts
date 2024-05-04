@@ -1,4 +1,4 @@
-type UserRoles = 'user' | 'doctor' | 'partner' | 'admin';
+export type UserRoles = 'user' | 'doctor' | 'partner' | 'admin';
 
 interface decodedAccessTokenPayloadItf {
   aid: number;

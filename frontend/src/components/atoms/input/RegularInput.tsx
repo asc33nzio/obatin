@@ -14,6 +14,7 @@ interface RegularInputItf extends InputHTMLAttributes<HTMLInputElement> {
   $width?: number;
   $height?: number;
   $isSet?: boolean;
+  $disabled?: boolean;
 }
 
 const RegularInput = ({
@@ -24,6 +25,7 @@ const RegularInput = ({
   $width = 100,
   $height = 100,
   $isSet = false,
+  $disabled = false,
   ...props
 }: RegularInputItf): React.ReactElement => {
   return (
@@ -33,6 +35,8 @@ const RegularInput = ({
         {...props}
         placeholder={placeholder}
         $hasError={validationMessage !== '' ? true : false}
+        disabled={$disabled}
+        $disabled={$disabled}
       />
       {props?.type === 'file' && (
         <CustomUploadButton

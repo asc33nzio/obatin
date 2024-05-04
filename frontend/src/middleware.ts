@@ -1,26 +1,48 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { StandardDecodedJwtItf } from './types/jwtTypes';
 import { cookies } from 'next/headers';
 import { decodeJWT } from './utils/decodeJWT';
-
-export const config = {
-  matcher: ['/:path*'],
-};
+import Axios from 'axios';
 
 //! Route group definitions
 const publicRoutes = ['/', '/shop'];
 const authRoutes = ['/auth/login', '/auth/register'];
 const protectedRoutes = [
   '/dashboard/user',
-  'dashboard/user/transactions',
-  'dashboard/doctor',
+  '/dashboard/user/transactions',
+  '/dashboard/doctor',
 ];
-const userOnlyRoutes = ['/dashboard/user', 'dashboard/transactions'];
+const userOnlyRoutes = ['/dashboard/user', '/dashboard/user/transactions'];
 const doctorOnlyRoutes = ['/dashboard/doctor'];
 
 export default async function middleware(request: NextRequest) {
+  const response = NextResponse.next();
+
+  //! Prolong access_token if refresh token is valid
+  const accessCookie = cookies().get('access_token')?.value;
+  const refreshToken = cookies().get('refresh_token')?.value;
+  const userSessionCredentials: StandardDecodedJwtItf =
+    await decodeJWT(accessCookie);
+  const expirationTime =
+    userSessionCredentials.payload?.RegisteredClaims?.exp ?? 0;
+
+  const currentTime = Math.floor(Date.now() / 1000);
+  const expirationThreshold = 5 * 60;
+  if (expirationTime && expirationTime - currentTime < expirationThreshold) {
+    const refreshResponse = await Axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh-token`,
+      {
+        refresh_token: refreshToken,
+      },
+    );
+    const newAccessToken = refreshResponse?.data?.data?.access_token;
+
+    if (newAccessToken) cookies().set('access_token', newAccessToken);
+  }
+
   //! Redirect URL definitions
+  // const redirectToHome = new URL('/', request.nextUrl.href).toString();
+
   const redirectToLogin = new URL(
     '/auth/login',
     request.nextUrl.href,
@@ -45,13 +67,9 @@ export default async function middleware(request: NextRequest) {
   const isDoctorOnlyRoute = doctorOnlyRoutes.includes(path);
 
   //! Protected route guard clause
-  const accessCookie = cookies().get('access_token')?.value;
   if (isProtectedRoute && accessCookie === undefined) {
     return NextResponse.redirect(redirectToLogin);
   }
-
-  const userSessionCredentials: StandardDecodedJwtItf =
-    await decodeJWT(accessCookie);
 
   // eslint-disable-next-line
   const authId = userSessionCredentials?.payload?.Payload?.aid;
@@ -102,7 +120,9 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectToDoctorDashboard);
   }
 
-  //! All checks passed, continue request
-  const response = NextResponse.next();
   return response;
 }
+
+export const config = {
+  matcher: ['/:path*'],
+};

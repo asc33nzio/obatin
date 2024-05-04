@@ -11,10 +11,12 @@ import ExpandIcon from './ExpandIcon';
 
 type MenuItemProps = {
   menuItem: MenuItemType;
+  handler?: () => void;
 };
 
 export default function MenuItem({
-  menuItem: { name, icon: Icon, url, depth, subItems, handler },
+  menuItem: { name, icon: Icon, url, depth, subItems },
+  handler,
 }: MenuItemProps) {
   const [isExpanded, toggleExpanded] = useState(false);
 

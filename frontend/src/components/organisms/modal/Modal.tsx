@@ -10,14 +10,15 @@ import ChangePasswordModalContent from './modalContent/ChangePasswordModalConten
 import CloseICO from '@/assets/icons/CloseICO';
 import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmPasswordModalContent';
 import AddAddressModalContent from './modalContent/AddAddressModalContent';
+import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
 
 export interface ModalPropsItf {
   $overlayHeight?: string;
   $containerWidth: string;
   $containerHeight: string;
+  $containerBgColor?: string;
   $fontSize?: string | undefined;
   $color?: string | undefined;
-  $bgColor?: string | undefined;
 }
 
 const Modal = () => {
@@ -35,19 +36,29 @@ const Modal = () => {
     $overlayHeight: '100vh',
     $containerWidth: '500px',
     $containerHeight: '500px',
+    $containerBgColor: '#ffffff',
     $fontSize: '18px',
     $color: '#4a5568',
-    $bgColor: 'white',
   };
 
   switch (modalType) {
     case 'confirm-password':
       modalContent = <ChangePasswordModalContent />;
-      title = 'Tolong konfirmasi sandi anda';
+      title = 'Tolong konfirmasi sandi baru anda';
       modalProps = {
-        $overlayHeight: '125vh',
+        $overlayHeight: '135vh',
         $containerWidth: '500px',
-        $containerHeight: '250px',
+        $containerHeight: '325px',
+      };
+      break;
+
+    case 'confirm-password-doctor':
+      modalContent = <ChangePasswordModalContent />;
+      title = 'Tolong konfirmasi sandi baru anda';
+      modalProps = {
+        $overlayHeight: '100vh',
+        $containerWidth: '500px',
+        $containerHeight: '325px',
       };
       break;
 
@@ -65,9 +76,19 @@ const Modal = () => {
       modalContent = <AddAddressModalContent />;
       title = 'Tambahkan Alamat';
       modalProps = {
-        $overlayHeight: '125vh',
-        $containerWidth: '500px',
-        $containerHeight: '500px',
+        $overlayHeight: '170vh',
+        $containerWidth: '650px',
+        $containerHeight: '850px',
+      };
+      break;
+
+    case 'update-address':
+      modalContent = <UpdateAddressModalContent />;
+      title = 'Ubah Informasi Alamat';
+      modalProps = {
+        $overlayHeight: '170vh',
+        $containerWidth: '650px',
+        $containerHeight: '850px',
       };
       break;
 

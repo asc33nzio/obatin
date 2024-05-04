@@ -27,7 +27,7 @@ export const SidebarContainer = styled.aside<{ $isOpened: boolean }>`
     text-decoration: none;
   }
 
-  z-index: 10;
+  z-index: 100;
 
   @media (max-width: 1440px) {
     width: ${(props) => (props.$isOpened ? '30vw' : '0vw')};
