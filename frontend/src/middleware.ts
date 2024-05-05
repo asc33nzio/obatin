@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { StandardDecodedJwtItf } from './types/jwtTypes';
 import { cookies } from 'next/headers';
 import { decodeJWT } from './utils/decodeJWT';
+import { store } from './redux/store/store';
+import { resetAuthState } from './redux/reducers/authSlice';
+import { resetAuthDoctorState } from './redux/reducers/authDoctorSlice';
 
 //! Route group definitions
 const publicRoutes = ['/', '/shop'];
@@ -57,6 +60,8 @@ export default async function middleware(request: NextRequest) {
     } else {
       response.cookies.delete('access_token');
       response.cookies.delete('refresh_token');
+      store.dispatch(resetAuthState());
+      store.dispatch(resetAuthDoctorState());
     }
   }
 
