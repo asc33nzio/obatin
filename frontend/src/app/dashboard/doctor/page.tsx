@@ -103,10 +103,12 @@ const DoctorDashboardPage = (): React.ReactElement => {
   );
 
   const openPasswordInterface = async () => {
-    if (!doctorInfo?.isVerified) {
+    if (!doctorInfo?.isVerified || !doctorInfo?.isApproved) {
       setToast({
         showToast: true,
-        toastMessage: 'Maaf, anda belum melakukan verifikasi akun anda.',
+        toastMessage: !doctorInfo?.isApproved
+          ? 'Mohon menunggu persetujuan admin dan cek e-mail secara berkala'
+          : 'Mohon lakukan verifikasi e-mail terlebih dahulu',
         toastType: 'warning',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
