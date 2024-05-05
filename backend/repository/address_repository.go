@@ -89,7 +89,7 @@ func (r *addressRepositoryPostgres) UpdateOneAddress(ctx context.Context, a *ent
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -125,7 +125,7 @@ func (r *addressRepositoryPostgres) DeleteOneAddress(ctx context.Context, a *ent
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil

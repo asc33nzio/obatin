@@ -20,7 +20,7 @@ type ChatRoomRepository interface {
 	IsChatRoomExist(ctx context.Context, userId int64, doctorId int64) (bool, error)
 	DeleteChatRoomById(ctx context.Context, chatRoomId int64) error
 	UpdateChatRoomValidByUserId(ctx context.Context, userId int64, isUser bool) error
-	DeleteChatRoomAfterExpired(ctx context.Context) error
+	DeleteChatRoomAfterExpiredById(ctx context.Context, chatRoomId int64) error
 	UpdateChatRoomUpdatedAtByID(ctx context.Context, chatRoomId int64) error
 }
 
@@ -93,7 +93,7 @@ func (r *chatRoomRepositoryPostgres) CreateOne(ctx context.Context, u entity.Cha
 		return apperror.NewInternal(err)
 	}
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -124,7 +124,7 @@ func (r *chatRoomRepositoryPostgres) UpdateUserIsTypingByUserId(ctx context.Cont
 		return apperror.NewInternal(err)
 	}
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -155,7 +155,7 @@ func (r *chatRoomRepositoryPostgres) UpdateDoctorIsTypingByDoctorId(ctx context.
 		return apperror.NewInternal(err)
 	}
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -407,13 +407,13 @@ func (r *chatRoomRepositoryPostgres) DeleteChatRoomById(ctx context.Context, cha
 		return apperror.NewInternal(err)
 	}
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
 }
 
-func (r *chatRoomRepositoryPostgres) DeleteChatRoomAfterExpired(ctx context.Context) error {
+func (r *chatRoomRepositoryPostgres) DeleteChatRoomAfterExpiredById(ctx context.Context, chatRoomId int64) error {
 	query := `
 		UPDATE 
 			chat_rooms
@@ -421,11 +421,14 @@ func (r *chatRoomRepositoryPostgres) DeleteChatRoomAfterExpired(ctx context.Cont
 			is_active = false
 		WHERE 
 			NOW() > expired_at
+		AND
+			id = $1
 	`
 
 	res, err := r.db.ExecContext(
 		ctx,
 		query,
+		chatRoomId,
 	)
 	if err != nil {
 		return apperror.NewInternal(err)
@@ -475,7 +478,7 @@ func (r *chatRoomRepositoryPostgres) UpdateChatRoomValidByUserId(ctx context.Con
 	}
 
 	if rowsAffected == 0 {
-		return nil
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -506,7 +509,7 @@ func (r *chatRoomRepositoryPostgres) UpdateChatRoomUpdatedAtByID(ctx context.Con
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil

@@ -8,8 +8,8 @@ import (
 )
 
 type RefreshTokenRepository interface {
-	CreateNewRefreshToken(ctx context.Context, token string, authId int) error
-	DeleteRefreshTokenAfterExpired(ctx context.Context) error
+	CreateNewRefreshToken(ctx context.Context, token string, authId int64) error
+	DeleteRefreshTokenAfterExpiredByAuthId(ctx context.Context, authId int64) error
 	IsRefreshTokenValidByEmail(ctx context.Context, email string) (bool, error)
 	IsRefreshTokenValidByToken(ctx context.Context, token string) (bool, error)
 	GetByEmail(ctx context.Context, email string) (*entity.RefreshToken, error)
@@ -25,7 +25,7 @@ func NewRefreshTokenRepositoryPostgres(db *sql.DB) *refreshTokenRepositoryPostgr
 	}
 }
 
-func (r *refreshTokenRepositoryPostgres) CreateNewRefreshToken(ctx context.Context, token string, authId int) error {
+func (r *refreshTokenRepositoryPostgres) CreateNewRefreshToken(ctx context.Context, token string, authId int64) error {
 	queryCreateNewRefreshToken := `
 		INSERT INTO
 			refresh_tokens(
@@ -51,25 +51,28 @@ func (r *refreshTokenRepositoryPostgres) CreateNewRefreshToken(ctx context.Conte
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
 }
 
-func (r *refreshTokenRepositoryPostgres) DeleteRefreshTokenAfterExpired(ctx context.Context) error {
+func (r *refreshTokenRepositoryPostgres) DeleteRefreshTokenAfterExpiredByAuthId(ctx context.Context, authId int64) error {
 	queryDeleteRefreshTokenAfterExpired := `
 		UPDATE 
 			refresh_tokens
 		SET 
-			deleted_at = now()
+			deleted_at = NOW() , updated_at = NOW()
 		WHERE 
 			NOW() > expired_at
+		AND
+			authentication_id = $1
 	`
 
 	res, err := r.db.ExecContext(
 		ctx,
 		queryDeleteRefreshTokenAfterExpired,
+		authId,
 	)
 	if err != nil {
 		return apperror.NewInternal(err)

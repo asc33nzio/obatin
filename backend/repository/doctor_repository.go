@@ -58,7 +58,7 @@ func (r *doctorRepositoryPostgres) CreateNewDoctor(ctx context.Context, authenti
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil

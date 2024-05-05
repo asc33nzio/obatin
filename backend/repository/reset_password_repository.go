@@ -52,7 +52,7 @@ func (r *resetPasswordRepositoryPostgres) CreateNewResetPassword(ctx context.Con
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(err)
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -212,7 +212,7 @@ func (r *resetPasswordRepositoryPostgres) DeleteResetPasswordTokenAfterUsed(ctx 
 	}
 
 	if rowsAffected == 0 {
-		return apperror.ErrInvalidToken(err)
+		return apperror.ErrInvalidToken(apperror.ErrStlNotFound)
 	}
 
 	return nil
