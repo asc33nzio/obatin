@@ -33,6 +33,8 @@ type Config struct {
 	jwtVerifyUserExp        int
 	jwtRefreshTokenExp      int
 	jwtForgotPasswordExp    int
+	rajaOngkirApiKey        string
+	rajaOngkirCostApiUrl    string
 }
 
 func NewConfig() (*Config, error) {
@@ -98,6 +100,8 @@ func NewConfig() (*Config, error) {
 	cloudinaryURL := os.Getenv("CLOUDINARY_URL")
 	verificationLinkBase := os.Getenv("VERIFICATION_LINK_BASE")
 	resetLinkBase := os.Getenv("RESET_LINK_BASE")
+	rajaOngkirApiKey := os.Getenv("RAJA_ONGKIR_API_KEY")
+	rajaOngkirCostApiUrl := os.Getenv("RAJA_ONGKIR_COST_API_URL")
 
 	return &Config{
 		dbUrl:                   dbUrl,
@@ -124,6 +128,8 @@ func NewConfig() (*Config, error) {
 		jwtVerifyUserExp:        jwtVerifyUserExp,
 		jwtRefreshTokenExp:      jwtRefreshTokenExp,
 		jwtForgotPasswordExp:    jwtForgotPasswordExp,
+		rajaOngkirApiKey:        rajaOngkirApiKey,
+		rajaOngkirCostApiUrl:    rajaOngkirCostApiUrl,
 	}, nil
 }
 
@@ -225,4 +231,12 @@ func (c *Config) JwtRefreshTokenExpired() int {
 
 func (c *Config) JwtForgotPasswordExp() int {
 	return c.jwtForgotPasswordExp
+}
+
+func (c *Config) RajaOngkirApiKey() string {
+	return c.rajaOngkirApiKey
+}
+
+func (c *Config) RajaOngkirCostApiUrl() string {
+	return c.rajaOngkirCostApiUrl
 }

@@ -20,3 +20,9 @@ type CartItem struct {
 	AuthenticationId   int64
 	PharmaciesProducts []*PharmacyProduct
 }
+
+type CartCheckout struct {
+	User           User
+	Payment        Payment
+	PharmaciesCart []Order
+}
