@@ -85,13 +85,11 @@ const LoginForm = (): React.ReactElement => {
       const isApproved = decoded.Payload.is_approved;
 
       setCookie('access_token', access_token, {
-        // httpOnly: true,
         priority: 'high',
         path: '/',
       });
 
       setCookie('refresh_token', refresh_token, {
-        // httpOnly: true,
         priority: 'high',
         path: '/',
       });

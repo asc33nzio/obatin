@@ -146,13 +146,11 @@ const RegisterForm = (): React.ReactElement => {
       const isApproved = decoded.Payload.is_approved;
 
       setCookie('access_token', access_token, {
-        // httpOnly: true,
         priority: 'high',
         path: '/',
       });
 
       setCookie('refresh_token', refresh_token, {
-        // httpOnly: true,
         priority: 'high',
         path: '/',
       });
@@ -189,6 +187,7 @@ const RegisterForm = (): React.ReactElement => {
 
       navigateToUserDashboard();
     } catch (error: any) {
+      console.log(error);
       const errorMessage = error?.response?.data?.message;
       const appError = error?.message;
       setToast({

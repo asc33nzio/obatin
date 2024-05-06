@@ -42,6 +42,7 @@ func (r *refreshTokenRepositoryPostgres) CreateNewRefreshToken(ctx context.Conte
 		queryCreateNewRefreshToken,
 		token,
 		authId,
+		expiry,
 	)
 	if err != nil {
 		return apperror.NewInternal(err)
