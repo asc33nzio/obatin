@@ -46,6 +46,7 @@ const LoginForm = (): React.ReactElement => {
     handlePasswordInputChange,
   } = usePasswordValidation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isExtended, setIsExtended] = useState<boolean>(false);
 
   const handleLogin = async () => {
     const isValidEmail = validateEmail(email);
@@ -70,7 +71,7 @@ const LoginForm = (): React.ReactElement => {
     try {
       setIsLoading(true);
       const loginResponse = await Axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login?extend=${isExtended}`,
         loginPayload,
       );
 
@@ -211,7 +212,12 @@ const LoginForm = (): React.ReactElement => {
 
       <RememberAndForgetDiv>
         <RememberMeDiv>
-          <input type='checkbox' name='remember-me' id='remember-me' />
+          <input
+            type='checkbox'
+            name='remember-me'
+            id='remember-me'
+            onChange={() => setIsExtended(!isExtended)}
+          />
           <p>Ingat Saya</p>
         </RememberMeDiv>
 

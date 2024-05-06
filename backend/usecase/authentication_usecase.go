@@ -16,7 +16,7 @@ import (
 )
 
 type AuthenticationUsecase interface {
-	Login(ctx context.Context, uReq entity.Authentication) (*entity.AuthenticationToken, error)
+	Login(ctx context.Context, uReq entity.Authentication, isExtended bool) (*entity.AuthenticationToken, error)
 	RegisterDoctor(ctx context.Context, uReq entity.Authentication) error
 	VerifyEmail(ctx context.Context, token string) error
 	RegisterUser(ctx context.Context, uReq entity.Authentication) error
@@ -62,7 +62,7 @@ func NewAuthenticationUsecaseImpl(
 	}
 }
 
-func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authentication) (*entity.AuthenticationToken, error) {
+func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authentication, isExtended bool) (*entity.AuthenticationToken, error) {
 	ur := u.repoStore.AuthenticationRepository()
 	rt := u.repoStore.RefreshTokenRepository()
 	dr := u.repoStore.DoctorRepository()
@@ -130,6 +130,11 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 		return nil, err
 	}
 
+	refreshTokenValidDuration := u.config.JwtRefreshTokenExpired()
+	if isExtended {
+		refreshTokenValidDuration *= 2
+	}
+
 	if !isRefreshTokenValid {
 		randomRefreshToken, err := u.tokenGenerator.GetRandomToken(u.config.RandomTokenLength())
 		if err != nil {
@@ -140,7 +145,7 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 				RandomToken:      randomRefreshToken,
 				Role:             authentication.Role,
 				AuthenticationId: authentication.Id},
-			u.config.JwtRefreshTokenExpired(),
+			refreshTokenValidDuration,
 			u.config.JwtSecret(),
 		)
 
@@ -170,7 +175,7 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 			RandomToken:      refreshToken.RefreshToken,
 			Role:             authentication.Role,
 			AuthenticationId: authentication.Id},
-		u.config.JwtRefreshTokenExpired(),
+		refreshTokenValidDuration,
 		u.config.JwtSecret(),
 	)
 	if err != nil {
