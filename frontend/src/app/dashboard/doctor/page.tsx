@@ -1,8 +1,5 @@
 'use client';
-import '@/styles/pages/dashboard/datePicker.css';
-import 'react-date-picker/dist/DatePicker.css';
-import 'react-calendar/dist/Calendar.css';
-import 'moment/locale/id';
+import 'primereact/resources/themes/lara-light-cyan/theme.css';
 import {
   DashboardPageContentContainer,
   DoctorDashboardPageContainer,
@@ -31,6 +28,7 @@ import { debounce } from '@/utils/debounce';
 import { getCookie } from 'cookies-next';
 import { setAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
 import { BounceLoader } from 'react-spinners';
+import { InputSwitch } from 'primereact/inputswitch';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
@@ -53,6 +51,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
       password: false,
       confirmPassword: false,
       avatar: false,
+      experiences: false,
     });
   const [hasNewValue, setHasNewValue] = useState<EditProfileDoctorStateItf>({
     email: false,
@@ -60,6 +59,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
     password: false,
     confirmPassword: false,
     avatar: false,
+    experiences: false,
   });
   const { setToast } = useToast();
   const { openModal } = useModal();
@@ -76,8 +76,13 @@ const DoctorDashboardPage = (): React.ReactElement => {
     useUploadValidation();
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
+  const [experiences, setExperiences] = useState<number>(0);
+  const [experiencesValidationError, setExperiencesValidationError] =
+    useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isToggleOnlineLoading, setIsToggleOnlineLoading] =
+    useState<boolean>(false);
   const [isInitialPassCheckLoading, setIsInitialPassCheckLoading] =
     useState<boolean>(false);
 
@@ -97,6 +102,33 @@ const DoctorDashboardPage = (): React.ReactElement => {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       if (validateName(event.target.value)) {
         setName(event.target.value);
+      }
+    },
+    750,
+  );
+
+  const validateExperiences = (input: string) => {
+    if (Number.isNaN(Number(input))) {
+      setExperiencesValidationError('Tahun pengalaman harus berupa angka');
+      return false;
+    }
+
+    const parsedInput = parseInt(input, 10);
+    if (parsedInput < 0 || parsedInput > 60) {
+      setExperiencesValidationError(
+        'Tahun pengalaman harus diantara 0 - 60 tahun',
+      );
+      return false;
+    }
+
+    setExperiencesValidationError('');
+    return true;
+  };
+
+  const handleExperiencesInputChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (validateExperiences(event.target.value)) {
+        setExperiences(parseInt(event.target.value, 10));
       }
     },
     750,
@@ -179,7 +211,78 @@ const DoctorDashboardPage = (): React.ReactElement => {
     }));
   };
 
-  const handleUpdateDcotorProfile = async () => {
+  const handleUpdateOnlineStatus = async () => {
+    try {
+      if (isToggleOnlineLoading) return;
+      setIsToggleOnlineLoading(true);
+      const payload = new FormData();
+      payload.append('is_online', doctorInfo?.isOnline ? 'false' : 'true');
+      await Axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/${doctorInfo?.aid}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const response = await Axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/details`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const udpatedDoctorData = response?.data?.data;
+      const oldDoctorData = doctorInfo;
+
+      dispatch(
+        setAuthDoctorState({
+          aid: oldDoctorData.aid,
+          email: udpatedDoctorData.email,
+          name: udpatedDoctorData.name,
+          role: oldDoctorData.role,
+          isVerified: oldDoctorData.isVerified,
+          isApproved: oldDoctorData.isApproved,
+          avatarUrl: udpatedDoctorData.avatar_url,
+          specialization: oldDoctorData.specialization,
+          isOnline: udpatedDoctorData.is_online,
+          experiences: udpatedDoctorData.experiences,
+          certificate: oldDoctorData.certificate,
+          fee: udpatedDoctorData.fee,
+          openingTime: udpatedDoctorData.opening_time,
+          operationalHours: udpatedDoctorData.operational_hours,
+          operationalDays: udpatedDoctorData.operational_days,
+        }),
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage: doctorInfo?.isOnline
+          ? 'Sukses mengubah status menjadi offline'
+          : 'Sukses mengubah status menjadi online',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } catch (error) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: 'Maaf, gagal mengubah status, mohon coba kembali',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } finally {
+      setIsToggleOnlineLoading(false);
+    }
+  };
+
+  const handleUpdateDoctorProfile = async () => {
     setIsLoading(true);
 
     if (!doctorInfo?.isVerified) {
@@ -213,6 +316,8 @@ const DoctorDashboardPage = (): React.ReactElement => {
               generalPayload.append('avatar', userUpload);
             }
             break;
+          case 'experiences':
+            generalPayload.append('experiences', experiences.toString());
           default:
             break;
         }
@@ -252,7 +357,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
 
       dispatch(
         setAuthDoctorState({
-          aid: udpatedDoctorData.aid,
+          aid: oldDoctorData.aid,
           email: udpatedDoctorData.email,
           name: udpatedDoctorData.name,
           role: oldDoctorData.role,
@@ -353,6 +458,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
       password: false,
       confirmPassword: false,
       avatar: false,
+      experiences: false,
     });
 
     setHasNewValue({
@@ -361,6 +467,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
       password: false,
       confirmPassword: false,
       avatar: false,
+      experiences: false,
     });
   };
 
@@ -387,7 +494,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
                 $height='40px'
                 $fontSize='18px'
                 disabled={!Object.values(hasNewValue).some((value) => value)}
-                onClick={handleUpdateDcotorProfile}
+                onClick={handleUpdateDoctorProfile}
               />
             </ProfileHeaderButtonsDiv>
           </ProfileHeader>
@@ -626,6 +733,85 @@ const DoctorDashboardPage = (): React.ReactElement => {
                   </>
                 )}
               </UserDetailDiv>
+
+              <h2>Pengalaman</h2>
+              <UserDetailDiv>
+                {isEditingField.experiences ? (
+                  <>
+                    <RegularInput
+                      defaultValue={
+                        doctorInfo?.experiences && !hasNewValue.experiences
+                          ? doctorInfo?.experiences
+                          : experiences
+                      }
+                      validationMessage={experiencesValidationError}
+                      onChange={handleExperiencesInputChange}
+                      $height={60}
+                      $marBot={0}
+                      title=''
+                      placeholder=''
+                    />
+                    <EditPencilICO
+                      isEditSuccessful={false}
+                      onClick={() => {
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          experiences: false,
+                        }));
+
+                        if (!experiences) {
+                          setToast({
+                            showToast: true,
+                            toastMessage: 'Tidak ada perubahan',
+                            toastType: 'warning',
+                            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+                            orientation: 'center',
+                          });
+                          return;
+                        }
+
+                        if (!experiencesValidationError) {
+                          setHasNewValue((prevState) => ({
+                            ...prevState,
+                            experiences: true,
+                          }));
+                        }
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {hasNewValue.experiences
+                        ? `${experiences} tahun`
+                        : doctorInfo?.experiences
+                          ? `${doctorInfo?.experiences} tahun`
+                          : 0}
+                    </span>
+                    <EditPencilICO
+                      isEditSuccessful={hasNewValue.experiences}
+                      onClick={() =>
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          experiences: true,
+                        }))
+                      }
+                    />
+                  </>
+                )}
+              </UserDetailDiv>
+
+              <h2>
+                Spesialisasi <span>{doctorInfo?.specialization}</span>
+              </h2>
+
+              <h2>
+                Online
+                <InputSwitch
+                  checked={doctorInfo?.isOnline}
+                  onChange={handleUpdateOnlineStatus}
+                />
+              </h2>
             </ProfileContentRight>
           </ProfileContent>
         </DoctorProfileContainer>

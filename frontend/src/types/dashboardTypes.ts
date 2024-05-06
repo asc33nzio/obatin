@@ -1,8 +1,5 @@
 import { Gender } from './reduxTypes';
 
-// export type datePickerData = Date | null;
-// export type DatePickerType = datePickerData | [datePickerData, datePickerData];
-
 export interface EditProfileStateItf {
   email: boolean;
   name: boolean;
@@ -19,6 +16,7 @@ export interface EditProfileDoctorStateItf {
   password: boolean;
   confirmPassword: boolean;
   avatar: boolean;
+  experiences: boolean;
 }
 
 export interface EditProfilePayloadItf {
@@ -29,6 +27,7 @@ export interface EditProfilePayloadItf {
   gender?: Gender;
   birthDate?: Date;
   avatar?: Blob;
+  experiences?: number;
 }
 
 export interface GenderItf {

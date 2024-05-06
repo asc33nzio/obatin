@@ -53,13 +53,10 @@ export const DoctorProfileContainer = styled.div<{
 }>`
   display: flex;
   flex-direction: column;
-  align-items: center;
 
   width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '100%')};
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '90%' : '100%')};
   gap: 10px;
-
-  margin-bottom: 100px;
 `;
 
 export const ProfileHeader = styled.div<{ $isDesktopDisplay: boolean }>`
@@ -168,9 +165,20 @@ export const ProfileContentRight = styled.div<{ $isDesktopDisplay: boolean }>`
   padding-left: 15px;
 
   h2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
     font-size: 16px;
     color: #4a5568;
     margin-bottom: 5px;
+
+    span {
+      font-size: 16px;
+      color: #4a5568;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
   }
 `;
 
@@ -263,7 +271,7 @@ export const DoctorProgressContainer = styled.div`
   justify-content: center;
 
   width: 100%;
-  height: 45%;
+  height: 10%;
 `;
 
 export const ContentSubcontainer = styled.div`
