@@ -1,3 +1,9 @@
+CREATE DATABASE obatin_db;
+
+\c obatin_db
+
+CREATE EXTENSION postgis;
+
 --? start: validator
 
 CREATE FUNCTION validate_operational_days(arr TEXT[]) RETURNS BOOLEAN AS $$
@@ -6,7 +12,7 @@ BEGIN
         array_length(arr, 1) >= 1 AND 
         array_length(arr, 1) <= 7 AND
         NOT EXISTS (
-            SELECT 1 FROM unnest(arr) AS days WHERE lower(days) NOT IN ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
+            SELECT 1 FROM unnest(arr) AS days WHERE lower(days) NOT IN ('senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu')
         )
     );
 END;
@@ -19,22 +25,32 @@ $$ LANGUAGE plpgsql;
 CREATE TABLE banners(
     id BIGSERIAL PRIMARY KEY,
     image_url VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE reset_password_requests(
     id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(64) NOT NULL,
     token VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP
+    expired_at TIMESTAMP NOT NULL DEFAULT NOW() + '10 minutes',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP
 );
 
 --? end: independent entities
 
 --? start: strong entities
+
+CREATE TABLE provinces(
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP
+);
 
 CREATE TYPE user_role_enum AS ENUM ('admin', 'manager', 'doctor', 'user');
 CREATE TABLE authentications(
@@ -45,9 +61,9 @@ CREATE TABLE authentications(
     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     is_approved BOOLEAN NOT NULL DEFAULT FALSE,
     role user_role_enum NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE categories( 
@@ -58,80 +74,117 @@ CREATE TABLE categories(
     image_url VARCHAR(255) NOT NULL,
     category_level SMALLINT NOT NULL,
     has_child_categories BOOLEAN NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE doctor_specializations( 
     id BIGSERIAL PRIMARY KEY,
-    specialization VARCHAR(64) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP
+    name VARCHAR NOT NULL,
+    description VARCHAR NOT NULL,
+    image_url VARCHAR(255) NOT NULL,
+    slug VARCHAR NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP
 );
 
+CREATE TYPE shipping_type_enum AS ENUM ('official', 'non_official');
 CREATE TABLE shipping_methods( 
     id BIGSERIAL PRIMARY KEY,
-    price INTEGER NOT NULL,
+    price INTEGER,
+    code VARCHAR(64),
+    description VARCHAR(255),
+    service VARCHAR(64),
     name VARCHAR(64) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP
+    estimated VARCHAR(64),
+    type shipping_type_enum NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE manufacturers(
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(64) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP
 );
 
 --? end: strong entities
 
 --? start: relational entities
 
+CREATE TYPE city_type_enum AS ENUM ('Kabupaten', 'Kota');
+CREATE TABLE cities(
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    type city_type_enum NOT NULL,
+    postal_code VARCHAR(64) NOT NULL,
+    province_id BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
+    FOREIGN KEY(province_id) REFERENCES provinces(id)
+);
+
+CREATE TABLE refresh_tokens(
+    id BIGSERIAL PRIMARY KEY,
+    authentication_id BIGINT NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expired_at TIMESTAMP NOT NULL DEFAULT NOW() + INTERVAL '1 day',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
+    FOREIGN KEY(authentication_id) REFERENCES authentications(id)
+);
+
+CREATE TYPE gender_enum AS ENUM ('perempuan', 'laki-laki');
 CREATE TABLE users(
     id BIGSERIAL PRIMARY KEY,
     authentication_id BIGINT NOT NULL,
     name VARCHAR(64) NOT NULL DEFAULT '',
+    gender gender_enum NOT NULL DEFAULT 'laki-laki',
+    birth_date DATE NOT NULL DEFAULT '1970-01-01',
+    active_address_id BIGINT,
     avatar_url VARCHAR(255) NOT NULL DEFAULT '',
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(authentication_id) REFERENCES authentications(id)
 );
 
 CREATE DOMAIN operational_days_domain AS TEXT[] 
-   CONSTRAINT valid_operational_days CHECK (validate_operational_days(VALUE));
+CONSTRAINT valid_operational_days CHECK (validate_operational_days(VALUE));
 CREATE TABLE doctors(
     id BIGSERIAL PRIMARY KEY,
     authentication_id BIGINT NOT NULL,
-    specialization_id BIGINT NOT NULL,
-    name VARCHAR(64) NOT NULL DEFAULT '',
+    doctor_specialization_id BIGINT NOT NULL,
+    name VARCHAR NOT NULL DEFAULT '',
     avatar_url VARCHAR(255) NOT NULL DEFAULT '',
     is_online BOOLEAN NOT NULL DEFAULT FALSE,
     experience_years SMALLINT NOT NULL DEFAULT 0,
     certificate_url VARCHAR(255) NOT NULL,
     fee BIGINT NOT NULL DEFAULT 0,
-    opening_time TIMESTAMP NOT NULL DEFAULT NOW(),
-    operational_hours DECIMAL NOT NULL DEFAULT 0,
-    operational_days operational_days_domain NOT NULL DEFAULT ARRAY['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    opening_time TIME NOT NULL DEFAULT NOW(),
+    operational_hours INTERVAL NOT NULL DEFAULT '0 hour',
+    operational_days operational_days_domain NOT NULL DEFAULT ARRAY['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'],
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(authentication_id) REFERENCES authentications(id),
-    FOREIGN KEY(specialization_id) REFERENCES doctor_specializations(id)
+    FOREIGN KEY(doctor_specialization_id) REFERENCES doctor_specializations(id)
 );
 
 CREATE TABLE admins(
     id BIGSERIAL PRIMARY KEY,
     authentication_id BIGINT NOT NULL,
     name VARCHAR(64) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(authentication_id) REFERENCES authentications(id)
 );
 
@@ -140,9 +193,9 @@ CREATE TABLE partners(
     authentication_id BIGINT NOT NULL,
     name VARCHAR(64) NOT NULL,
     logo_url VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(authentication_id) REFERENCES authentications(id)
 );
 
@@ -175,9 +228,9 @@ CREATE TABLE products(
     is_prescription_required BOOLEAN DEFAULT FALSE,
     min_price INTEGER NOT NULL DEFAULT 0,
     max_price INTEGER NOT NULL DEFAULT 0,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(manufacturer_id) REFERENCES manufacturers(id)
 );
 
@@ -185,9 +238,9 @@ CREATE TABLE products_categories(
     id BIGSERIAL PRIMARY KEY,
     product_id BIGINT NOT NULL,
     category_id BIGINT NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(product_id) REFERENCES products(id),
     FOREIGN KEY(category_id) REFERENCES categories(id)
 );
@@ -197,19 +250,20 @@ CREATE TABLE pharmacies(
     partner_id BIGINT NOT NULL,
     name VARCHAR(64) UNIQUE NOT NULL,
     address VARCHAR(255) UNIQUE NOT NULL,
-    city VARCHAR(64) NOT NULL,
+    city_id BIGINT NOT NULL,
     lat DECIMAL NOT NULL,
     lng DECIMAL NOT NULL,
-    opening_time TIMESTAMP NOT NULL,
-    operational_hours DECIMAL NOT NULL,
+    opening_time TIME NOT NULL,
+    operational_hours INTERVAL NOT NULL,
     operational_days TEXT[] NOT NULL CHECK (validate_operational_days(operational_days)),
     pharmacist_name VARCHAR(64) NOT NULL,
     pharmacist_license VARCHAR(64) NOT NULL,
     pharmacist_phone VARCHAR(32) NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,    
-    FOREIGN KEY(partner_id) REFERENCES partners(id)
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,    
+    FOREIGN KEY(partner_id) REFERENCES partners(id),
+    FOREIGN KEY(city_id) REFERENCES cities(id)
 );
 
 CREATE TABLE pharmacies_products(
@@ -219,9 +273,9 @@ CREATE TABLE pharmacies_products(
     price INTEGER NOT NULL,
     stock INTEGER NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(product_id) REFERENCES products(id),
     FOREIGN KEY(pharmacy_id) REFERENCES pharmacies(id)
 );
@@ -233,55 +287,70 @@ CREATE TABLE stock_movements(
     delta INTEGER NOT NULL,
     is_addition BOOLEAN NOT NULL,
     movement_type stock_movement_enum NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(pharmacy_product_id) REFERENCES pharmacies_products(id)
 );
 
 CREATE TABLE addresses(
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    name VARCHAR(64) NOT NULL,
-    city VARCHAR(64) NOT NULL,
-    province VARCHAR(64) NOT NULL,
+    alias VARCHAR(64) NOT NULL,
+    detail VARCHAR(255) NOT NULL,
+    city_id BIGINT NOT NULL,
     lat DECIMAL NOT NULL,
     lng DECIMAL NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(city_id) REFERENCES cities(id)
 );
 
 CREATE TABLE shippings(
     id BIGSERIAL PRIMARY KEY,
     shipping_method_id BIGINT NOT NULL,
     pharmacy_id BIGINT NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(shipping_method_id) REFERENCES shipping_methods(id),
     FOREIGN KEY(pharmacy_id) REFERENCES pharmacies(id)
 );
 
-CREATE TYPE delivery_status_enum AS ENUM ('waiting_payment', 'waiting_confirmation', 'processed', 'sent', 'confirmed', 'cancelled');
 CREATE TYPE payment_method_enum AS ENUM ('transfer', 'credit_card', 'e_wallet');
+CREATE TABLE payments(
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    payment_method payment_method_enum NOT NULL DEFAULT 'transfer',
+    total_payment INTEGER NOT NULL,
+    payment_proof_url VARCHAR(255),
+    expired_at TIMESTAMP NOT NULL DEFAULT NOW() + '30 minutes',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TYPE delivery_status_enum AS ENUM ('waiting_payment', 'waiting_confirmation', 'processed', 'sent', 'confirmed', 'cancelled');
 CREATE TABLE orders(
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     shipping_id BIGINT NOT NULL,
     pharmacy_id BIGINT NOT NULL,
-    status delivery_status_enum NOT NULL,
-    payment_method payment_method_enum NOT NULL,
+    status delivery_status_enum NOT NULL DEFAULT 'waiting_payment',
     number_items INTEGER NOT NULL,
-    total_payment INTEGER NOT NULL,
-    payment_proof_url VARCHAR(255),
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    shipping_cost INTEGER NOT NULL,
+    subtotal INTEGER NOT NULL,
+    payment_id BIGINT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(shipping_id) REFERENCES shippings(id),
-    FOREIGN KEY(pharmacy_id) REFERENCES pharmacies(id)
+    FOREIGN KEY(pharmacy_id) REFERENCES pharmacies(id),
+    FOREIGN KEY(payment_id) REFERENCES payments(id)
 );
 
 CREATE TABLE prescriptions(
@@ -289,9 +358,9 @@ CREATE TABLE prescriptions(
     user_id BIGINT NOT NULL,
     doctor_id BIGINT NOT NULL,
     is_redeemed BOOLEAN NOT NULL DEFAULT FALSE,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(doctor_id) REFERENCES doctors(id)
 );
@@ -299,18 +368,22 @@ CREATE TABLE prescriptions(
 CREATE TABLE cart_items(
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    order_id BIGINT NOT NULL,
-    pharmacy_product_id BIGINT NOT NULL,
-    prescription_id BIGINT NOT NULL,
+    order_id BIGINT,
+    pharmacy_id BIGINT,
+    pharmacy_product_id BIGINT,
+    product_id BIGINT,
+    prescription_id BIGINT,
     quantity INTEGER NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(order_id) REFERENCES orders(id),
     FOREIGN KEY(pharmacy_product_id) REFERENCES pharmacies_products(id),
-    FOREIGN KEY(prescription_id) REFERENCES prescriptions(id)
+    FOREIGN KEY(prescription_id) REFERENCES prescriptions(id),
+    FOREIGN KEY(product_id) REFERENCES products(id),
+    FOREIGN KEY(pharmacy_id) REFERENCES pharmacies(id)
 );
 
 CREATE TABLE prescription_items(
@@ -318,9 +391,9 @@ CREATE TABLE prescription_items(
     prescription_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
     amount INTEGER NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(prescription_id) REFERENCES prescriptions(id),
     FOREIGN KEY(product_id) REFERENCES products(id)
 );
@@ -332,9 +405,10 @@ CREATE TABLE chat_rooms(
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_user_typing BOOLEAN NOT NULL DEFAULT FALSE,
     is_doctor_typing BOOLEAN NOT NULL DEFAULT FALSE,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    expired_at TIMESTAMP NOT NULL DEFAULT NOW() + '30 minutes',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(doctor_id) REFERENCES doctors(id)
 );
@@ -345,9 +419,9 @@ CREATE TABLE messages(
     chat_room_id BIGINT NOT NULL,
     message VARCHAR(255) NOT NULL,
     sender message_sender_enum NOT NULL,
-    createdAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMP,
     FOREIGN KEY(chat_room_id) REFERENCES chat_rooms(id)
 );
 
