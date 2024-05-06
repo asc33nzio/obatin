@@ -15,4 +15,5 @@ var (
 	ErrStlAccountHasNotApproved   = errors.New("you should wait approval by admin")
 	ErrStlNotFound                = errors.New("not found")
 	ErrStlBadRequest              = errors.New("bad request")
+	ErrStlUnexpectedError         = errors.New("unexpected error")
 )

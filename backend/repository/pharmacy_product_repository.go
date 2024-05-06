@@ -5,15 +5,14 @@ import (
 	"database/sql"
 	"obatin/apperror"
 	"obatin/entity"
-	"strconv"
-	"strings"
-
-	"github.com/lib/pq"
 )
 
 type PharmacyProductRepository interface {
-	FindPharmaciesProductsWithin25km(ctx context.Context, c *entity.CartItem) ([]*entity.PharmacyProduct, error)
-	FindTotalStockPerPartner(ctx context.Context, pp entity.PharmacyProduct) (*int, error)
+	FindPharmaciesWithin25kmByProductId(ctx context.Context, userId int64, productId int64) ([]*entity.Pharmacy, error)
+	FindTotalStockPerPartner(ctx context.Context, pp *entity.PharmacyProduct) (*int, error)
+	FindStockAndLockById(ctx context.Context, pharmacyProductId int64) (*int, error)
+	FindNearbyPartner(ctx context.Context, pp *entity.PharmacyProduct) ([]*entity.PharmacyProduct, error)
+	UpdateStockPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct) error
 }
 
 type pharmacyProductRepositoryPostgres struct {
@@ -26,8 +25,8 @@ func NewPharmacyProductRepositoryPostgres(db *sql.DB) *pharmacyProductRepository
 	}
 }
 
-func (r *pharmacyProductRepositoryPostgres) FindPharmaciesProductsWithin25km(ctx context.Context, c *entity.CartItem) ([]*entity.PharmacyProduct, error) {
-	res := []*entity.PharmacyProduct{}
+func (r *pharmacyProductRepositoryPostgres) FindPharmaciesWithin25kmByProductId(ctx context.Context, userId int64, productId int64) ([]*entity.Pharmacy, error) {
+	res := []*entity.Pharmacy{}
 	query := `
 		WITH user_geom AS (
 			SELECT a.geom 
@@ -39,21 +38,19 @@ func (r *pharmacyProductRepositoryPostgres) FindPharmaciesProductsWithin25km(ctx
 		)
 		SELECT
 			ST_distancesphere(ug.geom, p.geom)::smallint as distance,
-			pp.id,  
-			pp.price, 
-			pp.stock, 
-			p.id,
-			p.name,
-			p.address,
-			p.lat,
-			p.lng,
+			p.id as pharmacy_id,
+			p.name as pharmacy_name,
+			p.address as pharmacy_address,
+			p.city_id as pharmacy_city_id,
+			p.lat as pharmacy_lat,
+			p.lng as pharmacy_lng,
 			p.pharmacist_name,
 			p.pharmacist_license,
 			p.pharmacist_phone,
-			p.city_id,
-			p.partner_id,
-			total_stock.total_stock,
-			shipping_methods.shipping_details
+			p.opening_time,
+			(p.opening_time + p.operational_hours) as closing_time,
+			p.operational_days,
+			p.partner_id
 		FROM 
 			pharmacies_products pp
 		JOIN 
@@ -64,35 +61,6 @@ func (r *pharmacyProductRepositoryPostgres) FindPharmaciesProductsWithin25km(ctx
 			user_geom ug 
 		ON 
 			ST_distancesphere(ug.geom, p.geom) <= 25000
-		JOIN 
-			(
-				SELECT 
-					p.partner_id,
-					SUM(pp.stock) AS total_stock 
-				FROM 
-					pharmacies_products pp 
-				JOIN 
-					pharmacies p ON pp.pharmacy_id = p.id
-				WHERE 
-					pp.product_id = $2 
-				GROUP BY 
-					p.partner_id
-			) AS total_stock ON total_stock.partner_id = p.partner_id
-		LEFT JOIN
-			(
-				SELECT
-					p.id AS pharmacy_id,
-					ARRAY_AGG(ROW(sm.id, sm.name, sm.price, sm.type)) 
-					AS shipping_details
-				FROM
-					pharmacies p
-				JOIN
-					shippings s ON s.pharmacy_id = p.id
-				JOIN
-					shipping_methods sm ON s.shipping_method_id = sm.id
-				GROUP BY
-					p.id
-			) AS shipping_methods ON shipping_methods.pharmacy_id = p.id
 		WHERE 
 			pp.product_id = $2 
 		AND 
@@ -104,10 +72,10 @@ func (r *pharmacyProductRepositoryPostgres) FindPharmaciesProductsWithin25km(ctx
 		LIMIT 10
 	`
 
-	rows, err := r.db.QueryContext(ctx, query, c.UserId, c.Product.Id)
+	rows, err := r.db.QueryContext(ctx, query, userId, productId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, apperror.ErrNoNearbyPharmacyProduct(err, c.Product.Id)
+			return nil, apperror.ErrNoNearbyPharmacyProduct(err, productId)
 		}
 
 		return nil, apperror.NewInternal(err)
@@ -115,59 +83,37 @@ func (r *pharmacyProductRepositoryPostgres) FindPharmaciesProductsWithin25km(ctx
 	defer rows.Close()
 
 	for rows.Next() {
-		var shippingDetails pq.StringArray
-		pharmacyProduct := entity.PharmacyProduct{}
+		pharmacy := entity.Pharmacy{}
 		err := rows.Scan(
-			&pharmacyProduct.Pharmacy.Distance,
-			&pharmacyProduct.Id,
-			&pharmacyProduct.Price,
-			&pharmacyProduct.Stock,
-			&pharmacyProduct.Pharmacy.Id,
-			&pharmacyProduct.Pharmacy.Name,
-			&pharmacyProduct.Pharmacy.Address,
-			&pharmacyProduct.Pharmacy.Latitude,
-			&pharmacyProduct.Pharmacy.Longitude,
-			&pharmacyProduct.Pharmacy.PharmacistName,
-			&pharmacyProduct.Pharmacy.PharmacistLicense,
-			&pharmacyProduct.Pharmacy.PharmacistPhone,
-			&pharmacyProduct.Pharmacy.City.Id,
-			&pharmacyProduct.Pharmacy.Id,
-			&pharmacyProduct.TotalStock,
-			&shippingDetails,
+			&pharmacy.Distance,
+			&pharmacy.Id,
+			&pharmacy.Name,
+			&pharmacy.Address,
+			&pharmacy.City.Id,
+			&pharmacy.Latitude,
+			&pharmacy.Longitude,
+			&pharmacy.PharmacistName,
+			&pharmacy.PharmacistLicense,
+			&pharmacy.PharmacistPhone,
+			&pharmacy.OpeningTime,
+			&pharmacy.ClosingTime,
+			&pharmacy.OperationalDays,
+			&pharmacy.PartnerId,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, sd := range shippingDetails {
-			sd = strings.TrimPrefix(sd, "(")
-			sd = strings.TrimSuffix(sd, ")")
-			parts := strings.Split(sd, ",")
-
-			id, _ := strconv.ParseInt(parts[0], 10, 64)
-			price, _ := strconv.Atoi(parts[2])
-
-			detail := entity.ShippingMethod{
-				Id:    id,
-				Name:  strings.Trim(parts[1], "\""),
-				Price: price * *pharmacyProduct.Pharmacy.Distance / 1000,
-				Type:  parts[3],
-			}
-
-			pharmacyProduct.Pharmacy.ShippingMethods = append(pharmacyProduct.Pharmacy.ShippingMethods, &detail)
-		}
-		pharmacyProduct.Product.Id = c.Product.Id
-		res = append(res, &pharmacyProduct)
+		res = append(res, &pharmacy)
 	}
 
 	return res, nil
 }
 
-func (r *pharmacyProductRepositoryPostgres) FindTotalStockPerPartner(ctx context.Context, pp entity.PharmacyProduct) (*int, error) {
-	var stock int
+func (r *pharmacyProductRepositoryPostgres) FindTotalStockPerPartner(ctx context.Context, pp *entity.PharmacyProduct) (*int, error) {
+	var stock *int
 	query := `
 		SELECT 
-			p.partner_id,
 			SUM(pp.stock) AS total_stock 
 		FROM 
 			pharmacies_products pp 
@@ -177,8 +123,6 @@ func (r *pharmacyProductRepositoryPostgres) FindTotalStockPerPartner(ctx context
 			pp.product_id = $1
 		AND
 			p.partner_id = $2
-		GROUP BY 
-			p.partner_id
 	`
 
 	err := r.db.QueryRowContext(
@@ -190,8 +134,168 @@ func (r *pharmacyProductRepositoryPostgres) FindTotalStockPerPartner(ctx context
 		&stock,
 	)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.NewProductNotFound(err)
+		}
+
+		return nil, apperror.NewInternal(err)
+	}
+
+	if stock == nil {
+		return nil, apperror.NewProductNotFound(apperror.ErrStlNotFound)
+	}
+
+	return stock, nil
+}
+
+func (r *pharmacyProductRepositoryPostgres) FindStockAndLockById(ctx context.Context, pharmacyProductId int64) (*int, error) {
+	var stock int
+
+	query := `
+		SELECT
+			stock
+		FROM
+			pharmacies_products
+		WHERE
+			id = $1
+		AND
+			is_active = true
+		AND
+			deleted_at IS NULL
+		FOR UPDATE
+`
+
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		pharmacyProductId,
+	).Scan(
+		&stock,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.NewProductNotFound(err)
+		}
+
 		return nil, apperror.NewInternal(err)
 	}
 
 	return &stock, nil
+}
+
+func (r pharmacyProductRepositoryPostgres) FindNearbyPartner(ctx context.Context, pp *entity.PharmacyProduct) ([]*entity.PharmacyProduct, error) {
+	res := []*entity.PharmacyProduct{}
+
+	query := `
+		WITH current_pharmacy as (
+			SELECT 
+				p.id as id, 
+				p.geom as geom, 
+				p.partner_id as partner_id
+			FROM 	
+				pharmacies p 
+			WHERE 
+				p.id = $1
+			AND 
+				deleted_at IS NULL
+		)
+		SELECT
+			ST_distancesphere(cp.geom, p.geom)::INTEGER AS distance,
+			p.id as pharmacy_id,
+			p.partner_id as partner_id,
+			p.name as pharmacy_name,
+			pp.id as pharmacy_product_id,
+			pp.product_id as product_id,
+			pp.stock as pharmacy_product_stock
+		FROM 
+			pharmacies_products pp 
+		JOIN 
+			pharmacies p 
+		ON 
+			pp.pharmacy_id = p.id
+		JOIN 
+			current_pharmacy cp
+		ON 
+			cp.partner_id = p.partner_id 
+		WHERE 
+			p.id != cp.id
+		AND 
+			p.partner_id = cp.partner_id
+		AND 
+			pp.product_id = $2
+		AND 
+			pp.is_active = true 
+		AND
+			pp.stock > 0
+		AND 
+			pp.deleted_at IS NULL
+		ORDER BY
+			ST_distancesphere(cp.geom, p.geom) ASC
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, *pp.Pharmacy.Id, pp.Product.Id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.ErrNoNearbyPharmacyPartner(err)
+		}
+
+		return nil, apperror.NewInternal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		pharmacyProduct := entity.PharmacyProduct{}
+		err := rows.Scan(
+			&pharmacyProduct.Pharmacy.Distance,
+			&pharmacyProduct.Pharmacy.Id,
+			&pharmacyProduct.Pharmacy.PartnerId,
+			&pharmacyProduct.Pharmacy.Name,
+			&pharmacyProduct.Id,
+			&pharmacyProduct.Product.Id,
+			&pharmacyProduct.Stock,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &pharmacyProduct)
+	}
+
+	return res, nil
+}
+
+func (r *pharmacyProductRepositoryPostgres) UpdateStockPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct) error {
+	query := `
+		UPDATE
+			pharmacies_products
+		SET
+			stock = $1 , updated_at = NOW()
+		WHERE
+			id = $2
+		AND
+			is_active = true
+		AND
+			deleted_at IS NULL
+`
+
+	res, err := r.db.ExecContext(
+		ctx,
+		query,
+		*pp.Stock,
+		pp.Id,
+	)
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	if rowsAffected == 0 {
+		return apperror.NewInternal(apperror.ErrStlNotFound)
+	}
+
+	return nil
 }
