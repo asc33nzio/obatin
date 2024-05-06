@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"obatin/apperror"
 	"obatin/entity"
+	"time"
 )
 
 type RefreshTokenRepository interface {
-	CreateNewRefreshToken(ctx context.Context, token string, authId int64) error
+	CreateNewRefreshToken(ctx context.Context, token string, authId int64, expiry *time.Time) error
 	DeleteRefreshTokenAfterExpiredByAuthId(ctx context.Context, authId int64) error
 	IsRefreshTokenValidByEmail(ctx context.Context, email string) (bool, error)
 	IsRefreshTokenValidByToken(ctx context.Context, token string) (bool, error)
@@ -25,14 +26,15 @@ func NewRefreshTokenRepositoryPostgres(db *sql.DB) *refreshTokenRepositoryPostgr
 	}
 }
 
-func (r *refreshTokenRepositoryPostgres) CreateNewRefreshToken(ctx context.Context, token string, authId int64) error {
+func (r *refreshTokenRepositoryPostgres) CreateNewRefreshToken(ctx context.Context, token string, authId int64, expiry *time.Time) error {
 	queryCreateNewRefreshToken := `
 		INSERT INTO
 			refresh_tokens(
 				token, 
-				authentication_id
+				authentication_id,
+				expired_at
 			)
-			VALUES ($1, $2)
+			VALUES ($1, $2, $3)
 	`
 
 	res, err := r.db.ExecContext(
@@ -40,6 +42,7 @@ func (r *refreshTokenRepositoryPostgres) CreateNewRefreshToken(ctx context.Conte
 		queryCreateNewRefreshToken,
 		token,
 		authId,
+		expiry,
 	)
 	if err != nil {
 		return apperror.NewInternal(err)
