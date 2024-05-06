@@ -30,6 +30,5 @@ const (
 	PrescriptionNotExist
 	PrescriptionItemNotExist
 	NoNearbyPharmacyProduct
-	InsufficientStock
-	NoNearbyPharmacyPartner
+	ErrorDuplicateSlug
 )

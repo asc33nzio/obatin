@@ -25,7 +25,7 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -36,7 +36,7 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 

@@ -31,15 +31,7 @@ func (h *AuthenticationHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	isExtendedQuery := ctx.Query(constant.IsExtendedQueryParam)
-	var isExtended bool
-	if isExtendedQuery == "true" {
-		isExtended = true
-	} else {
-		isExtended = false
-	}
-
-	token, err := h.userUsecase.Login(ctx, body.ToUser(), isExtended)
+	token, err := h.userUsecase.Login(ctx, body.ToUser())
 	if err != nil {
 		ctx.Error(err)
 		return

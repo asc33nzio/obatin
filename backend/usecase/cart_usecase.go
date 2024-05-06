@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
 	"obatin/entity"
@@ -12,9 +11,8 @@ import (
 type CartUsecase interface {
 	Bulk(ctx context.Context, cart entity.Cart) error
 	GetCartDetails(ctx context.Context, authenticationId int64) (*entity.Cart, error)
-	UpdateOneCartItem(ctx context.Context, cartItem *entity.CartItem) error
+	UpdateOneCartItemQuantity(ctx context.Context, cartItem *entity.CartItem) error
 	DeleteOneCartItem(ctx context.Context, cartItem *entity.CartItem) error
-	Checkout(ctx context.Context, co *entity.CartCheckout) error
 }
 
 type cartUsecaseImpl struct {
@@ -43,15 +41,6 @@ func (u *cartUsecaseImpl) Bulk(ctx context.Context, cart entity.Cart) error {
 		userId, err := ur.FindUserIdByAuthId(ctx, cart.User.Authentication.Id)
 		if err != nil {
 			return nil, err
-		}
-
-		hasActiveAddress, err := ur.HasActiveAddress(ctx, cart.User.Authentication.Id)
-		if err != nil {
-			return nil, err
-		}
-
-		if !hasActiveAddress {
-			return nil, apperror.ErrAddressNotFound(apperror.ErrStlNotFound)
 		}
 
 		for _, c := range cart.Items {
@@ -115,7 +104,7 @@ func (u *cartUsecaseImpl) Bulk(ctx context.Context, cart entity.Cart) error {
 			}
 
 			if isItemExist {
-				err := cr.UpdateOneCartItem(ctx, c)
+				err := cr.UpdateOneCartItemQuantity(ctx, c)
 				if err != nil {
 					return nil, err
 				}
@@ -170,7 +159,7 @@ func (u *cartUsecaseImpl) GetCartDetails(ctx context.Context, authenticationId i
 	return cart, nil
 }
 
-func (u *cartUsecaseImpl) UpdateOneCartItem(ctx context.Context, cartItem *entity.CartItem) error {
+func (u *cartUsecaseImpl) UpdateOneCartItemQuantity(ctx context.Context, cartItem *entity.CartItem) error {
 	ur := u.repoStore.UserRepository()
 	cr := u.repoStore.CartRepository()
 
@@ -190,7 +179,7 @@ func (u *cartUsecaseImpl) UpdateOneCartItem(ctx context.Context, cartItem *entit
 		return apperror.NewProductNotFound(apperror.ErrStlNotFound)
 	}
 
-	err = cr.UpdateOneCartItem(ctx, cartItem)
+	err = cr.UpdateOneCartItemQuantity(ctx, cartItem)
 	if err != nil {
 		return err
 	}
@@ -210,190 +199,6 @@ func (u *cartUsecaseImpl) DeleteOneCartItem(ctx context.Context, cartItem *entit
 	cartItem.UserId = userId
 
 	err = cr.DeleteOneCartItem(ctx, cartItem)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (u *cartUsecaseImpl) Checkout(ctx context.Context, co *entity.CartCheckout) error {
-	ur := u.repoStore.UserRepository()
-
-	userId, err := ur.FindUserIdByAuthId(ctx, co.User.Authentication.Id)
-	if err != nil {
-		return err
-	}
-
-	co.User.Id = userId
-
-	_, err = u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
-		ppr := rs.PharmacyProductRepository()
-		smr := rs.StockMovementRepository()
-		pr := rs.PaymentRepository()
-		or := rs.OrderRepository()
-		cr := rs.CartRepository()
-
-		payment := &entity.Payment{
-			User:          entity.User{Id: co.User.Id},
-			PaymentMethod: appconstant.DefaultPaymentMethod,
-			TotalPayment:  co.Payment.TotalPayment,
-		}
-
-		_, err := pr.CreateOnePayment(ctx, payment)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, pc := range co.PharmaciesCart {
-			pc.User.Id = userId
-			pc.Payment.Id = payment.Id
-			pc.NumberItems = len(pc.CartItems)
-			_, err := or.CreateOneOrder(ctx, &pc)
-			if err != nil {
-				return nil, err
-			}
-
-			for _, ci := range pc.CartItems {
-				stock, err := ppr.FindStockAndLockById(ctx, *ci.PharmacyProductId)
-				if err != nil {
-					return nil, err
-				}
-
-				currentStock := *stock
-				currentPharmacyMutation := &entity.StockMovement{
-					PharmacyProduct: entity.PharmacyProduct{Id: *ci.PharmacyProductId},
-					MovementType:    appconstant.InternalStockMovementType,
-					IsAddition:      true,
-				}
-
-				if *ci.Quantity > *stock {
-					totalStock, err := ppr.FindTotalStockPerPartner(ctx, &entity.PharmacyProduct{
-						Product:  entity.ProductDetail{Id: ci.Product.Id},
-						Pharmacy: entity.Pharmacy{PartnerId: pc.Pharmacy.PartnerId},
-					})
-					if err != nil {
-						return nil, err
-					}
-
-					if *ci.Quantity > *totalStock {
-						return nil, apperror.ErrInsufficientStock(apperror.ErrStlBadRequest, ci.Product.Name)
-					}
-
-					nearbyPartners, err := ppr.FindNearbyPartner(ctx, &entity.PharmacyProduct{
-						Product:  entity.ProductDetail{Id: ci.Product.Id},
-						Pharmacy: entity.Pharmacy{Id: pc.Pharmacy.Id},
-					})
-					if err != nil {
-						return nil, err
-					}
-
-					needed := *ci.Quantity - *stock
-					index := 0
-					for needed > 0 {
-						pp := nearbyPartners[index]
-
-						otherStock, err := ppr.FindStockAndLockById(ctx, pp.Id)
-						if err != nil {
-							return nil, err
-						}
-
-						otherPharmacyMutation := &entity.StockMovement{
-							PharmacyProduct: entity.PharmacyProduct{Id: pp.Id},
-							MovementType:    appconstant.InternalStockMovementType,
-							IsAddition:      false,
-						}
-
-						if needed >= *otherStock {
-							otherPharmacyMutation.Delta = *otherStock
-							currentPharmacyMutation.Delta = *otherStock
-							currentStock += currentPharmacyMutation.Delta
-							updatedOtherStock := *otherStock - otherPharmacyMutation.Delta
-
-							err = ppr.UpdateStockPharmacyProduct(ctx, &entity.PharmacyProduct{Id: pp.Id, Stock: &updatedOtherStock})
-							if err != nil {
-								return nil, err
-							}
-
-							err = ppr.UpdateStockPharmacyProduct(ctx, &entity.PharmacyProduct{Id: *ci.PharmacyProductId, Stock: &currentStock})
-							if err != nil {
-								return nil, err
-							}
-
-							err = smr.CreateOneStockMovement(ctx, otherPharmacyMutation)
-							if err != nil {
-								return nil, err
-							}
-
-							err = smr.CreateOneStockMovement(ctx, currentPharmacyMutation)
-							if err != nil {
-								return nil, err
-							}
-
-							needed -= *otherStock
-							index++
-							continue
-						}
-
-						otherPharmacyMutation.Delta = needed
-						currentPharmacyMutation.Delta = needed
-						currentStock += currentPharmacyMutation.Delta
-						updatedOtherStock := *otherStock - otherPharmacyMutation.Delta
-
-						err = ppr.UpdateStockPharmacyProduct(ctx, &entity.PharmacyProduct{Id: pp.Id, Stock: &updatedOtherStock})
-						if err != nil {
-							return nil, err
-						}
-
-						err = ppr.UpdateStockPharmacyProduct(ctx, &entity.PharmacyProduct{Id: *ci.PharmacyProductId, Stock: &currentStock})
-						if err != nil {
-							return nil, err
-						}
-
-						err = smr.CreateOneStockMovement(ctx, otherPharmacyMutation)
-						if err != nil {
-							return nil, err
-						}
-
-						err = smr.CreateOneStockMovement(ctx, currentPharmacyMutation)
-						if err != nil {
-							return nil, err
-						}
-
-						needed -= needed
-						index++
-					}
-				}
-
-				currentStock -= *ci.Quantity
-				currentPharmacyMutation.Delta = *ci.Quantity
-				currentPharmacyMutation.MovementType = appconstant.SaleStockMovementType
-				currentPharmacyMutation.IsAddition = false
-
-				err = ppr.UpdateStockPharmacyProduct(ctx, &entity.PharmacyProduct{Id: *ci.PharmacyProductId, Stock: &currentStock})
-				if err != nil {
-					return nil, err
-				}
-
-				err = smr.CreateOneStockMovement(ctx, currentPharmacyMutation)
-				if err != nil {
-					return nil, err
-				}
-
-				ci.OrderId = pc.Id
-				ci.Pharmacy.Id = pc.Pharmacy.Id
-				inactivate := appconstant.InactvateCartBool
-				ci.IsActive = &inactivate
-				ci.UserId = userId
-				err = cr.UpdateOneCartItem(ctx, ci)
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
-
-		return nil, nil
-	})
 	if err != nil {
 		return err
 	}

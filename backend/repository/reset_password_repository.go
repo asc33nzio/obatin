@@ -52,7 +52,7 @@ func (r *resetPasswordRepositoryPostgres) CreateNewResetPassword(ctx context.Con
 	}
 
 	if rowsAffected == 0 {
-		return nil
+		return apperror.NewInternal(apperror.ErrStlNotFound)
 	}
 
 	return nil

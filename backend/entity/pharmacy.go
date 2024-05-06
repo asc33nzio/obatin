@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"time"
+
 	"github.com/shopspring/decimal"
 )
 
@@ -11,8 +13,7 @@ type Pharmacy struct {
 	City              City
 	Latitude          *decimal.Decimal
 	Longitude         *decimal.Decimal
-	OpeningTime       *string
-	ClosingTime       *string
+	OpeningTime       *time.Time
 	OperationalHours  *string
 	OperationalDays   *string
 	PharmacistName    *string

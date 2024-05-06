@@ -32,7 +32,7 @@ func (h *DoctorHandler) GetDoctorDetailbyAuthId(ctx *gin.Context) {
 	}
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -145,7 +145,7 @@ func checkDoctor(ctx *gin.Context) bool {
 		return false
 	}
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return false
 	}
 	return true

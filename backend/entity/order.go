@@ -1,11 +1,7 @@
 package entity
 
-import (
-	"time"
-)
-
 type Order struct {
-	Id           *int64
+	Id           int64
 	User         User
 	Shipping     Shipping
 	Pharmacy     Pharmacy
@@ -14,8 +10,4 @@ type Order struct {
 	ShippingCost int
 	Subtotal     int
 	Payment      Payment
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    *time.Time
-	CartItems    []*CartItem
 }
