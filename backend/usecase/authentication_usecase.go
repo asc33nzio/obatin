@@ -9,6 +9,7 @@ import (
 	"obatin/config"
 	"obatin/constant"
 	"strings"
+	"time"
 
 	"obatin/entity"
 	"obatin/repository"
@@ -130,9 +131,9 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 		return nil, err
 	}
 
-	refreshTokenValidDuration := u.config.JwtRefreshTokenExpired()
+	refreshTokenValidDurationMinutes := u.config.JwtRefreshTokenExpired()
 	if isExtended {
-		refreshTokenValidDuration *= 2
+		refreshTokenValidDurationMinutes *= 2
 	}
 
 	if !isRefreshTokenValid {
@@ -145,7 +146,7 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 				RandomToken:      randomRefreshToken,
 				Role:             authentication.Role,
 				AuthenticationId: authentication.Id},
-			refreshTokenValidDuration,
+			refreshTokenValidDurationMinutes,
 			u.config.JwtSecret(),
 		)
 
@@ -153,7 +154,8 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 			return nil, apperror.NewInternal(err)
 		}
 
-		err = rt.CreateNewRefreshToken(ctx, randomRefreshToken, authentication.Id)
+		refreshTokenValidUntil := time.Now().Add(time.Duration(refreshTokenValidDurationMinutes) * time.Minute)
+		err = rt.CreateNewRefreshToken(ctx, randomRefreshToken, authentication.Id, &refreshTokenValidUntil)
 		if err != nil {
 			return nil, apperror.NewInternal(err)
 		}
@@ -175,7 +177,7 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 			RandomToken:      refreshToken.RefreshToken,
 			Role:             authentication.Role,
 			AuthenticationId: authentication.Id},
-		refreshTokenValidDuration,
+		refreshTokenValidDurationMinutes,
 		u.config.JwtSecret(),
 	)
 	if err != nil {

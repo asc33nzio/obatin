@@ -16,6 +16,7 @@
     "@nextui-org/react": "^2.3.5",
     "@reduxjs/toolkit": "^2.2.3",
     "@styled-icons/material": "^10.47.0",
+    "@wojtekmaj/react-timerange-picker": "^6.0.0",
     "axios": "^1.6.8",
     "cookies-next": "^4.1.1",
     "jwt-decode": "^4.0.0",

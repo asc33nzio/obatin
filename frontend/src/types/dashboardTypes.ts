@@ -17,6 +17,9 @@ export interface EditProfileDoctorStateItf {
   confirmPassword: boolean;
   avatar: boolean;
   experiences: boolean;
+  time: boolean;
+  operationalDays: boolean;
+  fee: boolean;
 }
 
 export interface EditProfilePayloadItf {
@@ -33,3 +36,6 @@ export interface EditProfilePayloadItf {
 export interface GenderItf {
   isMale: boolean;
 }
+
+type TimeValueType = Date | string | null;
+export type TimeValue = TimeValueType | [TimeValueType, TimeValueType];
