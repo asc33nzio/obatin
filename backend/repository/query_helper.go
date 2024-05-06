@@ -457,3 +457,65 @@ func prescriptionItemsBulkInsertQuery(cp *entity.CreatePrescription) (string, []
 
 	return sb.String(), args
 }
+
+func updateOneCartItemQuery(c *entity.CartItem) (string, []interface{}) {
+	var args []interface{}
+	var pharmacyId interface{}
+	var pharmacyProductId interface{}
+	var orderId interface{}
+	var isActive interface{}
+
+	query := `
+		UPDATE
+			cart_items
+		SET
+			quantity = $1 , 
+			pharmacy_id = $2,
+			pharmacy_product_id = $3,
+			order_id = $4,
+			is_active = $5, 
+			updated_at = NOW()
+		WHERE 
+			user_id = $6
+		AND
+			product_id = $7
+		AND
+			is_active = true
+		AND 
+			deleted_at IS NULL
+	`
+
+	if c.Pharmacy.Id == nil {
+		pharmacyId = nil
+	} else {
+		pharmacyId = *c.Pharmacy.Id
+	}
+
+	if c.PharmacyProductId == nil {
+		pharmacyProductId = nil
+	} else {
+		pharmacyProductId = *c.PharmacyProductId
+	}
+
+	if c.OrderId == nil {
+		orderId = nil
+	} else {
+		orderId = *c.OrderId
+	}
+
+	if c.IsActive == nil {
+		isActive = true
+	} else {
+		isActive = *c.IsActive
+	}
+
+	args = append(args, *c.Quantity)
+	args = append(args, pharmacyId)
+	args = append(args, pharmacyProductId)
+	args = append(args, orderId)
+	args = append(args, isActive)
+	args = append(args, *c.UserId)
+	args = append(args, c.Product.Id)
+
+	return query, args
+}

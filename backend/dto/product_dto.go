@@ -20,6 +20,10 @@ type ProductSlugParam struct {
 	Slug string `uri:"product_slug" binding:"required"`
 }
 
+type ProductIdUriParam struct {
+	Id int64 `uri:"id" binding:"required"`
+}
+
 type ProductDetailResponse struct {
 	Id                     int64                `json:"id"`
 	Name                   string               `json:"name"`

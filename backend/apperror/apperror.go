@@ -351,3 +351,21 @@ func ErrNoNearbyPharmacyProduct(err error, productId int64) *AppError {
 		stack:   debug.Stack(),
 	}
 }
+
+func ErrInsufficientStock(err error, name string) *AppError {
+	return &AppError{
+		code:    InsufficientStock,
+		err:     err,
+		message: InsufficientStockMsg + fmt.Sprintf(" for product %v", name),
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrNoNearbyPharmacyPartner(err error) *AppError {
+	return &AppError{
+		code:    NoNearbyPharmacyPartner,
+		err:     err,
+		message: NoNearbyPharmacyPartnerMsg,
+		stack:   debug.Stack(),
+	}
+}

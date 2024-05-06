@@ -32,6 +32,9 @@ type RouterOpt struct {
 	DoctorHandler               *handler.DoctorHandler
 	CartHandler                 *handler.CartHandler
 	PrescriptionHandler         *handler.PrescriptionHandler
+	PharmacyProductHandler      *handler.PharmacyProductHandler
+	ThirdPartyHandler           *handler.ThirdPartyHandler
+	ShippingHandler             *handler.ShippingHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -79,6 +82,14 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	prescriptionUsecase := usecase.NewPrescriptionUsecaseImpl(dbStore, config)
 	prescriptionHandler := handler.NewPrescriptionHandler(prescriptionUsecase)
 
+	pharmacyProductUsecase := usecase.NewPharmacyProductUsecaseImpl(dbStore, config)
+	pharmacyProductHandler := handler.NewPharmacyProductHandler(pharmacyProductUsecase)
+
+	shippingUsecase := usecase.NewShippingUsecaseImpl(dbStore, config)
+	shippingHandler := handler.NewShippingHandler(shippingUsecase, config)
+
+	thirdPartyHandler := handler.NewThirdPartyHandler(config)
+
 	return NewRouter(RouterOpt{
 		Middleware:                  middleware,
 		AuthenticationHandler:       authentiationHandler,
@@ -93,6 +104,9 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 		ChatRoomHandler:             chatRoomHandler,
 		CartHandler:                 cartHandler,
 		PrescriptionHandler:         prescriptionHandler,
+		PharmacyProductHandler:      pharmacyProductHandler,
+		ThirdPartyHandler:           thirdPartyHandler,
+		ShippingHandler:             shippingHandler,
 	})
 }
 
@@ -136,6 +150,8 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.GET(appconstant.EndpointGetDoctorSpecialization, h.DoctorSpecializationHandler.GetAll)
 	r.POST(appconstant.EndpointRefreshToken, h.AuthenticationHandler.GetRefreshToken)
 
+	r.POST(appconstant.EndpointRajaOngkirCost, h.ThirdPartyHandler.RajaOngkirCost)
+
 	r.Use(h.Middleware.JWTAuth)
 
 	r.PATCH(appconstant.EndpointGetDoctorDetail, h.DoctorHandler.UpdateOneDoctor)
@@ -167,5 +183,9 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.PUT(appconstant.EndpointCart, h.CartHandler.UpdateOneCartItemQuantity)
 	r.DELETE(appconstant.EndpointCartDelete, h.CartHandler.DeleteOneCartItem)
 	r.POST(appconstant.EndpointPrescription, h.PrescriptionHandler.CreatePrescription)
+	r.GET(appconstant.EndpointNearbyPharmaciesByProduct, h.PharmacyProductHandler.GetNearbyPharmacies)
+	r.POST(appconstant.EndpointProductTotalStock, h.PharmacyProductHandler.TotalStockPerPartner)
+	r.POST(appconstant.EndpointAvailableShippings, h.ShippingHandler.AvailableShippingsPerPharmacy)
+	r.POST(appconstant.EndpointCartCheckout, h.CartHandler.Checkout)
 	return r
 }
