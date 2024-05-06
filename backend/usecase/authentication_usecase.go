@@ -102,19 +102,11 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 		return nil, apperror.NewInternal(err)
 	}
 
-	claims, err := u.jwtAuth.ParseAndVerify(token, u.config.JwtSecret())
-	if err != nil {
-		return nil, apperror.ErrInvalidToken(err)
-	}
-	if claims.Payload.Role == constant.RoleDoctor {
-		doctor, err := dr.FindDoctorByAuthId(ctx, claims.Payload.AuthenticationId)
-		if err != nil {
-			return nil, err
-		}
+	if authentication.Role == constant.RoleDoctor {
 		onlineStatus := appconstant.DoctorOnlineTrue
 		_, err = dr.UpdateOneDoctor(ctx, entity.DoctorUpdateRequest{
 			IsOnline: &onlineStatus,
-		}, doctor.Id)
+		}, authentication.Id)
 		if err != nil {
 			return nil, err
 		}
