@@ -23,18 +23,18 @@ func NewCartHandler(cartUsecase usecase.CartUsecase) *CartHandler {
 func (h *CartHandler) GetCartDetails(ctx *gin.Context) {
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
 	if !isVerified {
-		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(nil))
 		return
 	}
 
@@ -56,13 +56,13 @@ func (h *CartHandler) Bulk(ctx *gin.Context) {
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -93,13 +93,13 @@ func (h *CartHandler) UpdateOneCartItemQuantity(ctx *gin.Context) {
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -114,7 +114,7 @@ func (h *CartHandler) UpdateOneCartItemQuantity(ctx *gin.Context) {
 		return
 	}
 
-	err = h.cartUsecase.UpdateOneCartItem(ctx, body.ToCartItem(&authenticationId))
+	err = h.cartUsecase.UpdateOneCartItemQuantity(ctx, body.ToCartItem(&authenticationId))
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -130,13 +130,13 @@ func (h *CartHandler) DeleteOneCartItem(ctx *gin.Context) {
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -159,42 +159,5 @@ func (h *CartHandler) DeleteOneCartItem(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseCartItemDeletedMsg,
-	})
-}
-
-func (h *CartHandler) Checkout(ctx *gin.Context) {
-	body := dto.CartCheckoutReq{}
-
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
-	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
-		return
-	}
-
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
-	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
-		return
-	}
-
-	if !isVerified {
-		ctx.Error(apperror.ErrNoAccessAccountNotVerified(nil))
-		return
-	}
-
-	err := ctx.ShouldBindJSON(&body)
-	if err != nil {
-		ctx.Error(apperror.ErrInvalidReq(err))
-		return
-	}
-
-	err = h.cartUsecase.Checkout(ctx, body.ToCartCheckout(authenticationId))
-	if err != nil {
-		ctx.Error(err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseCartCheckoutMsg,
 	})
 }

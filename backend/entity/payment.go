@@ -5,5 +5,5 @@ type Payment struct {
 	User            User
 	PaymentMethod   string
 	TotalPayment    int
-	PaymentProofUrl *string
+	PaymentProofUrl string
 }

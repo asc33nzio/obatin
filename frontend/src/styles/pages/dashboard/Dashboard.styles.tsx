@@ -19,7 +19,7 @@ export const DoctorDashboardPageContainer = styled.div<{
   display: flex;
   flex-direction: column;
 
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '135vh' : '200vh')};
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '100vh' : '200vh')};
   width: 100vw;
   max-width: 100vw;
 
@@ -53,12 +53,13 @@ export const DoctorProfileContainer = styled.div<{
 }>`
   display: flex;
   flex-direction: column;
+  align-items: center;
 
   width: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '90%')};
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '80%' : '100%')};
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '50%' : '100%')};
   gap: 10px;
-  margin-top: -15px;
-  margin-bottom: 15px;
+
+  margin-bottom: 100px;
 `;
 
 export const ProfileHeader = styled.div<{ $isDesktopDisplay: boolean }>`
@@ -167,20 +168,9 @@ export const ProfileContentRight = styled.div<{ $isDesktopDisplay: boolean }>`
   padding-left: 15px;
 
   h2 {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
     font-size: 16px;
     color: #4a5568;
     margin-bottom: 5px;
-
-    span {
-      font-size: 16px;
-      color: #4a5568;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
   }
 `;
 
@@ -273,7 +263,7 @@ export const DoctorProgressContainer = styled.div`
   justify-content: center;
 
   width: 100%;
-  height: 20%;
+  height: 45%;
 `;
 
 export const ContentSubcontainer = styled.div`
@@ -298,74 +288,5 @@ export const ContentSubcontainer = styled.div`
       color: #00b5c0;
       font-weight: 500;
     }
-  }
-`;
-
-export const AltDetailDiv = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-
-  width: 100%;
-  height: 60px;
-  margin-bottom: 5px;
-  color: #a5a5a5;
-  font-size: 18px;
-  gap: 10px;
-
-  svg {
-    cursor: pointer;
-    justify-self: flex-start;
-    background: transparent;
-    object-fit: cover;
-    width: 30px;
-    height: 30px;
-    margin-top: 5px;
-
-    :hover {
-      fill: #ff3f3f;
-    }
-  }
-
-  p {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-`;
-
-export const ClockDiv = styled.section`
-  display: flex;
-  align-items: center;
-  width: 100%;
-
-  svg {
-    stroke: #00b5c0;
-
-    :hover {
-      fill: aqua;
-    }
-  }
-`;
-
-export const RadioInputGroup = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  height: 50px;
-  gap: 10px;
-
-  div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    height: 100%;
-    width: 60px;
-    font-size: 16px;
   }
 `;

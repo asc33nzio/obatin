@@ -56,7 +56,7 @@ const Modal = () => {
       modalContent = <ChangePasswordModalContent />;
       title = 'Tolong konfirmasi sandi baru anda';
       modalProps = {
-        $overlayHeight: '135vh',
+        $overlayHeight: '100vh',
         $containerWidth: '500px',
         $containerHeight: '325px',
       };

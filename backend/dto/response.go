@@ -31,6 +31,11 @@ type UserVerifiedRes struct {
 	Email string `json:"email"`
 }
 
+type CloudinaryUrlRes struct {
+	FileUrl  string `json:"file_url,omitempty"`
+	ImageUrl string `json:"image_url,omitempty"`
+}
+
 func ToUserRegisterRes(u entity.Authentication) UserRegisterRes {
 	return UserRegisterRes{
 		Email: u.Email,

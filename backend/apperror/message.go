@@ -41,6 +41,5 @@ const (
 	PrescriptionNotExistMsg           = "prescription does not exist"
 	PrescriptionItemNotExistMsg       = "product does not exist in prescription"
 	NoNearbyPharmacyProductMsg        = "there are no nearby pharmacy that has the product"
-	InsufficientStockMsg              = "insufficient stock"
-	NoNearbyPharmacyPartnerMsg        = "no nearby pharmacy partner"
+	DuplicateSlugErrorMsg             = "you can't use duplicate slug"
 )

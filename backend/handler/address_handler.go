@@ -36,7 +36,7 @@ func (h *AddressHandler) CreateOneAddress(ctx *gin.Context) {
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -48,14 +48,14 @@ func (h *AddressHandler) CreateOneAddress(ctx *gin.Context) {
 
 		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
 		if !ok {
-			ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 			return
 		}
 	}
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -103,7 +103,7 @@ func (h *AddressHandler) UpdateOneAddress(ctx *gin.Context) {
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -115,14 +115,14 @@ func (h *AddressHandler) UpdateOneAddress(ctx *gin.Context) {
 
 		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
 		if !ok {
-			ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 			return
 		}
 	}
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -169,7 +169,7 @@ func (h *AddressHandler) DeleteOneAddress(ctx *gin.Context) {
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -181,14 +181,14 @@ func (h *AddressHandler) DeleteOneAddress(ctx *gin.Context) {
 
 		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
 		if !ok {
-			ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 			return
 		}
 	}
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 

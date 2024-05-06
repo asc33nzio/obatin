@@ -70,6 +70,257 @@ func convertUpdateCategoryQueryParamstoSql(params entity.CategoryUpdateBody, slu
 	return query.String(), args
 }
 
+func convertUpdateProductQueryParamstoSql(params entity.UpdateProduct, productId int64) (string, []interface{}) {
+	var query strings.Builder
+	var args []interface{}
+	var countParams = constant.StartingParamsCount
+	if params.Name != nil {
+		query.WriteString(fmt.Sprintf("name = $%d ", countParams))
+		args = append(args, *params.Name)
+		countParams++
+	}
+	if params.Manufacturer != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("manufacturer_id = $%d ", countParams))
+		args = append(args, params.Manufacturer.ID)
+		countParams++
+	}
+	if params.IsPrescriptionRequired != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("is_prescription_required = $%d ", countParams))
+		args = append(args, *params.IsPrescriptionRequired)
+		countParams++
+	}
+	if params.IsActive != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("is_active = $%d ", countParams))
+		args = append(args, *params.IsActive)
+		countParams++
+	}
+	if params.Width != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("width = $%d ", countParams))
+		args = append(args, *params.Width)
+		countParams++
+	}
+	if params.Height != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("height = $%d ", countParams))
+		args = append(args, *params.Height)
+		countParams++
+	}
+	if params.Length != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("length = $%d ", countParams))
+		args = append(args, *params.Length)
+		countParams++
+	}
+	if params.Weight != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("weight = $%d ", countParams))
+		args = append(args, *params.Weight)
+		countParams++
+	}
+	if params.SellingUnit != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("selling_unit = $%d ", countParams))
+		args = append(args, *params.SellingUnit)
+		countParams++
+	}
+	if params.Packaging != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("packaging = $%d ", countParams))
+		args = append(args, *params.Packaging)
+		countParams++
+	}
+	if params.Classification != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("classification = $%d ", countParams))
+		args = append(args, *params.Classification)
+		countParams++
+	}
+	if params.Description != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("description = $%d ", countParams))
+		args = append(args, *params.Description)
+		countParams++
+	}
+	if params.Content != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("content = $%d ", countParams))
+		args = append(args, *params.Content)
+		countParams++
+	}
+	if params.BpomNumber != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("bpom_number = $%d ", countParams))
+		args = append(args, *params.BpomNumber)
+		countParams++
+	}
+	if params.Warning != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("warning = $%d ", countParams))
+		args = append(args, *params.Warning)
+		countParams++
+	}
+	if params.Contraindication != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("contraindication = $%d ", countParams))
+		args = append(args, *params.Contraindication)
+		countParams++
+	}
+	if params.SideEffects != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("side_effects = $%d ", countParams))
+		args = append(args, *params.SideEffects)
+		countParams++
+	}
+	if params.HowToUse != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("how_to_use = $%d ", countParams))
+		args = append(args, *params.HowToUse)
+		countParams++
+	}
+	if params.Dosage != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("dosage = $%d ", countParams))
+		args = append(args, *params.Dosage)
+		countParams++
+	}
+	if params.GeneralIndication != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("general_indication = $%d ", countParams))
+		args = append(args, *params.GeneralIndication)
+		countParams++
+	}
+	if params.GenericName != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("generic_name = $%d ", countParams))
+		args = append(args, *params.GenericName)
+		countParams++
+	}
+	if params.MinPrice != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("min_price = $%d ", countParams))
+		args = append(args, *params.MinPrice)
+		countParams++
+	}
+	if params.MaxPrice != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("max_price = $%d ", countParams))
+		args = append(args, *params.MaxPrice)
+		countParams++
+	}
+	if params.Slug != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("category_slug = $%d ", countParams))
+		args = append(args, *params.Slug)
+		countParams++
+	}
+	if params.ImageUrl != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("image_url = $%d ", countParams))
+		countParams++
+		query.WriteString(fmt.Sprintf(", thumbnail_url = $%d ", countParams))
+		args = append(args, *params.ImageUrl)
+		args = append(args, *params.ImageUrl)
+		countParams++
+	}
+
+	query.WriteString(
+		fmt.Sprintf(`
+		, updated_at = NOW()
+	WHERE 
+		id = $%d
+	`, countParams))
+
+	args = append(args, productId)
+	countParams++
+	return query.String(), args
+}
+
+func convertUpdatePharmacyProductQueryParamstoSql(params entity.UpdatePharmacyProduct, id int64) (string, []interface{}) {
+	var query strings.Builder
+	var args []interface{}
+	var countParams = constant.StartingParamsCount
+
+	if params.Price != nil {
+		query.WriteString(fmt.Sprintf("price = $%d ", countParams))
+		args = append(args, *params.Price)
+		countParams++
+	}
+
+	if params.IsActive != nil {
+		if countParams > 1 {
+			query.WriteString(",")
+		}
+		query.WriteString(fmt.Sprintf("is_active = $%d ", countParams))
+		args = append(args, *params.Price)
+		countParams++
+	}
+
+	query.WriteString(
+		fmt.Sprintf(`
+		, updated_at = NOW()
+	WHERE 
+		id = $%d
+	RETURNING
+		id, product_id, pharmacy_id, price, stock, is_active 
+	`, countParams))
+
+	args = append(args, id)
+	countParams++
+	return query.String(), args
+}
+
 func convertUpdateDoctorQueryParamstoSql(params entity.DoctorUpdateRequest, id int64) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
@@ -170,7 +421,7 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 		query.WriteString(" WHERE ")
 	}
 	if params.Category != "" {
-		query.WriteString(fmt.Sprintf(` pc.category_id = $%v`, countParams))
+		query.WriteString(fmt.Sprintf(` pc.category_id = $%v AND pc.deleted_at IS NULL`, countParams))
 		filters = append(filters, params.Category)
 		countParams++
 	}
@@ -226,7 +477,7 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 
 }
 
-func ConvertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interface{}) {
+func convertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
 	var countParams = constant.StartingParamsCount
@@ -456,66 +707,4 @@ func prescriptionItemsBulkInsertQuery(cp *entity.CreatePrescription) (string, []
 	}
 
 	return sb.String(), args
-}
-
-func updateOneCartItemQuery(c *entity.CartItem) (string, []interface{}) {
-	var args []interface{}
-	var pharmacyId interface{}
-	var pharmacyProductId interface{}
-	var orderId interface{}
-	var isActive interface{}
-
-	query := `
-		UPDATE
-			cart_items
-		SET
-			quantity = $1 , 
-			pharmacy_id = $2,
-			pharmacy_product_id = $3,
-			order_id = $4,
-			is_active = $5, 
-			updated_at = NOW()
-		WHERE 
-			user_id = $6
-		AND
-			product_id = $7
-		AND
-			is_active = true
-		AND 
-			deleted_at IS NULL
-	`
-
-	if c.Pharmacy.Id == nil {
-		pharmacyId = nil
-	} else {
-		pharmacyId = *c.Pharmacy.Id
-	}
-
-	if c.PharmacyProductId == nil {
-		pharmacyProductId = nil
-	} else {
-		pharmacyProductId = *c.PharmacyProductId
-	}
-
-	if c.OrderId == nil {
-		orderId = nil
-	} else {
-		orderId = *c.OrderId
-	}
-
-	if c.IsActive == nil {
-		isActive = true
-	} else {
-		isActive = *c.IsActive
-	}
-
-	args = append(args, *c.Quantity)
-	args = append(args, pharmacyId)
-	args = append(args, pharmacyProductId)
-	args = append(args, orderId)
-	args = append(args, isActive)
-	args = append(args, *c.UserId)
-	args = append(args, c.Product.Id)
-
-	return query, args
 }
