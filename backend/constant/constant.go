@@ -13,6 +13,7 @@ const (
 	AvatarURLFormKey           = "avatar"
 	EmailJSONTag               = "email"
 	TokenQueryParam            = "token"
+	IsExtendedQueryParam       = "extend"
 	ApproveQueryParam          = "approve"
 	AuthenticationIDParam      = "authentication_id"
 	HeaderBearerToken          = "Authorization"
