@@ -13,10 +13,11 @@ export const NavContainer = styled.div`
 
   height: 125px;
   width: 100vw;
+  margin-bottom: 25px;
 
   padding-left: 50px;
   padding-right: 75px;
-  margin-bottom: 25px;
+
   border-bottom: 0.5px solid ${COLORS.input_border};
 
   @media (max-width: 1440px) {
@@ -65,9 +66,31 @@ export const IconContainer = styled.div`
 `;
 
 export const Right = styled.div`
-  @media (max-width: 769px) {
-    display: none;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  svg {
+    width: 40px;
+    height: 40px;
+    color: ${COLORS.primary_color};
+    stroke: 1px solid ${COLORS.primary_color};
   }
+`;
+
+export const CartContainer = styled.div`
+  display: flex;
+  cursor: pointer;
+`;
+export const Quantity = styled.div`
+  background-color: #ff6500;
+  border-radius: 50%;
+  padding: 4px;
+  font-size: 12px;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  color: white;
+  font-weight: 600;
 `;
 
 export const ImgBg = styled.div`

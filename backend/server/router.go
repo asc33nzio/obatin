@@ -32,6 +32,7 @@ type RouterOpt struct {
 	DoctorHandler               *handler.DoctorHandler
 	CartHandler                 *handler.CartHandler
 	PrescriptionHandler         *handler.PrescriptionHandler
+	CloudinaryHandler           *handler.CloudinaryHandler
 	PharmacyProductHandler      *handler.PharmacyProductHandler
 	ThirdPartyHandler           *handler.ThirdPartyHandler
 	ShippingHandler             *handler.ShippingHandler
@@ -46,10 +47,13 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	cloudinaryUpload := util.NewCloudinaryUpload(config)
 	sendEmail := util.NewSendEmail(config)
 
+	cloudinaryUseCase := usecase.NewCloudinaryUseCaseImpl(cloudinaryUpload)
+	cloudinaryHandler := handler.NewCloudinaryHandler(cloudinaryUseCase)
+
 	authenticationUsecase := usecase.NewAuthenticationUsecaseImpl(dbStore, cryptoHash, jwtAuth, config, tokenGenerator, cloudinaryUpload, sendEmail)
 	authentiationHandler := handler.NewAuthenticationHandler(authenticationUsecase)
 
-	productUseCase := usecase.NewProductUsecaseImpl(dbStore, config)
+	productUseCase := usecase.NewProductUsecaseImpl(dbStore, config, cloudinaryUpload)
 	productHandler := handler.NewProductHandler(productUseCase)
 
 	doctorSpecializationUsecase := usecase.NewDoctorSpecializationUsecaseImpl(dbStore, config)
@@ -104,6 +108,7 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 		ChatRoomHandler:             chatRoomHandler,
 		CartHandler:                 cartHandler,
 		PrescriptionHandler:         prescriptionHandler,
+		CloudinaryHandler:           cloudinaryHandler,
 		PharmacyProductHandler:      pharmacyProductHandler,
 		ThirdPartyHandler:           thirdPartyHandler,
 		ShippingHandler:             shippingHandler,
@@ -131,11 +136,23 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.Use(h.Middleware.RequestId)
 	r.Use(h.Middleware.Logger(log))
 	r.Use(h.Middleware.ErrorHandler)
+
 	r.GET(appconstant.EndpointPing, func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, dto.APIResponse{
 			Message: appconstant.ResponsePongMsg,
 		})
 	})
+	r.NoRoute(func(ctx *gin.Context) {
+		ctx.JSON(http.StatusNotFound, dto.APIResponse{
+			Message: appconstant.ResponseNotfoundMsg,
+		})
+	})
+	r.NoMethod(func(ctx *gin.Context) {
+		ctx.JSON(http.StatusNotFound, dto.APIResponse{
+			Message: appconstant.ResponseNotfoundMsg,
+		})
+	})
+
 	r.POST(appconstant.EndpointLogin, h.AuthenticationHandler.Login)
 	r.POST(appconstant.EndpointRegisterDoctor, h.AuthenticationHandler.RegisterDoctor)
 	r.POST(appconstant.EndpointRegisterUser, h.AuthenticationHandler.RegisterUser)
@@ -154,9 +171,13 @@ func NewRouter(h RouterOpt) *gin.Engine {
 
 	r.Use(h.Middleware.JWTAuth)
 
+	r.PATCH(appconstant.EndpointGetProductDetail, h.ProductHandler.UpdateProductDetaiBySlug)
+
+	r.POST(appconstant.EndpointUploadImageCloudinary, h.CloudinaryHandler.UploadImageOrFileToCloudinary)
 	r.PATCH(appconstant.EndpointGetDoctorDetail, h.DoctorHandler.UpdateOneDoctor)
 	r.GET(appconstant.EndpointGetDoctorProfileDetail, h.DoctorHandler.GetDoctorDetailbyAuthId)
 	r.POST(appconstant.EndpointSendVerifyToEmail, h.AuthenticationHandler.SendVerifyToEmail)
+	r.POST(appconstant.EndpointGetProductsList, h.ProductHandler.CreateProduct)
 	r.POST(appconstant.EndpointApproval, h.AuthenticationHandler.UpdateApproval)
 	r.PATCH(appconstant.EndpointUpdatePassword, h.AuthenticationHandler.UpdatePasswordByAuth)
 	r.GET(appconstant.EndpointGetDoctorPendingApproval, h.AuthenticationHandler.GetPendingDoctorApproval)
@@ -187,5 +208,8 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndpointProductTotalStock, h.PharmacyProductHandler.TotalStockPerPartner)
 	r.POST(appconstant.EndpointAvailableShippings, h.ShippingHandler.AvailableShippingsPerPharmacy)
 	r.POST(appconstant.EndpointCartCheckout, h.CartHandler.Checkout)
+	r.GET(appconstant.EndpointUserPrescription, h.PrescriptionHandler.GetAllUserPrescriptions)
+	r.GET(appconstant.EndpointPrescriptionDetails, h.PrescriptionHandler.GetPrescriptionDetails)
+	r.GET(appconstant.EndpointDoctorPrescription, h.PrescriptionHandler.GetAllDoctorPrescriptions)
 	return r
 }

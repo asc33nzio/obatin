@@ -25,7 +25,7 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -36,7 +36,7 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -51,7 +51,7 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 		return
 	}
 
-	err = h.prescriptionUsecase.CreatePrescription(ctx, body.ToCreatePrescription())
+	id, err := h.prescriptionUsecase.CreatePrescription(ctx, body.ToCreatePrescription())
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -59,5 +59,123 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
 		Message: constant.ResponsePrescriptionCreatedMsg,
+		Data:    dto.CreatePrescriptionRes{PrescriptionId: *id},
+	})
+}
+
+func (h *PrescriptionHandler) GetAllUserPrescriptions(ctx *gin.Context) {
+	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	if role != constant.RoleUser {
+		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
+		return
+	}
+
+	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	if !isVerified {
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
+		return
+	}
+
+	prescriptions, err := h.prescriptionUsecase.GetAllUserPrescriptions(ctx, authenticationId)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res := dto.ToGetAllUserPrescriptionRes(prescriptions)
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseOkMsg,
+		Data:    res,
+	})
+}
+
+func (h *PrescriptionHandler) GetAllDoctorPrescriptions(ctx *gin.Context) {
+	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	if role != constant.RoleDoctor {
+		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
+		return
+	}
+
+	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	if !isVerified {
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
+		return
+	}
+
+	prescriptions, err := h.prescriptionUsecase.GetAllDoctorPrescriptions(ctx, authenticationId)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res := dto.ToGetAllDoctorPrescriptionRes(prescriptions)
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseOkMsg,
+		Data:    res,
+	})
+}
+
+func (h *PrescriptionHandler) GetPrescriptionDetails(ctx *gin.Context) {
+	var uriParam dto.PrescriptionIdUriParam
+
+	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	if !isVerified {
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
+		return
+	}
+
+	err := ctx.ShouldBindUri(&uriParam)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+
+	items, err := h.prescriptionUsecase.GetPrescriptionDetails(ctx, uriParam.Id)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res := dto.ToGetPrescriptionDetailsRes(items)
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseOkMsg,
+		Data:    res,
 	})
 }

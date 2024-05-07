@@ -25,6 +25,10 @@ func (m *GinMiddleware) Logger(log *logrus.Logger) func(c *gin.Context) {
 		}
 
 		statusCode := c.Writer.Status()
+		clientIP := c.ClientIP()
+		userAgent := c.Request.UserAgent()
+		requestBody := c.Request.Body
+		responseSize := c.Writer.Size()
 
 		requestId, exist := c.Get(appconstant.RequestIdKey)
 		if !exist {
@@ -43,6 +47,10 @@ func (m *GinMiddleware) Logger(log *logrus.Logger) func(c *gin.Context) {
 			appconstant.LoggerMethodKey:     c.Request.Method,
 			appconstant.LoggerStatusCodeKey: statusCode,
 			appconstant.LoggerPathKey:       path,
+			"client_ip":                     clientIP,
+			"user_agent":                    userAgent,
+			"request_body":                  requestBody,
+			"response_size":                 responseSize,
 		})
 
 		if statusCode >= 500 && statusCode <= 599 {

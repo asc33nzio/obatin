@@ -29,7 +29,12 @@ const RegularInput = ({
   ...props
 }: RegularInputItf): React.ReactElement => {
   return (
-    <RegularInputContainer $marBot={$marBot} $width={$width} $height={$height}>
+    <RegularInputContainer
+      $marBot={$marBot}
+      $width={$width}
+      $height={$height}
+      // $fontSize={$fontSize}
+    >
       {title}
       <RegularCustomInput
         {...props}

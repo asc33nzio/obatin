@@ -38,8 +38,12 @@ const (
 	EndpointCartCheckout              = "/shop/cart/checkout"
 	EndpointCartDelete                = "/shop/cart/item"
 	EndpointPrescription              = "/prescriptions"
+	EndpointPrescriptionDetails       = "/prescriptions/:id"
+	EndpointUserPrescription          = "/users/prescriptions"
+	EndpointDoctorPrescription        = "/doctors/prescriptions"
 	EndpointNearbyPharmaciesByProduct = "/shop/nearby-pharmacies/products/:id"
 	EndpointProductTotalStock         = "/shop/products/total-stock"
 	EndpointAvailableShippings        = "/shop/pharmacy/shippings"
 	EndpointRajaOngkirCost            = "/third-parties/rajaongkir/cost"
+	EndpointUploadImageCloudinary    = "/cloudinary/image"
 )

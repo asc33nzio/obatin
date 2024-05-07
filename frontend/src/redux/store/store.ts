@@ -7,6 +7,7 @@ import { provincesReducer } from '../reducers/provincesSlice';
 import { encryptTransform } from 'redux-persist-transform-encrypt';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+import cartSlice from '../reducers/cartSlice';
 
 const createNoopStorage = () => {
   return {
@@ -50,6 +51,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   authDoctor: authDoctorReducer,
   provinces: provincesReducer,
+  cart: cartSlice,
 });
 
 const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(

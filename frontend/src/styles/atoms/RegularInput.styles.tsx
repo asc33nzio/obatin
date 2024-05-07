@@ -5,6 +5,7 @@ export const RegularInputContainer = styled.div<{
   $title?: string;
   $width?: number;
   $height?: number;
+  // $fontSize: number;
 }>`
   position: relative;
   display: flex;
@@ -15,7 +16,10 @@ export const RegularInputContainer = styled.div<{
   height: ${({ $height }) => ($height ? `${$height}px` : '100px')};
   gap: 5px;
 
-  font-size: 18px;
+  /* font-size: ${({ $fontSize }) =>
+    $fontSize ? `${$fontSize}px` : '18px'}; */
+  font-size: ${({ $fontSize }) => ($fontSize ? `${$fontSize}px` : '18px')};
+
   color: #718096;
   opacity: ${({ $title }) => ($title !== '' ? 1 : 0)};
 
