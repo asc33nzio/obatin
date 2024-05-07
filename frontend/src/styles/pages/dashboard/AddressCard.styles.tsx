@@ -1,13 +1,19 @@
 import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
-export const AddressCardContainer = styled.div`
+export const AddressCardContainer = styled.div<{
+  $justify: string | undefined;
+  $marBot: number | undefined;
+  $disableBorder: boolean | undefined;
+}>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  justify-content: space-between;
+  justify-content: ${({ $justify }) => ($justify ? $justify : 'center')};
 
+  border-bottom: ${({ $disableBorder }) =>
+    $disableBorder ? 'none' : '1px solid #000000'};
+  margin-bottom: ${({ $marBot }) => ($marBot ? `${$marBot}px` : '10px')};
   width: 100%;
   height: 25%;
   padding: 30px 0;

@@ -4,7 +4,7 @@ interface CartICOPropsItf {
   onClick: () => void;
 }
 
-const CartICO = (props: { onClick: CartICOPropsItf }): React.ReactElement => {
+const CartICO: React.FC<CartICOPropsItf> = (props: { onClick: Function }) => {
   return (
     <svg
       width='800px'

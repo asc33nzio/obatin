@@ -23,8 +23,11 @@ import { ProductType } from '@/types/Product';
 const ProductCartItem = () => {
   const { items } = useObatinSelector((state) => state.cart);
   const dispatch = useObatinDispatch();
+  // eslint-disable-next-line
   const router = useRouter();
+  // eslint-disable-next-line
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
+  const { openModal } = useModal();
 
   const handleRemoveItemCart = (id: number) => {
     dispatch(removeItemFromCart(id));
@@ -32,12 +35,12 @@ const ProductCartItem = () => {
 
   const handleAdd = (productId: number) => {
     const existingItem = items.find((item) => item.id === productId);
-    dispatch(
-      addItemToCart({
-        ...existingItem,
-        quantity: +1,
-      }),
-    );
+    // dispatch(
+    //   addItemToCart({
+    //     ...existingItem,
+    //     quantity: +1,
+    //   }),
+    // );
   };
 
   const handleSubtract = (productId: number) => {
@@ -55,15 +58,9 @@ const ProductCartItem = () => {
     }
   };
 
-  const { openModal } = useModal();
-
   const openDetailPharmacyInterface = () => {
     openModal('detail-pharmacy');
   };
-
-  // const handleProductClicked = (slug: string) => {
-  //   router.push(`products/${slug}`);
-  // };
 
   return (
     <>

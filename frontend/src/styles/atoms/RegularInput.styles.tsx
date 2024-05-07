@@ -5,7 +5,6 @@ export const RegularInputContainer = styled.div<{
   $title?: string;
   $width?: number;
   $height?: number;
-  // $fontSize: number;
 }>`
   position: relative;
   display: flex;
@@ -16,10 +15,8 @@ export const RegularInputContainer = styled.div<{
   height: ${({ $height }) => ($height ? `${$height}px` : '100px')};
   gap: 5px;
 
-  /* font-size: ${({ $fontSize }) => ($fontSize ? `${$fontSize}px` : '18px')}; */
-  font-size: ${({ $fontSize }) => ($fontSize ? `${$fontSize}px` : '18px')};
-
   color: #718096;
+  font-size: 18px;
   opacity: ${({ $title }) => ($title !== '' ? 1 : 0)};
 
   margin-bottom: ${({ $marBot }) => `${$marBot}px`};
@@ -53,12 +50,14 @@ export const RegularCustomInput = styled.input<{
     width: 100%;
     height: 85%;
     z-index: 2;
+    font-size: 12px;
   }
 `;
 
 export const CustomUploadButton = styled.button<{
   $hasError?: boolean;
   $isSet?: boolean;
+  $fontSize: number;
 }>`
   cursor: pointer;
   position: relative;
@@ -70,7 +69,7 @@ export const CustomUploadButton = styled.button<{
   border: none;
   outline: none;
 
-  font-size: 22px;
+  font-size: ${({ $fontSize }) => ($fontSize ? `${$fontSize}px` : '22px')};
   color: white;
   font-weight: 600;
   border: ${({ $hasError }) => ($hasError ? '1px solid #e04146' : 'none')};
