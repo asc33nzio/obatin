@@ -20,12 +20,12 @@ import Image from 'next/image';
 import React from 'react';
 
 const Checkout = () => {
-  const handlePdfChange = useUploadValidation();
+  const { handlePdfChange, userUploadValidationError } = useUploadValidation();
   // const [images, setImages] = useState([]);
   // const [imageURLS, setImageURLS] = useState([]);
   // const [tag, setTag] = useState(null);
 
-  const uploadImageToClient = () => {
+  // const uploadImageToClient = () => {
     // if (e.target.files && e.target.files[0]) {
     //   setImages((imageList) => [...imageList, e.target.files[0]]);
     //   setImageURLS((urlList) => [
@@ -33,7 +33,7 @@ const Checkout = () => {
     //     URL.createObjectURL(e.target.files[0]),
     //   ]);
     // }
-  };
+  // };
 
   const uploadToServer = async () => {
     // const body = new FormData();
@@ -61,10 +61,10 @@ const Checkout = () => {
               <RegularInput
                 type='file'
                 placeholder='Unggah file'
-                validationMessage={() => handlePdfChange}
-                onChange={uploadImageToClient}
+                validationMessage={userUploadValidationError}
+                onChange={handlePdfChange}
                 accept='image/*,.pdf'
-                fontSize={12}
+                $fontSize={18}
               />
               <ImageContainer>
                 <Image src='' width={300} height={300} alt='bukti' />

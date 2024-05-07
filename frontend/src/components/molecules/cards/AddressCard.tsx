@@ -23,7 +23,10 @@ const AddressCard = (props: {
   isMainAddress: boolean;
   alias: string | null;
   details: string | null;
-  disableButtons?: boolean;
+  $justify?: string | undefined;
+  $marBot?: number | undefined;
+  $borderDisable?: boolean | undefined;
+  $disableButtons?: boolean | undefined;
 }): React.ReactElement => {
   const { setToast } = useToast();
   const { openModal } = useModal();
@@ -156,7 +159,11 @@ const AddressCard = (props: {
   };
 
   return (
-    <AddressCardContainer>
+    <AddressCardContainer
+      $justify={props.$justify}
+      $marBot={props.$marBot}
+      $disableBorder={props.$borderDisable}
+    >
       <AddressCardLeftSection>
         <AddressCardHeader>
           <h1>{props.alias}</h1>
@@ -168,7 +175,7 @@ const AddressCard = (props: {
         <AddressDetails>{props.details}</AddressDetails>
       </AddressCardLeftSection>
 
-      {!props.disableButtons && (
+      {!props.$disableButtons && (
         <AddressCardRightSection>
           <DeleteICO onClick={handleDelete} />
           <EditICO onClick={handleOpenUpdateInterface} />
