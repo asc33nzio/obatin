@@ -21,7 +21,7 @@ export const ProductCard = styled.a`
   color: ${COLORS.primary_text};
   text-align: center;
   text-decoration: none;
-  gap: 5px;
+  gap: 20px;
 
   &:hover {
     zoom: 101%;

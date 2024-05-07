@@ -1,3 +1,4 @@
+import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
 export const AddressCardContainer = styled.div`
@@ -5,12 +6,11 @@ export const AddressCardContainer = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  justify-content: space-between;
 
   width: 100%;
   height: 25%;
-  margin-bottom: 10px;
-
-  border-bottom: 1px solid #000000;
+  padding: 30px 0;
 `;
 
 export const AddressCardLeftSection = styled.section`
@@ -33,9 +33,9 @@ export const AddressCardHeader = styled.div`
   gap: 25px;
 
   h1 {
-    color: #4a5568;
-    font-size: 24px;
-    font-weight: 650;
+    color: ${COLORS.primary_text};
+    font-size: 16px;
+    font-weight: 400;
     background: transparent;
   }
 `;
@@ -59,6 +59,7 @@ export const IsMainAddressBadge = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
 
   width: 95px;
   height: 20px;
@@ -66,7 +67,7 @@ export const IsMainAddressBadge = styled.div`
   border: 1px solid #00b5c0;
   border-radius: 5px;
   color: #00b5c0;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 550;
 `;
 
