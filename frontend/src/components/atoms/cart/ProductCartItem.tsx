@@ -70,9 +70,7 @@ const ProductCartItem = (): React.ReactElement => {
           <PharmacyName>
             <PharmacyICO />
             <p>Nama Apotek</p>
-            <div onClick={() => openDetailPharmacyInterface()}>
-              <DetailICO />
-            </div>
+            <DetailICO onClick={() => openDetailPharmacyInterface()} />
           </PharmacyName>
           <ProductItem>
             <Image alt='image' src={item.image_url} width={100} height={100} />

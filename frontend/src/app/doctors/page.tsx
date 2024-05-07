@@ -17,17 +17,16 @@ import {
 } from '@/styles/pages/product/ProductCard.styles';
 import { Body, Container } from '@/styles/Global.styles';
 import { useEffect, useState } from 'react';
+import { Inter } from 'next/font/google';
+import { DoctorSpecType, DoctorType } from '@/types/doctorTypes';
 import axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Navbar from '@/components/organisms/navbar/Navbar';
-import { Inter } from 'next/font/google';
-import { DoctorSpecType, DoctorType } from '@/types/doctorTypes';
 import SpecializationComponent from '@/components/molecules/specialization/Specialization';
 import Image from 'next/image';
 import DoctorFilterComponent from '@/components/atoms/filter/DoctorFilter';
 import Footer from '@/components/organisms/footer/Footer';
 import InvokableModal from '@/components/organisms/modal/InvokableModal';
-// import { useModal } from '@/hooks/useModal';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -37,7 +36,6 @@ const inter = Inter({
 const DoctorsPage = () => {
   const [doctors, setDoctors] = useState<DoctorType[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorType | null>(null);
-
   const [specializations, setSpecializations] = useState<DoctorSpecType[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -46,7 +44,6 @@ const DoctorsPage = () => {
   const [isOnline] = useState<string | null>(null);
   const [orderBy, setOrderBy] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  // const [isModalClose, setIsModalClose] = useState<boolean>(false);
 
   const handleModalOpen = (doctor: DoctorType) => {
     setSelectedDoctor(doctor);
@@ -78,7 +75,6 @@ const DoctorsPage = () => {
 
         setDoctors([...response.data]);
         setLoading(false);
-        console.log(response.data);
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -91,7 +87,6 @@ const DoctorsPage = () => {
   useEffect(() => {
     const fetchSpecialization = async () => {
       try {
-        console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
         const { data: response } = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctor-specializations`,
         );

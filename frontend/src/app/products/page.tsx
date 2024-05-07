@@ -15,19 +15,19 @@ import {
 } from '@/styles/pages/product/ProductCard.styles';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Body, Container } from '@/styles/Global.styles';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Inter } from 'next/font/google';
+import { ButtonAdd } from '@/styles/pages/product/ProductDetail.styles';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
+import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
 import axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import CategoryComponent from '@/components/molecules/category/Category';
-import { Inter } from 'next/font/google';
 import FilterComponent from '@/components/atoms/filter/DropdownFIlter';
 import Image from 'next/image';
 import Footer from '@/components/organisms/footer/Footer';
-import { ButtonAdd } from '@/styles/pages/product/ProductDetail.styles';
-import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
-import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -35,6 +35,7 @@ const inter = Inter({
 });
 
 const ProductsPage = () => {
+  const searchParams = useSearchParams();
   const router = useRouter();
   const dispatch = useObatinDispatch();
   const items = useObatinSelector((state) => state.cart.items);
@@ -47,11 +48,7 @@ const ProductsPage = () => {
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [classification, setClassification] = useState<string | null>(null);
   const [orderBy, setOrderBy] = useState<string | null>(null);
-
-  // const accessToken = getCookie('access_token');
-  // const userSessionCredentials = decodeJWTSync(accessToken?.toString());
-  // const userRole = userSessionCredentials?.payload?.Payload?.role;
-  // const [isLoading, setIsLoading] = useState<boolean>(false);
+  const search = searchParams.get('search');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,13 +64,13 @@ const ProductsPage = () => {
               sort_by: sortBy,
               classification: classification,
               order: orderBy,
+              search,
             },
           },
         );
 
         setProducts([...response.data]);
         setLoading(false);
-        console.log(response.data);
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -81,12 +78,11 @@ const ProductsPage = () => {
     };
 
     fetchData();
-  }, [page, categoryId, sortBy, classification, orderBy]);
+  }, [page, categoryId, sortBy, classification, orderBy, search]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
         const { data: response } = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/categories`,
         );

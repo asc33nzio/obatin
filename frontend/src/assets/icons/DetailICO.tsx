@@ -1,8 +1,15 @@
-import React from 'react';
+interface DetailICOPropsItf {
+  onClick: () => void;
+}
 
-const DetailICO = () => {
+const DetailICO = (props: DetailICOPropsItf): React.ReactElement => {
   return (
-    <svg fill='#000000' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'>
+    <svg
+      fill='#000000'
+      viewBox='0 0 16 16'
+      xmlns='http://www.w3.org/2000/svg'
+      onClick={() => props.onClick()}
+    >
       <g fill='gray'>
         <path d='M8 16a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8zm0-1a7 7 0 0 0 7-7 7 7 0 0 0-7-7 7 7 0 0 0-7 7 7 7 0 0 0 7 7z' />
         <path

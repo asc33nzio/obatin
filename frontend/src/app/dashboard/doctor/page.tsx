@@ -610,13 +610,6 @@ const DoctorDashboardPage = (): React.ReactElement => {
 
             <ProfileHeaderButtonsDiv>
               <CustomButton
-                content='Sejarah Transaksi'
-                $bgColor='#00B5C0'
-                $width='150px'
-                $height='40px'
-                $fontSize='18px'
-              />
-              <CustomButton
                 content='Simpan Profil'
                 $width='150px'
                 $height='40px'
@@ -1009,7 +1002,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
                 />
               </h2>
 
-              <h2>Waktu Bekerja</h2>
+              <h2>Waktu Praktek</h2>
               <AltDetailDiv>
                 {isEditingField.time ? (
                   <>
@@ -1052,7 +1045,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
                 )}
               </AltDetailDiv>
 
-              <h2>Hari Bekerja</h2>
+              <h2>Hari Praktek</h2>
               <RadioInputGroup>
                 <div>
                   <input

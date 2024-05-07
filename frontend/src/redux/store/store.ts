@@ -26,7 +26,7 @@ const createNoopStorage = () => {
 const storage =
   typeof window === 'undefined'
     ? createNoopStorage()
-    : createWebStorage('session');
+    : createWebStorage('local');
 
 const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_STORE_ENCRYPTION_KEY!;
 if (typeof ENCRYPTION_KEY === undefined) {

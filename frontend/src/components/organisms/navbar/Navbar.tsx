@@ -146,11 +146,6 @@ const Navbar = (): React.ReactElement => {
         {userRole === 'user' && <SearchComponent />}
 
         <Right>
-          <CartContainer onClick={() => navigateToCart()}>
-            <CartICO onClick={() => postToCart()} />
-            <Quantity>{quantity.totalQuantity}</Quantity>
-          </CartContainer>
-
           {accessToken === undefined ? (
             <CustomButton
               content='Login'
@@ -160,29 +155,35 @@ const Navbar = (): React.ReactElement => {
               onClick={() => navigateToLogin()}
             />
           ) : (
-            <ImgBg>
-              <Image
-                src={
-                  userRole === 'user' && avatarUrlUser
-                    ? avatarUrlUser
-                    : userRole === 'doctor' && avatarUrlDoctor
-                      ? avatarUrlDoctor
-                      : userRole === 'user' && userGender === 'perempuan'
-                        ? DefaultFemaleAvatar
-                        : userRole === 'user' && userGender === 'laki-laki'
-                          ? DefaultMaleAvatar
-                          : DefaultDoctorAvatar
-                }
-                alt='avatar'
-                width={75}
-                height={75}
-                onClick={() =>
-                  userRole === 'user'
-                    ? navigateToUserDashboard()
-                    : navigateToDoctorDashboard()
-                }
-              />
-            </ImgBg>
+            <>
+              <CartContainer onClick={() => navigateToCart()}>
+                <CartICO onClick={() => postToCart()} />
+                <Quantity>{quantity.totalQuantity}</Quantity>
+              </CartContainer>
+              <ImgBg>
+                <Image
+                  src={
+                    userRole === 'user' && avatarUrlUser
+                      ? avatarUrlUser
+                      : userRole === 'doctor' && avatarUrlDoctor
+                        ? avatarUrlDoctor
+                        : userRole === 'user' && userGender === 'perempuan'
+                          ? DefaultFemaleAvatar
+                          : userRole === 'user' && userGender === 'laki-laki'
+                            ? DefaultMaleAvatar
+                            : DefaultDoctorAvatar
+                  }
+                  alt='avatar'
+                  width={75}
+                  height={75}
+                  onClick={() =>
+                    userRole === 'user'
+                      ? navigateToUserDashboard()
+                      : navigateToDoctorDashboard()
+                  }
+                />
+              </ImgBg>
+            </>
           )}
         </Right>
       </NavContainer>
