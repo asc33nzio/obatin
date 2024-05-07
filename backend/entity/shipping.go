@@ -7,8 +7,12 @@ type Shipping struct {
 }
 
 type ShippingMethod struct {
-	Id    int64
-	Name  string
-	Price int
-	Type  string
+	Id          int64
+	Name        *string
+	Price       *int
+	Type        string
+	Description *string
+	Code        string
+	Estimated   string
+	Service     string
 }

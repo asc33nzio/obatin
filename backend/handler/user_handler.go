@@ -35,7 +35,7 @@ func (h *UserHandler) GetUserDetails(ctx *gin.Context) {
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
 		return
 	}
 
@@ -47,7 +47,7 @@ func (h *UserHandler) GetUserDetails(ctx *gin.Context) {
 
 		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
 		if !ok {
-			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+			ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
 			return
 		}
 	}
@@ -86,7 +86,7 @@ func (h *UserHandler) UpdateUserDetails(ctx *gin.Context) {
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
 		return
 	}
 
@@ -98,14 +98,14 @@ func (h *UserHandler) UpdateUserDetails(ctx *gin.Context) {
 
 		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
 		if !ok {
-			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+			ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
 			return
 		}
 	}
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
 		return
 	}
 

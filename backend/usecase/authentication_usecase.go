@@ -9,6 +9,7 @@ import (
 	"obatin/config"
 	"obatin/constant"
 	"strings"
+	"time"
 
 	"obatin/entity"
 	"obatin/repository"
@@ -16,7 +17,7 @@ import (
 )
 
 type AuthenticationUsecase interface {
-	Login(ctx context.Context, uReq entity.Authentication) (*entity.AuthenticationToken, error)
+	Login(ctx context.Context, uReq entity.Authentication, isExtended bool) (*entity.AuthenticationToken, error)
 	RegisterDoctor(ctx context.Context, uReq entity.Authentication) error
 	VerifyEmail(ctx context.Context, token string) error
 	RegisterUser(ctx context.Context, uReq entity.Authentication) error
@@ -62,7 +63,7 @@ func NewAuthenticationUsecaseImpl(
 	}
 }
 
-func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authentication) (*entity.AuthenticationToken, error) {
+func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authentication, isExtended bool) (*entity.AuthenticationToken, error) {
 	ur := u.repoStore.AuthenticationRepository()
 	rt := u.repoStore.RefreshTokenRepository()
 	dr := u.repoStore.DoctorRepository()
@@ -122,6 +123,11 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 		return nil, err
 	}
 
+	refreshTokenValidDurationMinutes := u.config.JwtRefreshTokenExpired()
+	if isExtended {
+		refreshTokenValidDurationMinutes *= 2
+	}
+
 	if !isRefreshTokenValid {
 		randomRefreshToken, err := u.tokenGenerator.GetRandomToken(u.config.RandomTokenLength())
 		if err != nil {
@@ -132,7 +138,7 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 				RandomToken:      randomRefreshToken,
 				Role:             authentication.Role,
 				AuthenticationId: authentication.Id},
-			u.config.JwtRefreshTokenExpired(),
+			refreshTokenValidDurationMinutes,
 			u.config.JwtSecret(),
 		)
 
@@ -140,7 +146,8 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 			return nil, apperror.NewInternal(err)
 		}
 
-		err = rt.CreateNewRefreshToken(ctx, randomRefreshToken, authentication.Id)
+		refreshTokenValidUntil := time.Now().Add(time.Duration(refreshTokenValidDurationMinutes) * time.Minute)
+		err = rt.CreateNewRefreshToken(ctx, randomRefreshToken, authentication.Id, &refreshTokenValidUntil)
 		if err != nil {
 			return nil, apperror.NewInternal(err)
 		}
@@ -162,7 +169,7 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 			RandomToken:      refreshToken.RefreshToken,
 			Role:             authentication.Role,
 			AuthenticationId: authentication.Id},
-		u.config.JwtRefreshTokenExpired(),
+		refreshTokenValidDurationMinutes,
 		u.config.JwtSecret(),
 	)
 	if err != nil {
@@ -252,7 +259,7 @@ func (u *authentictionUsecaseImpl) RegisterDoctor(ctx context.Context, uReq enti
 
 	_, ok := res.(*entity.Authentication)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	return nil
@@ -309,7 +316,7 @@ func (u *authentictionUsecaseImpl) RegisterUser(ctx context.Context, uReq entity
 
 	_, ok := res.(*entity.Authentication)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	return nil
@@ -343,11 +350,11 @@ func (u *authentictionUsecaseImpl) VerifyEmail(ctx context.Context, token string
 func (u *authentictionUsecaseImpl) SendVerificationEmail(ctx context.Context) error {
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 	ar := u.repoStore.AuthenticationRepository()
 
@@ -452,7 +459,7 @@ func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, updateReq
 
 	authId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	if updateReq.NewPassword == updateReq.OldPassword {
@@ -495,7 +502,7 @@ func (u *authentictionUsecaseImpl) UpdateApproval(ctx context.Context, authentic
 	ar := u.repoStore.AuthenticationRepository()
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	if authenticationRole != constant.RoleAdmin {
@@ -736,7 +743,7 @@ func (u *authentictionUsecaseImpl) GetPendingDoctorApproval(ctx context.Context,
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	if authenticationRole != constant.RoleAdmin {

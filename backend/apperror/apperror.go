@@ -235,7 +235,7 @@ func ErrInvalidSlug(err error) *AppError {
 	}
 }
 
-func ErrCategoryDuplicateSlug(err error) *AppError {
+func ErrDuplicateSlug(err error) *AppError {
 	return &AppError{
 		code:    InvalidSlug,
 		err:     err,
@@ -352,11 +352,20 @@ func ErrNoNearbyPharmacyProduct(err error, productId int64) *AppError {
 	}
 }
 
-func ErrDuplicateSlug(err error) *AppError {
+func ErrInsufficientStock(err error, name string) *AppError {
 	return &AppError{
-		code:    ErrorDuplicateSlug,
+		code:    InsufficientStock,
 		err:     err,
-		message: DuplicateSlugErrorMsg,
+		message: InsufficientStockMsg + fmt.Sprintf(" for product %v", name),
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrNoNearbyPharmacyPartner(err error) *AppError {
+	return &AppError{
+		code:    NoNearbyPharmacyPartner,
+		err:     err,
+		message: NoNearbyPharmacyPartnerMsg,
 		stack:   debug.Stack(),
 	}
 }

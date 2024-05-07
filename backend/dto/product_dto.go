@@ -1,10 +1,7 @@
 package dto
 
 import (
-	"obatin/apperror"
 	"obatin/entity"
-	"strconv"
-	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -23,64 +20,8 @@ type ProductSlugParam struct {
 	Slug string `uri:"product_slug" binding:"required"`
 }
 
-type AddProductRequest struct {
-	ManufacturerId         int64           `form:"manufacturer_id" binding:"required,gte=1"`
-	Name                   string          `form:"name" binding:"required"`
-	MinPrice               int             `form:"min_price" binding:"required"`
-	MaxPrice               int             `form:"max_price" binding:"required"`
-	Slug                   string          `form:"product_slug" binding:"required"`
-	GenericName            string          `form:"generic_name" binding:"required"`
-	GeneralIndication      string          `form:"general_indication" binding:"required"`
-	Dosage                 string          `form:"dosage" binding:"required"`
-	HowToUse               string          `form:"how_to_use" binding:"required"`
-	SideEffects            string          `form:"side_effects" binding:"required"`
-	Contraindication       string          `form:"contraindication" binding:"required"`
-	Warning                string          `form:"warning" binding:"required"`
-	BpomNumber             string          `form:"bpom_number" binding:"required"`
-	Content                string          `form:"content" binding:"required"`
-	Description            string          `form:"description" binding:"required"`
-	Classification         string          `form:"classification" binding:"required,oneof='obat_bebas' 'obat_bebas_terbatas' 'non_obat' 'obat_keras'"`
-	Packaging              string          `form:"packaging" binding:"required"`
-	SellingUnit            string          `form:"selling_unit" binding:"required"`
-	Weight                 decimal.Decimal `form:"weight" binding:"required"`
-	Height                 decimal.Decimal `form:"height" binding:"required"`
-	Length                 decimal.Decimal `form:"length" binding:"required"`
-	Width                  decimal.Decimal `form:"width" binding:"required"`
-	ImageUrl               *string         `form:"image_url"`
-	ThumbnailUrl           *string         `form:"thumbnail_url"`
-	IsActive               *bool           `form:"is_active" binding:"required"`
-	IsPrescriptionRequired *bool           `form:"is_prescription_required" binding:"required"`
-	Categories             string          `form:"categories" binding:"required"`
-}
-
-type UpdateProductRequest struct {
-	ManufacturerId         *int64           `form:"manufacturer_id"`
-	Name                   *string          `form:"name"`
-	MinPrice               *int             `form:"min_price"`
-	MaxPrice               *int             `form:"max_price"`
-	Slug                   *string          `form:"product_slug"`
-	GenericName            *string          `form:"generic_name"`
-	GeneralIndication      *string          `form:"general_indication"`
-	Dosage                 *string          `form:"dosage"`
-	HowToUse               *string          `form:"how_to_use"`
-	SideEffects            *string          `form:"side_effects"`
-	Contraindication       *string          `form:"contraindication"`
-	Warning                *string          `form:"warning"`
-	BpomNumber             *string          `form:"bpom_number"`
-	Content                *string          `form:"content"`
-	Description            *string          `form:"description"`
-	Classification         *string          `form:"classification" binding:"omitempty,oneof='obat_bebas' 'obat_bebas_terbatas' 'non_obat' 'obat_keras'"`
-	Packaging              *string          `form:"packaging"`
-	SellingUnit            *string          `form:"selling_unit"`
-	Weight                 *decimal.Decimal `form:"weight"`
-	Height                 *decimal.Decimal `form:"height"`
-	Length                 *decimal.Decimal `form:"length"`
-	Width                  *decimal.Decimal `form:"width"`
-	ImageUrl               *string          `form:"image_url"`
-	ThumbnailUrl           *string          `form:"thumbnail_url"`
-	IsActive               *bool            `form:"is_active"`
-	IsPrescriptionRequired *bool            `form:"is_prescription_required"`
-	Categories             *string          `form:"categories"`
+type ProductIdUriParam struct {
+	Id int64 `uri:"id" binding:"required"`
 }
 
 type ProductDetailResponse struct {
@@ -111,7 +52,6 @@ type ProductDetailResponse struct {
 	IsActive               bool                 `json:"is_active"`
 	IsPrescriptionRequired bool                 `json:"is_prescription_required"`
 	Manufacturer           ManufacturerResponse `json:"manufacturer"`
-	Categories             []CategoryResponse   `json:"categories"`
 }
 
 type ManufacturerResponse struct {
@@ -148,19 +88,6 @@ func (p ProductFilter) ToProductFilterEntity() entity.ProductFilter {
 }
 
 func ToProductDetailResponse(product *entity.ProductDetail) ProductDetailResponse {
-	var categories []CategoryResponse
-	for _, values := range product.Categories {
-		category := CategoryResponse{
-			Id:       values.Id,
-			Name:     values.Name,
-			Slug:     values.Slug,
-			ImageUrl: values.ImageUrl,
-			ParentId: values.ParentId,
-			HasChild: values.HasChild,
-			Level:    values.Level,
-		}
-		categories = append(categories, category)
-	}
 
 	return ProductDetailResponse{
 		Id:                     product.Id,
@@ -193,7 +120,6 @@ func ToProductDetailResponse(product *entity.ProductDetail) ProductDetailRespons
 			ID:   product.Manufacturer.ID,
 			Name: product.Manufacturer.Name,
 		},
-		Categories: categories,
 	}
 }
 
@@ -212,112 +138,4 @@ func ToProductListResponse(products *entity.ProductListPage) []ProductListRespon
 		})
 	}
 	return response
-}
-
-func ToProductDetailFromInsertBody(req AddProductRequest) (*entity.AddProduct, error) {
-	var categories []int64
-	categoryReqSilce := strings.Split(req.Categories, ",")
-	for _, v := range categoryReqSilce {
-		category, err := strconv.Atoi(v)
-		if err != nil {
-			return nil, apperror.ErrInvalidReq(apperror.ErrStlBadRequest)
-		}
-		categories = append(categories, int64(category))
-	}
-
-	res := entity.AddProduct{
-		Product: entity.ProductDetail{
-			Manufacturer: entity.Manufacturer{
-				ID: req.ManufacturerId,
-			},
-			Name:                   req.Name,
-			MinPrice:               req.MinPrice,
-			MaxPrice:               req.MaxPrice,
-			Slug:                   req.Slug,
-			GenericName:            req.GenericName,
-			GeneralIndication:      req.GeneralIndication,
-			Dosage:                 req.Dosage,
-			HowToUse:               req.HowToUse,
-			SideEffects:            req.SideEffects,
-			Contraindication:       req.Contraindication,
-			Warning:                req.Warning,
-			BpomNumber:             req.BpomNumber,
-			Content:                req.Content,
-			Description:            req.Description,
-			Classification:         req.Classification,
-			Packaging:              req.Packaging,
-			SellingUnit:            req.SellingUnit,
-			Weight:                 req.Weight,
-			Height:                 req.Height,
-			Length:                 req.Length,
-			Width:                  req.Width,
-			IsActive:               *req.IsActive,
-			IsPrescriptionRequired: *req.IsPrescriptionRequired,
-		},
-		Categories: categories,
-	}
-	if req.ImageUrl != nil {
-		res.Product.ImageUrl = *req.ImageUrl
-		res.Product.ThumbnailUrl = *req.ImageUrl
-	}
-	if req.ThumbnailUrl != nil {
-		res.Product.ThumbnailUrl = *req.ThumbnailUrl
-	}
-
-	return &res, nil
-}
-
-func ToEntityFromUpdateProductBody(req UpdateProductRequest) (*entity.UpdateProduct, error) {
-	var categories []int64
-	if req.Categories != nil {
-		categoryReqSilce := strings.Split(*req.Categories, ",")
-		for _, v := range categoryReqSilce {
-			category, err := strconv.Atoi(v)
-			if err != nil {
-				return nil, apperror.ErrInvalidReq(apperror.ErrStlBadRequest)
-			}
-			categories = append(categories, int64(category))
-		}
-	}
-
-	res := entity.UpdateProduct{
-		Name:                   req.Name,
-		MinPrice:               req.MinPrice,
-		MaxPrice:               req.MaxPrice,
-		Slug:                   req.Slug,
-		GenericName:            req.GenericName,
-		GeneralIndication:      req.GeneralIndication,
-		Dosage:                 req.Dosage,
-		HowToUse:               req.HowToUse,
-		SideEffects:            req.SideEffects,
-		Contraindication:       req.Contraindication,
-		Warning:                req.Warning,
-		BpomNumber:             req.BpomNumber,
-		Content:                req.Content,
-		Description:            req.Description,
-		Classification:         req.Classification,
-		Packaging:              req.Packaging,
-		SellingUnit:            req.SellingUnit,
-		Weight:                 req.Weight,
-		Height:                 req.Height,
-		Length:                 req.Length,
-		Width:                  req.Width,
-		IsActive:               req.IsActive,
-		IsPrescriptionRequired: req.IsPrescriptionRequired,
-		Categories:             &categories,
-	}
-	if req.ManufacturerId != nil {
-		res.Manufacturer = &entity.Manufacturer{
-			ID: *req.ManufacturerId,
-		}
-	}
-	if req.ImageUrl != nil {
-		res.ImageUrl = req.ImageUrl
-		res.ThumbnailUrl = req.ImageUrl
-	}
-	if req.ThumbnailUrl != nil {
-		res.ThumbnailUrl = req.ThumbnailUrl
-	}
-
-	return &res, nil
 }

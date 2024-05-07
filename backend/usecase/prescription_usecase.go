@@ -33,7 +33,7 @@ func (u *prescriptionUsecaseImpl) CreatePrescription(ctx context.Context, cp *en
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)

@@ -25,7 +25,10 @@ type RepoStore interface {
 	PrescriptionRepository() PrescriptionRepository
 	PrescriptionItemRepository() PrescriptionItemRepository
 	PharmacyProductRepository() PharmacyProductRepository
-	ProductCategoriesRepository() ProductCategoriesRepository
+	ShippingRepository() ShippingRepository
+	StockMovementRepository() StockMovementRepository
+	PaymentRepository() PaymentRepository
+	OrderRepository() OrderRepository
 }
 
 type dbStore struct {
@@ -161,8 +164,26 @@ func (s *dbStore) PharmacyProductRepository() PharmacyProductRepository {
 	}
 }
 
-func (s *dbStore) ProductCategoriesRepository() ProductCategoriesRepository {
-	return &productCategoriesRepositoryPostgres{
+func (s *dbStore) ShippingRepository() ShippingRepository {
+	return &shippingRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) StockMovementRepository() StockMovementRepository {
+	return &stockMovementRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) PaymentRepository() PaymentRepository {
+	return &paymentRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) OrderRepository() OrderRepository {
+	return &orderRepositoryPostgres{
 		db: s.querier,
 	}
 }

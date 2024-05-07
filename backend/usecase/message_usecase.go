@@ -53,11 +53,11 @@ func (u *messageUsecaseImpl) CreateMessage(ctx context.Context, mReq entity.Mess
 
 		authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 		if !ok {
-			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+			return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 		}
 		authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 		if !ok {
-			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+			return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 		}
 
 		err := crr.DeleteChatRoomAfterExpiredById(ctx, mReq.ChatRoomId)

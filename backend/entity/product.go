@@ -1,19 +1,15 @@
 package entity
 
-import (
-	"mime/multipart"
-
-	"github.com/shopspring/decimal"
-)
+import "github.com/shopspring/decimal"
 
 type ProductList struct {
-	Id                     int64
-	Name                   string
-	Slug                   string
-	SellingUnit            string
-	MinPrice               int
-	MaxPrice               int
-	ImageUrl               string
+	Id          int64
+	Name        string
+	Slug        string
+	SellingUnit string
+	MinPrice    int
+	MaxPrice    int
+	ImageUrl    string
 	IsPrescriptionRequired bool
 }
 
@@ -36,6 +32,7 @@ type ProductDetail struct {
 	Classification         string
 	Packaging              string
 	SellingUnit            string
+	Form                   string
 	Weight                 decimal.Decimal
 	Height                 decimal.Decimal
 	Length                 decimal.Decimal
@@ -45,44 +42,6 @@ type ProductDetail struct {
 	IsActive               bool
 	IsPrescriptionRequired bool
 	Manufacturer           Manufacturer
-	Categories             []Category
-}
-
-type UpdateProduct struct {
-	Name                   *string
-	MinPrice               *int
-	MaxPrice               *int
-	Slug                   *string
-	GenericName            *string
-	GeneralIndication      *string
-	Dosage                 *string
-	HowToUse               *string
-	SideEffects            *string
-	Contraindication       *string
-	Warning                *string
-	BpomNumber             *string
-	Content                *string
-	Description            *string
-	Classification         *string
-	Packaging              *string
-	SellingUnit            *string
-	Weight                 *decimal.Decimal
-	Height                 *decimal.Decimal
-	Length                 *decimal.Decimal
-	Width                  *decimal.Decimal
-	ImageUrl               *string
-	ThumbnailUrl           *string
-	IsActive               *bool
-	IsPrescriptionRequired *bool
-	Manufacturer           *Manufacturer
-	Categories             *[]int64
-	Image                  *multipart.File
-}
-
-type AddProduct struct {
-	Product    ProductDetail
-	Categories []int64
-	Image      *multipart.File
 }
 
 type Manufacturer struct {
@@ -104,10 +63,4 @@ type ProductFilter struct {
 	Order          *string
 	Page           int
 	Limit          int
-}
-
-type ProductCategory struct {
-	Id         int64
-	ProductId  int64
-	CategoryId int64
 }

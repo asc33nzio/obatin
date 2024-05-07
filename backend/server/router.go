@@ -32,7 +32,9 @@ type RouterOpt struct {
 	DoctorHandler               *handler.DoctorHandler
 	CartHandler                 *handler.CartHandler
 	PrescriptionHandler         *handler.PrescriptionHandler
-	CloudinaryHandler           *handler.CloudinaryHandler
+	PharmacyProductHandler      *handler.PharmacyProductHandler
+	ThirdPartyHandler           *handler.ThirdPartyHandler
+	ShippingHandler             *handler.ShippingHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -44,13 +46,10 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	cloudinaryUpload := util.NewCloudinaryUpload(config)
 	sendEmail := util.NewSendEmail(config)
 
-	cloudinaryUseCase := usecase.NewCloudinaryUseCaseImpl(cloudinaryUpload)
-	cloudinaryHandler := handler.NewCloudinaryHandler(cloudinaryUseCase)
-
 	authenticationUsecase := usecase.NewAuthenticationUsecaseImpl(dbStore, cryptoHash, jwtAuth, config, tokenGenerator, cloudinaryUpload, sendEmail)
 	authentiationHandler := handler.NewAuthenticationHandler(authenticationUsecase)
 
-	productUseCase := usecase.NewProductUsecaseImpl(dbStore, config, cloudinaryUpload)
+	productUseCase := usecase.NewProductUsecaseImpl(dbStore, config)
 	productHandler := handler.NewProductHandler(productUseCase)
 
 	doctorSpecializationUsecase := usecase.NewDoctorSpecializationUsecaseImpl(dbStore, config)
@@ -83,6 +82,14 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	prescriptionUsecase := usecase.NewPrescriptionUsecaseImpl(dbStore, config)
 	prescriptionHandler := handler.NewPrescriptionHandler(prescriptionUsecase)
 
+	pharmacyProductUsecase := usecase.NewPharmacyProductUsecaseImpl(dbStore, config)
+	pharmacyProductHandler := handler.NewPharmacyProductHandler(pharmacyProductUsecase)
+
+	shippingUsecase := usecase.NewShippingUsecaseImpl(dbStore, config)
+	shippingHandler := handler.NewShippingHandler(shippingUsecase, config)
+
+	thirdPartyHandler := handler.NewThirdPartyHandler(config)
+
 	return NewRouter(RouterOpt{
 		Middleware:                  middleware,
 		AuthenticationHandler:       authentiationHandler,
@@ -97,7 +104,9 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 		ChatRoomHandler:             chatRoomHandler,
 		CartHandler:                 cartHandler,
 		PrescriptionHandler:         prescriptionHandler,
-		CloudinaryHandler:           cloudinaryHandler,
+		PharmacyProductHandler:      pharmacyProductHandler,
+		ThirdPartyHandler:           thirdPartyHandler,
+		ShippingHandler:             shippingHandler,
 	})
 }
 
@@ -141,15 +150,13 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.GET(appconstant.EndpointGetDoctorSpecialization, h.DoctorSpecializationHandler.GetAll)
 	r.POST(appconstant.EndpointRefreshToken, h.AuthenticationHandler.GetRefreshToken)
 
+	r.POST(appconstant.EndpointRajaOngkirCost, h.ThirdPartyHandler.RajaOngkirCost)
+
 	r.Use(h.Middleware.JWTAuth)
 
-	r.PATCH(appconstant.EndpointGetProductDetail, h.ProductHandler.UpdateProductDetaiBySlug)
-
-	r.POST(appconstant.EndpointUploadImageCloudinary, h.CloudinaryHandler.UploadImageOrFileToCloudinary)
 	r.PATCH(appconstant.EndpointGetDoctorDetail, h.DoctorHandler.UpdateOneDoctor)
 	r.GET(appconstant.EndpointGetDoctorProfileDetail, h.DoctorHandler.GetDoctorDetailbyAuthId)
 	r.POST(appconstant.EndpointSendVerifyToEmail, h.AuthenticationHandler.SendVerifyToEmail)
-	r.POST(appconstant.EndpointGetProductsList, h.ProductHandler.CreateProduct)
 	r.POST(appconstant.EndpointApproval, h.AuthenticationHandler.UpdateApproval)
 	r.PATCH(appconstant.EndpointUpdatePassword, h.AuthenticationHandler.UpdatePasswordByAuth)
 	r.GET(appconstant.EndpointGetDoctorPendingApproval, h.AuthenticationHandler.GetPendingDoctorApproval)
@@ -176,5 +183,9 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.PUT(appconstant.EndpointCart, h.CartHandler.UpdateOneCartItemQuantity)
 	r.DELETE(appconstant.EndpointCartDelete, h.CartHandler.DeleteOneCartItem)
 	r.POST(appconstant.EndpointPrescription, h.PrescriptionHandler.CreatePrescription)
+	r.GET(appconstant.EndpointNearbyPharmaciesByProduct, h.PharmacyProductHandler.GetNearbyPharmacies)
+	r.POST(appconstant.EndpointProductTotalStock, h.PharmacyProductHandler.TotalStockPerPartner)
+	r.POST(appconstant.EndpointAvailableShippings, h.ShippingHandler.AvailableShippingsPerPharmacy)
+	r.POST(appconstant.EndpointCartCheckout, h.CartHandler.Checkout)
 	return r
 }

@@ -4,7 +4,7 @@ import "errors"
 
 var (
 	ErrStlUnknownClaims           = errors.New("unknown claims")
-	ErrStlInterfaceCasting        = errors.New("error when casting an interface")
+	ErrInterfaceCasting           = errors.New("error when casting an interface")
 	ErrStlInvalidEmail            = errors.New("invalid email")
 	ErrStlInvalidPassword         = errors.New("invalid password")
 	ErrStlUploadFileToCloudinary  = errors.New("error upload file to cloudinary")
@@ -15,5 +15,5 @@ var (
 	ErrStlAccountHasNotApproved   = errors.New("you should wait approval by admin")
 	ErrStlNotFound                = errors.New("not found")
 	ErrStlBadRequest              = errors.New("bad request")
-	ErrStlInternal                = errors.New("internal server error")
+	ErrStlUnexpectedError         = errors.New("unexpected error")
 )

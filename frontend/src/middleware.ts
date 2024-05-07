@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { StandardDecodedJwtItf } from './types/jwtTypes';
 import { cookies } from 'next/headers';
 import { decodeJWT } from './utils/decodeJWT';
-import Axios from 'axios';
+import { store } from './redux/store/store';
+import { resetAuthState } from './redux/reducers/authSlice';
+import { resetAuthDoctorState } from './redux/reducers/authDoctorSlice';
 
 //! Route group definitions
 const publicRoutes = ['/', '/shop'];
@@ -19,25 +21,48 @@ export default async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   //! Prolong access_token if refresh token is valid
-  const accessCookie = cookies().get('access_token')?.value;
+  const accessToken = cookies().get('access_token')?.value;
   const refreshToken = cookies().get('refresh_token')?.value;
+
   const userSessionCredentials: StandardDecodedJwtItf =
-    await decodeJWT(accessCookie);
-  const expirationTime =
+    await decodeJWT(accessToken);
+  const tokenExpirationTime =
     userSessionCredentials.payload?.RegisteredClaims?.exp ?? 0;
 
   const currentTime = Math.floor(Date.now() / 1000);
   const expirationThreshold = 5 * 60;
-  if (expirationTime && expirationTime - currentTime < expirationThreshold) {
-    const refreshResponse = await Axios.post(
+
+  if (
+    accessToken !== undefined &&
+    refreshToken !== undefined &&
+    tokenExpirationTime - currentTime < expirationThreshold
+  ) {
+    const refreshResponse = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh-token`,
       {
-        refresh_token: refreshToken,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          refresh_token: refreshToken,
+        }),
       },
     );
-    const newAccessToken = refreshResponse?.data?.data?.access_token;
 
-    if (newAccessToken) cookies().set('access_token', newAccessToken);
+    if (refreshResponse.ok) {
+      const responseData = await refreshResponse.json();
+      const newAccessToken = responseData?.data.access_token;
+      response.cookies.set('access_token', newAccessToken, {
+        priority: 'high',
+        path: '/',
+      });
+    } else {
+      response.cookies.delete('access_token');
+      response.cookies.delete('refresh_token');
+      store.dispatch(resetAuthState());
+      store.dispatch(resetAuthDoctorState());
+    }
   }
 
   //! Redirect URL definitions
@@ -66,11 +91,6 @@ export default async function middleware(request: NextRequest) {
   const isUserOnlyRoute = userOnlyRoutes.includes(path);
   const isDoctorOnlyRoute = doctorOnlyRoutes.includes(path);
 
-  //! Protected route guard clause
-  if (isProtectedRoute && accessCookie === undefined) {
-    return NextResponse.redirect(redirectToLogin);
-  }
-
   // eslint-disable-next-line
   const authId = userSessionCredentials?.payload?.Payload?.aid;
   const userRole = userSessionCredentials?.payload?.Payload?.role;
@@ -78,6 +98,11 @@ export default async function middleware(request: NextRequest) {
   const isVerified = userSessionCredentials?.payload?.Payload?.is_verified;
   // eslint-disable-next-line
   const isApproved = userSessionCredentials?.payload?.Payload?.is_approved;
+
+  //! Protected route guard clause
+  if (isProtectedRoute && tokenExpirationTime < currentTime) {
+    return NextResponse.redirect(redirectToLogin);
+  }
 
   //! Restricted base routes
   if (request.nextUrl.pathname.startsWith('/auth')) {
@@ -102,22 +127,24 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  //! Authorization based validations
-  if (isAuthRoute && userRole === 'user') {
-    return NextResponse.redirect(redirectToUserDashboard);
-  }
+  if (tokenExpirationTime > currentTime) {
+    //! Authorization based validations
+    if (isAuthRoute && userRole === 'user') {
+      return NextResponse.redirect(redirectToUserDashboard);
+    }
 
-  if (isAuthRoute && userRole === 'doctor') {
-    return NextResponse.redirect(redirectToDoctorDashboard);
-  }
+    if (isAuthRoute && userRole === 'doctor') {
+      return NextResponse.redirect(redirectToDoctorDashboard);
+    }
 
-  //! Role based validations
-  if (isDoctorOnlyRoute && userRole === 'user') {
-    return NextResponse.redirect(redirectToUserDashboard);
-  }
+    //! Role based validations
+    if (isDoctorOnlyRoute && userRole === 'user') {
+      return NextResponse.redirect(redirectToUserDashboard);
+    }
 
-  if (isUserOnlyRoute && userRole === 'doctor') {
-    return NextResponse.redirect(redirectToDoctorDashboard);
+    if (isUserOnlyRoute && userRole === 'doctor') {
+      return NextResponse.redirect(redirectToDoctorDashboard);
+    }
   }
 
   return response;
