@@ -25,7 +25,7 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -36,7 +36,7 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -66,13 +66,13 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 func (h *PrescriptionHandler) GetAllUserPrescriptions(ctx *gin.Context) {
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -83,7 +83,7 @@ func (h *PrescriptionHandler) GetAllUserPrescriptions(ctx *gin.Context) {
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -108,13 +108,13 @@ func (h *PrescriptionHandler) GetAllUserPrescriptions(ctx *gin.Context) {
 func (h *PrescriptionHandler) GetAllDoctorPrescriptions(ctx *gin.Context) {
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -125,7 +125,7 @@ func (h *PrescriptionHandler) GetAllDoctorPrescriptions(ctx *gin.Context) {
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
@@ -152,7 +152,7 @@ func (h *PrescriptionHandler) GetPrescriptionDetails(ctx *gin.Context) {
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 

@@ -52,7 +52,7 @@ func (h *PharmacyProductHandler) TotalStockPerPartner(ctx *gin.Context) {
 
 	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 

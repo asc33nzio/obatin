@@ -41,7 +41,7 @@ func checkAdmin(ctx *gin.Context) bool {
 		return false
 	}
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return false
 	}
 	return true

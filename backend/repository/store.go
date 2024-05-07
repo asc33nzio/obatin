@@ -25,6 +25,7 @@ type RepoStore interface {
 	PrescriptionRepository() PrescriptionRepository
 	PrescriptionItemRepository() PrescriptionItemRepository
 	PharmacyProductRepository() PharmacyProductRepository
+	ProductCategoriesRepository() ProductCategoriesRepository
 	ShippingRepository() ShippingRepository
 	StockMovementRepository() StockMovementRepository
 	PaymentRepository() PaymentRepository
@@ -184,6 +185,12 @@ func (s *dbStore) PaymentRepository() PaymentRepository {
 
 func (s *dbStore) OrderRepository() OrderRepository {
 	return &orderRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) ProductCategoriesRepository() ProductCategoriesRepository {
+	return &productCategoriesRepositoryPostgres{
 		db: s.querier,
 	}
 }

@@ -35,7 +35,7 @@ func (u *pharmacyProductUsecaseImpl) GetPharmaciesWithin25kmByProductId(ctx cont
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
 	userId, err := ur.FindUserIdByAuthId(ctx, authenticationId)
