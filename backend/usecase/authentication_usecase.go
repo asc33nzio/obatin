@@ -259,7 +259,7 @@ func (u *authentictionUsecaseImpl) RegisterDoctor(ctx context.Context, uReq enti
 
 	_, ok := res.(*entity.Authentication)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
 	return nil
@@ -316,7 +316,7 @@ func (u *authentictionUsecaseImpl) RegisterUser(ctx context.Context, uReq entity
 
 	_, ok := res.(*entity.Authentication)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
 	return nil
@@ -350,11 +350,11 @@ func (u *authentictionUsecaseImpl) VerifyEmail(ctx context.Context, token string
 func (u *authentictionUsecaseImpl) SendVerificationEmail(ctx context.Context) error {
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 	ar := u.repoStore.AuthenticationRepository()
 
@@ -459,7 +459,7 @@ func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, updateReq
 
 	authId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
 	if updateReq.NewPassword == updateReq.OldPassword {
@@ -502,7 +502,7 @@ func (u *authentictionUsecaseImpl) UpdateApproval(ctx context.Context, authentic
 	ar := u.repoStore.AuthenticationRepository()
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
 	if authenticationRole != constant.RoleAdmin {
@@ -743,7 +743,7 @@ func (u *authentictionUsecaseImpl) GetPendingDoctorApproval(ctx context.Context,
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
 	if authenticationRole != constant.RoleAdmin {

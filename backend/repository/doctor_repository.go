@@ -91,7 +91,7 @@ func (r *doctorRepositoryPostgres) GetDoctorList(ctx context.Context, params ent
         ON
             d.doctor_specialization_id = sp.id
             `)
-	queryParams, paramsData := ConvertDoctorQueryParamstoSql(params)
+	queryParams, paramsData := convertDoctorQueryParamstoSql(params)
 	sb.WriteString(queryParams)
 
 	data = append(data, paramsData...)
@@ -274,7 +274,6 @@ func (r *doctorRepositoryPostgres) UpdateOneDoctor(ctx context.Context, body ent
 		&doctor.Opening,
 		&doctor.OperationalHours,
 		&doctor.OperationalDays)
-
 	if err != nil {
 		return nil, apperror.NewInternal(err)
 	}

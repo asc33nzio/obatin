@@ -45,4 +45,5 @@ const (
 	EndpointProductTotalStock         = "/shop/products/total-stock"
 	EndpointAvailableShippings        = "/shop/pharmacy/shippings"
 	EndpointRajaOngkirCost            = "/third-parties/rajaongkir/cost"
+	EndpointUploadImageCloudinary    = "/cloudinary/image"
 )
