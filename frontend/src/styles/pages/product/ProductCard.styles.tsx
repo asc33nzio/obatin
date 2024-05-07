@@ -1,8 +1,11 @@
 import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
-export const Imagecontainer = styled.img`
+export const Imagecontainer = styled.div`
   width: 150px;
+  img {
+    object-fit: cover;
+  }
 `;
 
 export const ProductCard = styled.a`

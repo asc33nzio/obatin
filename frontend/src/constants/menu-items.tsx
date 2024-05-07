@@ -16,39 +16,39 @@ type MenuOption = {
 
 const MENU_USER: MenuOption[] = [
   {
-    name: 'Home',
+    name: 'Beranda',
     icon: HomeICO,
     url: '/',
   },
   {
-    name: 'Profile',
+    name: 'Profil',
     icon: UserICO,
     url: '/dashboard',
   },
   {
-    name: 'Products',
+    name: 'List Product',
     icon: ProductICO,
     url: '/products',
   },
   {
-    name: 'Cart',
+    name: 'Keranjang',
     icon: CartICO,
     url: '/shop/cart',
   },
   {
-    name: 'Order History',
+    name: 'Riwayat Pembelian',
     icon: OrderICO,
     url: '/',
   },
   {
-    name: 'Consultation',
+    name: 'Konsultasi',
     icon: ConsulICO,
-    url: '/',
+    url: '/telemidicine',
   },
   {
-    name: 'Doctor',
+    name: 'List Dokter',
     icon: DoctorICO,
-    url: '/',
+    url: '/doctors',
   },
   {
     name: 'Logout',

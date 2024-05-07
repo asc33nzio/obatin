@@ -12,6 +12,10 @@ import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmP
 import AddAddressModalContent from './modalContent/AddAddressModalContent';
 import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
 
+interface DoctorDetailItf {
+  name: string;
+}
+
 export interface ModalPropsItf {
   $overlayHeight?: string;
   $containerWidth: string;
@@ -19,6 +23,7 @@ export interface ModalPropsItf {
   $containerBgColor?: string;
   $fontSize?: string | undefined;
   $color?: string | undefined;
+  $doctorDetail?: DoctorDetailItf | null;
 }
 
 const Modal = () => {
@@ -39,6 +44,7 @@ const Modal = () => {
     $containerBgColor: '#ffffff',
     $fontSize: '18px',
     $color: '#4a5568',
+    $doctorDetail: null,
   };
 
   switch (modalType) {
