@@ -43,11 +43,9 @@ export const CategoryContainer = styled.div`
   flex-direction: column;
   border: 1px solid ${COLORS.primary_color};
   overflow: hidden;
-  height: 100vh;
   overflow-y: auto;
-  overflow: hidden;
   height: 100vh;
-  overflow-y: auto;
+
   @media (max-width: 1440px) {
     margin: 2rem 0 auto 1rem;
     align-items: center;

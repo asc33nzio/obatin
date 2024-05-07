@@ -30,34 +30,11 @@ interface CityItf {
 }
 
 const UpdateAddressModalContent = (): React.ReactElement => {
-  const provinces = useObatinSelector((state) => state?.provinces?.provinces);
-  const userInfo = useObatinSelector((state) => state?.auth);
-  const dispatch = useObatinDispatch();
   const { setToast } = useToast();
   const { closeModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  const [alias, setAlias] = useState<string>('');
-  const [aliasValidationError, setAliasValidationError] = useState<string>('');
-  const [lng, setLng] = useState<number>(0);
-  const [lat, setLat] = useState<number>(0);
-  const [provinceNames, setProvinceNames] = useState<Array<string>>([]);
-  const [chosenProvinceId, setChosenProvinceId] = useState<string>('');
-  const [chosenProvinceName, setChosenProvinceName] = useState<string>('');
-  const [cities, setCities] = useState<Array<CityItf>>([]);
-  const [cityNames, setCityNames] = useState<Array<string>>([]);
-  const [chosenCityId, setChosenCityId] = useState<string>('');
-  const [chosenCityName, setChosenCityName] = useState<string>('');
-  const [address, setAddress] = useState<string>('');
-  const [addressValidationError, setAddressValidationError] =
-    useState<string>('');
-  const [isProvinceLoading, setIsProvinceLoading] = useState<boolean>(false);
-  const [isCityLoading, setIsCityLoading] = useState<boolean>(false);
-  const [isCoordinatesLoading, setIsCoordinatesLoading] =
-    useState<boolean>(false);
-  const accessToken = getCookie('access_token');
-  const aid = useObatinSelector((state) => state?.auth?.aid);
-  const openCageApiUrl = process.env.NEXT_PUBLIC_OPENCAGE_API_URL;
-  const rajaOngkirBaseUrl = process.env.NEXT_PUBLIC_RAJAONGKIR_API_URL;
+  const provinces = useObatinSelector((state) => state?.provinces?.provinces);
+  const userInfo = useObatinSelector((state) => state?.auth);
   const proposedUpdateAddressId = sessionStorage.getItem('puID');
   const defaultAddress = userInfo?.addresses?.find((address) => {
     if (proposedUpdateAddressId !== null) {
@@ -69,6 +46,35 @@ const UpdateAddressModalContent = (): React.ReactElement => {
   const defaultCityId = defaultAddress?.city?.id;
   const defaultLatitude = defaultAddress?.latitude;
   const defaultLongitude = defaultAddress?.longitude;
+  const dispatch = useObatinDispatch();
+  const [alias, setAlias] = useState<string>(defaultAddress?.alias!);
+  const [aliasValidationError, setAliasValidationError] = useState<string>('');
+  const [lng, setLng] = useState<number>(
+    parseInt(defaultAddress?.longitude!, 10),
+  );
+  const [lat, setLat] = useState<number>(
+    parseInt(defaultAddress?.latitude!, 10),
+  );
+  const [provinceNames, setProvinceNames] = useState<Array<string>>([]);
+  const [chosenProvinceId, setChosenProvinceId] = useState<string>('');
+  const [chosenProvinceName, setChosenProvinceName] = useState<string>('');
+  const [cities, setCities] = useState<Array<CityItf>>([]);
+  const [cityNames, setCityNames] = useState<Array<string>>([]);
+  const [chosenCityId, setChosenCityId] = useState<string>(
+    defaultAddress?.city?.id!?.toString(),
+  );
+  const [chosenCityName, setChosenCityName] = useState<string>('');
+  const [address, setAddress] = useState<string>(defaultAddress?.detail!);
+  const [addressValidationError, setAddressValidationError] =
+    useState<string>('');
+  const [isProvinceLoading, setIsProvinceLoading] = useState<boolean>(false);
+  const [isCityLoading, setIsCityLoading] = useState<boolean>(false);
+  const [isCoordinatesLoading, setIsCoordinatesLoading] =
+    useState<boolean>(false);
+  const accessToken = getCookie('access_token');
+  const aid = useObatinSelector((state) => state?.auth?.aid);
+  const openCageApiUrl = process.env.NEXT_PUBLIC_OPENCAGE_API_URL;
+  const rajaOngkirBaseUrl = process.env.NEXT_PUBLIC_RAJAONGKIR_API_URL;
   const [hasUserChangedProvince, setHasUserChangedProvince] =
     useState<boolean>(false);
   const [hasUserChangedCity, setHasUserChangedCity] = useState<boolean>(false);
@@ -245,6 +251,25 @@ const UpdateAddressModalContent = (): React.ReactElement => {
       return;
     }
 
+    if (
+      alias === defaultAddress?.alias &&
+      parseInt(chosenCityId, 10) === defaultAddress?.city?.id &&
+      address === defaultAddress?.detail &&
+      lng.toString() === defaultAddress?.longitude &&
+      lat.toString() === defaultAddress?.latitude
+    ) {
+      setToast({
+        showToast: true,
+        toastMessage: 'Tidak ada perubahan',
+        toastType: 'warning',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      sessionStorage.removeItem('puID');
+      closeModal();
+      return;
+    }
+
     const payload = {
       alias,
       city_id: parseInt(chosenCityId, 10),
@@ -298,6 +323,7 @@ const UpdateAddressModalContent = (): React.ReactElement => {
       closeModal();
     } catch (error) {
       console.log(error);
+
       setToast({
         showToast: true,
         toastMessage: 'Alamat anda belum sesuai, mohon cek kembali',

@@ -79,3 +79,29 @@ export const ClearTxFilterButton = styled.button`
   font-weight: 700;
   color: #00b5c0;
 `;
+
+export const TxMainContainer = styled.section`
+  display: block;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px dashed black;
+
+  width: 100%;
+  height: 75%;
+  overflow: hidden;
+  overflow-y: scroll;
+`;
+
+export const PaginationDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid blue;
+
+  width: 100%;
+  height: 10%;
+`;
