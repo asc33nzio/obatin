@@ -23,6 +23,8 @@ import Navbar from '@/components/organisms/navbar/Navbar';
 import CategoryComponent from '@/components/molecules/category/Category';
 import { Inter } from 'next/font/google';
 import FilterComponent from '@/components/atoms/filter/DropdownFIlter';
+import Image from 'next/image';
+import Footer from '@/components/organisms/footer/Footer';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -105,10 +107,6 @@ const ProductsPage = () => {
               categories={categories}
               setCategoryId={setCategoryId}
             />
-            <CategoryComponent
-              categories={categories}
-              setCategoryId={setCategoryId}
-            />
           </CategoryContainer>
           <ProductContent>
             <FilterContainer>
@@ -124,27 +122,14 @@ const ProductsPage = () => {
                   key={product.id}
                   onClick={() => handleProductClicked(product.product_slug)}
                 >
-                  <Imagecontainer src={product.image_url} alt='banner' />
-                  <Bold>{product.name}</Bold>
-                  <Smallfont>{product.selling_unit}</Smallfont>
-                  <Price>
-                    Rp{product?.min_price.toLocaleString()} - Rp
-                    {product?.max_price.toLocaleString()}
-                  </Price>
-                  <CustomButton
-                    $width='90px'
-                    $height='32px'
-                    content='Add to Cart'
-                    $fontSize='12px'
-                  />
-                </ProductCard>
-              ))}
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  onClick={() => handleProductClicked(product.product_slug)}
-                >
-                  <Imagecontainer src={product.image_url} alt='banner' />
+                  <Imagecontainer>
+                    <Image
+                      height={150}
+                      width={150}
+                      src={product.image_url}
+                      alt='banner'
+                    />
+                  </Imagecontainer>
                   <Bold>{product.name}</Bold>
                   <Smallfont>{product.selling_unit}</Smallfont>
                   <Price>
@@ -167,15 +152,9 @@ const ProductsPage = () => {
               $width='150px'
               $fontSize='18px'
             />
-            <CustomButton
-              onClick={handleLoadMore}
-              disabled={loading}
-              content='load more'
-              $width='150px'
-              $fontSize='18px'
-            />
           </ProductContent>
         </Content>
+        <Footer />
       </Body>
     </Container>
   );

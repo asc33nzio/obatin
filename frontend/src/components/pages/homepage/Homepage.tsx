@@ -126,7 +126,14 @@ const Homepage = (): React.ReactElement => {
                     {CategoryImg.map((image, i) => {
                       return (
                         <SwiperSlide key={i} style={{ padding: '2rem' }}>
-                          <Imagecontainer src={image} alt='banner' />
+                          <Imagecontainer>
+                            <Image
+                              height={150}
+                              width={150}
+                              src={image}
+                              alt='banner'
+                            />
+                          </Imagecontainer>
                         </SwiperSlide>
                       );
                     })}
@@ -143,7 +150,14 @@ const Homepage = (): React.ReactElement => {
                       key={product.id}
                       onClick={() => handleProductClicked(product.product_slug)}
                     >
-                      <Imagecontainer src={product.image_url} alt='banner' />
+                      <Imagecontainer>
+                        <Image
+                          height={150}
+                          width={150}
+                          src={product.image_url}
+                          alt='banner'
+                        />
+                      </Imagecontainer>
                       <Bold>{product.name}</Bold>
                       <Smallfont>{product.selling_unit}</Smallfont>
                       <Price>

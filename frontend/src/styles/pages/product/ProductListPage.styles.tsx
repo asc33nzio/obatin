@@ -15,6 +15,12 @@ export const ProductListContainer = styled.div`
     align-items: center;
     align-content: center;
   }
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 `;
 
 export const Content = styled.div`
@@ -45,21 +51,12 @@ export const CategoryContainer = styled.div`
   overflow: hidden;
   height: 100vh;
   overflow-y: auto;
-  overflow: hidden;
-  height: 100vh;
-  overflow-y: auto;
-  @media (max-width: 1440px) {
-    margin: 2rem 0 auto 1rem;
-    align-items: center;
-    align-items: center;
-  }
   ul {
     background-color: transparent;
     li {
       background-color: transparent;
       list-style: none;
       position: relative;
-      padding: 10px;
       padding: 10px;
       a {
         color: ${COLORS.primary_color};
@@ -73,10 +70,19 @@ export const CategoryContainer = styled.div`
     flex-grow: 1;
     overflow-y: auto;
   }
+  @media (max-width: 1440px) {
+    margin: 2rem 0 auto 1rem;
+    align-items: flex-start;
+    overflow-x: auto;
+  }
+  @media (max-width: 768px) {
+    margin: 2rem 0 auto 1rem;
+    height: 90px;
+    align-items: flex-start;
+  }
 `;
 
 export const FilterContainer = styled.div`
-  width: 100%;
   width: 100%;
   display: flex;
   gap: 20px;
@@ -86,7 +92,8 @@ export const FilterContainer = styled.div`
     color: ${COLORS.primary_text};
   }
   @media (max-width: 768px) {
-    flex-direction: column;
+    justify-content: center;
+    width: 80%;
   }
 `;
 
@@ -100,4 +107,30 @@ export const ProductContent = styled.div`
   display: flex;
   flex-direction: column;
   padding-bottom: 2rem;
+`;
+
+export const Experience = styled.p`
+  font-size: 14px;
+  color: ${COLORS.primary_color};
+  font-weight: 600;
+`;
+
+export const IsOnline = styled.div`
+  width: max-content;
+  border-radius: 12%;
+  background-color: white;
+  border: 1px solid green;
+  padding: 6px;
+  font-size: 12px;
+  color: green;
+`;
+
+export const IsOffline = styled.div`
+  width: max-content;
+  border-radius: 12%;
+  background-color: white;
+  border: 1px solid red;
+  padding: 6px;
+  font-size: 12px;
+  color: red;
 `;

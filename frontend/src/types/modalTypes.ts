@@ -15,5 +15,6 @@ export type ModalType =
   | 'confirm-password-doctor'
   | 'confirm-password-register'
   | 'add-address'
+  | 'doctor-detail'
   | 'update-address'
   | '';

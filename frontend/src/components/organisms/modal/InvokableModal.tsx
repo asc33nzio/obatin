@@ -1,0 +1,97 @@
+'use client';
+import {
+  ModalContainer,
+  ModalOverlay,
+  ModalHeader,
+} from '@/styles/organisms/modal/Modal.styles';
+import CloseICO from '@/assets/icons/CloseICO';
+import DoctorDetailModalContent from './modalContent/DoctorDetailModalContent';
+import { ModalType } from '@/types/modalTypes';
+// import { useModal } from '@/hooks/useModal';
+
+interface DoctorDetailItf {
+  name: string | undefined;
+  specialization: string | undefined;
+  experiences: number | undefined;
+  fee: number | undefined;
+  openingTime: string | undefined;
+  operationalHours: string | undefined;
+  operationalDays: [] | undefined;
+}
+
+export interface ModalPropsItf {
+  $overlayHeight?: string;
+  $containerWidth: string;
+  $containerHeight: string;
+  $containerBgColor?: string;
+  $fontSize?: string | undefined;
+  $color?: string | undefined;
+  onOpen: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const InvokableModal = (props: {
+  $doctorDetail: DoctorDetailItf;
+  modalType: ModalType;
+  onOpen: Function;
+  isOpen: boolean;
+  onClose: () => {};
+}) => {
+  let modalContent: React.ReactElement | null;
+  let title: string | null = null;
+  let modalProps: ModalPropsItf = {
+    $overlayHeight: '100vh',
+    $containerWidth: '500px',
+    $containerHeight: '500px',
+    $containerBgColor: '#ffffff',
+    $fontSize: '18px',
+    $color: '#4a5568',
+    onOpen: () => {},
+    isOpen: false,
+    onClose: () => {},
+  };
+
+  //   const closeModal = useModal();
+  //   const handleModalClose = () => {
+  //     closeModal;
+  //   };
+
+  switch (props.modalType) {
+    case 'doctor-detail':
+      modalContent = (
+        <DoctorDetailModalContent $doctorDetail={props.$doctorDetail} />
+      );
+      title = 'Detail Dokter';
+      modalProps = {
+        $overlayHeight: '200vh',
+        $containerWidth: '450px',
+        $containerHeight: '500px',
+        onOpen: () => {},
+        isOpen: false,
+        onClose: () => {},
+      };
+      break;
+
+    default:
+      modalContent = null;
+      title = null;
+      break;
+  }
+
+  return (
+    props.isOpen && (
+      <ModalOverlay {...modalProps}>
+        <ModalContainer {...modalProps}>
+          <ModalHeader>
+            <h1>{title}</h1>
+            <CloseICO onClick={props.onClose} />
+          </ModalHeader>
+          {modalContent}
+        </ModalContainer>
+      </ModalOverlay>
+    )
+  );
+};
+
+export default InvokableModal;

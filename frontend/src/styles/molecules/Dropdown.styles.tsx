@@ -14,7 +14,7 @@ export const Dropdown = styled.li`
   a {
     cursor: pointer;
     text-decoration: none;
-    color: #333;
+    color: white;
     font-weight: bold;
     &:hover {
       background-color: ${COLORS.primary_color};
@@ -23,6 +23,16 @@ export const Dropdown = styled.li`
   }
   ul {
     list-style-type: none;
-    /* padding-left: 12px; */
+  }
+`;
+
+export const ItemContainer = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    a {
+      color: white;
+    }
   }
 `;
