@@ -9,9 +9,3 @@ type PharmacyProduct struct {
 	TotalStock int
 	IsActive   bool
 }
-
-type UpdatePharmacyProduct struct {
-	Price    *int
-	Stock    *int
-	IsActive *bool
-}

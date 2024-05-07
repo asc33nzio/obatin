@@ -1,6 +1,15 @@
 export type Gender = 'laki-laki' | 'perempuan';
 export type Role = 'user' | 'doctor' | 'partner' | 'admin';
 
+export type ValidDays =
+  | 'senin'
+  | 'selasa'
+  | 'rabu'
+  | 'kamis'
+  | 'jumat'
+  | 'sabtu'
+  | 'minggu';
+
 export interface ProvinceApiItf {
   id: number | null;
   name: string | null;
@@ -52,7 +61,7 @@ export interface AuthDoctorReduxItf {
   fee: number;
   openingTime: string;
   operationalHours: string;
-  operationalDays: Array<string>;
+  operationalDays: Array<ValidDays>;
 }
 
 export interface RajaOngkirProvinceItf {

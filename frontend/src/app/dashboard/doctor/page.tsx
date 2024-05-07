@@ -1,7 +1,7 @@
 'use client';
-import '@/styles/pages/dashboard/datePicker.css';
-import 'react-date-picker/dist/DatePicker.css';
-import 'react-calendar/dist/Calendar.css';
+import '@wojtekmaj/react-timerange-picker/dist/TimeRangePicker.css';
+import 'react-clock/dist/Clock.css';
+import 'primereact/resources/themes/lara-light-cyan/theme.css';
 import 'moment/locale/id';
 import {
   DashboardPageContentContainer,
@@ -17,8 +17,11 @@ import {
   UserDetailDiv,
   DoctorProgressContainer,
   ContentSubcontainer,
+  ClockDiv,
+  AltDetailDiv,
+  RadioInputGroup,
 } from '@/styles/pages/dashboard/Dashboard.styles';
-import { EditProfileDoctorStateItf } from '@/types/dashboardTypes';
+import { EditProfileDoctorStateItf, TimeValue } from '@/types/dashboardTypes';
 import { useState } from 'react';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
 import { usePasswordValidation } from '@/hooks/usePasswordValidation';
@@ -31,6 +34,8 @@ import { debounce } from '@/utils/debounce';
 import { getCookie } from 'cookies-next';
 import { setAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
 import { BounceLoader } from 'react-spinners';
+import { InputSwitch } from 'primereact/inputswitch';
+import { ValidDays } from '@/types/reduxTypes';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
@@ -40,6 +45,9 @@ import Axios from 'axios';
 import Image from 'next/image';
 import DefaultDoctorAvatar from '@/assets/DefaultDoctorAvatar.svg';
 import ProgressBar from '@/components/atoms/progressBar/ProgressBar';
+import TimeRangePicker from '@wojtekmaj/react-timerange-picker';
+import moment from 'moment';
+moment.locale('id');
 
 const DoctorDashboardPage = (): React.ReactElement => {
   const dispatch = useObatinDispatch();
@@ -53,6 +61,10 @@ const DoctorDashboardPage = (): React.ReactElement => {
       password: false,
       confirmPassword: false,
       avatar: false,
+      experiences: false,
+      time: false,
+      operationalDays: false,
+      fee: false,
     });
   const [hasNewValue, setHasNewValue] = useState<EditProfileDoctorStateItf>({
     email: false,
@@ -60,6 +72,10 @@ const DoctorDashboardPage = (): React.ReactElement => {
     password: false,
     confirmPassword: false,
     avatar: false,
+    experiences: false,
+    time: false,
+    operationalDays: false,
+    fee: false,
   });
   const { setToast } = useToast();
   const { openModal } = useModal();
@@ -76,10 +92,109 @@ const DoctorDashboardPage = (): React.ReactElement => {
     useUploadValidation();
   const [name, setName] = useState<string>('');
   const [nameValidationError, setNameValidationError] = useState<string>('');
+  const [experiences, setExperiences] = useState<number>(0);
+  const [experiencesValidationError, setExperiencesValidationError] =
+    useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isToggleOnlineLoading, setIsToggleOnlineLoading] =
+    useState<boolean>(false);
   const [isInitialPassCheckLoading, setIsInitialPassCheckLoading] =
     useState<boolean>(false);
+  const [operationalDays, setOperationalDays] = useState<Array<ValidDays>>(
+    doctorInfo?.operationalDays,
+  );
+  const [time, setTime] = useState<TimeValue>(['08:00', '17:30']);
+  const [timeStart, setTimeStart] = useState<string>('');
+  const [numHours, setNumHours] = useState<string>('');
+  const [openingHour, openingMinute] = doctorInfo?.openingTime
+    .split(':')
+    .map(Number);
+  const [operationalHour, operationalMinute] = doctorInfo?.operationalHours
+    ?.split(':')
+    .map(Number);
+  const closingHour = (openingHour + operationalHour) % 24;
+  const closingMinute = (openingMinute + operationalMinute) % 60;
+  const formattedOpeningTime = `${doctorInfo?.openingTime?.split(':')[0]}:${doctorInfo?.openingTime?.split(':')[1]}`;
+  const formattedClosingTime = `${closingHour < 10 ? '0' : ''}${closingHour}:${closingMinute < 10 ? '0' : ''}${closingMinute}`;
+  const [fee, setFee] = useState<number>(0);
+  const [feeValidationError, setFeeValidationError] = useState<string>('');
+
+  const handleTimeChange = (value: TimeValue) => {
+    if (!value) return;
+    let timeStartString: string;
+    let timeEndString: string;
+
+    if (Array.isArray(value)) {
+      timeStartString = value[0] as string;
+      timeEndString = value[1] as string;
+    } else {
+      return;
+    }
+    const timeStart = new Date(`01/01/1970 ${timeStartString}`);
+    const timeEnd = new Date(`01/01/1970 ${timeEndString}`);
+    const delta = timeEnd.getTime() - timeStart.getTime();
+    const deltaString = new Date(delta)?.toISOString()?.slice(11, -11);
+
+    setTimeStart(timeStartString);
+    setNumHours(deltaString);
+    setTime(value);
+
+    setHasNewValue((prevState) => ({
+      ...prevState,
+      time: true,
+    }));
+  };
+
+  const handleOperationalDaysChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const selectedDay = event.target.value as ValidDays;
+    if (operationalDays.includes(selectedDay)) {
+      const shallowCopy = operationalDays.filter((day) => day !== selectedDay);
+      setOperationalDays(shallowCopy);
+      setHasNewValue((prevState) => ({
+        ...prevState,
+        operationalDays: true,
+      }));
+      return;
+    }
+
+    setOperationalDays((prevState) => [...prevState, selectedDay]);
+    setHasNewValue((prevState) => ({
+      ...prevState,
+      operationalDays: true,
+    }));
+  };
+
+  const validateFee = (input: string) => {
+    if (Number.isNaN(Number(input))) {
+      setFeeValidationError('Upah harus berupa angka');
+      return false;
+    }
+
+    if (parseInt(input, 10) < 10000) {
+      setFeeValidationError('Upah harus lebih dari Rp. 10.000,00');
+      return false;
+    }
+
+    if (parseInt(input, 10) > 2000000) {
+      setFeeValidationError('Upah maksimum senilai Rp. 2.000.000,00');
+      return false;
+    }
+
+    setFeeValidationError('');
+    return true;
+  };
+
+  const handleFeeInputChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (validateFee(event.target.value)) {
+        setFee(parseInt(event.target.value, 10));
+      }
+    },
+    750,
+  );
 
   const validateName = (input: string) => {
     const sanitizedInput = input.trim();
@@ -102,11 +217,40 @@ const DoctorDashboardPage = (): React.ReactElement => {
     750,
   );
 
+  const validateExperiences = (input: string) => {
+    if (Number.isNaN(Number(input))) {
+      setExperiencesValidationError('Tahun pengalaman harus berupa angka');
+      return false;
+    }
+
+    const parsedInput = parseInt(input, 10);
+    if (parsedInput < 0 || parsedInput > 60) {
+      setExperiencesValidationError(
+        'Tahun pengalaman harus diantara 0 - 60 tahun',
+      );
+      return false;
+    }
+
+    setExperiencesValidationError('');
+    return true;
+  };
+
+  const handleExperiencesInputChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (validateExperiences(event.target.value)) {
+        setExperiences(parseInt(event.target.value, 10));
+      }
+    },
+    750,
+  );
+
   const openPasswordInterface = async () => {
-    if (!doctorInfo?.isVerified) {
+    if (!doctorInfo?.isVerified || !doctorInfo?.isApproved) {
       setToast({
         showToast: true,
-        toastMessage: 'Maaf, anda belum melakukan verifikasi akun anda.',
+        toastMessage: !doctorInfo?.isApproved
+          ? 'Mohon menunggu persetujuan admin dan cek e-mail secara berkala'
+          : 'Mohon lakukan verifikasi e-mail terlebih dahulu',
         toastType: 'warning',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
@@ -177,7 +321,78 @@ const DoctorDashboardPage = (): React.ReactElement => {
     }));
   };
 
-  const handleUpdateDcotorProfile = async () => {
+  const handleUpdateOnlineStatus = async () => {
+    try {
+      if (isToggleOnlineLoading) return;
+      setIsToggleOnlineLoading(true);
+      const payload = new FormData();
+      payload.append('is_online', doctorInfo?.isOnline ? 'false' : 'true');
+      await Axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/${doctorInfo?.aid}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const response = await Axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/details`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      const udpatedDoctorData = response?.data?.data;
+      const oldDoctorData = doctorInfo;
+
+      dispatch(
+        setAuthDoctorState({
+          aid: oldDoctorData.aid,
+          email: udpatedDoctorData.email,
+          name: udpatedDoctorData.name,
+          role: oldDoctorData.role,
+          isVerified: oldDoctorData.isVerified,
+          isApproved: oldDoctorData.isApproved,
+          avatarUrl: udpatedDoctorData.avatar_url,
+          specialization: oldDoctorData.specialization,
+          isOnline: udpatedDoctorData.is_online,
+          experiences: udpatedDoctorData.experiences,
+          certificate: oldDoctorData.certificate,
+          fee: udpatedDoctorData.fee,
+          openingTime: udpatedDoctorData.opening_time,
+          operationalHours: udpatedDoctorData.operational_hours,
+          operationalDays: udpatedDoctorData.operational_days,
+        }),
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage: doctorInfo?.isOnline
+          ? 'Sukses mengubah status menjadi offline'
+          : 'Sukses mengubah status menjadi online',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } catch (error) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: 'Maaf, gagal mengubah status, mohon coba kembali',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } finally {
+      setIsToggleOnlineLoading(false);
+    }
+  };
+
+  const handleUpdateDoctorProfile = async () => {
     setIsLoading(true);
 
     if (!doctorInfo?.isVerified) {
@@ -210,6 +425,20 @@ const DoctorDashboardPage = (): React.ReactElement => {
             if (userUpload !== undefined) {
               generalPayload.append('avatar', userUpload);
             }
+            break;
+          case 'experiences':
+            generalPayload.append('experiences', experiences?.toString());
+            break;
+          case 'time':
+            generalPayload.append('opening_time', timeStart);
+            generalPayload.append('operational_hours', numHours);
+            break;
+          case 'operationalDays':
+            const convertedArr = operationalDays.toString();
+            generalPayload.append('operational_days', convertedArr);
+            break;
+          case 'fee':
+            generalPayload.append('fee', fee?.toString());
             break;
           default:
             break;
@@ -250,7 +479,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
 
       dispatch(
         setAuthDoctorState({
-          aid: udpatedDoctorData.aid,
+          aid: oldDoctorData.aid,
           email: udpatedDoctorData.email,
           name: udpatedDoctorData.name,
           role: oldDoctorData.role,
@@ -351,6 +580,10 @@ const DoctorDashboardPage = (): React.ReactElement => {
       password: false,
       confirmPassword: false,
       avatar: false,
+      experiences: false,
+      time: false,
+      operationalDays: false,
+      fee: false,
     });
 
     setHasNewValue({
@@ -359,6 +592,10 @@ const DoctorDashboardPage = (): React.ReactElement => {
       password: false,
       confirmPassword: false,
       avatar: false,
+      experiences: false,
+      time: false,
+      operationalDays: false,
+      fee: false,
     });
   };
 
@@ -385,7 +622,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
                 $height='40px'
                 $fontSize='18px'
                 disabled={!Object.values(hasNewValue).some((value) => value)}
-                onClick={handleUpdateDcotorProfile}
+                onClick={handleUpdateDoctorProfile}
               />
             </ProfileHeaderButtonsDiv>
           </ProfileHeader>
@@ -624,6 +861,297 @@ const DoctorDashboardPage = (): React.ReactElement => {
                   </>
                 )}
               </UserDetailDiv>
+
+              <h2>Pengalaman</h2>
+              <UserDetailDiv>
+                {isEditingField.experiences ? (
+                  <>
+                    <RegularInput
+                      defaultValue={
+                        doctorInfo?.experiences && !hasNewValue.experiences
+                          ? doctorInfo?.experiences
+                          : experiences
+                      }
+                      validationMessage={experiencesValidationError}
+                      onChange={handleExperiencesInputChange}
+                      $height={60}
+                      $marBot={0}
+                      title=''
+                      placeholder=''
+                    />
+                    <EditPencilICO
+                      isEditSuccessful={false}
+                      onClick={() => {
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          experiences: false,
+                        }));
+
+                        if (!experiences) {
+                          setToast({
+                            showToast: true,
+                            toastMessage: 'Tidak ada perubahan',
+                            toastType: 'warning',
+                            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+                            orientation: 'center',
+                          });
+                          return;
+                        }
+
+                        if (!experiencesValidationError) {
+                          setHasNewValue((prevState) => ({
+                            ...prevState,
+                            experiences: true,
+                          }));
+                        }
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {hasNewValue.experiences
+                        ? `${experiences} tahun`
+                        : doctorInfo?.experiences
+                          ? `${doctorInfo?.experiences} tahun`
+                          : 0}
+                    </span>
+                    <EditPencilICO
+                      isEditSuccessful={hasNewValue.experiences}
+                      onClick={() =>
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          experiences: true,
+                        }))
+                      }
+                    />
+                  </>
+                )}
+              </UserDetailDiv>
+
+              <h2>Biaya Konsultasi</h2>
+              <UserDetailDiv>
+                {isEditingField.fee ? (
+                  <>
+                    <RegularInput
+                      defaultValue={
+                        doctorInfo?.fee && !hasNewValue.fee
+                          ? doctorInfo?.fee
+                          : fee
+                      }
+                      validationMessage={feeValidationError}
+                      onChange={handleFeeInputChange}
+                      $height={60}
+                      $marBot={0}
+                      title=''
+                      placeholder='Rp. 10.000'
+                      type='number'
+                    />
+                    <EditPencilICO
+                      isEditSuccessful={false}
+                      onClick={() => {
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          fee: false,
+                        }));
+
+                        if (!fee) {
+                          setToast({
+                            showToast: true,
+                            toastMessage: 'Tidak ada perubahan',
+                            toastType: 'warning',
+                            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+                            orientation: 'center',
+                          });
+                          return;
+                        }
+
+                        if (!feeValidationError) {
+                          setHasNewValue((prevState) => ({
+                            ...prevState,
+                            fee: true,
+                          }));
+                        }
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {hasNewValue.fee
+                        ? `Rp. ${fee.toLocaleString('id-ID')},00`
+                        : doctorInfo?.fee
+                          ? `Rp. ${doctorInfo?.fee?.toLocaleString('id-ID')},00`
+                          : `Rp. 0`}
+                    </span>
+                    <EditPencilICO
+                      isEditSuccessful={hasNewValue.fee}
+                      onClick={() =>
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          fee: true,
+                        }))
+                      }
+                    />
+                  </>
+                )}
+              </UserDetailDiv>
+
+              <h2>
+                Spesialisasi <span>{doctorInfo?.specialization}</span>
+              </h2>
+
+              <h2>
+                Online
+                <InputSwitch
+                  checked={doctorInfo?.isOnline}
+                  onChange={handleUpdateOnlineStatus}
+                />
+              </h2>
+
+              <h2>Waktu Bekerja</h2>
+              <AltDetailDiv>
+                {isEditingField.time ? (
+                  <>
+                    <ClockDiv>
+                      <TimeRangePicker
+                        onChange={handleTimeChange}
+                        value={time}
+                        rangeDivider=''
+                      />
+                    </ClockDiv>
+                    <EditPencilICO
+                      isEditSuccessful={false}
+                      onClick={() => {
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          time: false,
+                        }));
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      {hasNewValue.time && Array.isArray(time)
+                        ? `${time?.[0]!} - ${time?.[1]!}`
+                        : doctorInfo?.openingTime
+                          ? `${formattedOpeningTime} - ${formattedClosingTime}`
+                          : 'Belum disetel'}
+                    </p>
+                    <EditPencilICO
+                      isEditSuccessful={hasNewValue.time}
+                      onClick={() =>
+                        setIsEditingField((prevState) => ({
+                          ...prevState,
+                          time: true,
+                        }))
+                      }
+                    />
+                  </>
+                )}
+              </AltDetailDiv>
+
+              <h2>Hari Bekerja</h2>
+              <RadioInputGroup>
+                <div>
+                  <input
+                    type='checkbox'
+                    id='senin'
+                    name='senin'
+                    value='senin'
+                    defaultChecked={doctorInfo?.operationalDays?.includes(
+                      'senin',
+                    )}
+                    onChange={(e) => handleOperationalDaysChange(e)}
+                  />
+                  <label htmlFor='senin'> Senin</label>
+                </div>
+
+                <div>
+                  <input
+                    type='checkbox'
+                    id='selasa'
+                    name='selasa'
+                    value='selasa'
+                    defaultChecked={doctorInfo?.operationalDays?.includes(
+                      'selasa',
+                    )}
+                    onChange={(e) => handleOperationalDaysChange(e)}
+                  />
+                  <label htmlFor='selasa'> Selasa</label>
+                </div>
+
+                <div>
+                  <input
+                    type='checkbox'
+                    id='rabu'
+                    name='rabu'
+                    value='rabu'
+                    defaultChecked={doctorInfo?.operationalDays?.includes(
+                      'rabu',
+                    )}
+                    onChange={(e) => handleOperationalDaysChange(e)}
+                  />
+                  <label htmlFor='rabu'> Rabu</label>
+                </div>
+
+                <div>
+                  <input
+                    type='checkbox'
+                    id='kamis'
+                    name='kamis'
+                    value='kamis'
+                    defaultChecked={doctorInfo?.operationalDays?.includes(
+                      'kamis',
+                    )}
+                    onChange={(e) => handleOperationalDaysChange(e)}
+                  />
+                  <label htmlFor='kamis'> Kamis</label>
+                </div>
+
+                <div>
+                  <input
+                    type='checkbox'
+                    id='jumat'
+                    name='jumat'
+                    value='jumat'
+                    defaultChecked={doctorInfo?.operationalDays?.includes(
+                      'jumat',
+                    )}
+                    onChange={(e) => handleOperationalDaysChange(e)}
+                  />
+                  <label htmlFor='jumat'> Jumat</label>
+                </div>
+
+                <div>
+                  <input
+                    type='checkbox'
+                    id='sabtu'
+                    name='sabtu'
+                    value='sabtu'
+                    defaultChecked={doctorInfo?.operationalDays?.includes(
+                      'sabtu',
+                    )}
+                    onChange={(e) => handleOperationalDaysChange(e)}
+                  />
+                  <label htmlFor='sabtu'> Sabtu</label>
+                </div>
+
+                <div>
+                  <input
+                    type='checkbox'
+                    id='minggu'
+                    name='minggu'
+                    value='minggu'
+                    defaultChecked={doctorInfo?.operationalDays?.includes(
+                      'minggu',
+                    )}
+                    onChange={(e) => handleOperationalDaysChange(e)}
+                  />
+                  <label htmlFor='minggu'> Minggu</label>
+                </div>
+              </RadioInputGroup>
             </ProfileContentRight>
           </ProfileContent>
         </DoctorProfileContainer>
@@ -652,7 +1180,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
                   <u onClick={handleReverify}>Klik disini</u> bila anda belum
                   menerima e-mail verifikasi. Terima kasih
                 </>
-              ) : !doctorInfo?.avatarUrl ? (
+              ) : !doctorInfo?.avatarUrl || !doctorInfo?.name ? (
                 'Segera lengkapi data diri agar memudahkan pasien mencari anda'
               ) : (
                 'Selamat! Semua terlihat baik. Salam sehat!'

@@ -56,7 +56,7 @@ func (u *partnerUsecaseImpl) CreateNewPartner(ctx context.Context, uReq entity.P
 
 		authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 		if !ok {
-			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+			return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 		}
 
 		if authenticationRole != constant.RoleAdmin {
@@ -140,7 +140,7 @@ func (u *partnerUsecaseImpl) CreateNewPartner(ctx context.Context, uReq entity.P
 
 	_, ok := res.(*entity.Partner)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	return nil
@@ -151,7 +151,7 @@ func (u *partnerUsecaseImpl) GetAllPartner(ctx context.Context, params entity.Pa
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	if authenticationRole != constant.RoleAdmin {
@@ -190,7 +190,7 @@ func (u *partnerUsecaseImpl) UpdateOnePartner(ctx context.Context, pReq entity.P
 
 		authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 		if !ok {
-			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+			return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 		}
 
 		if authenticationRole != constant.RoleAdmin {
@@ -294,7 +294,7 @@ func (u *partnerUsecaseImpl) UpdateOnePartner(ctx context.Context, pReq entity.P
 
 	partner, ok := res.(*entity.Partner)
 	if !ok {
-		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	return partner, nil

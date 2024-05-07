@@ -41,7 +41,7 @@ func checkAdmin(ctx *gin.Context) bool {
 		return false
 	}
 	if !ok {
-		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		ctx.Error(apperror.NewInternal(apperror.ErrInterfaceCasting))
 		return false
 	}
 	return true
@@ -126,7 +126,7 @@ func (h *CategoryHandler) UpdateOneCategory(ctx *gin.Context) {
 		defer file.Close()
 	}
 	if body.Slug != nil && *body.Slug == slugParam.Slug {
-		ctx.Error(apperror.ErrCategoryDuplicateSlug(nil))
+		ctx.Error(apperror.ErrDuplicateSlug(nil))
 		return
 	}
 

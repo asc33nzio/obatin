@@ -13,10 +13,8 @@ import (
 type ProductRepository interface {
 	GetProductsList(ctx context.Context, params entity.ProductFilter) (*entity.ProductListPage, error)
 	FindProductDetailBySlug(ctx context.Context, slug string) (*entity.ProductDetail, error)
-	CreateOne(ctx context.Context, product entity.ProductDetail) (*int64, error)
 	IsProductExistById(ctx context.Context, productId int64) (bool, error)
 	IsPrescriptionRequired(ctx context.Context, productId int64) (bool, error)
-	UpdateOneById(ctx context.Context, body entity.UpdateProduct, productId int64) error
 }
 
 type productRepositoryPostgres struct {
@@ -39,14 +37,7 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 
 	sb.WriteString(`
 		SELECT DISTINCT 
-			p.id, 
-			p.name, 
-			p.product_slug, 
-			p.selling_unit, 
-			p.min_price, 
-			p.max_price, 
-			p.image_url, 
-			p.is_prescription_required 
+			p.id, p.name, p.product_slug, p.selling_unit, p.min_price, p.max_price, p.image_url, p.is_prescription_required 
 		FROM 
 			products p 
 		JOIN 
@@ -173,85 +164,11 @@ func (r *productRepositoryPostgres) FindProductDetailBySlug(ctx context.Context,
 		if err == sql.ErrNoRows {
 			return nil, apperror.NewProductNotFound(err)
 		}
+
 		return nil, apperror.NewInternal(err)
 	}
 
 	return &res, nil
-}
-
-func (r *productRepositoryPostgres) CreateOne(ctx context.Context, product entity.ProductDetail) (*int64, error) {
-	var productId int64
-	queryInsert := `
-		INSERT INTO 
-			products (
-				manufacturer_id,      
-				name,
-				min_price,
-            	max_price,
-				product_slug,   
-				generic_name,
-				general_indication,  
-				dosage,  
-				how_to_use,  
-				side_effects,  
-				contraindication,  
-				warning,  
-				bpom_number,
-				content,  
-				description,  
-				classification,  
-				packaging,  
-				selling_unit,
-				weight,  
-				height,  
-				length,  
-				width,  
-				image_url,  
-				thumbnail_url,  
-				is_active,
-				is_prescription_required 
-			)
-		VALUES
-				($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-				$11, $12, $13, $14, $15, $16, $17, $18, 
-				$19, $20, $21, $22, $23, $24, $25, $26)
-		RETURNING 
-				id
-	`
-	err := r.db.QueryRowContext(ctx, queryInsert,
-		product.Manufacturer.ID,
-		product.Name,
-		product.MinPrice,
-		product.MaxPrice,
-		product.Slug,
-		product.GenericName,
-		product.GeneralIndication,
-		product.Dosage,
-		product.HowToUse,
-		product.SideEffects,
-		product.Contraindication,
-		product.Warning,
-		product.BpomNumber,
-		product.Content,
-		product.Description,
-		product.Classification,
-		product.Packaging,
-		product.SellingUnit,
-		product.Weight,
-		product.Height,
-		product.Length,
-		product.Width,
-		product.ImageUrl,
-		product.ThumbnailUrl,
-		product.IsActive,
-		product.IsPrescriptionRequired,
-	).Scan(&productId)
-
-	if err != nil {
-		return nil, apperror.NewInternal(err)
-	}
-
-	return &productId, nil
 }
 
 func (r *productRepositoryPostgres) IsProductExistById(ctx context.Context, productId int64) (bool, error) {
@@ -316,25 +233,4 @@ func (r *productRepositoryPostgres) IsPrescriptionRequired(ctx context.Context, 
 	}
 
 	return isExist, nil
-}
-
-func (r *productRepositoryPostgres) UpdateOneById(ctx context.Context, body entity.UpdateProduct, productId int64) error {
-	var query strings.Builder
-	var data []interface{}
-
-	query.WriteString(`
-		UPDATE
-			products
-		SET `)
-
-	queryParams, paramsData := convertUpdateProductQueryParamstoSql(body, productId)
-	query.WriteString(queryParams)
-	data = append(data, paramsData...)
-
-	_, err := r.db.ExecContext(ctx, query.String(), data...)
-	if err != nil {
-		return apperror.NewInternal(err)
-	}
-
-	return nil
 }

@@ -10,7 +10,7 @@ import (
 type CartRepository interface {
 	FindCart(ctx context.Context, userId int64) (*entity.Cart, error)
 	CreateOneCartItem(ctx context.Context, c *entity.CartItem) error
-	UpdateOneCartItemQuantity(ctx context.Context, c *entity.CartItem) error
+	UpdateOneCartItem(ctx context.Context, c *entity.CartItem) error
 	IsItemExistInCart(ctx context.Context, c *entity.CartItem) (bool, error)
 	FindCartDetails(ctx context.Context, userId int64) (*entity.Cart, error)
 	DeleteOneCartItem(ctx context.Context, cartItem *entity.CartItem) error
@@ -99,15 +99,17 @@ func (r *cartRepositoryPostgres) FindCart(ctx context.Context, userId int64) (*e
 
 func (r *cartRepositoryPostgres) CreateOneCartItem(ctx context.Context, c *entity.CartItem) error {
 	var prescriptionId interface{}
+	var pharmacyId interface{}
 	query := `
 		INSERT INTO
 			cart_items(
 				user_id,
 				product_id,
 				prescription_id,
+				pharmacy_id,
 				quantity)
 		VALUES 
-			($1, $2, $3, $4)
+			($1, $2, $3, $4, $5)
 	`
 
 	if c.PrescriptionId == nil {
@@ -116,12 +118,19 @@ func (r *cartRepositoryPostgres) CreateOneCartItem(ctx context.Context, c *entit
 		prescriptionId = *c.PrescriptionId
 	}
 
+	if c.Pharmacy.Id == nil {
+		pharmacyId = nil
+	} else {
+		pharmacyId = *c.Pharmacy.Id
+	}
+
 	res, err := r.db.ExecContext(
 		ctx,
 		query,
 		*c.UserId,
 		c.Product.Id,
 		prescriptionId,
+		pharmacyId,
 		*c.Quantity,
 	)
 	if err != nil {
@@ -140,28 +149,13 @@ func (r *cartRepositoryPostgres) CreateOneCartItem(ctx context.Context, c *entit
 	return nil
 }
 
-func (r *cartRepositoryPostgres) UpdateOneCartItemQuantity(ctx context.Context, c *entity.CartItem) error {
-	query := `
-		UPDATE
-			cart_items
-		SET
-			quantity = $1 , updated_at = NOW()
-		WHERE 
-			user_id = $2
-		AND
-			product_id = $3
-		AND
-			is_active = true
-		AND 
-			deleted_at IS NULL
-	`
+func (r *cartRepositoryPostgres) UpdateOneCartItem(ctx context.Context, c *entity.CartItem) error {
+	query, args := updateOneCartItemQuery(c)
 
 	res, err := r.db.ExecContext(
 		ctx,
 		query,
-		*c.Quantity,
-		*c.UserId,
-		c.Product.Id,
+		args...,
 	)
 	if err != nil {
 		return apperror.NewInternal(err)
@@ -226,6 +220,7 @@ func (r *cartRepositoryPostgres) FindCartDetails(ctx context.Context, userId int
 			p.name as product_name,
 			p.thumbnail_url as product_thumbnail_url,
 			p.selling_unit as product_selling_unit,
+			p.weight,
 			p.is_prescription_required,
 			np.pharmacy_id as pharmacy_id,
 			np.distance as pharmacy_distance,
@@ -237,6 +232,9 @@ func (r *cartRepositoryPostgres) FindCartDetails(ctx context.Context, userId int
 			np.pharmacist_name,
 			np.pharmacist_license,
 			np.pharmacist_phone,
+			np.opening_time,
+			np.closing_time,
+			np.operational_days,
 			np.partner_id,
 			pp.id as pharmacy_product_id,
 			pp.price,
@@ -272,14 +270,23 @@ func (r *cartRepositoryPostgres) FindCartDetails(ctx context.Context, userId int
 				p.lng,
 				p.pharmacist_name,
 				p.pharmacist_license,
-				p.pharmacist_phone
+				p.pharmacist_phone,
+        p.opening_time,
+        (p.opening_time + p.operational_hours) as closing_time,
+				p.operational_days
 			FROM
 				pharmacies p
 			JOIN
 				user_geom ug ON ST_distancesphere(ug.geom, p.geom) <= 25000
 			ORDER BY 
 				ST_distancesphere(ug.geom, p.geom) ASC
-			) as np ON pp.pharmacy_id = np.pharmacy_id
+			) as np 
+		ON 
+			CASE
+				WHEN c.pharmacy_id IS NOT NULL 
+				THEN c.pharmacy_id = np.pharmacy_id AND pp.pharmacy_id = np.pharmacy_id
+				ELSE pp.pharmacy_id = np.pharmacy_id
+			END
 		WHERE
 			c.is_active = true
 		AND
@@ -312,6 +319,7 @@ func (r *cartRepositoryPostgres) FindCartDetails(ctx context.Context, userId int
 			&cartItem.Product.Name,
 			&cartItem.Product.ThumbnailUrl,
 			&cartItem.Product.SellingUnit,
+			&cartItem.Product.Weight,
 			&cartItem.Product.IsPrescriptionRequired,
 			&cartItem.Pharmacy.Id,
 			&cartItem.Pharmacy.Distance,
@@ -323,13 +331,16 @@ func (r *cartRepositoryPostgres) FindCartDetails(ctx context.Context, userId int
 			&cartItem.Pharmacy.PharmacistName,
 			&cartItem.Pharmacy.PharmacistLicense,
 			&cartItem.Pharmacy.PharmacistPhone,
+			&cartItem.Pharmacy.OpeningTime,
+			&cartItem.Pharmacy.ClosingTime,
+			&cartItem.Pharmacy.OperationalDays,
 			&cartItem.Pharmacy.PartnerId,
 			&cartItem.PharmacyProductId,
 			&cartItem.PharmacyProduct.Price,
 			&cartItem.PharmacyProduct.Stock,
 		)
 		if err != nil {
-			return nil, err
+			return nil, apperror.NewInternal(err)
 		}
 
 		res.Items = append(res.Items, &cartItem)

@@ -58,7 +58,7 @@ func (u *chatRoomUsecaseImpl) CreateChatRoom(ctx context.Context, crReq entity.C
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	if authenticationRole != constant.RoleUser {
@@ -67,7 +67,7 @@ func (u *chatRoomUsecaseImpl) CreateChatRoom(ctx context.Context, crReq entity.C
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	user, err := ur.FindUserByAuthId(ctx, authenticationId)
@@ -120,7 +120,7 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoomMessageById(ctx context.Context, cha
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 	auth, err := ar.FindAuthenticationById(ctx, authenticationId)
 	if err != nil {
@@ -132,7 +132,7 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoomMessageById(ctx context.Context, cha
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	chatRoom, err := crr.FindChatRoomByID(ctx, chatRoomId)
@@ -176,12 +176,12 @@ func (u *chatRoomUsecaseImpl) UpdateIsTyping(ctx context.Context, crReq entity.C
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	auth, err := ar.FindAuthenticationById(ctx, authenticationId)
@@ -244,12 +244,12 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoom(ctx context.Context, params entity.
 
 	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
-		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	auth, err := ar.FindAuthenticationById(ctx, authenticationId)
