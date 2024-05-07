@@ -8,4 +8,8 @@ const (
 	LoggerErrorKey         = "error"
 	LoggerRequestProcessed = "request processed"
 	LoggerStackKey         = "stack"
+	LoggerClientIpKey      = "client_ip"
+	LoggerUserAgentKey     = "user_agent"
+	LoggerRequestBodyKey   = "request_body"
+	LoggerResponseSizeKey  = "response_size"
 )
