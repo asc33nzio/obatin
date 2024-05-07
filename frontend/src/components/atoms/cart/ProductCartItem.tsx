@@ -6,27 +6,28 @@ import {
   PharmacyName,
   ProductItem,
 } from '@/styles/pages/product/Cart.styles';
-import Image from 'next/image';
-import React, { useState } from 'react';
-import CustomButton from '../button/CustomButton';
-import PharmacyICO from '@/assets/icons/PharmacyICO';
-import DetailICO from '@/assets/icons/DetailICO';
+import { useState } from 'react';
 import { Container } from '@/styles/Global.styles';
-import DeleteICO from '@/assets/dashboard/DeleteICO';
-import BikeICO from '@/assets/icons/BikeICO';
 import { useModal } from '@/hooks/useModal';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
 import { useRouter } from 'next/navigation';
 import { ProductType } from '@/types/Product';
+import Image from 'next/image';
+import CustomButton from '../button/CustomButton';
+import PharmacyICO from '@/assets/icons/PharmacyICO';
+import DetailICO from '@/assets/icons/DetailICO';
+import DeleteICO from '@/assets/dashboard/DeleteICO';
+import BikeICO from '@/assets/icons/BikeICO';
 
-const ProductCartItem = () => {
+const ProductCartItem = (): React.ReactElement => {
   const { items } = useObatinSelector((state) => state.cart);
   const dispatch = useObatinDispatch();
   // eslint-disable-next-line
   const router = useRouter();
   // eslint-disable-next-line
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
+  const { openModal } = useModal();
 
   const handleRemoveItemCart = (id: number) => {
     dispatch(removeItemFromCart(id));
@@ -58,15 +59,9 @@ const ProductCartItem = () => {
     }
   };
 
-  const { openModal } = useModal();
-
   const openDetailPharmacyInterface = () => {
     openModal('detail-pharmacy');
   };
-
-  // const handleProductClicked = (slug: string) => {
-  //   router.push(`products/${slug}`);
-  // };
 
   return (
     <>

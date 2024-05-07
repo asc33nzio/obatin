@@ -15,6 +15,7 @@ interface RegularInputItf extends InputHTMLAttributes<HTMLInputElement> {
   $height?: number;
   $isSet?: boolean;
   $disabled?: boolean;
+  $fontSize?: number;
 }
 
 const RegularInput = ({
@@ -26,15 +27,11 @@ const RegularInput = ({
   $height = 100,
   $isSet = false,
   $disabled = false,
+  $fontSize = 18,
   ...props
 }: RegularInputItf): React.ReactElement => {
   return (
-    <RegularInputContainer
-      $marBot={$marBot}
-      $width={$width}
-      $height={$height}
-      // $fontSize={$fontSize}
-    >
+    <RegularInputContainer $marBot={$marBot} $width={$width} $height={$height}>
       {title}
       <RegularCustomInput
         {...props}
@@ -45,6 +42,7 @@ const RegularInput = ({
       />
       {props?.type === 'file' && (
         <CustomUploadButton
+          $fontSize={$fontSize}
           $hasError={validationMessage !== '' ? true : false}
           $isSet={$isSet}
         >

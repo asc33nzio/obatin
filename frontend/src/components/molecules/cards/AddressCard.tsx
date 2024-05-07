@@ -23,7 +23,13 @@ const AddressCard = (props: {
   isMainAddress: boolean;
   alias: string | null;
   details: string | null;
-  disableButtons?: boolean;
+  $justify?: string | undefined;
+  $marBot?: number | undefined;
+  $borderDisable?: boolean | undefined;
+  $disableButtons?: boolean | undefined;
+  $padding?: string | undefined;
+  $fontSize?: number | undefined;
+  $height?: number | undefined;
 }): React.ReactElement => {
   const { setToast } = useToast();
   const { openModal } = useModal();
@@ -156,11 +162,17 @@ const AddressCard = (props: {
   };
 
   return (
-    <AddressCardContainer>
+    <AddressCardContainer
+      $justify={props.$justify}
+      $marBot={props.$marBot}
+      $disableBorder={props.$borderDisable}
+      $padding={props.$padding}
+      $height={props.$height}
+    >
       <AddressCardLeftSection>
-        <AddressCardHeader>
+        <AddressCardHeader $fontSize={props.$fontSize}>
           <h1>{props.alias}</h1>
-          {userInfo.activeAddressId === props.$id && (
+          {userInfo?.activeAddressId === props.$id && props.isMainAddress && (
             <IsMainAddressBadge>UTAMA</IsMainAddressBadge>
           )}
         </AddressCardHeader>
@@ -168,12 +180,12 @@ const AddressCard = (props: {
         <AddressDetails>{props.details}</AddressDetails>
       </AddressCardLeftSection>
 
-      {!props.disableButtons && (
+      {!props.$disableButtons && (
         <AddressCardRightSection>
           <DeleteICO onClick={handleDelete} />
           <EditICO onClick={handleOpenUpdateInterface} />
           <InputSwitch
-            checked={userInfo.activeAddressId === props.$id}
+            checked={userInfo?.activeAddressId === props.$id}
             onChange={handleSetMainAddress}
           />
         </AddressCardRightSection>

@@ -1,16 +1,24 @@
 import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
-export const AddressCardContainer = styled.div`
+export const AddressCardContainer = styled.div<{
+  $justify: string | undefined;
+  $marBot: number | undefined;
+  $disableBorder: boolean | undefined;
+  $padding?: string | undefined;
+  $height?: number | undefined;
+}>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  justify-content: space-between;
+  justify-content: ${({ $justify }) => ($justify ? $justify : 'center')};
 
+  border-bottom: ${({ $disableBorder }) =>
+    $disableBorder ? 'none' : '1px solid #000000'};
+  margin-bottom: ${({ $marBot }) => ($marBot ? `${$marBot}px` : '10px')};
   width: 100%;
-  height: 25%;
-  padding: 30px 0;
+  height: ${({ $height }) => ($height ? `${$height}px` : '25%')};
+  padding: ${({ $padding }) => ($padding ? $padding : 0)};
 `;
 
 export const AddressCardLeftSection = styled.section`
@@ -22,7 +30,7 @@ export const AddressCardLeftSection = styled.section`
   height: 100%;
 `;
 
-export const AddressCardHeader = styled.div`
+export const AddressCardHeader = styled.div<{ $fontSize: number | undefined }>`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -34,7 +42,7 @@ export const AddressCardHeader = styled.div`
 
   h1 {
     color: ${COLORS.primary_text};
-    font-size: 16px;
+    font-size: ${({ $fontSize }) => ($fontSize ? `${$fontSize}px` : '24px')};
     font-weight: 400;
     background: transparent;
   }

@@ -38,7 +38,10 @@ const CartPage = () => {
                 isMainAddress={false}
                 alias='8GVH+9Q3, Sirnabaya, Kecamatan Gunungjati, Jawa Barat, Indonesia, 45151'
                 details=''
-                disableButtons={true}
+                $disableButtons={true}
+                $marBot={0}
+                $borderDisable={true}
+                $justify='space-between'
               />
             </CartSection>
             <CartSection>

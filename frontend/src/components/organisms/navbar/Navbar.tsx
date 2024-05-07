@@ -21,6 +21,8 @@ import { useEffect, useState } from 'react';
 import { useNavbar } from '@/hooks/useNavbar';
 import { decodeJWTSync } from '@/utils/decodeJWT';
 import { useToast } from '@/hooks/useToast';
+import { navigateToCart } from '@/app/actions';
+import { clearCart } from '@/redux/reducers/cartSlice';
 import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
 import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
 import DefaultDoctorAvatar from '@/assets/DefaultDoctorAvatar.svg';
@@ -32,9 +34,6 @@ import Image from 'next/image';
 import Axios from 'axios';
 import ClosePopupICO from '@/assets/icons/ClosePopupICO';
 import CartICO from '@/assets/icons/CartICO';
-import { navigateToCart } from '@/app/actions';
-import axios from 'axios';
-import { clearCart } from '@/redux/reducers/cartSlice';
 
 const Navbar = (): React.ReactElement => {
   const { isOpened, toggleDrawer, isPopupOpened, setIsPopupOpened } =
@@ -44,17 +43,16 @@ const Navbar = (): React.ReactElement => {
   const userInfo = useObatinSelector((state) => state?.auth);
   const userGender = useObatinSelector((state) => state?.auth?.gender);
   const avatarUrlUser = useObatinSelector((state) => state?.auth?.avatarUrl);
+  const quantity = useObatinSelector((state) => state?.cart);
+  const { items } = useObatinSelector((state) => state?.cart);
   const avatarUrlDoctor = useObatinSelector(
     (state) => state?.authDoctor?.avatarUrl,
   );
+  const dispatch = useObatinDispatch();
   const accessToken = getCookie('access_token');
   const userSessionCredentials = decodeJWTSync(accessToken?.toString());
   const userRole = userSessionCredentials?.payload?.Payload?.role;
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const quantity = useObatinSelector((state) => state.cart);
-  const { items } = useObatinSelector((state) => state.cart);
-  const dispatch = useObatinDispatch();
 
   const handleReverify = async () => {
     try {
@@ -118,7 +116,7 @@ const Navbar = (): React.ReactElement => {
 
   const postToCart = async () => {
     try {
-      await axios.post(
+      await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
         {
           cart: items,
