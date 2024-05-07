@@ -131,11 +131,23 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.Use(h.Middleware.RequestId)
 	r.Use(h.Middleware.Logger(log))
 	r.Use(h.Middleware.ErrorHandler)
+
 	r.GET(appconstant.EndpointPing, func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, dto.APIResponse{
 			Message: appconstant.ResponsePongMsg,
 		})
 	})
+	r.NoRoute(func(ctx *gin.Context) {
+		ctx.JSON(http.StatusNotFound, dto.APIResponse{
+			Message: appconstant.ResponseNotfoundMsg,
+		})
+	})
+	r.NoMethod(func(ctx *gin.Context) {
+		ctx.JSON(http.StatusNotFound, dto.APIResponse{
+			Message: appconstant.ResponseNotfoundMsg,
+		})
+	})
+
 	r.POST(appconstant.EndpointLogin, h.AuthenticationHandler.Login)
 	r.POST(appconstant.EndpointRegisterDoctor, h.AuthenticationHandler.RegisterDoctor)
 	r.POST(appconstant.EndpointRegisterUser, h.AuthenticationHandler.RegisterUser)
@@ -187,5 +199,8 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndpointProductTotalStock, h.PharmacyProductHandler.TotalStockPerPartner)
 	r.POST(appconstant.EndpointAvailableShippings, h.ShippingHandler.AvailableShippingsPerPharmacy)
 	r.POST(appconstant.EndpointCartCheckout, h.CartHandler.Checkout)
+	r.GET(appconstant.EndpointUserPrescription, h.PrescriptionHandler.GetAllUserPrescriptions)
+	r.GET(appconstant.EndpointPrescriptionDetails, h.PrescriptionHandler.GetPrescriptionDetails)
+	r.GET(appconstant.EndpointDoctorPrescription, h.PrescriptionHandler.GetAllDoctorPrescriptions)
 	return r
 }

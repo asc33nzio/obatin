@@ -1,5 +1,6 @@
 package appconstant
 
 const (
-	ResponsePongMsg = "pong"
+	ResponsePongMsg     = "pong"
+	ResponseNotfoundMsg = "not found"
 )

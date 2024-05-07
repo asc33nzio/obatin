@@ -10,7 +10,10 @@ import (
 )
 
 type PrescriptionUsecase interface {
-	CreatePrescription(ctx context.Context, cp *entity.CreatePrescription) error
+	CreatePrescription(ctx context.Context, cp *entity.CreatePrescription) (*int64, error)
+	GetAllUserPrescriptions(ctx context.Context, authId int64) ([]*entity.Prescription, error)
+	GetAllDoctorPrescriptions(ctx context.Context, authId int64) ([]*entity.Prescription, error)
+	GetPrescriptionDetails(ctx context.Context, prescriptionId int64) ([]*entity.PrescriptionItem, error)
 }
 
 type prescriptionUsecaseImpl struct {
@@ -28,22 +31,22 @@ func NewPrescriptionUsecaseImpl(
 	}
 }
 
-func (u *prescriptionUsecaseImpl) CreatePrescription(ctx context.Context, cp *entity.CreatePrescription) error {
+func (u *prescriptionUsecaseImpl) CreatePrescription(ctx context.Context, cp *entity.CreatePrescription) (*int64, error) {
 	dr := u.repoStore.DoctorRepository()
 
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
-		return apperror.NewInternal(apperror.ErrInterfaceCasting)
+		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
 	}
 
 	doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	cp.DoctorId = doctor.Id
 
-	_, err = u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
+	res, err := u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
 		pr := rs.PrescriptionRepository()
 		pir := rs.PrescriptionItemRepository()
 
@@ -57,11 +60,61 @@ func (u *prescriptionUsecaseImpl) CreatePrescription(ctx context.Context, cp *en
 			return nil, err
 		}
 
-		return nil, nil
+		return cp.Id, nil
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	id, ok := res.(int64)
+	if !ok {
+		return nil, apperror.NewInternal(apperror.ErrInterfaceCasting)
+	}
+
+	return &id, nil
+}
+
+func (u *prescriptionUsecaseImpl) GetAllUserPrescriptions(ctx context.Context, authId int64) ([]*entity.Prescription, error) {
+	pr := u.repoStore.PrescriptionRepository()
+	ur := u.repoStore.UserRepository()
+
+	userid, err := ur.FindUserIdByAuthId(ctx, authId)
+	if err != nil {
+		return nil, err
+	}
+
+	prescriptions, err := pr.FindAllUserPrescriptions(ctx, *userid)
+	if err != nil {
+		return nil, err
+	}
+
+	return prescriptions, nil
+}
+
+func (u *prescriptionUsecaseImpl) GetAllDoctorPrescriptions(ctx context.Context, authId int64) ([]*entity.Prescription, error) {
+	dr := u.repoStore.DoctorRepository()
+	pr := u.repoStore.PrescriptionRepository()
+
+	doctor, err := dr.FindDoctorByAuthId(ctx, authId)
+	if err != nil {
+		return nil, err
+	}
+
+	prescriptions, err := pr.FindAllDoctorPrescriptions(ctx, doctor.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return prescriptions, nil
+}
+
+func (u *prescriptionUsecaseImpl) GetPrescriptionDetails(ctx context.Context, prescriptionId int64) ([]*entity.PrescriptionItem, error) {
+	pir := u.repoStore.PrescriptionItemRepository()
+
+	items, err := pir.FindAllPrescriptionItems(ctx, prescriptionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
