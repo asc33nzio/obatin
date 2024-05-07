@@ -17,4 +17,7 @@ export type ModalType =
   | 'add-address'
   | 'doctor-detail'
   | 'update-address'
+  | 'payment-upload'
+  | 'select-address'
+  | 'detail-pharmacy'
   | '';

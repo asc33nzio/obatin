@@ -1,8 +1,10 @@
 import {
+  CartContainer,
   IconContainer,
   ImgBg,
   Left,
   NavContainer,
+  Quantity,
   Right,
   VerifyPopup,
 } from '@/styles/organisms/Navbar.styles';
@@ -12,7 +14,7 @@ import {
   navigateToUserDashboard,
 } from '@/app/actions';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { useObatinSelector } from '@/redux/store/store';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { Menu, ChevronLeft } from '@styled-icons/material';
 import { getCookie } from 'cookies-next';
 import { useEffect, useState } from 'react';
@@ -29,6 +31,10 @@ import Sidebar from '../sidebar/Sidebar';
 import Image from 'next/image';
 import Axios from 'axios';
 import ClosePopupICO from '@/assets/icons/ClosePopupICO';
+import CartICO from '@/assets/icons/CartICO';
+import { navigateToCart } from '@/app/actions';
+import axios from 'axios';
+import { clearCart } from '@/redux/reducers/cartSlice';
 
 const Navbar = (): React.ReactElement => {
   const { isOpened, toggleDrawer, isPopupOpened, setIsPopupOpened } =
@@ -45,6 +51,10 @@ const Navbar = (): React.ReactElement => {
   const userSessionCredentials = decodeJWTSync(accessToken?.toString());
   const userRole = userSessionCredentials?.payload?.Payload?.role;
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const quantity = useObatinSelector((state) => state.cart);
+  const { items } = useObatinSelector((state) => state.cart);
+  const dispatch = useObatinDispatch();
 
   const handleReverify = async () => {
     try {
@@ -106,6 +116,25 @@ const Navbar = (): React.ReactElement => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const postToCart = async () => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
+        {
+          cart: items,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      dispatch(clearCart());
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <NavContainer>
@@ -119,6 +148,11 @@ const Navbar = (): React.ReactElement => {
         {userRole === 'user' && <SearchComponent />}
 
         <Right>
+          <CartContainer onClick={() => navigateToCart()}>
+            <CartICO onClick={() => postToCart()} />
+            <Quantity>{quantity.totalQuantity}</Quantity>
+          </CartContainer>
+
           {accessToken === undefined ? (
             <CustomButton
               content='Login'

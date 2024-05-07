@@ -23,6 +23,7 @@ const AddressCard = (props: {
   isMainAddress: boolean;
   alias: string | null;
   details: string | null;
+  disableButtons?: boolean;
 }): React.ReactElement => {
   const { setToast } = useToast();
   const { openModal } = useModal();
@@ -167,14 +168,16 @@ const AddressCard = (props: {
         <AddressDetails>{props.details}</AddressDetails>
       </AddressCardLeftSection>
 
-      <AddressCardRightSection>
-        <DeleteICO onClick={handleDelete} />
-        <EditICO onClick={handleOpenUpdateInterface} />
-        <InputSwitch
-          checked={userInfo.activeAddressId === props.$id}
-          onChange={handleSetMainAddress}
-        />
-      </AddressCardRightSection>
+      {!props.disableButtons && (
+        <AddressCardRightSection>
+          <DeleteICO onClick={handleDelete} />
+          <EditICO onClick={handleOpenUpdateInterface} />
+          <InputSwitch
+            checked={userInfo.activeAddressId === props.$id}
+            onChange={handleSetMainAddress}
+          />
+        </AddressCardRightSection>
+      )}
     </AddressCardContainer>
   );
 };

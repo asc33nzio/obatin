@@ -9,7 +9,10 @@ import { useModal } from '@/hooks/useModal';
 import ChangePasswordModalContent from './modalContent/ChangePasswordModalContent';
 import CloseICO from '@/assets/icons/CloseICO';
 import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmPasswordModalContent';
-import AddAddressModalContent from './modalContent/AddAddressModalContent';
+import AddAddressModalContent from '@/components/organisms/modal/modalContent/AddAddressModalContent';
+import UploadPembayaranModal from '@/components/organisms/modal/modalContent/UploadPembayaranModal';
+import SelectAddressModalContent from './modalContent/SelectAddressModalContent';
+import SelectDetailPharmacyModalContent from './modalContent/SelectDetailPharmacyModalContent';
 import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
 
 interface DoctorDetailItf {
@@ -81,6 +84,37 @@ const Modal = () => {
     case 'add-address':
       modalContent = <AddAddressModalContent />;
       title = 'Tambahkan Alamat';
+      modalProps = {
+        $overlayHeight: '170vh',
+        $containerWidth: '650px',
+        $containerHeight: '850px',
+      };
+      break;
+
+    case 'payment-upload':
+      modalContent = <UploadPembayaranModal />;
+      title = 'Upload Bukti Pembayaran';
+      modalProps = {
+        $overlayHeight: '100vh',
+        $containerWidth: '500px',
+        $containerHeight: '500px',
+        // $bgColor: 'white',
+      };
+      break;
+
+    case 'select-address':
+      modalContent = <SelectAddressModalContent />;
+      title = 'Pilih atau tambahkan alamat';
+      modalProps = {
+        $overlayHeight: '100vh',
+        $containerWidth: '500px',
+        $containerHeight: '500px',
+      };
+      break;
+
+    case 'detail-pharmacy':
+      modalContent = <SelectDetailPharmacyModalContent />;
+      title = 'Detail Pharmacy';
       modalProps = {
         $overlayHeight: '170vh',
         $containerWidth: '650px',

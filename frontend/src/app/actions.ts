@@ -28,3 +28,15 @@ export const navigateToUserDashboard = async () => {
 export const navigateToDoctorDashboard = async () => {
   redirect('/dashboard/doctor');
 };
+
+export const navigateToCheckout = async () => {
+  redirect('/shop/checkout');
+};
+
+export const navigateToCart = async () => {
+  redirect('/shop/cart');
+};
+
+export const navigateToProductList = async () => {
+  redirect('/products');
+};
