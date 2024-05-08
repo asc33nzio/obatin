@@ -14,7 +14,7 @@ import {
   navigateToUserDashboard,
 } from '@/app/actions';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
+import { useObatinSelector } from '@/redux/store/store';
 import { Menu, ChevronLeft } from '@styled-icons/material';
 import { getCookie } from 'cookies-next';
 import { useEffect, useState } from 'react';
@@ -22,7 +22,7 @@ import { useNavbar } from '@/hooks/useNavbar';
 import { decodeJWTSync } from '@/utils/decodeJWT';
 import { useToast } from '@/hooks/useToast';
 import { navigateToCart } from '@/app/actions';
-import { CartItem, clearCart } from '@/redux/reducers/cartSlice';
+import { CartItem } from '@/redux/reducers/cartSlice';
 import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
 import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
 import DefaultDoctorAvatar from '@/assets/DefaultDoctorAvatar.svg';
@@ -47,7 +47,6 @@ const Navbar = (): React.ReactElement => {
   const avatarUrlDoctor = useObatinSelector(
     (state) => state?.authDoctor?.avatarUrl,
   );
-  const dispatch = useObatinDispatch();
   const accessToken = getCookie('access_token');
   const userSessionCredentials = decodeJWTSync(accessToken?.toString());
   const userRole = userSessionCredentials?.payload?.Payload?.role;
@@ -142,7 +141,6 @@ const Navbar = (): React.ReactElement => {
           },
         );
 
-        dispatch(clearCart());
         navigateToCart();
       }
     } catch (error: any) {

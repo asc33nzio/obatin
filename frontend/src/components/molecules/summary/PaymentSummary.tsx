@@ -14,6 +14,8 @@ const PaymentSummaryComponent = (props: {
   const { totalQuantity } = useObatinSelector((state) => state.cart);
   const { totalPrice } = useObatinSelector((state) => state.cart);
 
+  // const handleCheckout = async () =>
+
   return (
     <>
       <PaymentSummaryContainer>

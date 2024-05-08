@@ -20,7 +20,7 @@ import AddressCard from '@/components/molecules/cards/AddressCard';
 import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
 import LocationICO from '@/assets/icons/LocationICO';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
-import axios from 'axios';
+import Axios from 'axios';
 import { getCookie } from 'cookies-next';
 import { setPharmacies } from '@/redux/reducers/pharmacySlice';
 
@@ -32,7 +32,7 @@ const CartPage = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get(
+        const response = await Axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
           {
             headers: {
