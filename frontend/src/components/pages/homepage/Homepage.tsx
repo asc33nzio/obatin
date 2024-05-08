@@ -73,7 +73,7 @@ const Homepage = (): React.ReactElement => {
   }, []);
 
   const handleProductClicked = (slug: string) => {
-    router.push(`products/${slug}`);
+    router.push(`/products/${slug}`);
   };
 
   return (

@@ -65,7 +65,7 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  //! Redirect URL definitions
+  //! Redirect URL definitionsAuthDoc
   // const redirectToHome = new URL('/', request.nextUrl.href).toString();
 
   const redirectToLogin = new URL(

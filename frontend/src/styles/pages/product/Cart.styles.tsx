@@ -8,6 +8,12 @@ export const Content = styled.div`
   display: grid;
   grid-template-columns: 3fr 1fr;
   gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    width: 80vw;
+  }
 `;
 export const CartSection = styled.div`
   width: 100%;
@@ -63,6 +69,10 @@ export const ProductItem = styled.div`
     border-radius: 12px;
     padding: 5px;
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 export const Left = styled.div`
@@ -99,35 +109,8 @@ export const ButtonAddContainer = styled.div`
   }
 `;
 
-// export const AddressContainer = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   /* border-bottom: 1px solid ${COLORS.primary_text}; */
-//   padding-bottom: 20px;
-//   color: ${COLORS.primary_text};
-//   div {
-//     display: flex;
-//     flex-direction: column;
-//     gap: 5px;
-//     h2 {
-//       font-size: 18px;
-//     }
-//     h3 {
-//       font-size: 16px;
-//       font-weight: 400;
-//     }
-//   }
-//   a {
-//     color: ${COLORS.primary_color};
-//     font-weight: 700;
-//     cursor: pointer;
-//   }
-// `;
-
 export const PaymentSummary = styled.div`
   color: ${COLORS.primary_text};
-  /* border-bottom: 1px solid ${COLORS.primary_text}; */
   padding-bottom: 20px;
   div {
     display: flex;
@@ -202,6 +185,11 @@ export const DeliveryItem = styled.div`
       flex-direction: column;
       gap: 5px;
     }
+  }
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
   }
 `;
 

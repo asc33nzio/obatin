@@ -9,7 +9,7 @@ import UserICO from '@/assets/icons/UserICO';
 
 type MenuOption = {
   name: string;
-  icon: React.ComponentType;
+  icon: React.ComponentType | React.FC<any>;
   url: string;
   subItems?: MenuOption[];
 };

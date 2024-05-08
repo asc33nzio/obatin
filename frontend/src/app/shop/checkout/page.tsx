@@ -21,31 +21,6 @@ import React from 'react';
 
 const Checkout = () => {
   const { handlePdfChange, userUploadValidationError } = useUploadValidation();
-  // const [images, setImages] = useState([]);
-  // const [imageURLS, setImageURLS] = useState([]);
-  // const [tag, setTag] = useState(null);
-
-  // const uploadImageToClient = () => {
-    // if (e.target.files && e.target.files[0]) {
-    //   setImages((imageList) => [...imageList, e.target.files[0]]);
-    //   setImageURLS((urlList) => [
-    //     ...urlList,
-    //     URL.createObjectURL(e.target.files[0]),
-    //   ]);
-    // }
-  // };
-
-  const uploadToServer = async () => {
-    // const body = new FormData();
-    // images.map((file, index) => {
-    //   body.append(`file${index}`, file);
-    // });
-    // body.append('tag', tag);
-    // const response = await fetch('/api/file', {
-    //   method: 'POST',
-    //   body,
-    // });
-  };
 
   return (
     <Container>
@@ -73,7 +48,6 @@ const Checkout = () => {
                 $width='100%'
                 $fontSize='16px'
                 content='Proses Pembayaran'
-                onClick={uploadToServer}
               />
             </CartSection>
           </Cart>

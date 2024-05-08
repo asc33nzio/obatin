@@ -4,10 +4,9 @@ import {
   ModalOverlay,
   ModalHeader,
 } from '@/styles/organisms/modal/Modal.styles';
-import CloseICO from '@/assets/icons/CloseICO';
-import DoctorDetailModalContent from './modalContent/DoctorDetailModalContent';
 import { ModalType } from '@/types/modalTypes';
-// import { useModal } from '@/hooks/useModal';
+import DoctorDetailModalContent from './modalContent/DoctorDetailModalContent';
+import CloseICO from '@/assets/icons/CloseICO';
 
 interface DoctorDetailItf {
   name: string | undefined;
@@ -36,7 +35,7 @@ const InvokableModal = (props: {
   modalType: ModalType;
   onOpen: Function;
   isOpen: boolean;
-  onClose: () => {};
+  onClose: () => void;
 }) => {
   let modalContent: React.ReactElement | null;
   let title: string | null = null;
@@ -51,11 +50,6 @@ const InvokableModal = (props: {
     isOpen: false,
     onClose: () => {},
   };
-
-  //   const closeModal = useModal();
-  //   const handleModalClose = () => {
-  //     closeModal;
-  //   };
 
   switch (props.modalType) {
     case 'doctor-detail':

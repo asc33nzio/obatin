@@ -8,7 +8,7 @@ import {
 } from '@/styles/molecules/Search.styles';
 import { PropagateLoader } from 'react-spinners';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useToast } from '@/hooks/useToast';
 import { debounce } from '@/utils/debounce';
@@ -27,6 +27,7 @@ interface CompactProductItf {
 }
 
 const Search = (): React.ReactElement => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
@@ -60,14 +61,14 @@ const Search = (): React.ReactElement => {
     setIsLoading,
   );
 
-  // const handleNavigation = (term: string) => {
-  //   const params = new URLSearchParams(searchParams);
-  //   if (term) {
-  //     params.set(`/shop/${search}`, term);
-  //   } else {
-  //     params.delete('query');
-  //   }
-  // };
+  const handleViewRelated = () => {
+    const queryParams = new URLSearchParams({
+      sort_by: 'name',
+      order: 'desc',
+      search: search,
+    }).toString();
+    router.replace(`/products/?${queryParams}`);
+  };
 
   return (
     <SearchContainer>
@@ -105,6 +106,9 @@ const Search = (): React.ReactElement => {
               onMouseDown={(e) => {
                 e.preventDefault();
               }}
+              onClick={() =>
+                router.replace(`/products/${product.product_slug}`)
+              }
             >
               <Image
                 src={product.image_url}
@@ -112,7 +116,6 @@ const Search = (): React.ReactElement => {
                 width={65}
                 height={65}
                 loading='lazy'
-                objectFit='cover'
               />
               <h1>{product.name}</h1>
               <span
@@ -134,6 +137,7 @@ const Search = (): React.ReactElement => {
               onMouseDown={(e) => {
                 e.preventDefault();
               }}
+              onClick={handleViewRelated}
             >
               {search.length !== 0 ? (
                 <span style={{ textAlign: 'center' }}>
@@ -141,7 +145,10 @@ const Search = (): React.ReactElement => {
                   {search.charAt(0).toUpperCase() + search.slice(1)}&quot;
                 </span>
               ) : search.length === 0 ? (
-                <span style={{ textAlign: 'center' }}>
+                <span
+                  style={{ textAlign: 'center' }}
+                  onClick={() => router.replace('/products')}
+                >
                   Lihat semua produk di ObatIn
                 </span>
               ) : null}
