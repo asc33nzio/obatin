@@ -27,7 +27,10 @@ const DoctorDetailModalContent = (props: { $doctorDetail: any }) => {
         <Experience>
           {props.$doctorDetail?.experiences} tahun pengalaman
         </Experience>
-        <Smallfont>Rp{props.$doctorDetail?.fee}</Smallfont>
+
+        <Smallfont>
+          Rp. {props.$doctorDetail?.fee?.toLocaleString('id-ID')},00
+        </Smallfont>
         <Bold>Jadwal Operasional:</Bold>
         <Experience>{`${props.$doctorDetail?.operationalDays.join(', ')}`}</Experience>
         <Smallfont>{props.$doctorDetail?.operationalHours}</Smallfont>

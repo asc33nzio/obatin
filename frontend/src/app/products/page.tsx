@@ -13,6 +13,7 @@ import {
   ProductCard,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
+import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Body, Container } from '@/styles/Global.styles';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -20,7 +21,6 @@ import { useEffect, useState } from 'react';
 import { Inter } from 'next/font/google';
 import { ButtonAdd } from '@/styles/pages/product/ProductDetail.styles';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
-import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
 import axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Navbar from '@/components/organisms/navbar/Navbar';
@@ -38,7 +38,7 @@ const ProductsPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const dispatch = useObatinDispatch();
-  const items = useObatinSelector((state) => state.cart.items);
+  const items = useObatinSelector((state) => state?.cart?.items);
 
   const [products, setProducts] = useState<ProductType[]>([]);
   const [categories, setCategories] = useState<CategoryType[]>([]);
@@ -48,6 +48,7 @@ const ProductsPage = () => {
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [classification, setClassification] = useState<string | null>(null);
   const [orderBy, setOrderBy] = useState<string | null>(null);
+  const [isPrescriptionRequied] = useState<boolean>();
   const search = searchParams.get('search');
 
   useEffect(() => {
@@ -64,21 +65,30 @@ const ProductsPage = () => {
               sort_by: sortBy,
               classification: classification,
               order: orderBy,
+              isPrescriptionRequied: isPrescriptionRequied,
               search,
             },
           },
         );
 
         setProducts([...response.data]);
-        setLoading(false);
       } catch (error) {
         console.error(error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [page, categoryId, sortBy, classification, orderBy, search]);
+  }, [
+    page,
+    categoryId,
+    sortBy,
+    classification,
+    orderBy,
+    isPrescriptionRequied,
+    search,
+  ]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -97,7 +107,9 @@ const ProductsPage = () => {
 
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
   const handleAddToCart = (product: ProductType) => {
-    const existingItem = items.find((item) => item.id === product.id);
+    const existingItem = items.find((item) => {
+      item.product_id === product.id;
+    });
     if (existingItem) {
       dispatch(
         addItemToCart({
@@ -105,22 +117,23 @@ const ProductsPage = () => {
           quantity: +1,
         }),
       );
-    } else {
-      dispatch(
-        addItemToCart({
-          id: product.id,
-          name: product.name,
-          quantity: 1,
-          price: product.min_price,
-          image_url: product.image_url,
-        }),
-      );
+      setSelectedProduct(product);
+      return;
     }
+
+    dispatch(
+      addItemToCart({
+        product_id: product.id,
+        prescription_id: null,
+        pharmacy_id: null,
+        quantity: 1,
+      }),
+    );
     setSelectedProduct(product);
   };
 
   const handleSubtract = (productId: number) => {
-    const existingItem = items.find((item) => item.id === productId);
+    const existingItem = items.find((item) => item.product_id === productId);
     if (existingItem && existingItem.quantity > 1) {
       dispatch(
         addItemToCart({
@@ -183,7 +196,6 @@ const ProductsPage = () => {
                       {product?.max_price.toLocaleString()}
                     </Price>
                   </div>
-
                   {selectedProduct?.id === product.id ? (
                     <ButtonAdd>
                       <CustomButton
@@ -197,7 +209,10 @@ const ProductsPage = () => {
                         $border='#00B5C0'
                       />
                       <p>
-                        {items.find((item) => item.id === product.id)?.quantity}
+                        {
+                          items.find((item) => item.product_id === product.id)
+                            ?.quantity
+                        }
                       </p>
                       <CustomButton
                         content='+'

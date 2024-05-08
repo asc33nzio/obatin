@@ -2,7 +2,6 @@ import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
 export const Imagecontainer = styled.div`
-  width: 150px;
   img {
     object-fit: cover;
   }
@@ -17,11 +16,10 @@ export const ProductCard = styled.a`
   border: 1px solid ${COLORS.input_border};
   border-radius: 12px;
   padding: 20px;
-  justify-content: space-between;
   color: ${COLORS.primary_text};
   text-align: center;
   text-decoration: none;
-  gap: 20px;
+  gap: 5px;
 
   &:hover {
     zoom: 101%;

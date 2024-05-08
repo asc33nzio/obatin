@@ -12,7 +12,6 @@ export const AddressCardContainer = styled.div<{
   flex-direction: row;
   align-items: center;
   justify-content: ${({ $justify }) => ($justify ? $justify : 'center')};
-
   border-bottom: ${({ $disableBorder }) =>
     $disableBorder ? 'none' : '1px solid #000000'};
   margin-bottom: ${({ $marBot }) => ($marBot ? `${$marBot}px` : '10px')};
