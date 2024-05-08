@@ -8,7 +8,7 @@ import {
   OrderSummary,
   SectionTitle,
 } from '@/styles/pages/product/Cart.styles';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Body,
   SubmitSection,
@@ -19,8 +19,37 @@ import ProductCartItem from '@/components/atoms/cart/ProductCartItem';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
 import LocationICO from '@/assets/icons/LocationICO';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
+import axios from 'axios';
+import { getCookie } from 'cookies-next';
+import { setPharmacies } from '@/redux/reducers/pharmacySlice';
 
 const CartPage = () => {
+  const userInfo = useObatinSelector((state) => state?.auth);
+  const dispatch = useObatinDispatch();
+  const accessToken = getCookie('access_token');
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
+        dispatch(setPharmacies(response.data.data.pharmacies_cart));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCartItems();
+    //eslint-disable-next-line
+  }, []);
+
   return (
     <Container>
       <Navbar />
@@ -33,16 +62,27 @@ const CartPage = () => {
                 <LocationICO />
                 <p>Alamat Pengiriman</p>
               </SectionTitle>
-              <AddressCard
-                $id={1}
-                isMainAddress={false}
-                alias='8GVH+9Q3, Sirnabaya, Kecamatan Gunungjati, Jawa Barat, Indonesia, 45151'
-                details=''
-                $disableButtons={true}
-                $marBot={0}
-                $borderDisable={true}
-                $justify='space-between'
-              />
+
+              {userInfo?.addresses?.map((address, index) => {
+                if (!address.alias) return;
+                let fullAddress = address.detail;
+                fullAddress += `, ${address.city.province.name}, ${address.city.type} ${address.city.name}, ${address.city.postal_code}`;
+                return (
+                  <AddressCard
+                    $id={address.id === null ? 0 : address.id}
+                    key={`userAddressCard${index}`}
+                    isMainAddress={false}
+                    alias={address.alias}
+                    details={fullAddress}
+                    $disableButtons
+                    $justify='space-between'
+                    $padding='20px 0'
+                    $fontSize={16}
+                    $borderDisable={true}
+                    $height={100}
+                  />
+                );
+              })}
             </CartSection>
             <CartSection>
               <ProductCartItem />

@@ -8,6 +8,7 @@ import { encryptTransform } from 'redux-persist-transform-encrypt';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import cartSlice from '../reducers/cartSlice';
+import pharmacySlice from '../reducers/pharmacySlice';
 
 const createNoopStorage = () => {
   return {
@@ -52,6 +53,7 @@ const rootReducer = combineReducers({
   authDoctor: authDoctorReducer,
   provinces: provincesReducer,
   cart: cartSlice,
+  pharmacy: pharmacySlice,
 });
 
 const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(
@@ -72,6 +74,8 @@ export const createPreloadedState = (customState: Partial<RootState>) => {
     auth: { ...store.getState().auth, ...customState.auth },
     authDoctor: { ...store.getState().authDoctor, ...customState.authDoctor },
     provinces: { ...store.getState().provinces, ...customState.provinces },
+    cart: { ...store.getState().cart, ...customState.cart },
+    pharmacy: { ...store.getState().pharmacy, ...customState.pharmacy },
   };
 };
 
