@@ -36,6 +36,8 @@ type RouterOpt struct {
 	PharmacyProductHandler      *handler.PharmacyProductHandler
 	ThirdPartyHandler           *handler.ThirdPartyHandler
 	ShippingHandler             *handler.ShippingHandler
+	OrderHandler                *handler.OrderHandler
+	PaymentHandler              *handler.PaymentHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -92,6 +94,12 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	shippingUsecase := usecase.NewShippingUsecaseImpl(dbStore, config)
 	shippingHandler := handler.NewShippingHandler(shippingUsecase, config)
 
+	orderUsecase := usecase.NewOrderUsecaseImpl(dbStore, config)
+	orderHandler := handler.NewOrderHandler(orderUsecase)
+
+	paymentUsecase := usecase.NewPaymentUsecaseImpl(dbStore, config, cloudinaryUpload)
+	paymentHandler := handler.NewPaymentHandler(paymentUsecase)
+
 	thirdPartyHandler := handler.NewThirdPartyHandler(config)
 
 	return NewRouter(RouterOpt{
@@ -112,6 +120,8 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 		PharmacyProductHandler:      pharmacyProductHandler,
 		ThirdPartyHandler:           thirdPartyHandler,
 		ShippingHandler:             shippingHandler,
+		OrderHandler:                orderHandler,
+		PaymentHandler:              paymentHandler,
 	})
 }
 
@@ -211,5 +221,9 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.GET(appconstant.EndpointUserPrescription, h.PrescriptionHandler.GetAllUserPrescriptions)
 	r.GET(appconstant.EndpointPrescriptionDetails, h.PrescriptionHandler.GetPrescriptionDetails)
 	r.GET(appconstant.EndpointDoctorPrescription, h.PrescriptionHandler.GetAllDoctorPrescriptions)
+	r.GET(appconstant.EndpointUserOrders, h.OrderHandler.GetUserOrders)
+	r.PATCH(appconstant.EndpointPaymentDetails, h.PaymentHandler.UploadPaymentProof)
+	r.POST(appconstant.EndpointPaymentConfirm, h.PaymentHandler.ConfirmPaymentProof)
+	r.GET(appconstant.EndpointPendingPayments, h.PaymentHandler.GetAllPendingPayment)
 	return r
 }

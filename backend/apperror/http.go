@@ -68,6 +68,10 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusBadRequest
 	case NoNearbyPharmacyPartner:
 		return http.StatusNotFound
+	case PaymentNotFound:
+		return http.StatusNotFound
+	case PaymentExpired:
+		return http.StatusBadRequest
 	default:
 		return http.StatusInternalServerError
 	}

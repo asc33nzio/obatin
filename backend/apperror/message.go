@@ -44,4 +44,6 @@ const (
 	DuplicateSlugErrorMsg             = "you can't use duplicate slug"
 	InsufficientStockMsg              = "insufficient stock"
 	NoNearbyPharmacyPartnerMsg        = "no nearby pharmacy partner"
+	PaymentNotFoundMsg                = "payment not found"
+	PaymentExpiredMsg                 = "payment session expired"
 )

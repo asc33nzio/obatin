@@ -378,3 +378,21 @@ func ErrNoNearbyPharmacyPartner(err error) *AppError {
 		stack:   debug.Stack(),
 	}
 }
+
+func ErrPaymentNotFound(err error) *AppError {
+	return &AppError{
+		code:    PaymentNotFound,
+		err:     err,
+		message: PaymentNotFoundMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrPaymentExpired(err error) *AppError {
+	return &AppError{
+		code:    PaymentExpired,
+		err:     err,
+		message: PaymentExpiredMsg,
+		stack:   debug.Stack(),
+	}
+}
