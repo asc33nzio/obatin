@@ -41,6 +41,7 @@ type CartItemRes struct {
 	OrderId                *int64  `json:"order_id"`
 	Price                  *int    `json:"price"`
 	Stock                  *int    `json:"stock"`
+	Slug                   string  `json:"slug"`
 	Weight                 int64   `json:"weight"`
 	IsPrescriptionRequired bool    `json:"is_prescription_required"`
 }
@@ -95,6 +96,10 @@ type CartCheckoutItemReq struct {
 	PharmacyProductId *int64 `json:"pharmacy_product_id" binding:"required"`
 	OrderId           *int64 `json:"order_id"`
 	Name              string `json:"name" binding:"required"`
+}
+
+type CartCheckoutRes struct {
+	PaymentId int64 `json:"payment_id"`
 }
 
 func (c UpdateCartReq) ToCart(authentiactionId *int64) entity.Cart {

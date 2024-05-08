@@ -1,9 +1,5 @@
 package entity
 
-import (
-	"time"
-)
-
 type Order struct {
 	Id           *int64
 	User         User
@@ -14,8 +10,19 @@ type Order struct {
 	ShippingCost int
 	Subtotal     int
 	Payment      Payment
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    *time.Time
+	WantDelete   bool
+	CreatedAt    string
 	CartItems    []*CartItem
+}
+
+type UserOrdersFilter struct {
+	Status *string
+	Page   int
+	Limit  int
+}
+
+type UserOrdersPagination struct {
+	Orders     []*Order
+	TotalRows  int64
+	Pagination PaginationResponse
 }

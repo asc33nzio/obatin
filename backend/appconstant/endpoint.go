@@ -45,5 +45,9 @@ const (
 	EndpointProductTotalStock         = "/shop/products/total-stock"
 	EndpointAvailableShippings        = "/shop/pharmacy/shippings"
 	EndpointRajaOngkirCost            = "/third-parties/rajaongkir/cost"
-	EndpointUploadImageCloudinary    = "/cloudinary/image"
+	EndpointUploadImageCloudinary     = "/cloudinary/image"
+	EndpointUserOrders                = "/users/orders"
+	EndpointPaymentDetails            = "/payments/:id"
+	EndpointPaymentConfirm            = "/payments/confirm"
+	EndpointPendingPayments           = "/payments/pending"
 )

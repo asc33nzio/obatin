@@ -14,7 +14,7 @@ type CartUsecase interface {
 	GetCartDetails(ctx context.Context, authenticationId int64) (*entity.Cart, error)
 	UpdateOneCartItem(ctx context.Context, cartItem *entity.CartItem) error
 	DeleteOneCartItem(ctx context.Context, cartItem *entity.CartItem) error
-	Checkout(ctx context.Context, co *entity.CartCheckout) error
+	Checkout(ctx context.Context, co *entity.CartCheckout) (*int64, error)
 }
 
 type cartUsecaseImpl struct {
@@ -217,17 +217,17 @@ func (u *cartUsecaseImpl) DeleteOneCartItem(ctx context.Context, cartItem *entit
 	return nil
 }
 
-func (u *cartUsecaseImpl) Checkout(ctx context.Context, co *entity.CartCheckout) error {
+func (u *cartUsecaseImpl) Checkout(ctx context.Context, co *entity.CartCheckout) (*int64, error) {
 	ur := u.repoStore.UserRepository()
 
 	userId, err := ur.FindUserIdByAuthId(ctx, co.User.Authentication.Id)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	co.User.Id = userId
 
-	_, err = u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
+	res, err := u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
 		ppr := rs.PharmacyProductRepository()
 		smr := rs.StockMovementRepository()
 		pr := rs.PaymentRepository()
@@ -392,11 +392,16 @@ func (u *cartUsecaseImpl) Checkout(ctx context.Context, co *entity.CartCheckout)
 			}
 		}
 
-		return nil, nil
+		return payment.Id, nil
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	paymentId, ok := res.(int64)
+	if !ok {
+		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+	}
+
+	return &paymentId, nil
 }
