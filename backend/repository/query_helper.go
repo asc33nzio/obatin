@@ -770,3 +770,134 @@ func updateOneCartItemQuery(c *entity.CartItem) (string, []interface{}) {
 
 	return query, args
 }
+
+func userOrdersQuery(userId int64, params *entity.UserOrdersFilter) (string, []interface{}) {
+	var query strings.Builder
+	var queryConditionalPart strings.Builder
+	var subqueryOrder strings.Builder
+	var subqueryRowsCount strings.Builder
+	var args []interface{}
+
+	queryConditionalPart.WriteString(`
+		WHERE
+			o.user_id = $1
+		AND
+			o.deleted_at IS NULL
+	`)
+	args = append(args, userId)
+
+	if params.Status != nil {
+		queryConditionalPart.WriteString(" AND o.status = $2 ")
+		args = append(args, *params.Status)
+	}
+
+	subqueryRowsCount.WriteString(fmt.Sprintf(`
+		CROSS JOIN (
+			SELECT
+				COUNT(*) as total_rows
+			FROM
+				orders o
+			%v
+		) AS tr
+`, queryConditionalPart.String()))
+
+	paginationParams, paginationData := convertPaginationParamsToSql(params.Limit, params.Page, len(args)+1)
+	args = append(args, paginationData...)
+	subqueryOrder.WriteString(fmt.Sprintf(` 
+		WITH 
+			order_details AS ( 
+				SELECT 
+					o.id,
+					o.user_id,
+					o.shipping_id,
+					o.pharmacy_id,
+					o.status,
+					o.number_items,
+					o.shipping_cost,
+					o.subtotal,
+					o.payment_id,
+					TO_CHAR(o.created_at, 'DD-MM-YYYY HH24:MI') as created_at		
+				FROM
+					orders o
+					%v
+				ORDER BY o.created_at DESC , o.id ASC
+				%v
+			)
+	`,
+		queryConditionalPart.String(), paginationParams))
+
+	query.WriteString(subqueryOrder.String())
+	query.WriteString(`
+		SELECT
+			tr.total_rows,
+			od.id,
+			od.user_id,
+			od.shipping_id,
+			od.pharmacy_id,
+			od.status,
+			od.number_items,
+			od.shipping_cost,
+			od.subtotal,
+			od.payment_id,
+			od.created_at,
+			sm.code,
+			sm.name,
+			sm.type,
+			p.name as pharmacy_name,
+			p.address as pharmacy_address,
+			p.city_id as pharmacy_city_id,
+			p.lat as pharmacy_lat,
+			p.lng as pharmacy_lng,
+			p.pharmacist_name,
+			p.pharmacist_license,
+			p.pharmacist_phone,
+			p.opening_time,
+			(p.opening_time + p.operational_hours) as closing_time,
+			p.operational_days,
+			p.partner_id,
+			pd.name,
+			pd.thumbnail_url,
+			pd.selling_unit,
+			pd.is_prescription_required,
+			pd.weight,
+			pd.product_slug,
+			ci.id,
+			ci.prescription_id,
+			ci.quantity,
+			ci.order_id,
+			ci.product_id,
+			ci.pharmacy_product_id,
+			pp.price
+		FROM
+			order_details od 
+		JOIN
+			shippings s
+		ON
+			od.shipping_id = s.id
+		JOIN
+			shipping_methods sm
+		ON
+			s.shipping_method_id = sm.id
+		JOIN
+			pharmacies p
+		ON
+			od.pharmacy_id = p.id
+		JOIN
+			cart_items ci
+		ON
+			ci.order_id = od.id
+		AND
+			ci.is_active = false
+		JOIN
+			products pd
+		ON
+			ci.product_id = pd.id
+		JOIN
+			pharmacies_products pp
+		ON
+			ci.pharmacy_product_id = pp.id
+	`)
+	query.WriteString(subqueryRowsCount.String())
+
+	return query.String(), args
+}

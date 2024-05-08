@@ -188,7 +188,7 @@ func (h *CartHandler) Checkout(ctx *gin.Context) {
 		return
 	}
 
-	err = h.cartUsecase.Checkout(ctx, body.ToCartCheckout(authenticationId))
+	id, err := h.cartUsecase.Checkout(ctx, body.ToCartCheckout(authenticationId))
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -196,5 +196,6 @@ func (h *CartHandler) Checkout(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseCartCheckoutMsg,
+		Data:    dto.CartCheckoutRes{PaymentId: *id},
 	})
 }

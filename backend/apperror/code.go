@@ -33,4 +33,6 @@ const (
 	ErrorDuplicateSlug
 	InsufficientStock
 	NoNearbyPharmacyPartner
+	PaymentNotFound
+	PaymentExpired
 )
