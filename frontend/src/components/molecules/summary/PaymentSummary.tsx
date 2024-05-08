@@ -1,12 +1,11 @@
 import { navigateToCheckout } from '@/app/actions';
-import CustomButton from '@/components/atoms/button/CustomButton';
 import { useObatinSelector } from '@/redux/store/store';
 import {
   PaymentSummary,
   PaymentSummaryContainer,
   Summary,
 } from '@/styles/pages/product/Cart.styles';
-import React from 'react';
+import CustomButton from '@/components/atoms/button/CustomButton';
 
 const PaymentSummaryComponent = (props: {
   isNext: boolean;
@@ -14,7 +13,9 @@ const PaymentSummaryComponent = (props: {
   const { totalQuantity } = useObatinSelector((state) => state.cart);
   const { totalPrice } = useObatinSelector((state) => state.cart);
 
-  // const handleCheckout = async () =>
+  // const handleCheckout = async () => {
+  // dispatch(clearCart()) saat tidak ada error di post req
+  // }
 
   return (
     <>

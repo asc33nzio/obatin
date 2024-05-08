@@ -98,7 +98,12 @@ const TransactionCard = (props: OrderItf): React.ReactElement => {
 
             <SeparatorDiv />
 
-            <BreakdownRightDiv>asd</BreakdownRightDiv>
+            <BreakdownRightDiv>
+              Total untuk produk ini:
+              <span>
+                Rp. {(product.price * product.quantity).toLocaleString('id-ID')}
+              </span>
+            </BreakdownRightDiv>
           </TxProductBreakdown>
         );
       })}

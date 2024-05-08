@@ -147,11 +147,19 @@ export const SeparatorDiv = styled.div`
 export const BreakdownRightDiv = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
 
   width: 15%;
   height: 100%;
+  padding-top: 5px;
+  padding-left: 10px;
+  font-size: 12px;
+
+  span {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    font-size: 24px;
+  }
 `;
 
 export const SeeMoreDiv = styled.div`
