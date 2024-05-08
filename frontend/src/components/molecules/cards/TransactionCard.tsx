@@ -1,7 +1,10 @@
 import 'moment/locale/id';
 import {
+  BreakdownCenterDiv,
+  BreakdownRightDiv,
   DeliveryStatusBadge,
   SeeMoreDiv,
+  SeparatorDiv,
   TransactionCardContainer,
   TxCardPharmacyName,
   TxHeaders,
@@ -74,6 +77,28 @@ const TransactionCard = (props: OrderItf): React.ReactElement => {
               height={75}
               onClick={() => router.replace(`/products/${product.slug}`)}
             />
+
+            <BreakdownCenterDiv>
+              <h1>
+                {product.name.charAt(0).toUpperCase()}
+                {product.name.slice(1, product.name.length - 1)}
+              </h1>
+              <span>
+                {product.quantity} unit x Rp.&nbsp;
+                {product.price.toLocaleString('id-ID')} {product.sellingUnit}
+              </span>
+              <span>
+                {product.weight > 1000
+                  ? `${product.weight / 1000} kg`
+                  : `${product.weight} g`}
+                &nbsp;
+                {product.sellingUnit}
+              </span>
+            </BreakdownCenterDiv>
+
+            <SeparatorDiv />
+
+            <BreakdownRightDiv>asd</BreakdownRightDiv>
           </TxProductBreakdown>
         );
       })}

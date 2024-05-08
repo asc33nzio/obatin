@@ -21,7 +21,7 @@ export const TxHeaders = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
 
   width: 100%;
   height: 15%;
@@ -29,24 +29,27 @@ export const TxHeaders = styled.div`
   h2 {
     display: flex;
     align-items: center;
-    justify-content: center;
+    text-align: start;
     font-size: 18px;
     height: 100%;
     margin: 0;
-    width: 30%;
+    width: 22.5%;
+    padding-left: 10px;
     color: #4a5568;
     font-weight: 400;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   h3 {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    border-top-right-radius: 15px;
     font-size: 18px;
     height: 100%;
     margin: 0;
-    width: 25%;
+    width: 60%;
+    padding-left: 10px;
     font-weight: 750;
     color: #000000;
   }
@@ -59,7 +62,7 @@ export const TxCardPharmacyName = styled.div`
   justify-content: flex-start;
 
   height: 100%;
-  width: 30%;
+  width: 17%;
   border-top-left-radius: 15px;
   gap: 10px;
 
@@ -92,6 +95,63 @@ export const TxProductBreakdown = styled.div`
     border-radius: 12px;
     padding: 5px;
   }
+`;
+
+export const BreakdownCenterDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  width: 80%;
+  height: 100%;
+  padding-left: 25px;
+
+  h1 {
+    height: 45%;
+    width: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+
+    font-size: 22px;
+    font-weight: 550;
+    word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  span {
+    height: 25%;
+    width: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+
+    color: #718099;
+    font-size: 14px;
+    font-weight: 450;
+    word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+export const SeparatorDiv = styled.div`
+  display: flex;
+
+  width: 0.5px;
+  height: 75%;
+  background-color: #a5aeb8;
+`;
+
+export const BreakdownRightDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 15%;
+  height: 100%;
 `;
 
 export const SeeMoreDiv = styled.div`

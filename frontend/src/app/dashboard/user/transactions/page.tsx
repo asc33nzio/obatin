@@ -86,12 +86,12 @@ const TransactionHistoryPage = (): React.ReactElement => {
     perscriptionId: null,
     name: 'example product 2',
     slug: 'valsartan-160-mg-3-strip-10-tablet-strip-obat-rutin',
-    quantity: 50,
+    quantity: 35,
     thumbnailUrl:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1R28Hy9Wf3qhwUDl9Pss3e7LOQ5E27WL8GYMfmHvvQw&s',
     sellingUnit: 'per dus',
     price: 100000,
-    weight: 2000,
+    weight: 500,
     isPrescribed: false,
   };
 

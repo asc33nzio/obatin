@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+::selection {
+  background-color: #00b5c0;
+  color: #ffffff;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 0;
