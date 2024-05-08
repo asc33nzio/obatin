@@ -96,10 +96,12 @@ func (u *productUsecaseImpl) UpdateProductDetaiBySlug(ctx context.Context, body 
 		if body.Slug != nil {
 			productSlug, err := pr.FindProductDetailBySlug(ctx, *body.Slug)
 			if err != nil {
-				return nil, err
+				if err.Error() != apperror.ProductNotFoundMsg {
+					return nil, err
+				}
 			}
 			if productSlug != nil {
-				return nil, apperror.ErrDuplicateSlug(nil)
+				return nil, apperror.ErrDuplicateSlug(apperror.ErrStlBadRequest)
 			}
 		}
 
