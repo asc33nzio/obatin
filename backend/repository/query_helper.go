@@ -259,7 +259,7 @@ func convertUpdateProductQueryParamstoSql(params entity.UpdateProduct, productId
 		if countParams > 1 {
 			query.WriteString(",")
 		}
-		query.WriteString(fmt.Sprintf("category_slug = $%d ", countParams))
+		query.WriteString(fmt.Sprintf("product_slug = $%d ", countParams))
 		args = append(args, *params.Slug)
 		countParams++
 	}
