@@ -30,6 +30,7 @@ type RepoStore interface {
 	StockMovementRepository() StockMovementRepository
 	PaymentRepository() PaymentRepository
 	OrderRepository() OrderRepository
+	ManufacturerRepository() ManufacturerRepository
 }
 
 type dbStore struct {
@@ -191,6 +192,12 @@ func (s *dbStore) OrderRepository() OrderRepository {
 
 func (s *dbStore) ProductCategoriesRepository() ProductCategoriesRepository {
 	return &productCategoriesRepositoryPostgres{
+		db: s.querier,
+	}
+}
+
+func (s *dbStore) ManufacturerRepository() ManufacturerRepository {
+	return &manufacturerRepositoryPostgres{
 		db: s.querier,
 	}
 }

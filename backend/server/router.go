@@ -38,6 +38,7 @@ type RouterOpt struct {
 	ShippingHandler             *handler.ShippingHandler
 	OrderHandler                *handler.OrderHandler
 	PaymentHandler              *handler.PaymentHandler
+	ManufacturerHandler         *handler.ManufacturerHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -100,6 +101,9 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	paymentUsecase := usecase.NewPaymentUsecaseImpl(dbStore, config, cloudinaryUpload)
 	paymentHandler := handler.NewPaymentHandler(paymentUsecase)
 
+	manufacturerUseCase := usecase.NewManufacturerUsecaseImpl(dbStore, config)
+	manufacturerHandler := handler.NewManufacturerHandler(manufacturerUseCase)
+
 	thirdPartyHandler := handler.NewThirdPartyHandler(config)
 
 	return NewRouter(RouterOpt{
@@ -122,6 +126,7 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 		ShippingHandler:             shippingHandler,
 		OrderHandler:                orderHandler,
 		PaymentHandler:              paymentHandler,
+		ManufacturerHandler:         manufacturerHandler,
 	})
 }
 
@@ -181,6 +186,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 
 	r.Use(h.Middleware.JWTAuth)
 
+	r.GET(appconstant.EndpointManufacturerList, h.ManufacturerHandler.GetAllManufacturers)
 	r.PATCH(appconstant.EndpointGetProductDetail, h.ProductHandler.UpdateProductDetaiBySlug)
 	r.GET(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.GetAllPartnerPharmacyProduct)
 	r.POST(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.CreateOnePharmacyProduct)
