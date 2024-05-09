@@ -15,13 +15,16 @@ type Order struct {
 	CartItems    []*CartItem
 }
 
-type UserOrdersFilter struct {
-	Status *string
-	Page   int
-	Limit  int
+type OrdersFilter struct {
+	UserId     *int64
+	PharmacyId *int64
+	Status     *string
+	PartnerId  *int64
+	Page       int
+	Limit      int
 }
 
-type UserOrdersPagination struct {
+type OrdersPagination struct {
 	Orders     []*Order
 	TotalRows  int64
 	Pagination PaginationResponse

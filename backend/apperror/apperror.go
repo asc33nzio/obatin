@@ -396,3 +396,12 @@ func ErrPaymentExpired(err error) *AppError {
 		stack:   debug.Stack(),
 	}
 }
+
+func ErrOrderNotFound(err error) *AppError {
+	return &AppError{
+		code:    OrderNotFound,
+		err:     err,
+		message: OrderNotFoundMsg,
+		stack:   debug.Stack(),
+	}
+}

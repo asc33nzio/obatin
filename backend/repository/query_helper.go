@@ -771,24 +771,37 @@ func updateOneCartItemQuery(c *entity.CartItem) (string, []interface{}) {
 	return query, args
 }
 
-func userOrdersQuery(userId int64, params *entity.UserOrdersFilter) (string, []interface{}) {
+func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 	var query strings.Builder
 	var queryConditionalPart strings.Builder
 	var subqueryOrder strings.Builder
 	var subqueryRowsCount strings.Builder
 	var args []interface{}
 
+	if params.PartnerId != nil {
+		queryConditionalPart.WriteString(fmt.Sprintf(` 
+		JOIN pharmacies ph ON o.pharmacy_id = ph.id AND ph.partner_id = $%d `, len(args)+1))
+		args = append(args, *params.PartnerId)
+	}
+
 	queryConditionalPart.WriteString(`
 		WHERE
-			o.user_id = $1
-		AND
 			o.deleted_at IS NULL
 	`)
-	args = append(args, userId)
 
 	if params.Status != nil {
-		queryConditionalPart.WriteString(" AND o.status = $2 ")
+		queryConditionalPart.WriteString(fmt.Sprintf(" AND o.status = $%d ", len(args)+1))
 		args = append(args, *params.Status)
+	}
+
+	if params.PharmacyId != nil {
+		queryConditionalPart.WriteString(fmt.Sprintf(" AND o.pharmacy_id = $%d ", len(args)+1))
+		args = append(args, *params.PharmacyId)
+	}
+
+	if params.UserId != nil {
+		queryConditionalPart.WriteString(fmt.Sprintf(" AND o.user_id = $%d ", len(args)+1))
+		args = append(args, *params.UserId)
 	}
 
 	subqueryRowsCount.WriteString(fmt.Sprintf(`
@@ -809,6 +822,8 @@ func userOrdersQuery(userId int64, params *entity.UserOrdersFilter) (string, []i
 				SELECT 
 					o.id,
 					o.user_id,
+					u.authentication_id,
+					u.name,
 					o.shipping_id,
 					o.pharmacy_id,
 					o.status,
@@ -819,6 +834,10 @@ func userOrdersQuery(userId int64, params *entity.UserOrdersFilter) (string, []i
 					TO_CHAR(o.created_at, 'DD-MM-YYYY HH24:MI') as created_at		
 				FROM
 					orders o
+				JOIN
+					users u
+				ON
+					o.user_id = u.id
 					%v
 				ORDER BY o.created_at DESC , o.id ASC
 				%v
@@ -832,6 +851,8 @@ func userOrdersQuery(userId int64, params *entity.UserOrdersFilter) (string, []i
 			tr.total_rows,
 			od.id,
 			od.user_id,
+			od.authentication_id,
+			od.name,
 			od.shipping_id,
 			od.pharmacy_id,
 			od.status,

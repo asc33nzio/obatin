@@ -24,6 +24,12 @@ type DeleteOneCartItemReq struct {
 }
 
 type GetCartRes struct {
+	UserId   *int64        `json:"user_id"`
+	Subtotal *int          `json:"subtotal"`
+	Cart     []CartItemRes `json:"cart"`
+}
+
+type GetCartDetailsRes struct {
 	UserId         *int64            `json:"user_id"`
 	Subtotal       *int              `json:"subtotal"`
 	PharmaciesCart []CartPharmacyRes `json:"pharmacies_cart"`
@@ -40,6 +46,7 @@ type CartItemRes struct {
 	SellingUnit            *string `json:"selling_unit"`
 	OrderId                *int64  `json:"order_id"`
 	Price                  *int    `json:"price"`
+	MaxPrice               *int    `json:"max_price,omitempty"`
 	Stock                  *int    `json:"stock"`
 	Slug                   string  `json:"slug"`
 	Weight                 int64   `json:"weight"`
@@ -175,6 +182,30 @@ func (c CartCheckoutReq) ToCartCheckout(authenticationId int64) *entity.CartChec
 
 func ToGetCartRes(c *entity.Cart) GetCartRes {
 	res := GetCartRes{}
+	res.UserId = c.User.Id
+	res.Subtotal = &c.Subtotal
+
+	for _, item := range c.Items {
+		res.Cart = append(res.Cart, CartItemRes{
+			Id:                item.Id,
+			ProductId:         &item.Product.Id,
+			Name:              &item.Product.Name,
+			Quantity:          item.Quantity,
+			PrescriptionId:    item.PrescriptionId,
+			PharmacyProductId: item.PharmacyProductId,
+			ThumbnailUrl:      &item.Product.ThumbnailUrl,
+			SellingUnit:       &item.Product.SellingUnit,
+			OrderId:           item.OrderId,
+			Price:             item.PharmacyProduct.Price,
+			MaxPrice:          &item.Product.MaxPrice,
+		})
+	}
+
+	return res
+}
+
+func ToGetCartDetailsRes(c *entity.Cart) GetCartDetailsRes {
+	res := GetCartDetailsRes{}
 	res.UserId = c.User.Id
 	res.Subtotal = &c.Subtotal
 	cartPharmacyRes := make(map[int64]entity.Pharmacy)

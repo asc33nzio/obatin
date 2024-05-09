@@ -20,6 +20,37 @@ func NewCartHandler(cartUsecase usecase.CartUsecase) *CartHandler {
 	}
 }
 
+func (h *CartHandler) GetCart(ctx *gin.Context) {
+	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	if !isVerified {
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
+		return
+	}
+
+	cart, err := h.cartUsecase.GetCart(ctx, authenticationId)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	res := dto.ToGetCartRes(cart)
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseOkMsg,
+		Data:    res,
+	})
+}
+
 func (h *CartHandler) GetCartDetails(ctx *gin.Context) {
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
@@ -44,7 +75,7 @@ func (h *CartHandler) GetCartDetails(ctx *gin.Context) {
 		return
 	}
 
-	res := dto.ToGetCartRes(cart)
+	res := dto.ToGetCartDetailsRes(cart)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseOkMsg,
 		Data:    res,
@@ -67,7 +98,7 @@ func (h *CartHandler) Bulk(ctx *gin.Context) {
 	}
 
 	if !isVerified {
-		ctx.Error(apperror.ErrNoAccessAccountNotVerified(nil))
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
 		return
 	}
 
@@ -104,7 +135,7 @@ func (h *CartHandler) UpdateOneCartItemQuantity(ctx *gin.Context) {
 	}
 
 	if !isVerified {
-		ctx.Error(apperror.ErrNoAccessAccountNotVerified(nil))
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
 		return
 	}
 
@@ -141,7 +172,7 @@ func (h *CartHandler) DeleteOneCartItem(ctx *gin.Context) {
 	}
 
 	if !isVerified {
-		ctx.Error(apperror.ErrNoAccessAccountNotVerified(nil))
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
 		return
 	}
 
@@ -178,7 +209,7 @@ func (h *CartHandler) Checkout(ctx *gin.Context) {
 	}
 
 	if !isVerified {
-		ctx.Error(apperror.ErrNoAccessAccountNotVerified(nil))
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
 		return
 	}
 

@@ -27,7 +27,11 @@ const (
 	SaleStockMovementType      = "sale"
 	DefaultPaymentMethod       = "transfer"
 	InactvateCartBool          = false
-	InvoicePrefix              = "INVOBTN"
 	PaymentWaitingConfirmation = "waiting_confirmation"
 	PaymentProcessed           = "processed"
+	InvoicePrefix              = "INVOBTN"
+	OrderWaitingConfirmation   = "waiting_confirmation"
+	OrderProcessed             = "processed"
+	OrderWaitingPayment        = "waiting_payment"
+	OrderCancel                = "cancelled"
 )
