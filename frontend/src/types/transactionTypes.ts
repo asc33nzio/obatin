@@ -1,9 +1,9 @@
 export type TxStatusTypes =
-  | 'waitingUserPayment'
-  | 'waitingConfirmation'
+  | 'waiting_payment'
+  | 'waiting_confirmation'
   | 'processed'
   | 'sent'
-  | 'received'
+  | 'confirmed'
   | 'cancelled';
 
 export interface TxFilterItf {
@@ -17,16 +17,16 @@ export interface TxFilterItf {
 }
 
 export interface CartItemItf {
-  cartItemId: number;
-  productId: number;
-  pharmacyProductId: number;
-  perscriptionId: number | null;
-  orderId: number;
+  id: number;
+  product_id: number;
+  pharmacy_product_id: number;
+  perscription_id: number | null;
+  order_id: number;
   name: string;
   slug: string;
   quantity: number;
-  thumbnailUrl: string;
-  sellingUnit: string;
+  thumbnail_url: string;
+  selling_unit: string;
   price: number;
   weight: number;
   isPrescribed: boolean;
@@ -74,8 +74,8 @@ export interface TxItf {
 }
 
 export interface PaginationInfoItf {
-  currentPage: number;
-  totalPages: number;
   limit: number;
-  totalEntries: number;
+  page: number;
+  page_count: number;
+  total_records: number;
 }

@@ -37,8 +37,13 @@ import ClosePopupICO from '@/assets/icons/ClosePopupICO';
 import CartICO from '@/assets/icons/CartICO';
 
 const Navbar = (): React.ReactElement => {
-  const { isOpened, toggleDrawer, isPopupOpened, setIsPopupOpened } =
-    useNavbar();
+  const {
+    isOpened,
+    toggleDrawer,
+    closeDrawer,
+    isPopupOpened,
+    setIsPopupOpened,
+  } = useNavbar();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const userInfo = useObatinSelector((state) => state?.auth);
@@ -191,7 +196,7 @@ const Navbar = (): React.ReactElement => {
   }, []);
 
   useEffect(() => {
-    toggleDrawer();
+    closeDrawer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
@@ -205,7 +210,9 @@ const Navbar = (): React.ReactElement => {
           <ObatinICO />
         </Left>
 
-        {userRole === 'user' && <SearchComponent />}
+        {!['admin', 'manager', 'doctor'].includes(userRole!) && (
+          <SearchComponent />
+        )}
 
         <Right>
           {accessToken === undefined ? (
@@ -238,6 +245,7 @@ const Navbar = (): React.ReactElement => {
                   alt='avatar'
                   width={75}
                   height={75}
+                  priority={true}
                   onClick={() =>
                     userRole === 'user'
                       ? navigateToUserDashboard()

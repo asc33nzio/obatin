@@ -3,6 +3,8 @@ import {
   BreakdownCenterDiv,
   BreakdownRightDiv,
   DeliveryStatusBadge,
+  //eslint-disable-next-line
+  FillerDiv,
   SeeMoreDiv,
   SeparatorDiv,
   TransactionCardContainer,
@@ -22,8 +24,8 @@ moment.locale('id');
 const TransactionCard = (props: TxItf): React.ReactElement => {
   const router = useRouter();
   const { openModal } = useModal();
-  const splittedDate = props?.createdAt?.split(' ')?.[0];
-  const orderTime = props?.createdAt?.split(' ')?.[1];
+  const splittedDate = props?.created_at?.split(' ')?.[0];
+  const orderTime = props?.created_at?.split(' ')?.[1];
   const formattedDate = moment(splittedDate, 'DD-MM-YYYY').format(
     'dddd, Do MMMM YYYY',
   );
@@ -33,20 +35,20 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
   };
 
   const deliveryStatusMap = {
-    waitingUserPayment: 'MENUNGGU PEMBAYARAN',
-    waitingConfirmation: 'MENUNGGU KONFIRMASI',
+    waiting_payment: 'MENUNGGU PEMBAYARAN',
+    waiting_confirmation: 'MENUNGGU KONFIRMASI',
     processed: 'DIPROSES',
     sent: 'DIKIRIM',
-    received: 'DITERIMA',
+    confirmed: 'DITERIMA',
     cancelled: 'DIBATALKAN',
   };
 
   const deliveryStatusColorMap = {
-    waitingUserPayment: '#BD2680',
-    waitingConfirmation: '#E7CE50',
+    waiting_payment: '#BD2680',
+    waiting_confirmation: '#E7CE50',
     processed: '#00C5C0',
     sent: '#5F5D98',
-    received: '#14F500',
+    confirmed: '#14F500',
     cancelled: '#DE161C',
   };
 
@@ -63,15 +65,19 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
         <h2>
           {formattedDate} {orderTime}
         </h2>
-        <h3>{props.invoiceNumber}</h3>
+        <h3>{props.invoice_number}</h3>
       </TxHeaders>
 
-      {props?.products?.map((product, index) => {
+      {props?.cart_items?.map((product, index) => {
         if (index > 1) return null;
+        // if (props?.cart_items?.length === 1) {
+        //   return <FillerDiv key={`txProductCard${index}`} />;
+        // }
+
         return (
           <TxProductBreakdown key={`txProductCard${index}`}>
             <Image
-              src={product.thumbnailUrl}
+              src={product.thumbnail_url}
               alt={`txProductIMG${index}`}
               width={75}
               height={75}
@@ -85,14 +91,14 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
               </h1>
               <span>
                 {product.quantity} unit x Rp.&nbsp;
-                {product.price.toLocaleString('id-ID')} {product.sellingUnit}
+                {product.price.toLocaleString('id-ID')} {product.selling_unit}
               </span>
               <span>
                 {product.weight > 1000
                   ? `${product.weight / 1000} kg`
                   : `${product.weight} g`}
                 &nbsp;
-                {product.sellingUnit}
+                {product.selling_unit}
               </span>
             </BreakdownCenterDiv>
 
@@ -108,12 +114,14 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
         );
       })}
 
-      {props?.products?.length > 2 && (
-        <SeeMoreDiv onClick={props.handleOpenViewMore}>
-          <h4>Lihat {props?.products?.length - 2} produk lainnya</h4>
-          <DotICO />
-        </SeeMoreDiv>
-      )}
+      <SeeMoreDiv onClick={props.handleOpenViewMore}>
+        {props?.cart_items?.length < 2 ? (
+          <h4>Lihat Detail Transaksi</h4>
+        ) : (
+          <h4>Lihat {props?.cart_items?.length - 2} produk lainnya</h4>
+        )}
+        <DotICO />
+      </SeeMoreDiv>
     </TransactionCardContainer>
   );
 };

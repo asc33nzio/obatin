@@ -1,7 +1,42 @@
+import { ReduxTxItf } from '@/types/reduxTypes';
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  orders: [],
+const initialState: ReduxTxItf = {
+  info: {
+    order_id: 0,
+    payment_id: 0,
+    invoice_number: '',
+    status: 'waiting_payment',
+    number_items: 0,
+    subtotal: 0,
+    created_at: '',
+    shipping: {
+      cost: 0,
+      code: '',
+      name: '',
+      type: '',
+    },
+    pharmacy: {
+      id: 0,
+      name: '',
+      address: '',
+      city_id: 0,
+      lat: '',
+      lng: '',
+      pharmacist_name: '',
+      pharmacist_license: '',
+      pharmacist_phone: '',
+      opening_time: '',
+      closing_time: '',
+      operational_days: [],
+      partner_id: 0,
+      distance: 0,
+      total_weight: 0,
+      subtotal_pharmacy: 0,
+      cart_items: null,
+    },
+  },
+  products: [],
 };
 
 export const txSlice = createSlice({
@@ -9,10 +44,11 @@ export const txSlice = createSlice({
   initialState,
   reducers: {
     setTxState: (state, action) => {
-      state.orders = action.payload;
+      state.info = action.payload.info;
+      state.products = action.payload.products;
     },
     resetTxState: (state) => {
-      state.orders = [];
+      state.products = [];
     },
   },
 });

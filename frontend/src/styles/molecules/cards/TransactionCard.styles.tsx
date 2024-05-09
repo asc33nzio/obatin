@@ -97,23 +97,35 @@ export const TxProductBreakdown = styled.div`
   }
 `;
 
-export const BreakdownCenterDiv = styled.div`
+export const FillerDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  width: 100%;
+  height: 33.3%;
+
+  border: 1px solid ${COLORS.input_border};
+  border-radius: 15px;
+`;
+
+export const BreakdownCenterDiv = styled.div<{ $isModal?: boolean }>`
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: ${({ $isModal }) => (!$isModal ? 'flex-start' : 'center')};
 
   width: 80%;
   height: 100%;
   padding-left: 25px;
 
   h1 {
-    height: 45%;
+    height: ${({ $isModal }) => (!$isModal ? '45%' : '35%')};
     width: 100%;
     margin: 0;
     display: flex;
     align-items: center;
 
-    font-size: 22px;
+    font-size: ${({ $isModal }) => (!$isModal ? '22px' : '18px')};
     font-weight: 550;
     word-wrap: break-word;
     overflow: hidden;
@@ -144,7 +156,7 @@ export const SeparatorDiv = styled.div`
   background-color: #a5aeb8;
 `;
 
-export const BreakdownRightDiv = styled.div`
+export const BreakdownRightDiv = styled.div<{ $isModal?: boolean }>`
   display: flex;
   flex-direction: column;
 
@@ -158,7 +170,7 @@ export const BreakdownRightDiv = styled.div`
     display: flex;
     align-items: center;
     height: 40px;
-    font-size: 24px;
+    font-size: ${({ $isModal }) => (!$isModal ? '24px' : '18px')};
   }
 `;
 

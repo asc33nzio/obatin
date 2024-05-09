@@ -1,10 +1,10 @@
 import { MenuItem as MenuItemType } from '@/constants/menu-items';
 import { deleteCookie } from 'cookies-next';
-import { useObatinDispatch } from '@/redux/store/store';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { resetAuthState } from '@/redux/reducers/authSlice';
-import MenuItem from './MenuItem';
 import { navigateToLogin } from '@/app/actions';
 import { resetAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
+import MenuItem from './MenuItem';
 
 type MenuItemsListProps = {
   options: MenuItemType[];
@@ -14,6 +14,9 @@ export default function MenuItemsList({
   options,
 }: MenuItemsListProps): React.ReactElement {
   const dispatch = useObatinDispatch();
+  const userInfo = useObatinSelector((state) => state?.auth);
+  const doctorInfo = useObatinSelector((state) => state?.authDoctor);
+  const isLoggedIn = userInfo?.aid || doctorInfo?.aid;
 
   const handleLogout = () => {
     localStorage.clear();
@@ -26,8 +29,10 @@ export default function MenuItemsList({
 
   return (
     <>
-      {options.map((option, index) => {
-        if (options.length - 1 === index) {
+      {options.map((option) => {
+        if (option.name === 'Logout') {
+          if (!isLoggedIn) return null;
+
           return (
             <MenuItem
               menuItem={option}
@@ -35,11 +40,11 @@ export default function MenuItemsList({
               handler={handleLogout}
             />
           );
-        } else {
-          return (
-            <MenuItem menuItem={option} key={option.id} handler={undefined} />
-          );
         }
+
+        return (
+          <MenuItem menuItem={option} key={option.id} handler={undefined} />
+        );
       })}
     </>
   );

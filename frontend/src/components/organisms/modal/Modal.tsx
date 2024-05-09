@@ -6,6 +6,8 @@ import {
 } from '@/styles/organisms/modal/Modal.styles';
 import { useEventEmitter } from '@/hooks/useEventEmitter';
 import { useModal } from '@/hooks/useModal';
+import { useObatinDispatch } from '@/redux/store/store';
+import { resetTxState } from '@/redux/reducers/txSlice';
 import ChangePasswordModalContent from './modalContent/ChangePasswordModalContent';
 import CloseICO from '@/assets/icons/CloseICO';
 import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmPasswordModalContent';
@@ -32,10 +34,12 @@ export interface ModalPropsItf {
 
 const Modal = () => {
   const { isOpen, modalType, closeModal } = useModal();
+  const dispatch = useObatinDispatch();
   const emitter = useEventEmitter();
 
   const handleModalClose = () => {
     emitter.emit('close-modal-fail');
+    dispatch(resetTxState());
     closeModal();
   };
 
@@ -99,7 +103,6 @@ const Modal = () => {
         $overlayHeight: '100vh',
         $containerWidth: '500px',
         $containerHeight: '500px',
-        // $bgColor: 'white',
       };
       break;
 

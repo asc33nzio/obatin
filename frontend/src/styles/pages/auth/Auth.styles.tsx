@@ -10,11 +10,15 @@ export const LoginOrRegisterFormContainer = styled.div<{
   height: 90%;
 
   h1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 15%;
     font-size: 48px;
     color: #00b5c0;
 
-    margin-top: ${({ $isLoginPage }) => ($isLoginPage ? '100px' : 0)};
-    margin-bottom: ${({ $isLoginPage }) => ($isLoginPage ? '20px' : 0)};
+    margin-top: ${({ $isLoginPage }) => ($isLoginPage ? '25px' : 0)};
+    margin-bottom: ${({ $isLoginPage }) => ($isLoginPage ? '5px' : 0)};
   }
 `;
 
