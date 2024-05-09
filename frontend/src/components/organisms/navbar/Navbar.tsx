@@ -14,7 +14,7 @@ import {
   navigateToUserDashboard,
 } from '@/app/actions';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
+import { useObatinSelector } from '@/redux/store/store';
 import { Menu, ChevronLeft } from '@styled-icons/material';
 import { getCookie } from 'cookies-next';
 import { useEffect, useState } from 'react';
@@ -22,7 +22,8 @@ import { useNavbar } from '@/hooks/useNavbar';
 import { decodeJWTSync } from '@/utils/decodeJWT';
 import { useToast } from '@/hooks/useToast';
 import { navigateToCart } from '@/app/actions';
-import { CartItem, clearCart } from '@/redux/reducers/cartSlice';
+import { CartItem } from '@/redux/reducers/cartSlice';
+import { usePathname } from 'next/navigation';
 import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
 import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
 import DefaultDoctorAvatar from '@/assets/DefaultDoctorAvatar.svg';
@@ -36,8 +37,13 @@ import ClosePopupICO from '@/assets/icons/ClosePopupICO';
 import CartICO from '@/assets/icons/CartICO';
 
 const Navbar = (): React.ReactElement => {
-  const { isOpened, toggleDrawer, isPopupOpened, setIsPopupOpened } =
-    useNavbar();
+  const {
+    isOpened,
+    toggleDrawer,
+    closeDrawer,
+    isPopupOpened,
+    setIsPopupOpened,
+  } = useNavbar();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const userInfo = useObatinSelector((state) => state?.auth);
@@ -47,12 +53,12 @@ const Navbar = (): React.ReactElement => {
   const avatarUrlDoctor = useObatinSelector(
     (state) => state?.authDoctor?.avatarUrl,
   );
-  const dispatch = useObatinDispatch();
   const accessToken = getCookie('access_token');
   const userSessionCredentials = decodeJWTSync(accessToken?.toString());
   const userRole = userSessionCredentials?.payload?.Payload?.role;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const userCart = useObatinSelector((state) => state?.cart);
+  const pathname = usePathname();
 
   const handleReverify = async () => {
     try {
@@ -107,13 +113,6 @@ const Navbar = (): React.ReactElement => {
     }
   };
 
-  useEffect(() => {
-    setIsPopupOpened(
-      userRole === 'user' && !userInfo?.isVerified ? true : false,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const postToCart = async () => {
     try {
       if (userCart.items.length > 0) {
@@ -142,7 +141,6 @@ const Navbar = (): React.ReactElement => {
           },
         );
 
-        dispatch(clearCart());
         navigateToCart();
       }
     } catch (error: any) {
@@ -190,6 +188,18 @@ const Navbar = (): React.ReactElement => {
     }
   };
 
+  useEffect(() => {
+    setIsPopupOpened(
+      userRole === 'user' && !userInfo?.isVerified ? true : false,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    closeDrawer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
   return (
     <>
       <NavContainer>
@@ -200,7 +210,9 @@ const Navbar = (): React.ReactElement => {
           <ObatinICO />
         </Left>
 
-        {userRole === 'user' && <SearchComponent />}
+        {!['admin', 'manager', 'doctor'].includes(userRole!) && (
+          <SearchComponent />
+        )}
 
         <Right>
           {accessToken === undefined ? (
@@ -233,6 +245,7 @@ const Navbar = (): React.ReactElement => {
                   alt='avatar'
                   width={75}
                   height={75}
+                  priority={true}
                   onClick={() =>
                     userRole === 'user'
                       ? navigateToUserDashboard()

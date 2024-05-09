@@ -1,10 +1,4 @@
 'use client';
-// import { useState } from 'react';
-import { navigateToCart } from '@/app/actions';
-import CustomButton from '@/components/atoms/button/CustomButton';
-import RegularInput from '@/components/atoms/input/RegularInput';
-import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
-import Navbar from '@/components/organisms/navbar/Navbar';
 import { useUploadValidation } from '@/hooks/useUploadValidation';
 import { Container } from '@/styles/Global.styles';
 import { ImageContainer } from '@/styles/organisms/modal/modalContent/UploadPayment.styles';
@@ -16,6 +10,11 @@ import {
   OrderSummary,
   SectionTitle,
 } from '@/styles/pages/product/Cart.styles';
+import { navigateToCart } from '@/app/actions';
+import CustomButton from '@/components/atoms/button/CustomButton';
+import RegularInput from '@/components/atoms/input/RegularInput';
+import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
+import Navbar from '@/components/organisms/navbar/Navbar';
 import Image from 'next/image';
 import React from 'react';
 

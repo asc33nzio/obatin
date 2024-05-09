@@ -20,4 +20,5 @@ export type ModalType =
   | 'payment-upload'
   | 'select-address'
   | 'detail-pharmacy'
+  | 'view-more-tx'
   | '';

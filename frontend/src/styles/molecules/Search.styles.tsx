@@ -69,8 +69,7 @@ export const SearchResult = styled.div<{
   background-color: transparent;
 
   img {
-    width: 15%;
-    height: 100%;
+    object-fit: cover;
     background: transparent;
   }
 

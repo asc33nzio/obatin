@@ -27,7 +27,7 @@ export const RegularCustomInput = styled.input<{
   $disabled?: boolean;
 }>`
   width: 100%;
-  height: 50%;
+  height: 55%;
 
   background-color: ${({ $disabled }) => ($disabled ? '#918d8d' : '#f7fafc')};
   color: #4a5568;

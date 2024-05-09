@@ -17,7 +17,6 @@ export const NavContainer = styled.div`
 
   padding-left: 50px;
   padding-right: 75px;
-
   border-bottom: 0.5px solid ${COLORS.input_border};
 
   @media (max-width: 1440px) {
@@ -68,7 +67,9 @@ export const IconContainer = styled.div`
 export const Right = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 20px;
+
   svg {
     width: 40px;
     height: 40px;
@@ -81,6 +82,7 @@ export const CartContainer = styled.div`
   display: flex;
   cursor: pointer;
 `;
+
 export const Quantity = styled.div`
   background-color: #ff6500;
   border-radius: 50%;
@@ -103,7 +105,6 @@ export const ImgBg = styled.div`
 
   width: 80px;
   height: 80px;
-  margin-bottom: 20px;
 
   border-radius: 50%;
   border: 5px solid #00b5c0;

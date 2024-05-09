@@ -13,9 +13,14 @@ export const NavbarProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsOpened(!isOpened);
   };
 
+  const closeDrawer = () => {
+    setIsOpened(false);
+  };
+
   const contextValue: NavbarItf = {
     isOpened,
     toggleDrawer,
+    closeDrawer,
     isPopupOpened,
     setIsPopupOpened,
   };

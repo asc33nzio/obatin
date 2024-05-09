@@ -32,6 +32,7 @@ import { debounce } from '@/utils/debounce';
 import { getCookie } from 'cookies-next';
 import { setAuthState } from '@/redux/reducers/authSlice';
 import { BounceLoader } from 'react-spinners';
+import { NavigateToTxHistory } from '@/app/actions';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
@@ -361,11 +362,12 @@ const UserDashboardPage = (): React.ReactElement => {
 
             <ProfileHeaderButtonsDiv>
               <CustomButton
-                content='Sejarah Transaksi'
+                content='Riwayat Transaksi'
                 $bgColor='#00B5C0'
                 $width='150px'
                 $height='40px'
                 $fontSize='18px'
+                onClick={() => NavigateToTxHistory()}
               />
               <CustomButton
                 content='Simpan Profil'

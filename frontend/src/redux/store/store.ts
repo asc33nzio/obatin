@@ -3,6 +3,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import { authReducer } from '@/redux/reducers/authSlice';
 import { authDoctorReducer } from '../reducers/authDoctorSlice';
+import { txReducer } from '../reducers/txSlice';
 import { provincesReducer } from '../reducers/provincesSlice';
 import { encryptTransform } from 'redux-persist-transform-encrypt';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
@@ -27,7 +28,7 @@ const createNoopStorage = () => {
 const storage =
   typeof window === 'undefined'
     ? createNoopStorage()
-    : createWebStorage('session');
+    : createWebStorage('local');
 
 const ENCRYPTION_KEY = process.env.NEXT_PUBLIC_STORE_ENCRYPTION_KEY!;
 if (typeof ENCRYPTION_KEY === undefined) {
@@ -54,6 +55,7 @@ const rootReducer = combineReducers({
   provinces: provincesReducer,
   cart: cartSlice,
   pharmacy: pharmacySlice,
+  tx: txReducer,
 });
 
 const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(
@@ -76,6 +78,7 @@ export const createPreloadedState = (customState: Partial<RootState>) => {
     provinces: { ...store.getState().provinces, ...customState.provinces },
     cart: { ...store.getState().cart, ...customState.cart },
     pharmacy: { ...store.getState().pharmacy, ...customState.pharmacy },
+    tx: { ...store.getState().tx, ...customState.tx },
   };
 };
 

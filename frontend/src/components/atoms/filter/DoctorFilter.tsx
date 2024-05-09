@@ -46,8 +46,8 @@ const DoctorFilterComponent = ({
       }
       router.push(pathname + '?' + createQueryString(name, `${value}`));
     },
-    // eslint-disable-next-line
 
+    // eslint-disable-next-line
     [router, newParams],
   );
 
