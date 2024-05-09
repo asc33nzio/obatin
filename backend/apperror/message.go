@@ -46,4 +46,5 @@ const (
 	NoNearbyPharmacyPartnerMsg        = "no nearby pharmacy partner"
 	PaymentNotFoundMsg                = "payment not found"
 	PaymentExpiredMsg                 = "payment session expired"
+	OrderNotFoundMsg                  = "order not found"
 )

@@ -42,7 +42,7 @@ func (h *AddressHandler) CreateOneAddress(ctx *gin.Context) {
 
 	if role != constant.RoleAdmin {
 		if role != constant.RoleUser {
-			ctx.Error(apperror.ErrForbiddenAccess(nil))
+			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
 		}
 
@@ -60,7 +60,7 @@ func (h *AddressHandler) CreateOneAddress(ctx *gin.Context) {
 	}
 
 	if !isVerified {
-		ctx.Error(apperror.ErrNoAccessAccountNotVerified(nil))
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
 		return
 	}
 
@@ -109,7 +109,7 @@ func (h *AddressHandler) UpdateOneAddress(ctx *gin.Context) {
 
 	if role != constant.RoleAdmin {
 		if role != constant.RoleUser {
-			ctx.Error(apperror.ErrForbiddenAccess(nil))
+			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
 		}
 
@@ -127,7 +127,7 @@ func (h *AddressHandler) UpdateOneAddress(ctx *gin.Context) {
 	}
 
 	if !isVerified {
-		ctx.Error(apperror.ErrNoAccessAccountNotVerified(nil))
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
 		return
 	}
 
@@ -175,7 +175,7 @@ func (h *AddressHandler) DeleteOneAddress(ctx *gin.Context) {
 
 	if role != constant.RoleAdmin {
 		if role != constant.RoleUser {
-			ctx.Error(apperror.ErrForbiddenAccess(nil))
+			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
 		}
 
@@ -193,7 +193,7 @@ func (h *AddressHandler) DeleteOneAddress(ctx *gin.Context) {
 	}
 
 	if !isVerified {
-		ctx.Error(apperror.ErrNoAccessAccountNotVerified(nil))
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
 		return
 	}
 

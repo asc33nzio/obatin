@@ -35,4 +35,5 @@ const (
 	NoNearbyPharmacyPartner
 	PaymentNotFound
 	PaymentExpired
+	OrderNotFound
 )

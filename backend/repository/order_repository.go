@@ -11,9 +11,9 @@ import (
 
 type OrderRepository interface {
 	CreateOneOrder(ctx context.Context, o *entity.Order) (*entity.Order, error)
-	FindUserOrders(ctx context.Context, userId int64, params *entity.UserOrdersFilter) (*entity.UserOrdersPagination, error)
 	UpdateOrderById(ctx context.Context, o *entity.Order) error
 	FindOrdersByPaymentId(ctx context.Context, paymentId int64) ([]*entity.Order, error)
+	FindAllOrders(ctx context.Context, params *entity.OrdersFilter) (*entity.OrdersPagination, error)
 }
 
 type orderRepositoryPostgres struct {
@@ -60,100 +60,6 @@ func (r *orderRepositoryPostgres) CreateOneOrder(ctx context.Context, o *entity.
 	}
 
 	return o, nil
-}
-
-func (r *orderRepositoryPostgres) FindUserOrders(ctx context.Context, userId int64, params *entity.UserOrdersFilter) (*entity.UserOrdersPagination, error) {
-	res := []*entity.Order{}
-	cartItems := []*entity.CartItem{}
-	var rowsCount int64
-
-	query, args := userOrdersQuery(userId, params)
-
-	rows, err := r.db.QueryContext(
-		ctx,
-		query,
-		args...,
-	)
-	if err != nil {
-		return nil, apperror.NewInternal(err)
-	}
-	defer rows.Close()
-
-	var idx int
-	for rows.Next() {
-		o := entity.Order{}
-		ci := entity.CartItem{}
-
-		err = rows.Scan(
-			&rowsCount,
-			&o.Id,
-			&o.User.Id,
-			&o.Shipping.Id,
-			&o.Pharmacy.Id,
-			&o.Status,
-			&o.NumberItems,
-			&o.ShippingCost,
-			&o.Subtotal,
-			&o.Payment.Id,
-			&o.CreatedAt,
-			&o.Shipping.ShippingMethod.Code,
-			&o.Shipping.ShippingMethod.Name,
-			&o.Shipping.ShippingMethod.Type,
-			&o.Pharmacy.Name,
-			&o.Pharmacy.Address,
-			&o.Pharmacy.City.Id,
-			&o.Pharmacy.Latitude,
-			&o.Pharmacy.Longitude,
-			&o.Pharmacy.PharmacistName,
-			&o.Pharmacy.PharmacistLicense,
-			&o.Pharmacy.PharmacistPhone,
-			&o.Pharmacy.OpeningTime,
-			&o.Pharmacy.ClosingTime,
-			&o.Pharmacy.OperationalDays,
-			&o.Pharmacy.PartnerId,
-			&ci.Product.Name,
-			&ci.Product.ThumbnailUrl,
-			&ci.Product.SellingUnit,
-			&ci.Product.IsPrescriptionRequired,
-			&ci.Product.Weight,
-			&ci.Product.Slug,
-			&ci.Id,
-			&ci.PrescriptionId,
-			&ci.Quantity,
-			&ci.OrderId,
-			&ci.Product.Id,
-			&ci.PharmacyProductId,
-			&ci.PharmacyProduct.Price,
-		)
-		if err != nil {
-			return nil, apperror.NewInternal(err)
-		}
-
-		cartItems = append(cartItems, &ci)
-		if len(res) > 0 {
-			if *res[idx].Id == *o.Id {
-				idx++
-				continue
-			}
-			res = append(res, &o)
-			idx++
-			continue
-		}
-		res = append(res, &o)
-	}
-
-	for _, order := range res {
-		for _, cartItem := range cartItems {
-			if *order.Id == *cartItem.OrderId {
-				order.CartItems = append(order.CartItems, cartItem)
-			}
-		}
-	}
-
-	return &entity.UserOrdersPagination{
-		Orders:    res,
-		TotalRows: rowsCount,
-	}, nil
 }
 
 func (r *orderRepositoryPostgres) UpdateOrderById(ctx context.Context, o *entity.Order) error {
@@ -203,7 +109,7 @@ func (r *orderRepositoryPostgres) UpdateOrderById(ctx context.Context, o *entity
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(apperror.ErrStlNotFound)
+		return apperror.ErrOrderNotFound(apperror.ErrStlNotFound)
 	}
 
 	return nil
@@ -214,7 +120,8 @@ func (r *orderRepositoryPostgres) FindOrdersByPaymentId(ctx context.Context, pay
 
 	query := `
 		SELECT
-			o.id
+			o.id,
+			o.status
 		FROM 
 			orders o
 		WHERE
@@ -233,6 +140,7 @@ func (r *orderRepositoryPostgres) FindOrdersByPaymentId(ctx context.Context, pay
 		o := entity.Order{}
 		err := rows.Scan(
 			&o.Id,
+			&o.Status,
 		)
 		if err != nil {
 			return nil, apperror.NewInternal(err)
@@ -242,4 +150,99 @@ func (r *orderRepositoryPostgres) FindOrdersByPaymentId(ctx context.Context, pay
 	}
 
 	return res, nil
+}
+
+func (r *orderRepositoryPostgres) FindAllOrders(ctx context.Context, params *entity.OrdersFilter) (*entity.OrdersPagination, error) {
+	res := []*entity.Order{}
+	cartItems := []*entity.CartItem{}
+	var rowsCount int64
+
+	query, args := allOrdersQuery(params)
+
+	rows, err := r.db.QueryContext(
+		ctx,
+		query,
+		args...,
+	)
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+	defer rows.Close()
+
+	var idx int
+	for rows.Next() {
+		o := entity.Order{}
+		ci := entity.CartItem{}
+
+		err = rows.Scan(
+			&rowsCount,
+			&o.Id,
+			&o.User.Id,
+			&o.User.Authentication.Id,
+			&o.User.Name,
+			&o.Shipping.Id,
+			&o.Pharmacy.Id,
+			&o.Status,
+			&o.NumberItems,
+			&o.ShippingCost,
+			&o.Subtotal,
+			&o.Payment.Id,
+			&o.CreatedAt,
+			&o.Shipping.ShippingMethod.Code,
+			&o.Shipping.ShippingMethod.Name,
+			&o.Shipping.ShippingMethod.Type,
+			&o.Pharmacy.Name,
+			&o.Pharmacy.Address,
+			&o.Pharmacy.City.Id,
+			&o.Pharmacy.Latitude,
+			&o.Pharmacy.Longitude,
+			&o.Pharmacy.PharmacistName,
+			&o.Pharmacy.PharmacistLicense,
+			&o.Pharmacy.PharmacistPhone,
+			&o.Pharmacy.OpeningTime,
+			&o.Pharmacy.ClosingTime,
+			&o.Pharmacy.OperationalDays,
+			&o.Pharmacy.PartnerId,
+			&ci.Product.Name,
+			&ci.Product.ThumbnailUrl,
+			&ci.Product.SellingUnit,
+			&ci.Product.IsPrescriptionRequired,
+			&ci.Product.Weight,
+			&ci.Product.Slug,
+			&ci.Id,
+			&ci.PrescriptionId,
+			&ci.Quantity,
+			&ci.OrderId,
+			&ci.Product.Id,
+			&ci.PharmacyProductId,
+			&ci.PharmacyProduct.Price,
+		)
+		if err != nil {
+			return nil, apperror.NewInternal(err)
+		}
+
+		cartItems = append(cartItems, &ci)
+		if len(res) > 0 {
+			if *res[idx].Id == *o.Id {
+				continue
+			}
+			res = append(res, &o)
+			idx++
+			continue
+		}
+		res = append(res, &o)
+	}
+
+	for _, order := range res {
+		for _, cartItem := range cartItems {
+			if *order.Id == *cartItem.OrderId {
+				order.CartItems = append(order.CartItems, cartItem)
+			}
+		}
+	}
+
+	return &entity.OrdersPagination{
+		Orders:    res,
+		TotalRows: rowsCount,
+	}, nil
 }

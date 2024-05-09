@@ -120,7 +120,6 @@ func (r *paymentRepositoryPostgres) FindAllPendingPayments(ctx context.Context) 
 			p.total_payment,
 			p.payment_proof_url,
 			p.is_confirmed,
-			TO_CHAR(p.expired_at, 'DD-MM-YYYY HH24:MI'),
 			TO_CHAR(p.created_at, 'DD-MM-YYYY HH24:MI')
 		FROM
 			payments p
@@ -131,11 +130,7 @@ func (r *paymentRepositoryPostgres) FindAllPendingPayments(ctx context.Context) 
 		WHERE
 			p.is_confirmed = true
 		AND
-			p.expired_at > NOW()
-		AND
 			p.deleted_at IS NULL
-		ORDER BY
-			p.expired_at ASC
 	`
 
 	rows, err := r.db.QueryContext(
@@ -162,7 +157,7 @@ func (r *paymentRepositoryPostgres) FindAllPendingPayments(ctx context.Context) 
 			&p.CreatedAt,
 		)
 		if err != nil {
-			return nil, err
+			return nil, apperror.NewInternal(err)
 		}
 
 		res = append(res, &p)

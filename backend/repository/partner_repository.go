@@ -17,6 +17,7 @@ type PartnerRepository interface {
 	UpdateOnePartner(ctx context.Context, body entity.PartnerUpdateRequest, id int64) (*entity.Partner, error)
 	IsPartnerExistUpdate(ctx context.Context, name string, id int64) (int, error)
 	FindPartnerById(ctx context.Context, id int64) (*entity.Partner, error)
+	FindPartnerIdByAuthId(ctx context.Context, authId int64) (*int64, error)
 }
 
 type partnerRepositoryPostgres struct {
@@ -235,4 +236,30 @@ func (r *partnerRepositoryPostgres) FindPartnerById(ctx context.Context, id int6
 	}
 
 	return &res, nil
+}
+
+func (r *partnerRepositoryPostgres) FindPartnerIdByAuthId(ctx context.Context, authId int64) (*int64, error) {
+	var id int64
+
+	q := `
+		SELECT 
+			p.id
+		FROM 
+			partners p 
+		WHERE
+			p.authentication_id = $1
+		AND
+		p.deleted_at IS NULL
+
+`
+	err := r.db.QueryRowContext(ctx, q, authId).Scan(&id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.ErrPartnerNotFound(err)
+		}
+
+		return nil, apperror.NewInternal(err)
+	}
+
+	return &id, nil
 }

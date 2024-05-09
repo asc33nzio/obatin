@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"obatin/apperror"
 	"obatin/appvalidator"
@@ -45,7 +44,6 @@ func (h *PaymentHandler) UploadPaymentProof(ctx *gin.Context) {
 
 	err := ctx.ShouldBindUri(&uriParams)
 	if err != nil {
-		log.Println(err)
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
 	}
@@ -82,8 +80,8 @@ func (h *PaymentHandler) UploadPaymentProof(ctx *gin.Context) {
 	})
 }
 
-func (h *PaymentHandler) ConfirmPaymentProof(ctx *gin.Context) {
-	var body dto.ConfirmPaymentProofReq
+func (h *PaymentHandler) UpdatePaymentStatus(ctx *gin.Context) {
+	var body dto.PaymentProofConfirmationReq
 
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
@@ -113,9 +111,10 @@ func (h *PaymentHandler) ConfirmPaymentProof(ctx *gin.Context) {
 		return
 	}
 
-	err = h.paymentUsecase.ConfirmPaymentProof(ctx, &entity.Payment{
-		Id:   body.PaymentId,
-		User: entity.User{Id: &body.UserId},
+	err = h.paymentUsecase.UpdatePaymentStatus(ctx, &entity.Payment{
+		Id:          body.PaymentId,
+		User:        entity.User{Id: &body.UserId},
+		IsConfirmed: body.IsConfirmed,
 	})
 	if err != nil {
 		ctx.Error(err)
@@ -159,5 +158,46 @@ func (h *PaymentHandler) GetAllPendingPayment(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseOkMsg,
 		Data:    payments,
+	})
+}
+
+func (h *PaymentHandler) CancelPayment(ctx *gin.Context) {
+	var uriParams dto.PaymentIdUriParams
+
+	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	if !isVerified {
+		ctx.Error(apperror.ErrNoAccessAccountNotVerified(apperror.ErrStlForbiddenAccess))
+		return
+	}
+
+	err := ctx.ShouldBindUri(&uriParams)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+
+	err = h.paymentUsecase.CancelPayment(ctx,
+		&entity.Payment{
+			Id:   uriParams.Id,
+			User: entity.User{Authentication: entity.Authentication{Id: authenticationId}},
+		})
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseOkMsg,
 	})
 }
