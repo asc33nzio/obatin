@@ -85,11 +85,6 @@ type AddProduct struct {
 	Image      *multipart.File
 }
 
-type Manufacturer struct {
-	ID   int64
-	Name string
-}
-
 type ProductListPage struct {
 	Products   []ProductList
 	TotalRows  int

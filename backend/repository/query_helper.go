@@ -323,6 +323,48 @@ func convertUpdatePharmacyProductQueryParamstoSql(params entity.UpdatePharmacyPr
 	return query.String(), args
 }
 
+func convertManufacturerQueryParamstoSql(params entity.ManufacturerFilter)(string, []interface{}){
+	var query strings.Builder
+	var filters []interface{}
+	var countParams = constant.StartingParamsCount
+	if params.Search != ""{
+		query.WriteString(" WHERE ")
+	}
+	if params.Search != "" {
+		query.WriteString(fmt.Sprintf(` name ILIKE '%%' ||$%v|| '%%'`, countParams))
+		filters = append(filters, params.Search)
+		countParams++
+	}
+
+	if countParams > constant.StartingParamsCount {
+		query.WriteString(` AND `)
+	}
+	if countParams == constant.StartingParamsCount {
+		query.WriteString(` WHERE `)
+	}
+	query.WriteString(` deleted_at IS NULL `)
+
+	if params.SortBy != nil {
+		if *params.SortBy == constant.SortByName {
+			query.WriteString(` ORDER BY name `)
+		}
+	}
+
+	if params.Order != nil {
+		if params.SortBy == nil {
+			query.WriteString(` ORDER BY id `)
+		}
+		switch order := *params.Order; order {
+		case constant.OrderAscending:
+			query.WriteString(`ASC`)
+		case constant.OrderDescending:
+			query.WriteString(`DESC`)
+		}
+	}
+	return query.String(), filters
+
+}
+
 func convertUpdateDoctorQueryParamstoSql(params entity.DoctorUpdateRequest, id int64) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
