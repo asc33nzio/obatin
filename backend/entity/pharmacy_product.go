@@ -10,8 +10,30 @@ type PharmacyProduct struct {
 	IsActive   bool
 }
 
+type PharmacyProductFilter struct {
+	Search         string
+	ProductId      *int64
+	PharmacyId     int64
+	SortBy         *string
+	Classification *string
+	Order          *string
+	Page           int
+	Limit          int
+}
+
 type UpdatePharmacyProduct struct {
-	Price    *int
-	Stock    *int
-	IsActive *bool
+	UpdateType              string
+	Price                   *int
+	Stock                   *int
+	Delta                   *int
+	IsActive                *bool
+	SourcePharmacyProductId *int64
+	TargetPharmacyProductId *int64
+	IsAddition              *bool
+}
+
+type PharmacyProductListPage struct {
+	Products   []PharmacyProduct
+	TotalRows  int
+	Pagination PaginationResponse
 }

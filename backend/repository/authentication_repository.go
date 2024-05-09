@@ -26,6 +26,7 @@ type AuthenticationRepository interface {
 	UpdateAuthenticationPartner(ctx context.Context, body entity.PartnerUpdateRequest, idAuth int64) (*entity.Authentication, error)
 	IsEmailExistUpdatePartner(ctx context.Context, email string, id int64) (int, error)
 	FindAuthenticationById(ctx context.Context, authenticationId int64) (*entity.Authentication, error)
+	FindPartnerIdByAuthId(ctx context.Context, authenticationId int64) (*int64, error)
 	DeleteOneAuthenticationById(ctx context.Context, authenticationId int64) error
 }
 
@@ -585,6 +586,29 @@ func (r *authenticationRepositoryPostgres) FindAuthenticationById(ctx context.Co
 	}
 
 	return &a, nil
+}
+
+func (r *authenticationRepositoryPostgres) FindPartnerIdByAuthId(ctx context.Context, authenticationId int64) (*int64, error) {
+	var partnerId int64
+	query := `
+		SELECT
+			p.authentication_id
+		FROM
+			partners p
+		WHERE
+			id = $1
+		AND
+			deleted_at IS NULL
+	`
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		authenticationId,
+	).Scan(&partnerId)
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+	return &partnerId, nil
 }
 
 func (r *authenticationRepositoryPostgres) DeleteOneAuthenticationById(ctx context.Context, authenticationId int64) error {

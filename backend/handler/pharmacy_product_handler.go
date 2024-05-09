@@ -2,11 +2,13 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/constant"
 	"obatin/dto"
 	"obatin/entity"
 	"obatin/usecase"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,6 +41,43 @@ func (h *PharmacyProductHandler) GetNearbyPharmacies(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseOkMsg,
 		Data:    res,
+	})
+}
+
+func (h *PharmacyProductHandler) GetAllPartnerPharmacyProduct(ctx *gin.Context) {
+	query := dto.PharmacyProductFilter{}
+
+	err := ctx.ShouldBindQuery(&query)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	if role != constant.RoleManager || role == "" {
+		ctx.Error(apperror.ErrForbiddenAccess(nil))
+		return
+	}
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	queryEntity := query.ToPharmacyProductFilterEntity()
+	products, err := h.pharmacyProductUsecase.GetPharmacyProductByPartner(ctx, queryEntity)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	productsRes := dto.PharmacyProductListPageResponse{
+		Pagination: (*dto.PaginationResponse)(&products.Pagination),
+		Data:       dto.ToPharmacyProductResponse(products.Products),
+	}
+
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message:    constant.ResponseOkMsg,
+		Pagination: productsRes.Pagination,
+		Data:       productsRes.Data,
 	})
 }
 
@@ -75,5 +114,90 @@ func (h *PharmacyProductHandler) TotalStockPerPartner(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseOkMsg,
 		Data:    res,
+	})
+}
+
+func (h *PharmacyProductHandler) CreateOnePharmacyProduct(ctx *gin.Context) {
+	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	if role != constant.RoleManager || role == "" {
+		ctx.Error(apperror.ErrForbiddenAccess(nil))
+		return
+	}
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	body := dto.CreatePharmacyProduct{}
+	err := ctx.ShouldBind(&body)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+	err = h.pharmacyProductUsecase.CreatePharmacyProduct(ctx, *body.ToEntityPharmacyProductFromCreate())
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, dto.APIResponse{
+		Message: constant.ResponsePharmacyProductCreatedMsg,
+	})
+}
+
+func (h *PharmacyProductHandler) UpdatePharmacyProduct(ctx *gin.Context) {
+	var ppParam dto.PharmacyProductParam
+	err := ctx.ShouldBindUri(&ppParam)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+
+	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	if role != constant.RoleManager || role == "" {
+		ctx.Error(apperror.ErrForbiddenAccess(nil))
+		return
+	}
+	if !ok {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+
+	body := dto.UpdatePharmacyProductReq{}
+	err = ctx.ShouldBind(&body)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+
+	if body.UpdateType == appconstant.UpdatePharmacyProductTypeStockMutation {
+		if body.SourcePharmacyProductId == nil || body.Delta == nil {
+			ctx.Error(apperror.ErrInvalidReq(apperror.ErrStlIncompleteRequest))
+			return
+		}
+	}
+	if body.UpdateType == appconstant.UpdatePharmacyProductTypeManualMutation {
+		if body.Delta == nil || body.IsAddition == nil {
+			ctx.Error(apperror.ErrInvalidReq(apperror.ErrStlIncompleteRequest))
+			return
+		}
+	}
+	bodyEntity := body.ToEntityUpdatePharmacyProduct()
+	targetPPIdint, err := strconv.Atoi(ppParam.PharmacyProductId)
+	if err != nil {
+		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+	ptrTargetPPIdInt64 := int64(targetPPIdint)
+	bodyEntity.TargetPharmacyProductId = &ptrTargetPPIdInt64
+
+	err = h.pharmacyProductUsecase.UpdatePharmacyProduct(ctx, *bodyEntity)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: constant.ResponseOkMsg,
 	})
 }

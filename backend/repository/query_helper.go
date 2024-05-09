@@ -287,7 +287,7 @@ func convertUpdateProductQueryParamstoSql(params entity.UpdateProduct, productId
 	return query.String(), args
 }
 
-func convertUpdatePharmacyProductQueryParamstoSql(params entity.UpdatePharmacyProduct, id int64) (string, []interface{}) {
+func convertUpdatePharmacyProductQueryParamstoSql(params entity.UpdatePharmacyProduct) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
 	var countParams = constant.StartingParamsCount
@@ -303,7 +303,7 @@ func convertUpdatePharmacyProductQueryParamstoSql(params entity.UpdatePharmacyPr
 			query.WriteString(",")
 		}
 		query.WriteString(fmt.Sprintf("is_active = $%d ", countParams))
-		args = append(args, *params.Price)
+		args = append(args, *params.IsActive)
 		countParams++
 	}
 
@@ -312,11 +312,13 @@ func convertUpdatePharmacyProductQueryParamstoSql(params entity.UpdatePharmacyPr
 		, updated_at = NOW()
 	WHERE 
 		id = $%d
+	AND
+		deleted_at IS NULL
 	RETURNING
 		id, product_id, pharmacy_id, price, stock, is_active 
 	`, countParams))
 
-	args = append(args, id)
+	args = append(args, params.TargetPharmacyProductId)
 	countParams++
 	return query.String(), args
 }
@@ -465,6 +467,77 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 	if params.Order != nil {
 		if params.SortBy == nil {
 			query.WriteString(` ORDER BY p.id `)
+		}
+		switch order := *params.Order; order {
+		case constant.OrderAscending:
+			query.WriteString(`ASC`)
+		case constant.OrderDescending:
+			query.WriteString(`DESC`)
+		}
+	}
+	return query.String(), filters
+
+}
+
+func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilter) (string, []interface{}) {
+	var query strings.Builder
+	var filters []interface{}
+	var countParams = constant.StartingParamsCount + 1
+	if params.Search != "" || params.Classification != nil || params.PharmacyId != 0 || params.ProductId != nil {
+		query.WriteString(" WHERE ")
+	}
+
+	if params.Search != "" {
+		query.WriteString(fmt.Sprintf(`(p.name ILIKE '%%' ||$%v|| '%%' `, countParams))
+		query.WriteString(fmt.Sprintf(` OR p.generic_name ILIKE '%%' ||$%v|| '%%' )`, countParams))
+		filters = append(filters, params.Search)
+		countParams++
+	}
+	if params.PharmacyId != 0 {
+		if countParams > constant.StartingParamsCount+1 {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` ppc.pharmacy_id = $%v `, countParams))
+		filters = append(filters, &params.PharmacyId)
+		countParams++
+	}
+
+	if params.ProductId != nil {
+		if countParams > constant.StartingParamsCount+1 {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` p.id = $%v `, countParams))
+		filters = append(filters, &params.ProductId)
+		countParams++
+	}
+
+	if params.Classification != nil {
+		if countParams > constant.StartingParamsCount+1 {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` p.classification = $%v `, countParams))
+		filters = append(filters, &params.Classification)
+		countParams++
+	}
+	if countParams > constant.StartingParamsCount+1 {
+		query.WriteString(` AND `)
+	}
+	if countParams == constant.StartingParamsCount+1 {
+		query.WriteString(` WHERE `)
+	}
+	query.WriteString(` p.deleted_at IS NULL `)
+
+	if params.SortBy != nil {
+		if *params.SortBy == constant.SortByName {
+			query.WriteString(` ORDER BY p.name `)
+		} else if *params.SortBy == constant.SortByPrice {
+			query.WriteString(" ORDER BY pp.price  ")
+		}
+	}
+
+	if params.Order != nil {
+		if params.SortBy == nil {
+			query.WriteString(` ORDER BY pp.updated_at `)
 		}
 		switch order := *params.Order; order {
 		case constant.OrderAscending:

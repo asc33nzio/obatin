@@ -60,6 +60,8 @@ func GetHttpStatusCode(code int) int {
 		return http.StatusNotFound
 	case NoNearbyPharmacyProduct:
 		return http.StatusNotFound
+	case DuplicatePharmacyProduct:
+		return http.StatusBadRequest
 	case ErrorInvalidSameAsPrevUpdatePass:
 		return http.StatusBadRequest
 	case ErrorDuplicateSlug:
@@ -67,6 +69,8 @@ func GetHttpStatusCode(code int) int {
 	case InsufficientStock:
 		return http.StatusBadRequest
 	case NoNearbyPharmacyPartner:
+		return http.StatusNotFound
+	case NoPharmacyFromPartner:
 		return http.StatusNotFound
 	case OrderNotFound:
 		return http.StatusNotFound

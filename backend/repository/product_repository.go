@@ -13,6 +13,7 @@ import (
 type ProductRepository interface {
 	GetProductsList(ctx context.Context, params entity.ProductFilter) (*entity.ProductListPage, error)
 	FindProductDetailBySlug(ctx context.Context, slug string) (*entity.ProductDetail, error)
+	FindProductDetailById(ctx context.Context, productId int64) (*entity.ProductDetail, error)
 	CreateOne(ctx context.Context, product entity.ProductDetail) (*int64, error)
 	IsProductExistById(ctx context.Context, productId int64) (bool, error)
 	IsPrescriptionRequired(ctx context.Context, productId int64) (bool, error)
@@ -140,6 +141,93 @@ func (r *productRepositoryPostgres) FindProductDetailBySlug(ctx context.Context,
 
 	`
 	err := r.db.QueryRowContext(ctx, q, slug).Scan(
+		&res.Id,
+		&res.Name,
+		&res.MinPrice,
+		&res.MaxPrice,
+		&res.Slug,
+		&res.GenericName,
+		&res.GeneralIndication,
+		&res.Dosage,
+		&res.HowToUse,
+		&res.SideEffects,
+		&res.Contraindication,
+		&res.Warning,
+		&res.BpomNumber,
+		&res.Content,
+		&res.Description,
+		&res.Classification,
+		&res.Packaging,
+		&res.SellingUnit,
+		&res.Weight,
+		&res.Height,
+		&res.Length,
+		&res.Width,
+		&res.ImageUrl,
+		&res.ThumbnailUrl,
+		&res.IsActive,
+		&res.IsPrescriptionRequired,
+		&res.Manufacturer.ID,
+		&res.Manufacturer.Name,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.NewProductNotFound(err)
+		}
+		return nil, apperror.NewInternal(err)
+	}
+
+	return &res, nil
+}
+
+func (r *productRepositoryPostgres) FindProductDetailById(ctx context.Context, productId int64) (*entity.ProductDetail, error) {
+	res := entity.ProductDetail{}
+
+	q := `
+		SELECT 
+			p.id,     
+			p.name,
+			p.min_price,
+            p.max_price,
+			p.product_slug,   
+			p.generic_name,
+			p.general_indication,  
+			p.dosage,  
+			p.how_to_use,  
+			p.side_effects,  
+			p.contraindication,  
+			p.warning,  
+			p.bpom_number,
+			p.content,  
+			p.description,  
+			p.classification,  
+			p.packaging,  
+			p.selling_unit,
+			p.weight,  
+			p.height,  
+			p.length,  
+			p.width,  
+			p.image_url,  
+			p.thumbnail_url,  
+			p.is_active,
+			p.is_prescription_required,
+			m.id,
+			m.name  
+		FROM 
+			products p 
+		JOIN
+			manufacturers m
+		ON 
+			p.manufacturer_id = m.id
+		WHERE
+			p.id = $1
+		AND
+		    p.deleted_at IS NULL
+		AND 
+			p.is_active IS TRUE
+
+	`
+	err := r.db.QueryRowContext(ctx, q, productId).Scan(
 		&res.Id,
 		&res.Name,
 		&res.MinPrice,
