@@ -30,9 +30,12 @@ const (
 	PrescriptionNotExist
 	PrescriptionItemNotExist
 	NoNearbyPharmacyProduct
+	DuplicatePharmacyProduct
 	ErrorDuplicateSlug
 	InsufficientStock
 	NoNearbyPharmacyPartner
+	NoPharmacyFromPartner
 	PaymentNotFound
 	PaymentExpired
+	OrderNotFound
 )

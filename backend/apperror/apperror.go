@@ -352,6 +352,15 @@ func ErrNoNearbyPharmacyProduct(err error, productId int64) *AppError {
 	}
 }
 
+func ErrPharmacyProductAlreadyExist(err error, productId int64) *AppError {
+	return &AppError{
+		code:    DuplicatePharmacyProduct,
+		err:     err,
+		message: DuplicatePharmacyProductMsg + fmt.Sprintf(" for product id %v", productId),
+		stack:   debug.Stack(),
+	}
+}
+
 func ErrDuplicateSlug(err error) *AppError {
 	return &AppError{
 		code:    ErrorDuplicateSlug,
@@ -393,6 +402,24 @@ func ErrPaymentExpired(err error) *AppError {
 		code:    PaymentExpired,
 		err:     err,
 		message: PaymentExpiredMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrOrderNotFound(err error) *AppError {
+	return &AppError{
+		code:    OrderNotFound,
+		err:     err,
+		message: OrderNotFoundMsg,
+		stack:   debug.Stack(),
+	}
+}
+
+func ErrNoPharmacyFromPartner(err error) *AppError {
+	return &AppError{
+		code:    NoPharmacyFromPartner,
+		err:     err,
+		message: NoPharmacyFromPartnerMsg,
 		stack:   debug.Stack(),
 	}
 }

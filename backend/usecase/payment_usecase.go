@@ -12,8 +12,9 @@ import (
 
 type PaymentUsecase interface {
 	UploadPaymentProof(ctx context.Context, p *entity.Payment) error
-	ConfirmPaymentProof(ctx context.Context, p *entity.Payment) error
+	UpdatePaymentStatus(ctx context.Context, p *entity.Payment) error
 	GetAllPendingPayments(ctx context.Context) ([]*entity.Payment, error)
+	CancelPayment(ctx context.Context, p *entity.Payment) error
 }
 
 type paymentUsecaseImpl struct {
@@ -67,7 +68,7 @@ func (u *paymentUsecaseImpl) UploadPaymentProof(ctx context.Context, p *entity.P
 		}
 
 		for _, o := range orders {
-			o.Status = appconstant.PaymentWaitingConfirmation
+			o.Status = appconstant.OrderWaitingConfirmation
 			err := or.UpdateOrderById(ctx, o)
 			if err != nil {
 				return nil, err
@@ -83,13 +84,10 @@ func (u *paymentUsecaseImpl) UploadPaymentProof(ctx context.Context, p *entity.P
 	return nil
 }
 
-func (u *paymentUsecaseImpl) ConfirmPaymentProof(ctx context.Context, p *entity.Payment) error {
+func (u *paymentUsecaseImpl) UpdatePaymentStatus(ctx context.Context, p *entity.Payment) error {
 	_, err := u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
 		pr := rs.PaymentRepository()
 		or := rs.OrderRepository()
-
-		isConfirmed := true
-		p.IsConfirmed = &isConfirmed
 
 		err := pr.UpdateOnePayment(ctx, p)
 		if err != nil {
@@ -102,7 +100,11 @@ func (u *paymentUsecaseImpl) ConfirmPaymentProof(ctx context.Context, p *entity.
 		}
 
 		for _, o := range orders {
-			o.Status = appconstant.PaymentProcessed
+			if *p.IsConfirmed {
+				o.Status = appconstant.OrderProcessed
+			} else {
+				o.Status = appconstant.OrderWaitingPayment
+			}
 			err := or.UpdateOrderById(ctx, o)
 			if err != nil {
 				return nil, err
@@ -127,4 +129,47 @@ func (u *paymentUsecaseImpl) GetAllPendingPayments(ctx context.Context) ([]*enti
 	}
 
 	return payments, nil
+}
+
+func (u *paymentUsecaseImpl) CancelPayment(ctx context.Context, p *entity.Payment) error {
+	_, err := u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
+		pr := rs.PaymentRepository()
+		or := rs.OrderRepository()
+		ur := rs.UserRepository()
+
+		userId, err := ur.FindUserIdByAuthId(ctx, p.User.Authentication.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		p.User.Id = userId
+
+		err = pr.UpdateOnePayment(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+
+		orders, err := or.FindOrdersByPaymentId(ctx, p.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, o := range orders {
+			if o.Status != appconstant.OrderWaitingPayment {
+				return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
+			}
+			o.Status = appconstant.OrderCancel
+			err := or.UpdateOrderById(ctx, o)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		return nil, nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

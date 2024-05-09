@@ -11,6 +11,7 @@ import (
 
 type CartUsecase interface {
 	Bulk(ctx context.Context, cart entity.Cart) error
+	GetCart(ctx context.Context, authenticationId int64) (*entity.Cart, error)
 	GetCartDetails(ctx context.Context, authenticationId int64) (*entity.Cart, error)
 	UpdateOneCartItem(ctx context.Context, cartItem *entity.CartItem) error
 	DeleteOneCartItem(ctx context.Context, cartItem *entity.CartItem) error
@@ -134,6 +135,29 @@ func (u *cartUsecaseImpl) Bulk(ctx context.Context, cart entity.Cart) error {
 	}
 
 	return nil
+}
+
+func (u *cartUsecaseImpl) GetCart(ctx context.Context, authenticationId int64) (*entity.Cart, error) {
+	ur := u.repoStore.UserRepository()
+	cr := u.repoStore.CartRepository()
+
+	userId, err := ur.FindUserIdByAuthId(ctx, authenticationId)
+	if err != nil {
+		return nil, err
+	}
+
+	cart, err := cr.FindCart(ctx, *userId)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range cart.Items {
+		cart.Subtotal += item.Product.MaxPrice
+	}
+
+	cart.User.Id = userId
+
+	return cart, nil
 }
 
 func (u *cartUsecaseImpl) GetCartDetails(ctx context.Context, authenticationId int64) (*entity.Cart, error) {

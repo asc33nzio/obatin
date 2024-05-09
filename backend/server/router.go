@@ -182,7 +182,9 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.Use(h.Middleware.JWTAuth)
 
 	r.PATCH(appconstant.EndpointGetProductDetail, h.ProductHandler.UpdateProductDetaiBySlug)
-
+	r.GET(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.GetAllPartnerPharmacyProduct)
+	r.POST(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.CreateOnePharmacyProduct)
+	r.PATCH(appconstant.EndpointDetailPartnerPharmacyProducts, h.PharmacyProductHandler.UpdatePharmacyProduct)
 	r.POST(appconstant.EndpointUploadImageCloudinary, h.CloudinaryHandler.UploadImageOrFileToCloudinary)
 	r.PATCH(appconstant.EndpointGetDoctorDetail, h.DoctorHandler.UpdateOneDoctor)
 	r.GET(appconstant.EndpointGetDoctorProfileDetail, h.DoctorHandler.GetDoctorDetailbyAuthId)
@@ -210,7 +212,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.GET(appconstant.EndpointGetAllChatRoom, h.ChatRoomHandler.GetListChatRoom)
 	r.DELETE(appconstant.EndpointDeleteChatRoom, h.ChatRoomHandler.DeleteChatRoom)
 	r.POST(appconstant.EndpointCart, h.CartHandler.Bulk)
-	r.GET(appconstant.EndpointCart, h.CartHandler.GetCartDetails)
+	r.GET(appconstant.EndpointCartDetails, h.CartHandler.GetCartDetails)
 	r.PUT(appconstant.EndpointCart, h.CartHandler.UpdateOneCartItemQuantity)
 	r.DELETE(appconstant.EndpointCartDelete, h.CartHandler.DeleteOneCartItem)
 	r.POST(appconstant.EndpointPrescription, h.PrescriptionHandler.CreatePrescription)
@@ -223,7 +225,11 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.GET(appconstant.EndpointDoctorPrescription, h.PrescriptionHandler.GetAllDoctorPrescriptions)
 	r.GET(appconstant.EndpointUserOrders, h.OrderHandler.GetUserOrders)
 	r.PATCH(appconstant.EndpointPaymentDetails, h.PaymentHandler.UploadPaymentProof)
-	r.POST(appconstant.EndpointPaymentConfirm, h.PaymentHandler.ConfirmPaymentProof)
+	r.POST(appconstant.EndpointPaymentConfirmation, h.PaymentHandler.UpdatePaymentStatus)
 	r.GET(appconstant.EndpointPendingPayments, h.PaymentHandler.GetAllPendingPayment)
+	r.GET(appconstant.EndpointOrders, h.OrderHandler.GetAllOrders)
+	r.POST(appconstant.EndpointPaymentCancel, h.PaymentHandler.CancelPayment)
+	r.GET(appconstant.EndpointCart, h.CartHandler.GetCart)
+	r.PATCH(appconstant.EndpointOrdersDetails, h.OrderHandler.UpdateOrderStatus)
 	return r
 }

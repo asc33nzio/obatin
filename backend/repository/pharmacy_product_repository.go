@@ -3,8 +3,11 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"obatin/apperror"
+	"obatin/constant"
 	"obatin/entity"
+	"strings"
 )
 
 type PharmacyProductRepository interface {
@@ -13,6 +16,12 @@ type PharmacyProductRepository interface {
 	FindStockAndLockById(ctx context.Context, pharmacyProductId int64) (*int, error)
 	FindNearbyPartner(ctx context.Context, pp *entity.PharmacyProduct) ([]*entity.PharmacyProduct, error)
 	UpdateStockPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct) error
+	GetPharmacyProductListByPartnerId(ctx context.Context, params entity.PharmacyProductFilter, partnerId int64) (*entity.PharmacyProductListPage, error)
+	FindPharmacyProductByPharmacyProductId(ctx context.Context, pharmacyProductId int64) (*entity.PharmacyProduct, error)
+	FindPharmacyProductByPharmacyIdAndProductId(ctx context.Context, pharmacyId int64, productId int64) (*entity.PharmacyProduct,error)
+	FindIdPharmacyProductByProductAndPharmacyId(ctx context.Context, partnerId int64, pharmacyId int64) (*entity.PharmacyProduct,error)
+	InsertPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct) (*int64, error)
+	UpdatePharmacyProductDetail(ctx context.Context, body entity.UpdatePharmacyProduct)error
 }
 
 type pharmacyProductRepositoryPostgres struct {
@@ -108,6 +117,139 @@ func (r *pharmacyProductRepositoryPostgres) FindPharmaciesWithin25kmByProductId(
 	}
 
 	return res, nil
+}
+
+func (r *pharmacyProductRepositoryPostgres) FindPharmacyProductByPharmacyProductId(ctx context.Context, pharmacyProductId int64) (*entity.PharmacyProduct, error) {
+	res := entity.PharmacyProduct{}
+	query := `
+		SELECT
+			pp.id,
+			pp.product_id,
+            pp.pharmacy_id,
+			pp.price,
+            pp.stock,
+            pp.is_active,
+			p.name
+        FROM
+			pharmacies_products pp
+		JOIN
+			products p 
+		ON 
+			pp.product_id = p.id
+		WHERE
+			pp.id = $1
+		AND
+			pp.deleted_at IS NULL
+		AND
+			pp.is_active = true
+		FOR UPDATE
+	`
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		pharmacyProductId,
+	).Scan(
+		&res.Id,
+		&res.Product.Id,
+		&res.Pharmacy.Id,
+		&res.Price,
+		&res.Stock,
+		&res.IsActive,
+		&res.Product.Name,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.NewProductNotFound(err)
+		}
+
+		return nil, apperror.NewInternal(err)
+	}
+	return &res, nil
+}
+
+func (r *pharmacyProductRepositoryPostgres)FindPharmacyProductByPharmacyIdAndProductId(ctx context.Context, pharmacyId int64, productId int64) (*entity.PharmacyProduct,error){
+	res := entity.PharmacyProduct{}
+	query := `
+		SELECT
+			pp.id,
+			pp.product_id,
+            pp.pharmacy_id,
+			pp.price,
+            pp.stock,
+            pp.is_active,
+			p.name
+        FROM
+			pharmacies_products pp
+		JOIN
+			products p 
+		ON 
+			pp.product_id = p.id
+		WHERE
+			pp.pharmacy_id = $1
+		AND
+		    pp.product_id = $2
+		AND
+			pp.deleted_at IS NULL
+		AND
+			pp.is_active = true
+		FOR UPDATE
+	`
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		pharmacyId,
+		productId,
+	).Scan(
+		&res.Id,
+		&res.Product.Id,
+		&res.Pharmacy.Id,
+		&res.Price,
+		&res.Stock,
+		&res.IsActive,
+		&res.Product.Name,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, apperror.NewProductNotFound(err)
+		}
+
+		return nil, apperror.NewInternal(err)
+	}
+	return &res, nil
+}
+
+func (r *pharmacyProductRepositoryPostgres)FindIdPharmacyProductByProductAndPharmacyId(ctx context.Context, partnerId int64, pharmacyId int64) (*entity.PharmacyProduct,error){
+	var pharmacyResId int64
+	query := `
+		SELECT 
+			id
+		FROM
+			pharmacies
+		WHERE
+			partner_id=$1
+		AND
+			id = $2
+	`
+	err := r.db.QueryRowContext(
+		ctx,
+		query,
+		partnerId,
+		pharmacyId,
+	).Scan(
+		&pharmacyId,
+	)
+	if err != nil {
+		if pharmacyResId == 0 {
+			return nil, apperror.ErrNoPharmacyFromPartner(apperror.ErrStlForbiddenAccess)
+		}
+		return nil, err
+	}
+	return &entity.PharmacyProduct{
+		Pharmacy: entity.Pharmacy{
+			Id: &pharmacyResId,
+		},
+	}, nil
+
 }
 
 func (r *pharmacyProductRepositoryPostgres) FindTotalStockPerPartner(ctx context.Context, pp *entity.PharmacyProduct) (*int, error) {
@@ -264,6 +406,100 @@ func (r pharmacyProductRepositoryPostgres) FindNearbyPartner(ctx context.Context
 	return res, nil
 }
 
+func (r *pharmacyProductRepositoryPostgres) GetPharmacyProductListByPartnerId(ctx context.Context, params entity.PharmacyProductFilter, partnerId int64) (*entity.PharmacyProductListPage, error) {
+	paramsCount := constant.StartingParamsCount
+	res := []entity.PharmacyProduct{}
+	var sb strings.Builder
+	rowsCount := 0
+	var queryDataCount strings.Builder
+	var data []interface{}
+
+	sb.WriteString(`
+		WITH 
+			partner_pharmacies AS (
+		SELECT 
+			ph.partner_id AS partner_id,
+			ph.id AS pharmacy_id,
+			ph.name AS pharmacy_name
+		FROM 
+			pharmacies ph
+		WHERE
+			ph.partner_id = $1
+	`)
+	if params.SortBy != nil {
+		if *params.SortBy == constant.SortByPharmacy {
+			sb.WriteString(`ORDER BY pharmacy_name`)
+		}
+	}
+	sb.WriteString(`
+			)
+		SELECT 	
+			pp.id,
+			p.id, 
+			p.name, 
+			p.product_slug, 
+			ppc.pharmacy_id,
+			ppc.pharmacy_name,
+			p.image_url, 
+			pp.price, 
+			pp.stock,
+			pp.is_active
+		FROM 
+			products p
+		JOIN
+			pharmacies_products pp 
+		ON
+			pp.product_id = p.id 
+		JOIN 
+			partner_pharmacies ppc
+		ON
+			pp.pharmacy_id = ppc.pharmacy_id
+		JOIN 
+			partners pt
+		ON
+			pt.id = ppc.partner_id
+	`)
+
+	queryParams, paramsData := convertGetPharmacyProductQueryParamstoSql(params)
+	sb.WriteString(queryParams)
+	data = append(data, partnerId)
+	data = append(data, paramsData...)
+	queryDataCount.WriteString(fmt.Sprintf(` SELECT COUNT (*) FROM ( %v )`, sb.String()))
+	err := r.db.QueryRowContext(ctx, queryDataCount.String(), data...).Scan(&rowsCount)
+
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+
+	if len(data) > 0 {
+		paramsCount = len(data) + 1
+	}
+	paginationParams, paginationData := convertPaginationParamsToSql(params.Limit, params.Page, paramsCount)
+	sb.WriteString(paginationParams)
+	data = append(data, paginationData...)
+	rows, err := r.db.QueryContext(ctx, sb.String(), data...)
+
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		pp := entity.PharmacyProduct{}
+		err := rows.Scan(&pp.Id, &pp.Product.Id, &pp.Product.Name, &pp.Product.Slug, &pp.Pharmacy.Id, &pp.Pharmacy.Name,
+			&pp.Product.ImageUrl, &pp.Price, &pp.Stock, &pp.IsActive)
+		if err != nil {
+			return nil, apperror.NewInternal(err)
+		}
+		res = append(res, pp)
+	}
+	return &entity.PharmacyProductListPage{
+		Products:  res,
+		TotalRows: rowsCount,
+	}, nil
+
+}
+
 func (r *pharmacyProductRepositoryPostgres) UpdateStockPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct) error {
 	query := `
 		UPDATE
@@ -298,4 +534,66 @@ func (r *pharmacyProductRepositoryPostgres) UpdateStockPharmacyProduct(ctx conte
 	}
 
 	return nil
+}
+
+func (r *pharmacyProductRepositoryPostgres) InsertPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct)(*int64, error) {
+	var ppId int64 
+	queryInsertPharmacyProduct := `
+        INSERT INTO
+            pharmacies_products(
+                product_id, pharmacy_id, price, stock, is_active
+			)
+        VALUES ($1, $2, $3, $4, $5)
+		RETURNING id
+    `
+
+	err := r.db.QueryRowContext(
+		ctx,
+		queryInsertPharmacyProduct,
+		pp.Product.Id,
+		*pp.Pharmacy.Id,
+		*pp.Price,
+		*pp.Stock,
+		pp.IsActive,
+	).Scan(&ppId)
+	if err != nil {
+		return &ppId, apperror.NewInternal(err)
+	}
+
+	if ppId == 0 {
+		return nil, apperror.NewInternal(err)
+	}
+
+	return &ppId, nil
+}
+
+func (r *pharmacyProductRepositoryPostgres) UpdatePharmacyProductDetail(ctx context.Context, body entity.UpdatePharmacyProduct) error {
+	var query strings.Builder
+	var data []interface{}
+
+	query.WriteString(`
+		UPDATE 
+			pharmacies_products 
+		SET
+	`)
+
+	queryParams, paramsData := convertUpdatePharmacyProductQueryParamstoSql(body)
+	query.WriteString(queryParams)
+	data = append(data, paramsData...)
+	res, err := r.db.ExecContext(ctx, query.String(), data...)
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+
+	if rowsAffected == 0 {
+		return apperror.NewInternal(apperror.ErrStlNotFound)
+	}
+
+	return nil
+
 }
