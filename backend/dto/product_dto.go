@@ -34,22 +34,22 @@ type AddProductRequest struct {
 	MaxPrice               int             `form:"max_price" binding:"required"`
 	Slug                   string          `form:"product_slug" binding:"required"`
 	GenericName            string          `form:"generic_name" binding:"required"`
-	GeneralIndication      string          `form:"general_indication" binding:"required"`
-	Dosage                 string          `form:"dosage" binding:"required"`
-	HowToUse               string          `form:"how_to_use" binding:"required"`
-	SideEffects            string          `form:"side_effects" binding:"required"`
-	Contraindication       string          `form:"contraindication" binding:"required"`
-	Warning                string          `form:"warning" binding:"required"`
-	BpomNumber             string          `form:"bpom_number" binding:"required"`
-	Content                string          `form:"content" binding:"required"`
-	Description            string          `form:"description" binding:"required"`
+	GeneralIndication      string          `form:"general_indication" binding:"omitempty"`
+	Dosage                 string          `form:"dosage" binding:"omitempty"`
+	HowToUse               string          `form:"how_to_use" binding:"omitempty"`
+	SideEffects            string          `form:"side_effects" binding:"omitempty"`
+	Contraindication       string          `form:"contraindication" binding:"omitempty"`
+	Warning                string          `form:"warning" binding:"omitempty"`
+	BpomNumber             string          `form:"bpom_number" binding:"omitempty"`
+	Content                string          `form:"content" binding:"omitempty"`
+	Description            string          `form:"description" binding:"omitempty"`
 	Classification         string          `form:"classification" binding:"required,oneof='obat_bebas' 'obat_bebas_terbatas' 'non_obat' 'obat_keras'"`
-	Packaging              string          `form:"packaging" binding:"required"`
-	SellingUnit            string          `form:"selling_unit" binding:"required"`
+	Packaging              string          `form:"packaging" binding:"omitempty"`
+	SellingUnit            string          `form:"selling_unit" binding:"omitempty"`
 	Weight                 decimal.Decimal `form:"weight" binding:"required"`
-	Height                 decimal.Decimal `form:"height" binding:"required"`
-	Length                 decimal.Decimal `form:"length" binding:"required"`
-	Width                  decimal.Decimal `form:"width" binding:"required"`
+	Height                 decimal.Decimal `form:"height" binding:"omitempty"`
+	Length                 decimal.Decimal `form:"length" binding:"omitempty"`
+	Width                  decimal.Decimal `form:"width" binding:"omitempty"`
 	ImageUrl               *string         `form:"image_url"`
 	ThumbnailUrl           *string         `form:"thumbnail_url"`
 	IsActive               *bool           `form:"is_active" binding:"required"`
@@ -116,11 +116,6 @@ type ProductDetailResponse struct {
 	IsPrescriptionRequired bool                 `json:"is_prescription_required"`
 	Manufacturer           ManufacturerResponse `json:"manufacturer"`
 	Categories             []CategoryResponse   `json:"categories"`
-}
-
-type ManufacturerResponse struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
 }
 
 type ProductListResponse struct {

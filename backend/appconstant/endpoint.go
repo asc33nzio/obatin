@@ -57,4 +57,5 @@ const (
 	EndpointPendingPayments               = "/payments/pending"
 	EndpointOrders                        = "/shop/orders"
 	EndpointOrdersDetails                 = "/shop/orders/:id"
+	EndpointManufacturerList              = "/shop/manufacturers"
 )
