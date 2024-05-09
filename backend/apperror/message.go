@@ -41,10 +41,12 @@ const (
 	PrescriptionNotExistMsg           = "prescription does not exist"
 	PrescriptionItemNotExistMsg       = "product does not exist in prescription"
 	NoNearbyPharmacyProductMsg        = "there are no nearby pharmacy that has the product"
+	DuplicatePharmacyProductMsg       = "pharmacy product already exists"
 	DuplicateSlugErrorMsg             = "you can't use duplicate slug"
 	InsufficientStockMsg              = "insufficient stock"
 	NoNearbyPharmacyPartnerMsg        = "no nearby pharmacy partner"
 	PaymentNotFoundMsg                = "payment not found"
 	PaymentExpiredMsg                 = "payment session expired"
 	OrderNotFoundMsg                  = "order not found"
+	NoPharmacyFromPartnerMsg          = "you are not allowed to access pharmacy thats not yours"
 )

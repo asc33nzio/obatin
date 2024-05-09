@@ -182,7 +182,9 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.Use(h.Middleware.JWTAuth)
 
 	r.PATCH(appconstant.EndpointGetProductDetail, h.ProductHandler.UpdateProductDetaiBySlug)
-
+	r.GET(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.GetAllPartnerPharmacyProduct)
+	r.POST(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.CreateOnePharmacyProduct)
+	r.PATCH(appconstant.EndpointDetailPartnerPharmacyProducts, h.PharmacyProductHandler.UpdatePharmacyProduct)
 	r.POST(appconstant.EndpointUploadImageCloudinary, h.CloudinaryHandler.UploadImageOrFileToCloudinary)
 	r.PATCH(appconstant.EndpointGetDoctorDetail, h.DoctorHandler.UpdateOneDoctor)
 	r.GET(appconstant.EndpointGetDoctorProfileDetail, h.DoctorHandler.GetDoctorDetailbyAuthId)

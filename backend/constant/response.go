@@ -34,4 +34,5 @@ const (
 	ResponseCartItemDeletedMsg            = "cart item deleted successfully"
 	ResponsePrescriptionCreatedMsg        = "prescription created successfully"
 	ResponseSuccessUploadCloudinaryMsg    = "successfully upload to cloudinary"
+	ResponsePharmacyProductCreatedMsg     = "pharmacy product created succesfully"
 )

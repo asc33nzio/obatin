@@ -17,4 +17,5 @@ var (
 	ErrStlBadRequest              = errors.New("bad request")
 	ErrStlInternal                = errors.New("internal server error")
 	ErrStlUnexpectedError         = errors.New("unexpected error")
+	ErrStlIncompleteRequest       = errors.New("request missing fields to be processed")
 )
