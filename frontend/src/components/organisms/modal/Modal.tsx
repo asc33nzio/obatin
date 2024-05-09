@@ -14,6 +14,7 @@ import UploadPembayaranModal from '@/components/organisms/modal/modalContent/Upl
 import SelectAddressModalContent from './modalContent/SelectAddressModalContent';
 import SelectDetailPharmacyModalContent from './modalContent/SelectDetailPharmacyModalContent';
 import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
+import ViewMoreTxModalContent from './modalContent/ViewMoreTxModalContent';
 
 interface DoctorDetailItf {
   name: string;
@@ -128,6 +129,16 @@ const Modal = () => {
       modalProps = {
         $overlayHeight: '170vh',
         $containerWidth: '650px',
+        $containerHeight: '850px',
+      };
+      break;
+
+    case 'view-more-tx':
+      modalContent = <ViewMoreTxModalContent />;
+      title = 'Detail Transaksi';
+      modalProps = {
+        $overlayHeight: '170vh',
+        $containerWidth: '1050px',
         $containerHeight: '850px',
       };
       break;

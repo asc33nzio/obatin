@@ -16,10 +16,12 @@ export interface TxFilterItf {
   cancelled: boolean;
 }
 
-export interface ProductItf {
+export interface CartItemItf {
+  cartItemId: number;
   productId: number;
   pharmacyProductId: number;
   perscriptionId: number | null;
+  orderId: number;
   name: string;
   slug: string;
   quantity: number;
@@ -32,15 +34,22 @@ export interface ProductItf {
 
 export interface PharmacyItf {
   id: number;
-  cityId: number;
   name: string;
   address: string;
+  city_id: number;
   lat: string;
   lng: string;
-  pharmacistName: string;
-  pharmacistLicense: string;
-  pharmacistPhone: string;
-  partnerId: number;
+  pharmacist_name: string;
+  pharmacist_license: string;
+  pharmacist_phone: string;
+  opening_time: string;
+  closing_time: string;
+  operational_days: Array<string>;
+  partner_id: number;
+  distance: number | null;
+  total_weight: number;
+  subtotal_pharmacy: number;
+  cart_items: null;
 }
 
 export interface ShippingItf {
@@ -50,14 +59,18 @@ export interface ShippingItf {
   type: string;
 }
 
-export interface OrderItf {
+export interface TxItf {
+  order_id: number;
+  payment_id: number;
+  invoice_number: string;
   status: TxStatusTypes;
-  totalAmount: number;
-  invoiceNumber: string;
+  number_items: number;
+  subtotal: number;
+  created_at: string;
+  shipping: ShippingItf;
   pharmacy: PharmacyItf;
-  products: Array<ProductItf>;
-  createdAt: string;
-  shippingInfo: ShippingItf;
+  cart_items: Array<CartItemItf>;
+  handleOpenViewMore?: () => void;
 }
 
 export interface PaginationInfoItf {

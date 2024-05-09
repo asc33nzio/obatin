@@ -23,6 +23,7 @@ import { decodeJWTSync } from '@/utils/decodeJWT';
 import { useToast } from '@/hooks/useToast';
 import { navigateToCart } from '@/app/actions';
 import { CartItem } from '@/redux/reducers/cartSlice';
+import { usePathname } from 'next/navigation';
 import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
 import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
 import DefaultDoctorAvatar from '@/assets/DefaultDoctorAvatar.svg';
@@ -52,6 +53,7 @@ const Navbar = (): React.ReactElement => {
   const userRole = userSessionCredentials?.payload?.Payload?.role;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const userCart = useObatinSelector((state) => state?.cart);
+  const pathname = usePathname();
 
   const handleReverify = async () => {
     try {
@@ -105,13 +107,6 @@ const Navbar = (): React.ReactElement => {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    setIsPopupOpened(
-      userRole === 'user' && !userInfo?.isVerified ? true : false,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const postToCart = async () => {
     try {
@@ -187,6 +182,18 @@ const Navbar = (): React.ReactElement => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    setIsPopupOpened(
+      userRole === 'user' && !userInfo?.isVerified ? true : false,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    toggleDrawer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <>

@@ -11,7 +11,7 @@ import {
   TxProductBreakdown,
 } from '@/styles/molecules/cards/TransactionCard.styles';
 import { useModal } from '@/hooks/useModal';
-import { OrderItf } from '@/types/transactionTypes';
+import { TxItf } from '@/types/transactionTypes';
 import { useRouter } from 'next/navigation';
 import DetailICO from '@/assets/icons/DetailICO';
 import Image from 'next/image';
@@ -19,7 +19,7 @@ import moment from 'moment';
 import DotICO from '@/assets/icons/DotICO';
 moment.locale('id');
 
-const TransactionCard = (props: OrderItf): React.ReactElement => {
+const TransactionCard = (props: TxItf): React.ReactElement => {
   const router = useRouter();
   const { openModal } = useModal();
   const splittedDate = props?.createdAt?.split(' ')?.[0];
@@ -28,7 +28,7 @@ const TransactionCard = (props: OrderItf): React.ReactElement => {
     'dddd, Do MMMM YYYY',
   );
 
-  const openDetailPharmacyInterface = () => {
+  const handleOpenDetail = () => {
     openModal('detail-pharmacy');
   };
 
@@ -54,7 +54,7 @@ const TransactionCard = (props: OrderItf): React.ReactElement => {
     <TransactionCardContainer>
       <TxHeaders>
         <TxCardPharmacyName>
-          <DetailICO onClick={openDetailPharmacyInterface} />
+          <DetailICO onClick={handleOpenDetail} />
           <DeliveryStatusBadge $color={deliveryStatusColorMap[props?.status]}>
             <h1>{deliveryStatusMap[props?.status]}</h1>
           </DeliveryStatusBadge>
@@ -109,7 +109,7 @@ const TransactionCard = (props: OrderItf): React.ReactElement => {
       })}
 
       {props?.products?.length > 2 && (
-        <SeeMoreDiv>
+        <SeeMoreDiv onClick={props.handleOpenViewMore}>
           <h4>Lihat {props?.products?.length - 2} produk lainnya</h4>
           <DotICO />
         </SeeMoreDiv>

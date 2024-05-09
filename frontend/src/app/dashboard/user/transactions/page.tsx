@@ -8,18 +8,18 @@ import {
   TxHistoryPageContainer,
   TxMainContainer,
 } from '@/styles/pages/dashboard/transactions/Transactions.styles';
-import {
-  OrderItf,
-  PharmacyItf,
-  ProductItf,
-  TxFilterItf,
-} from '@/types/transactionTypes';
+import { TxFilterItf } from '@/types/transactionTypes';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useState } from 'react';
+import { useObatinDispatch } from '@/redux/store/store';
+import { setTxState } from '@/redux/reducers/txSlice';
+import { useModal } from '@/hooks/useModal';
 import TransactionCard from '@/components/molecules/cards/TransactionCard';
 import Navbar from '@/components/organisms/navbar/Navbar';
 
 const TransactionHistoryPage = (): React.ReactElement => {
+  const dispatch = useObatinDispatch();
+  const { openModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const [chosenFilter, setChosenFilter] = useState<TxFilterItf>({
     all: false,
@@ -65,167 +65,211 @@ const TransactionHistoryPage = (): React.ReactElement => {
   //! Order Confirmed/Received
   //! Canceled
 
-  const exampleProduct1: ProductItf = {
-    productId: 1,
-    pharmacyProductId: 24351,
-    perscriptionId: null,
-    name: 'example product 1',
-    slug: 'valsartan-160-mg-3-strip-10-tablet-strip-obat-rutin',
-    quantity: 50,
-    thumbnailUrl:
-      'https://www.redwolf.in/image/cache/catalog/stickers/rick-and-morty-rick-head-sticker-600x800.jpg?m=1687862089',
-    sellingUnit: 'per dus',
-    price: 100000,
-    weight: 2000,
-    isPrescribed: false,
+  const response = {
+    message: 'ok',
+    pagination: {
+      page: 1,
+      page_count: 1,
+      total_records: 2,
+      limit: 10,
+    },
+    data: [
+      {
+        order_id: 3,
+        payment_id: 3,
+        invoice_number: 'INVOBTN-07-05-2024-3',
+        status: 'waiting_payment',
+        number_items: 2,
+        subtotal: 478440,
+        created_at: '07-05-2024 22:23',
+        shipping: {
+          cost: 2810,
+          code: 'ofc_courier',
+          name: 'Obatin Kurir',
+          type: 'official',
+        },
+        pharmacy: {
+          id: 96797,
+          name: 'Sentosa Farma Apotek 477',
+          address:
+            'Jl. Edy IV No.21, RW.6, Guntur, Kecamatan Setiabudi, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12980, Indonesia',
+          city_id: 153,
+          lat: '-6.2067855',
+          lng: '106.8322247',
+          pharmacist_name: 'Tia Edwards',
+          pharmacist_license: '2024-14-477-47714',
+          pharmacist_phone: '08123414477',
+          opening_time: '08:00:00',
+          closing_time: '21:00:00',
+          operational_days: ['Senin', 'Rabu', 'Jumat'],
+          partner_id: 14,
+          distance: null,
+          total_weight: 0,
+          subtotal_pharmacy: 0,
+          cart_items: [
+            {
+              id: 1,
+              product_id: 1,
+              prescription_id: null,
+              pharmacy_product_id: 9679632,
+              name: 'Combantrin Jeruk Sirup 10 ml',
+              quantity: 230,
+              thumbnail_url:
+                'https://d2qjkwm11akmwu.cloudfront.net/thumbnails/9387-1665779695.jpeg',
+              selling_unit: 'Per Botol',
+              order_id: 3,
+              price: 22822,
+              stock: null,
+              slug: 'combantrin-jeruk-sirup-10-ml',
+              weight: 63,
+              is_prescription_required: false,
+            },
+            {
+              id: 2,
+              product_id: 12,
+              name: 'Oralit 200 4.1 g 1 Sachet',
+              quantity: 20,
+              prescription_id: null,
+              pharmacy_product_id: 9679635,
+              thumbnail_url:
+                'https://d2qjkwm11akmwu.cloudfront.net/thumbnails/150718_5-11-2020_14-55-53-1665779679.jpeg',
+              selling_unit: 'Per Sachet',
+              order_id: 3,
+              price: 1100,
+              stock: null,
+              slug: 'oralit-200-4-1-g-1-sachet',
+              weight: 642,
+              is_prescription_required: false,
+            },
+          ],
+        },
+      },
+      {
+        order_id: 3,
+        payment_id: 3,
+        invoice_number: 'INVOBTN-07-05-2024-3',
+        status: 'waiting_payment',
+        number_items: 2,
+        subtotal: 478440,
+        created_at: '07-05-2024 22:23',
+        shipping: {
+          cost: 2810,
+          code: 'ofc_courier',
+          name: 'Obatin Kurir',
+          type: 'official',
+        },
+        pharmacy: {
+          id: 96797,
+          name: 'Sentosa Farma Apotek 510',
+          address:
+            'Jl. Edy IV No.21, RW.6, Guntur, Kecamatan Setiabudi, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12980, Indonesia',
+          city_id: 153,
+          lat: '-6.2067855',
+          lng: '106.8322247',
+          pharmacist_name: 'Tia Edwards',
+          pharmacist_license: '2024-14-477-47714',
+          pharmacist_phone: '08123414477',
+          opening_time: '08:00:00',
+          closing_time: '21:00:00',
+          operational_days: ['Senin', 'Rabu', 'Jumat'],
+          partner_id: 14,
+          distance: null,
+          total_weight: 0,
+          subtotal_pharmacy: 0,
+          cart_items: [
+            {
+              id: 1,
+              product_id: 1,
+              prescription_id: null,
+              pharmacy_product_id: 9679632,
+              name: 'example Jeruk Sirup 10 ml',
+              quantity: 230,
+              thumbnail_url:
+                'https://d2qjkwm11akmwu.cloudfront.net/thumbnails/9387-1665779695.jpeg',
+              selling_unit: 'Per Botol',
+              order_id: 3,
+              price: 22822,
+              stock: null,
+              slug: 'combantrin-jeruk-sirup-10-ml',
+              weight: 63,
+              is_prescription_required: false,
+            },
+            {
+              id: 2,
+              product_id: 12,
+              name: 'Oralit 200 4.1 g 1 Sachet',
+              quantity: 20,
+              prescription_id: null,
+              pharmacy_product_id: 9679635,
+              thumbnail_url:
+                'https://www.redwolf.in/image/cache/catalog/stickers/rick-and-morty-rick-head-sticker-600x800.jpg?m=1687862089',
+              selling_unit: 'Per Sachet',
+              order_id: 3,
+              price: 1100,
+              stock: null,
+              slug: 'oralit-200-4-1-g-1-sachet',
+              weight: 642,
+              is_prescription_required: false,
+            },
+            {
+              id: 2,
+              product_id: 12,
+              name: 'Oralit 200 4.1 g 1 Sachet',
+              quantity: 20,
+              prescription_id: null,
+              pharmacy_product_id: 9679635,
+              thumbnail_url:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1R28Hy9Wf3qhwUDl9Pss3e7LOQ5E27WL8GYMfmHvvQw&s',
+              selling_unit: 'Per Sachet',
+              order_id: 3,
+              price: 1100,
+              stock: null,
+              slug: 'oralit-200-4-1-g-1-sachet',
+              weight: 642,
+              is_prescription_required: false,
+            },
+            {
+              id: 2,
+              product_id: 12,
+              name: 'Oralit 200 4.1 g 1 Sachet',
+              quantity: 20,
+              prescription_id: null,
+              pharmacy_product_id: 9679635,
+              thumbnail_url:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1R28Hy9Wf3qhwUDl9Pss3e7LOQ5E27WL8GYMfmHvvQw&s',
+              selling_unit: 'Per Sachet',
+              order_id: 3,
+              price: 1100,
+              stock: null,
+              slug: 'oralit-200-4-1-g-1-sachet',
+              weight: 642,
+              is_prescription_required: false,
+            },
+            {
+              id: 2,
+              product_id: 12,
+              name: 'Oralit 200 4.1 g 1 Sachet',
+              quantity: 20,
+              prescription_id: null,
+              pharmacy_product_id: 9679635,
+              thumbnail_url:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1R28Hy9Wf3qhwUDl9Pss3e7LOQ5E27WL8GYMfmHvvQw&s',
+              selling_unit: 'Per Sachet',
+              order_id: 3,
+              price: 1100,
+              stock: null,
+              slug: 'oralit-200-4-1-g-1-sachet',
+              weight: 642,
+              is_prescription_required: false,
+            },
+          ],
+        },
+      },
+    ],
   };
 
-  const exampleProduct2: ProductItf = {
-    productId: 50,
-    pharmacyProductId: 54551,
-    perscriptionId: null,
-    name: 'example product 2',
-    slug: 'valsartan-160-mg-3-strip-10-tablet-strip-obat-rutin',
-    quantity: 35,
-    thumbnailUrl:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1R28Hy9Wf3qhwUDl9Pss3e7LOQ5E27WL8GYMfmHvvQw&s',
-    sellingUnit: 'per dus',
-    price: 100000,
-    weight: 500,
-    isPrescribed: false,
-  };
-
-  const examplePharmacy1: PharmacyItf = {
-    id: 1,
-    cityId: 1,
-    partnerId: 2,
-    name: 'Happy Pharma',
-    address: 'Jl. manarupa abc, Jakarta Selatan, Sopo Del 18729',
-    lat: '1.123',
-    lng: '2.123',
-    pharmacistName: 'John',
-    pharmacistLicense: 'DFGHJK',
-    pharmacistPhone: '08527272839',
-  };
-
-  const examplePharmacy2: PharmacyItf = {
-    id: 11,
-    cityId: 11,
-    partnerId: 12,
-    name: 'Sad Pharma',
-    address: 'Jl. Ajuuubababa abc, Jakarta Selatan, Sopo Del 18729',
-    lat: '5.123',
-    lng: '2.123',
-    pharmacistName: 'Alice',
-    pharmacistLicense: 'iajnsdiIBA',
-    pharmacistPhone: '99988877651',
-  };
-
-  // const examplePaginationInfo: PaginationInfoItf = {
-  //   currentPage: 1,
-  //   totalPages: 10,
-  //   limit: 5,
-  //   totalEntries: 50,
-  // };
-
-  const exampleOrders: Array<OrderItf> = [
-    {
-      status: 'waitingUserPayment',
-      totalAmount: 500000,
-      invoiceNumber: 'OBTN-XXX-8877769420',
-      pharmacy: examplePharmacy1,
-      createdAt: '06-02-2024 16:37',
-      products: [
-        exampleProduct1,
-        exampleProduct2,
-        exampleProduct1,
-        exampleProduct2,
-        exampleProduct1,
-        exampleProduct2,
-      ],
-      shippingInfo: {
-        cost: 100000,
-        code: 'TKI-77',
-        name: 'TIKI',
-        type: 'official',
-      },
-    },
-    {
-      createdAt: '10-03-2024 16:37',
-      status: 'waitingConfirmation',
-      totalAmount: 300000,
-      invoiceNumber: 'OBTN-ZZZ-8877766333',
-      pharmacy: examplePharmacy2,
-      products: [
-        exampleProduct1,
-        exampleProduct2,
-        exampleProduct1,
-        exampleProduct2,
-      ],
-      shippingInfo: {
-        cost: 50000,
-        code: 'JNE-77',
-        name: 'JNE',
-        type: 'official',
-      },
-    },
-    {
-      createdAt: '25-12-2024 15:37',
-      status: 'processed',
-      totalAmount: 300000,
-      invoiceNumber: 'OBTN-AAA-8877766333',
-      pharmacy: examplePharmacy2,
-      products: [exampleProduct1],
-      shippingInfo: {
-        cost: 150000,
-        code: 'XGZ-57',
-        name: 'XGZ',
-        type: 'official',
-      },
-    },
-    {
-      createdAt: '25-12-2024 15:37',
-      status: 'sent',
-      totalAmount: 300000,
-      invoiceNumber: 'OBTN-AAA-8877766333',
-      pharmacy: examplePharmacy2,
-      products: [exampleProduct1],
-      shippingInfo: {
-        cost: 150000,
-        code: 'XGZ-57',
-        name: 'XGZ',
-        type: 'official',
-      },
-    },
-    {
-      createdAt: '25-12-2024 15:37',
-      status: 'received',
-      totalAmount: 300000,
-      invoiceNumber: 'OBTN-AAA-8877766333',
-      pharmacy: examplePharmacy2,
-      products: [exampleProduct1],
-      shippingInfo: {
-        cost: 150000,
-        code: 'XGZ-57',
-        name: 'XGZ',
-        type: 'official',
-      },
-    },
-    {
-      createdAt: '25-12-2024 15:37',
-      status: 'cancelled',
-      totalAmount: 300000,
-      invoiceNumber: 'OBTN-AAA-8877766333',
-      pharmacy: examplePharmacy2,
-      products: [exampleProduct1],
-      shippingInfo: {
-        cost: 150000,
-        code: 'XGZ-57',
-        name: 'XGZ',
-        type: 'official',
-      },
-    },
-  ];
+  // eslint-disable-next-line
+  const paginationInfo = response.pagination;
 
   return (
     <TxHistoryPageContainer $isDesktopDisplay={isDesktopDisplay}>
@@ -297,17 +341,23 @@ const TransactionHistoryPage = (): React.ReactElement => {
         </TxFilterContainer>
 
         <TxMainContainer className='scrollbar-5px'>
-          {exampleOrders.map((order, index) => {
+          {response.data.map((order, index) => {
+            const handleOpenViewMore = () => {
+              dispatch(setTxState(order));
+              openModal('view-more-tx');
+            };
+
             return (
               <TransactionCard
-                key={`txCard${order.invoiceNumber}${index}`}
+                key={`txCard${order.invoice_number}${index}`}
                 status={order.status}
-                totalAmount={order.totalAmount}
-                invoiceNumber={order.invoiceNumber}
+                totalAmount={order.subtotal}
+                invoiceNumber={order.invoice_number}
                 pharmacy={order.pharmacy}
-                products={order.products}
-                createdAt={order.createdAt}
-                shippingInfo={order.shippingInfo}
+                products={order.pharmacy.cart_items}
+                createdAt={order.created_at}
+                shippingInfo={order.shipping}
+                handleOpenViewMore={handleOpenViewMore}
               />
             );
           })}
