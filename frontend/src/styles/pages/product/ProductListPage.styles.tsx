@@ -49,7 +49,6 @@ export const CategoryContainer = styled.div`
   flex-direction: column;
   border: 1px solid ${COLORS.primary_color};
   overflow: hidden;
-  height: 100vh;
   overflow-y: auto;
   ul {
     background-color: transparent;

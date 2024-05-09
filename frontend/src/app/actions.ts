@@ -40,3 +40,7 @@ export const navigateToCart = async () => {
 export const navigateToProductList = async () => {
   redirect('/products');
 };
+
+export const NavigateToTxHistory = async () => {
+  redirect('/dashboard/user/transactions');
+};

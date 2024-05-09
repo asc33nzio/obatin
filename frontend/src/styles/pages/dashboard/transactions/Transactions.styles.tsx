@@ -1,17 +1,19 @@
 import styled from 'styled-components';
 
+interface TxFilterButtonPropsItf {
+  $isChosen: boolean;
+  $width: number;
+}
+
 export const TxHistoryPageContainer = styled.div<{
   $isDesktopDisplay: boolean;
 }>`
   display: flex;
   flex-direction: column;
 
-  width: 100vw;
-  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '125vh' : '200vh')};
+  width: 99vw;
+  height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '170vh' : '200vh')};
   overflow-x: hidden;
-
-  padding-left: 135px;
-  padding-right: 135px;
 `;
 
 export const TxHistoryContentContainer = styled.div`
@@ -20,8 +22,8 @@ export const TxHistoryContentContainer = styled.div`
 
   width: 100%;
   height: 90%;
-
-  border: 1px solid black;
+  padding-left: 135px;
+  padding-right: 135px;
 
   h1 {
     background: transparent;
@@ -39,14 +41,7 @@ export const TxFilterContainer = styled.div`
   height: 10%;
 
   gap: 25px;
-
-  border: 1px solid aqua;
 `;
-
-interface TxFilterButtonPropsItf {
-  $isChosen: boolean;
-  $width: number;
-}
 
 export const TxFilterButton = styled.button<TxFilterButtonPropsItf>`
   cursor: pointer;
@@ -78,4 +73,27 @@ export const ClearTxFilterButton = styled.button`
   font-size: 18px;
   font-weight: 700;
   color: #00b5c0;
+`;
+
+export const TxMainContainer = styled.section`
+  display: block;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 75%;
+  overflow: hidden;
+  overflow-y: scroll;
+  padding-bottom: 20px;
+`;
+
+export const PaginationDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 10%;
 `;

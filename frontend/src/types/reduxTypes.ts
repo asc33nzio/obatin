@@ -1,5 +1,7 @@
+import { CartItemItf, TxItf } from './transactionTypes';
+
 export type Gender = 'laki-laki' | 'perempuan';
-export type Role = 'user' | 'doctor' | 'partner' | 'admin';
+export type Role = 'user' | 'doctor' | 'manager' | 'admin';
 
 export type ValidDays =
   | 'senin'
@@ -62,6 +64,11 @@ export interface AuthDoctorReduxItf {
   openingTime: string;
   operationalHours: string;
   operationalDays: Array<ValidDays>;
+}
+
+export interface ReduxTxItf {
+  info: Partial<TxItf>;
+  products: Array<CartItemItf>;
 }
 
 export interface RajaOngkirProvinceItf {

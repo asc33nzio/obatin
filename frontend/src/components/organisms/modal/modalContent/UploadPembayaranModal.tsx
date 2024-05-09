@@ -10,7 +10,7 @@ import Image from 'next/image';
 import CustomButton from '@/components/atoms/button/CustomButton';
 const UploadPembayaranModal = (): React.ReactElement => {
   const { closeModal } = useModal();
-//   const handlePdfChange = useUploadValidation();
+  //   const handlePdfChange = useUploadValidation();
 
   return (
     <UploadModalContainer>
