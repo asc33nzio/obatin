@@ -76,7 +76,7 @@ const ProductDetailPage = () => {
         }),
       );
     } else {
-      dispatch(removeItemFromCart(productId));
+      dispatch(removeItemFromCart({ product_id: productId }));
       setSelectedProduct(null);
     }
   };

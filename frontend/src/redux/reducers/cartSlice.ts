@@ -56,7 +56,7 @@ export const cartSlice = createSlice({
     },
 
     removeItemFromCart: (state, action: PayloadAction<Partial<CartItem>>) => {
-      const product_id = action.payload.product_id;
+      const { product_id } = action.payload;
 
       const existingItem = state.items.find(
         (item) => item.product_id === product_id,
@@ -71,7 +71,7 @@ export const cartSlice = createSlice({
           (state.items = []),
         );
       }
-      state.totalQuantity;
+      state.totalQuantity -= 1;
     },
 
     updateQuantityCart: (state, action: PayloadAction<number>) => {

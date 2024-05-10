@@ -13,11 +13,7 @@ import {
   ProductCard,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
-import {
-  addItemToCart,
-  clearCart,
-  removeItemFromCart,
-} from '@/redux/reducers/cartSlice';
+import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Body, Container } from '@/styles/Global.styles';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -123,37 +119,36 @@ const ProductsPage = () => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
-      dispatch(clearCart);
       NavigateToChat();
-    } else {
-      const existingItem = items.find((item) => {
-        item.product_id === product.id;
-      });
-      if (existingItem) {
-        dispatch(
-          addItemToCart({
-            ...existingItem,
-            quantity: +1,
-          }),
-        );
-        setSelectedProduct(product);
-        return;
-      }
+      return;
+    }
+
+    const existingItem = items.find((item) => {
+      item.product_id === product.id;
+    });
+    if (existingItem) {
       dispatch(
         addItemToCart({
-          product_id: product.id,
-          prescription_id: null,
-          pharmacy_id: null,
-          quantity: 1,
+          ...existingItem,
+          quantity: +1,
         }),
       );
       setSelectedProduct(product);
+      return;
     }
+    dispatch(
+      addItemToCart({
+        product_id: product.id,
+        prescription_id: null,
+        pharmacy_id: null,
+        quantity: 1,
+      }),
+    );
+    setSelectedProduct(product);
   };
 
   const handleSubtract = (productId: number) => {
     const existingItem = items.find((item) => item.product_id === productId);
-
     if (existingItem && existingItem.quantity > 1) {
       dispatch(
         removeItemFromCart({
@@ -164,7 +159,7 @@ const ProductsPage = () => {
     } else {
       dispatch(
         removeItemFromCart({
-          ...existingItem,
+          product_id: productId,
         }),
       );
       setSelectedProduct(null);
@@ -251,7 +246,7 @@ const ProductsPage = () => {
                     </ButtonAdd>
                   ) : (
                     <CustomButton
-                      content='Add to Cart'
+                      content='Tambah Ke Keranjang'
                       onClick={() => handleAddToCart(product)}
                       $width='150px'
                       $height='50px'
@@ -264,7 +259,7 @@ const ProductsPage = () => {
             <CustomButton
               onClick={handleLoadMore}
               disabled={loading}
-              content='load more'
+              content='Lebih Banyak'
               $width='150px'
               $fontSize='18px'
             />
