@@ -131,11 +131,19 @@ func (u ChatRoomReq) ToChatRoom() entity.ChatRoom {
 	}
 }
 
-func (u UpdateIsTypingReq) ToUpdateIsTyping() entity.ChatRoom {
+func (u UpdateIsTypingReq) ToUpdateIsTypingDoctor() entity.ChatRoom {
 	return entity.ChatRoom{
-		DoctorId: u.DoctorId,
-		UserId:   u.UserId,
-		IsTyping: *u.IsTyping,
+		DoctorId:       u.DoctorId,
+		UserId:         u.UserId,
+		IsDoctorTyping: *u.IsTyping,
+	}
+}
+
+func (u UpdateIsTypingReq) ToUpdateIsTypingUser() entity.ChatRoom {
+	return entity.ChatRoom{
+		DoctorId:     u.DoctorId,
+		UserId:       u.UserId,
+		IsUserTyping: *u.IsTyping,
 	}
 }
 

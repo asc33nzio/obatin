@@ -179,8 +179,10 @@ func ToGetAllChatRoomRes(chatRooms []entity.ChatRoom) []OneChatRoomRes {
 }
 
 type OneChatRoom struct {
-	Id      int64                `json:"chat_room_id"`
-	Message []OneMessageRes      `json:"message"`
-	Doctor  DoctorDetailResponse `json:"doctor,omitempty"`
-	User    UserDetailRes        `json:"user,omitempty"`
+	Id             int64                `json:"chat_room_id"`
+	IsDoctorTyping bool                 `json:"is_doctor_typing"`
+	IsUserTyping   bool                 `json:"is_user_typing"`
+	Message        []OneMessageRes      `json:"message"`
+	Doctor         DoctorDetailResponse `json:"doctor,omitempty"`
+	User           UserDetailRes        `json:"user,omitempty"`
 }

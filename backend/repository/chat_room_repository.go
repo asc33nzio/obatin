@@ -42,7 +42,9 @@ func (r *chatRoomRepositoryPostgres) FindChatRoomByID(ctx context.Context, chatR
 			id,     
 			user_id,
 			doctor_id,
-			is_active
+			is_active,
+			is_doctor_typing,
+			is_user_typing
 		FROM 
 			chat_rooms
 		WHERE
@@ -56,6 +58,8 @@ func (r *chatRoomRepositoryPostgres) FindChatRoomByID(ctx context.Context, chatR
 		&res.UserId,
 		&res.DoctorId,
 		&res.IsActive,
+		&res.IsDoctorTyping,
+		&res.IsUserTyping,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -114,7 +118,7 @@ func (r *chatRoomRepositoryPostgres) UpdateUserIsTypingByUserId(ctx context.Cont
 			deleted_at IS NULL
 	`
 
-	res, err := r.db.ExecContext(ctx, queryCreateChatRoom, crReq.UserId, crReq.Id, crReq.IsTyping)
+	res, err := r.db.ExecContext(ctx, queryCreateChatRoom, crReq.UserId, crReq.Id, crReq.IsUserTyping)
 	if err != nil {
 		return apperror.NewInternal(err)
 	}
@@ -145,7 +149,7 @@ func (r *chatRoomRepositoryPostgres) UpdateDoctorIsTypingByDoctorId(ctx context.
 			deleted_at IS NULL
 	`
 
-	res, err := r.db.ExecContext(ctx, queryCreateChatRoom, crReq.DoctorId, crReq.Id, crReq.IsTyping)
+	res, err := r.db.ExecContext(ctx, queryCreateChatRoom, crReq.DoctorId, crReq.Id, crReq.IsDoctorTyping)
 	if err != nil {
 		return apperror.NewInternal(err)
 	}
@@ -478,7 +482,7 @@ func (r *chatRoomRepositoryPostgres) UpdateChatRoomValidByUserId(ctx context.Con
 	}
 
 	if rowsAffected == 0 {
-		return apperror.NewInternal(apperror.ErrStlNotFound)
+		return nil
 	}
 
 	return nil

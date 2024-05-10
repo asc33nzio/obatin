@@ -13,9 +13,11 @@ import Image from 'next/image';
 const SpecializationComponent = ({
   specializations,
   setSpecSlug,
+  setParentPage,
 }: {
   specializations: DoctorSpecType[];
   setSpecSlug: (specSlug: string) => void;
+  setParentPage: () => void;
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -23,6 +25,7 @@ const SpecializationComponent = ({
 
   const handleSpecializationClicked = (specSlug: string) => {
     setSpecSlug(specSlug);
+    setParentPage();
   };
 
   const createQueryString = useCallback(

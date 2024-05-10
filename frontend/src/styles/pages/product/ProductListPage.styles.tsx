@@ -42,13 +42,13 @@ export const Content = styled.div`
 export const CategoryContainer = styled.div`
   border: 1px solid ${COLORS.input_border};
   width: 300px;
-  height: max-content;
-  margin: 2rem 0 auto 5rem;
+  height: 80vh;
+  margin: 2rem 0 auto 10rem;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   border: 1px solid ${COLORS.primary_color};
-  overflow: hidden;
+  /* overflow: hidden; */
   overflow-y: auto;
   ul {
     background-color: transparent;

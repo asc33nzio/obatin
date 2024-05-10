@@ -11,19 +11,25 @@ import {
 const DoctorFilterComponent = ({
   setSortBy,
   setOrderBy,
+  onClickClear,
 }: {
   setSortBy: (sortBy: string | null) => void;
   setOrderBy: (orderBy: string | null) => void;
+  onClickClear: () => void;
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const newParams = new URLSearchParams(searchParams.toString());
   const pathname = usePathname();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenSortBy, setIsOpenSortBy] = useState(false);
+  const [isOpenOrderBy, setIsOpenOrderBy] = useState(false);
 
-  const toggleFilter = () => {
-    setIsOpen(!isOpen);
+  const toggleFilterSortBy = () => {
+    setIsOpenSortBy(!isOpenSortBy);
+  };
+  const toggleFilterOrderBy = () => {
+    setIsOpenOrderBy(!isOpenOrderBy);
   };
 
   const createQueryString = useCallback(
@@ -65,6 +71,7 @@ const DoctorFilterComponent = ({
     newParams.delete('order');
     setSortBy(null);
     setOrderBy(null);
+    onClickClear();
 
     const queryString = newParams.toString();
     router.push(`${pathname}${queryString ? `?${queryString}` : ''}`);
@@ -74,16 +81,17 @@ const DoctorFilterComponent = ({
     <FilterContainer>
       <FilterButtonStyle>
         <CustomButton
-          content='Sort By'
-          onClick={toggleFilter}
+          content='Urut berdasarkan'
+          onClick={toggleFilterSortBy}
           $fontSize='16px'
         />
-        {isOpen && (
-          <div>
+        {isOpenSortBy && (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button
               onClick={() => {
                 handleFilterClicked('sort_by', 'name');
                 handleSortByClicked('name');
+                setIsOpenSortBy(false);
               }}
             >
               Nama
@@ -92,6 +100,7 @@ const DoctorFilterComponent = ({
               onClick={() => {
                 handleFilterClicked('is_online', 'true');
                 handleSortByClicked('true');
+                setIsOpenSortBy(false);
               }}
             >
               Online
@@ -102,11 +111,11 @@ const DoctorFilterComponent = ({
 
       <FilterButtonStyle>
         <CustomButton
-          content='Order By'
-          onClick={toggleFilter}
+          content='Urutan'
+          onClick={toggleFilterOrderBy}
           $fontSize='16px'
         />
-        {isOpen && (
+        {isOpenOrderBy && (
           <div>
             <button
               onClick={() => {
@@ -129,13 +138,14 @@ const DoctorFilterComponent = ({
       </FilterButtonStyle>
 
       <CustomButton
-        content='Clear Filter'
+        content='Hapus filter'
         $width='150px'
         $height='50px'
         $fontSize='16px'
         onClick={() => {
           handleClearClicked();
-          toggleFilter();
+          setIsOpenOrderBy(false);
+          setIsOpenSortBy(false);
         }}
       />
     </FilterContainer>

@@ -293,7 +293,7 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoom(ctx context.Context, params entity.
 
 		err = crr.UpdateChatRoomValidByUserId(ctx, *user.Id, false)
 		if err != nil {
-			return nil, apperror.NewInternal(err)
+			return nil, err
 		}
 
 		allUserMessage, err := crr.GetAllMessageForUser(ctx, *user.Id, params)
