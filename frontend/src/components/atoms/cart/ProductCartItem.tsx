@@ -1,20 +1,3 @@
-import { useModal } from '@/hooks/useModal';
-import {
-  PharmacyCart,
-  setPharmacies,
-  setSelectedPharmacy,
-} from '@/redux/reducers/pharmacySlice';
-import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
-import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
-import Image from 'next/image';
-import React, { useEffect } from 'react';
-import CustomButton from '../button/CustomButton';
-import PharmacyICO from '@/assets/icons/PharmacyICO';
-import DetailICO from '@/assets/icons/DetailICO';
-import DeleteICO from '@/assets/dashboard/DeleteICO';
-import BikeICO from '@/assets/icons/BikeICO';
-import { getCookie } from 'cookies-next';
-import axios from 'axios';
 import {
   ButtonAddContainer,
   CartItemContainer,
@@ -24,6 +7,27 @@ import {
   PharmacyName,
   ProductItem,
 } from '@/styles/pages/product/Cart.styles';
+import {
+  PharmacyCart,
+  setPharmacies,
+  setSelectedPharmacy,
+} from '@/redux/reducers/pharmacySlice';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
+import {
+  addItemToCart,
+  removeItemFromCart,
+  deduceOneFromCart,
+} from '@/redux/reducers/cartSlice';
+import { useModal } from '@/hooks/useModal';
+import { getCookie } from 'cookies-next';
+import Image from 'next/image';
+import React, { useEffect } from 'react';
+import CustomButton from '../button/CustomButton';
+import PharmacyICO from '@/assets/icons/PharmacyICO';
+import DetailICO from '@/assets/icons/DetailICO';
+import DeleteICO from '@/assets/dashboard/DeleteICO';
+import BikeICO from '@/assets/icons/BikeICO';
+import Axios from 'axios';
 
 const ProductCartItem = () => {
   const dispatch = useObatinDispatch();
@@ -39,7 +43,7 @@ const ProductCartItem = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get(
+        const response = await Axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/details`,
           {
             headers: {
@@ -53,7 +57,6 @@ const ProductCartItem = () => {
           setPharmacies({ ...pharmaciesState, pharmacies: pharmaciesCart }),
         );
       } catch (error) {
-        console.log('called');
         console.error(error);
       }
     };
@@ -61,25 +64,27 @@ const ProductCartItem = () => {
     //eslint-disable-next-line
   }, []);
 
-  const deleteFromCart = async (id: number, product_id: number) => {
+  const handleCartDelete = async (id: number, product_id: number) => {
     try {
-      await axios.delete(
+      const payload = {
+        id,
+        product_id,
+      };
+
+      await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/item`,
+        payload,
         {
-          data: {
-            id: id,
-            product_id: product_id,
-          },
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         },
       );
-      dispatch(
-        removeItemFromCart({
-          product_id,
-        }),
-      );
+
+      const existingItem = items.find((item) => item.product_id === product_id);
+      if (!existingItem) return;
+
+      dispatch(removeItemFromCart(existingItem));
     } catch (error: any) {
       console.log(error);
     }
@@ -87,6 +92,7 @@ const ProductCartItem = () => {
 
   const handleAddToCart = (product_id: number) => {
     const existingItem = items.find((item) => item.product_id === product_id);
+
     if (existingItem) {
       dispatch(
         addItemToCart({
@@ -108,16 +114,8 @@ const ProductCartItem = () => {
 
   const handleSubtract = (productId: number) => {
     const existingItem = items.find((item) => item.product_id === productId);
-    if (existingItem && existingItem.quantity > 1) {
-      dispatch(
-        removeItemFromCart({
-          ...existingItem,
-          quantity: existingItem.quantity - 1,
-        }),
-      );
-    } else {
-      dispatch(removeItemFromCart({ product_id: productId }));
-    }
+    if (!existingItem) return;
+    dispatch(deduceOneFromCart(existingItem));
   };
 
   const openDetailPharmacyInterface = () => {
@@ -169,7 +167,7 @@ const ProductCartItem = () => {
                     onClick={() => handleAddToCart(item.id)}
                   />
                   <DeleteICO
-                    onClick={() => deleteFromCart(item.id, item.product_id)}
+                    onClick={() => handleCartDelete(item.id, item.product_id)}
                   />
                 </ButtonAddContainer>
               </ProductItem>

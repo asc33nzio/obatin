@@ -32,7 +32,7 @@ import { debounce } from '@/utils/debounce';
 import { getCookie } from 'cookies-next';
 import { setAuthState } from '@/redux/reducers/authSlice';
 import { BounceLoader } from 'react-spinners';
-import { NavigateToTxHistory } from '@/app/actions';
+import { navigateToTxHistory } from '@/app/actions';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
@@ -367,7 +367,7 @@ const UserDashboardPage = (): React.ReactElement => {
                 $width='150px'
                 $height='40px'
                 $fontSize='18px'
-                onClick={() => NavigateToTxHistory()}
+                onClick={() => navigateToTxHistory()}
               />
               <CustomButton
                 content='Simpan Profil'

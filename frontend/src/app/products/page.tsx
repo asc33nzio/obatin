@@ -13,7 +13,7 @@ import {
   ProductCard,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
-import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
+import { addItemToCart, deduceOneFromCart } from '@/redux/reducers/cartSlice';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Body, Container } from '@/styles/Global.styles';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -23,7 +23,8 @@ import { ButtonAdd } from '@/styles/pages/product/ProductDetail.styles';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useToast } from '@/hooks/useToast';
-import { NavigateToChat } from '../actions';
+import { navigateToChat } from '../actions';
+import { PaginationDiv } from '@/styles/pages/dashboard/transactions/Transactions.styles';
 import axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Navbar from '@/components/organisms/navbar/Navbar';
@@ -31,7 +32,7 @@ import CategoryComponent from '@/components/molecules/category/Category';
 import FilterComponent from '@/components/atoms/filter/DropdownFIlter';
 import Image from 'next/image';
 import Footer from '@/components/organisms/footer/Footer';
-import Pagination from '@/components/molecules/admin/Pagination';
+import PaginationComponent from '@/components/organisms/pagination/PaginationComponent';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -61,18 +62,88 @@ const ProductsPage = () => {
   const [products, setProducts] = useState<IResponseProduct>();
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  // eslint-disable-next-line
+  const [isLoading, setIsLoading] = useState(false);
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [classification, setClassification] = useState<string | null>(null);
   const [orderBy, setOrderBy] = useState<string | null>(null);
   const [isPrescriptionRequied] = useState<boolean>();
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
   const search = searchParams.get('search');
+  console.log(items);
+
+  const handlePageJump = (i: number) => {
+    setPage(i);
+  };
+
+  const handlePrevPage = () => {
+    if (page === 1) return;
+    setPage(page - 1);
+  };
+
+  const handleNextPage = () => {
+    if (page === products?.pagination.page_count) return;
+    setPage(page + 1);
+  };
+
+  const handleAddToCart = (product: ProductType) => {
+    if (product.is_prescription_required) {
+      setToast({
+        showToast: true,
+        toastMessage:
+          'product ini membutuhkan resep, silahkan melakukan konsultasi',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      navigateToChat();
+      return;
+    }
+
+    const existingItem = items.find((item) => item.product_id === product.id);
+    if (existingItem) {
+      dispatch(addItemToCart(existingItem));
+      setSelectedProduct(product);
+      return;
+    }
+
+    setSelectedProduct(product);
+    dispatch(
+      addItemToCart({
+        product_id: product.id,
+        prescription_id: null,
+        pharmacy_id: null,
+        quantity: 1,
+      }),
+    );
+  };
+
+  const handleSubtract = (productId: number) => {
+    const existingItem = items.find((item) => item.product_id === productId);
+    console.log(existingItem);
+
+    if (existingItem === undefined) {
+      return;
+    }
+    console.log(typeof existingItem);
+    console.log('called');
+
+    dispatch(deduceOneFromCart(existingItem));
+
+    if (existingItem.quantity === 0) {
+      setSelectedProduct(null);
+    }
+  };
+
+  const handleProductClicked = (slug: string) => {
+    router.push(`products/${slug}`);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        setIsLoading(true);
         const { data: response } = await axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?`,
           {
@@ -92,7 +163,9 @@ const ProductsPage = () => {
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 500);
       }
     };
 
@@ -109,7 +182,7 @@ const ProductsPage = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [sortBy, orderBy, classification]);
+  }, [categoryId, sortBy, classification, orderBy, search]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -125,76 +198,6 @@ const ProductsPage = () => {
 
     fetchCategories();
   }, []);
-
-  const handleClickPage = async (page: number) => {
-    setPage(page);
-    setLoading(false);
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  };
-
-  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
-  const handleAddToCart = (product: ProductType) => {
-    if (product.is_prescription_required) {
-      setToast({
-        showToast: true,
-        toastMessage: 'product ini membutuhkan prescription',
-        toastType: 'error',
-        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-        orientation: 'center',
-      });
-      NavigateToChat();
-      return;
-    }
-
-    const existingItem = items.find((item) => {
-      item.product_id === product.id;
-    });
-    if (existingItem) {
-      dispatch(
-        addItemToCart({
-          ...existingItem,
-          quantity: +1,
-        }),
-      );
-      setSelectedProduct(product);
-      return;
-    }
-    dispatch(
-      addItemToCart({
-        product_id: product.id,
-        prescription_id: null,
-        pharmacy_id: null,
-        quantity: 1,
-      }),
-    );
-    setSelectedProduct(product);
-  };
-
-  const handleSubtract = (productId: number) => {
-    const existingItem = items.find((item) => item.product_id === productId);
-    if (existingItem && existingItem.quantity > 1) {
-      dispatch(
-        removeItemFromCart({
-          ...existingItem,
-          quantity: -1,
-        }),
-      );
-    } else {
-      dispatch(
-        removeItemFromCart({
-          product_id: productId,
-        }),
-      );
-      setSelectedProduct(null);
-    }
-  };
-
-  const handleProductClicked = (slug: string) => {
-    router.push(`products/${slug}`);
-  };
 
   return (
     <Container className={inter.className}>
@@ -241,7 +244,9 @@ const ProductsPage = () => {
                       {product?.max_price.toLocaleString()}
                     </Price>
                   </div>
-                  {selectedProduct?.id === product.id ? (
+                  {selectedProduct?.id === product.id &&
+                  items.find((item) => item.product_id === product.id)
+                    ?.quantity !== undefined ? (
                     <ButtonAdd>
                       <CustomButton
                         content='-'
@@ -283,14 +288,16 @@ const ProductsPage = () => {
               ))}
             </ProductListContainer>
 
-            {!loading && products && products.pagination && (
-              <div style={{ padding: '30px 0' }}>
-                <Pagination
-                  currentPage={products.pagination.page}
+            {products && products.pagination && (
+              <PaginationDiv>
+                <PaginationComponent
+                  page={products.pagination.page}
                   totalPages={products.pagination.page_count}
-                  onPageChange={(page) => handleClickPage(page)}
+                  goToPage={handlePageJump}
+                  handlePrevPage={handlePrevPage}
+                  handleNextPage={handleNextPage}
                 />
-              </div>
+              </PaginationDiv>
             )}
           </ProductContent>
         </Content>

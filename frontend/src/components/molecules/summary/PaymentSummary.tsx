@@ -1,23 +1,23 @@
-import { navigateToCheckout } from '@/app/actions';
-import CustomButton from '@/components/atoms/button/CustomButton';
-import { updateQuantityCart } from '@/redux/reducers/cartSlice';
-import { setPaymentId } from '@/redux/reducers/pharmacySlice';
-import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import {
   PaymentSummary,
   PaymentSummaryContainer,
   Summary,
 } from '@/styles/pages/product/Cart.styles';
-import axios from 'axios';
+import { navigateToCheckout } from '@/app/actions';
+import { updateQuantityCart } from '@/redux/reducers/cartSlice';
+import { setPaymentId } from '@/redux/reducers/pharmacySlice';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { getCookie } from 'cookies-next';
+import CustomButton from '@/components/atoms/button/CustomButton';
+import axios from 'axios';
 import React from 'react';
 
 const PaymentSummaryComponent = (props: {
   isNext: boolean;
 }): React.ReactElement => {
-  const { selectedPharmacy } = useObatinSelector((state) => ({
-    selectedPharmacy: state.pharmacy.selectedPharmacy,
-  }));
+  const selectedPharmacy = useObatinSelector(
+    (state) => state?.pharmacy?.selectedPharmacy,
+  );
   const totalQuantity = useObatinSelector((state) => state.cart.totalQuantity);
   const totalPrice = useObatinSelector((state) => state.cart.totalPrice);
   const shippingCost = selectedPharmacy?.shipping_cost || 0;

@@ -47,31 +47,43 @@ export const cartSlice = createSlice({
       const existingItem = state.items.find(
         (item) => item.product_id === product_id,
       );
+
       if (existingItem) {
         existingItem.quantity += 1;
       } else {
         state.items.push({ ...action.payload, quantity: 1 });
       }
+
       state.totalQuantity += 1;
     },
 
-    removeItemFromCart: (state, action: PayloadAction<Partial<CartItem>>) => {
+    deduceOneFromCart: (state, action: PayloadAction<CartItem>) => {
       const { product_id } = action.payload;
-
-      const existingItem = state.items.find(
+      const existingItemIndex = state.items.findIndex(
         (item) => item.product_id === product_id,
       );
 
-      if (existingItem && existingItem.quantity > 1) {
-        existingItem.quantity -= 1;
-        state.totalQuantity -= 1;
-      } else {
+      if (existingItemIndex === -1) return;
+      const existingItem = state.items[existingItemIndex];
+
+      if (existingItem?.quantity <= 1) {
         state.items = state.items.filter(
-          (item) => item.product_id !== product_id,
-          (state.items = []),
+          (item) => item.product_id !== existingItem.product_id,
         );
+        return;
       }
-      state.totalQuantity -= 1;
+    },
+
+    removeItemFromCart: (state, action: PayloadAction<CartItem>) => {
+      const { product_id } = action.payload;
+      const item = state.items.find((item) => item.product_id === product_id);
+
+      if (item === undefined) return;
+
+      state.totalQuantity -= item.quantity;
+      state.items = state.items.filter(
+        (item) => item.product_id !== item.product_id,
+      );
     },
 
     updateQuantityCart: (state, action: PayloadAction<number>) => {
@@ -89,6 +101,7 @@ export const cartSlice = createSlice({
 
 export const {
   addItemToCart,
+  deduceOneFromCart,
   removeItemFromCart,
   clearCart,
   updateQuantityCart,
