@@ -1013,6 +1013,8 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 					o.shipping_cost,
 					o.subtotal,
 					o.payment_id,
+					p.invoice_number,
+					p.payment_proof_url,
 					TO_CHAR(o.created_at, 'DD-MM-YYYY HH24:MI') as created_at		
 				FROM
 					orders o
@@ -1020,6 +1022,10 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 					users u
 				ON
 					o.user_id = u.id
+				JOIN
+					payments p
+				ON
+					o.payment_id = p.id
 					%v
 				ORDER BY o.created_at DESC , o.id ASC
 				%v
@@ -1042,6 +1048,8 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 			od.shipping_cost,
 			od.subtotal,
 			od.payment_id,
+			od.invoice_number,
+			od.payment_proof_url,
 			od.created_at,
 			sm.code,
 			sm.name,

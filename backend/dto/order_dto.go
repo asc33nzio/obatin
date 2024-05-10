@@ -1,8 +1,6 @@
 package dto
 
 import (
-	"fmt"
-	"obatin/appconstant"
 	"obatin/entity"
 	"strings"
 )
@@ -23,6 +21,7 @@ type UserOrderRes struct {
 	AuthenticationId int64            `json:"user_authentication_id"`
 	UserName         string           `json:"user_name"`
 	InvoiceNumber    string           `json:"invoice_number"`
+	PaymentProofUrl  string           `json:"payment_proof_url"`
 	Status           string           `json:"status"`
 	NumberItems      int              `json:"number_items"`
 	Subtotal         int              `json:"subtotal"`
@@ -63,10 +62,13 @@ func ToUserOrdersRes(orders []*entity.Order) []*UserOrderRes {
 
 	for _, o := range orders {
 		oRes := UserOrderRes{}
-		date := strings.Fields(o.CreatedAt)
+
+		if o.Payment.PaymentProofUrl != nil {
+			oRes.PaymentProofUrl = *o.Payment.PaymentProofUrl
+		}
 		oRes.Id = *o.Id
 		oRes.PaymentId = o.Payment.Id
-		oRes.InvoiceNumber = fmt.Sprintf("%v-%v-%d", appconstant.InvoicePrefix, date[0], o.Payment.Id)
+		oRes.InvoiceNumber = o.Payment.InvoiceNumber
 		oRes.Status = o.Status
 		oRes.UserId = *o.User.Id
 		oRes.UserName = *o.User.Name

@@ -127,6 +127,8 @@ func (h *PaymentHandler) UpdatePaymentStatus(ctx *gin.Context) {
 }
 
 func (h *PaymentHandler) GetAllPendingPayment(ctx *gin.Context) {
+	var params dto.PaymentFilter
+
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
@@ -149,15 +151,17 @@ func (h *PaymentHandler) GetAllPendingPayment(ctx *gin.Context) {
 		return
 	}
 
-	payments, err := h.paymentUsecase.GetAllPendingPayments(ctx)
+	payments, err := h.paymentUsecase.GetAllPendingPayments(ctx, params.ToPaymentFilterEntity())
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
+	res := dto.ToGetAllPendingPayments(payments.Payments)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
-		Data:    payments,
+		Message:    constant.ResponseOkMsg,
+		Pagination: (*dto.PaginationResponse)(&payments.Pagination),
+		Data:       res,
 	})
 }
 

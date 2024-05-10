@@ -13,7 +13,7 @@ import (
 type PaymentUsecase interface {
 	UploadPaymentProof(ctx context.Context, p *entity.Payment) error
 	UpdatePaymentStatus(ctx context.Context, p *entity.Payment) error
-	GetAllPendingPayments(ctx context.Context) ([]*entity.Payment, error)
+	GetAllPendingPayments(ctx context.Context, params *entity.PaymentFilter) (*entity.PaymentsPagination, error)
 	CancelPayment(ctx context.Context, p *entity.Payment) error
 }
 
@@ -120,12 +120,29 @@ func (u *paymentUsecaseImpl) UpdatePaymentStatus(ctx context.Context, p *entity.
 	return nil
 }
 
-func (u *paymentUsecaseImpl) GetAllPendingPayments(ctx context.Context) ([]*entity.Payment, error) {
+func (u *paymentUsecaseImpl) GetAllPendingPayments(ctx context.Context, params *entity.PaymentFilter) (*entity.PaymentsPagination, error) {
 	pr := u.repoStore.PaymentRepository()
 
-	payments, err := pr.FindAllPendingPayments(ctx)
+	if params.Limit < appconstant.DefaultMinLimit {
+		params.Limit = appconstant.DefaultProductLimit
+	}
+	if params.Page < appconstant.DefaultMinPage {
+		params.Page = appconstant.DefaultMinPage
+	}
+
+	payments, err := pr.FindAllPendingPayments(ctx, params)
 	if err != nil {
 		return nil, err
+	}
+
+	payments.Pagination = entity.PaginationResponse{
+		Page:         params.Page,
+		PageCount:    payments.TotalRows / int64(params.Limit),
+		Limit:        params.Limit,
+		TotalRecords: payments.TotalRows,
+	}
+	if payments.Pagination.TotalRecords-(payments.Pagination.PageCount*int64(params.Limit)) > 0 {
+		payments.Pagination.PageCount = int64(payments.Pagination.PageCount) + appconstant.DefaultMinPage
 	}
 
 	return payments, nil
