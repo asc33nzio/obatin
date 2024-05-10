@@ -17,6 +17,7 @@ services:
 
   obatin-be:
     image: yassarnaufal/obatin:be-develop
+    network_mode: host
     env_file:
       - ./backend/.env
     ports:
@@ -25,9 +26,21 @@ services:
       obatin-db:
         condition: service_healthy
     restart: "always"
+    logging:
+      driver: "json-file"
+
+  obatin-be-express:
+    image: yassarnaufal/obatin:be-express-develop
+    network_mode: host
+    env_file:
+      - ./proxy/.env
+    ports:
+      - "8081:8081"
+    restart: "always"
 
   obatin-fe:
     image: yassarnaufal/obatin:fe-develop
+    network_mode: host
     env_file:
       - ./frontend/.env
     ports:

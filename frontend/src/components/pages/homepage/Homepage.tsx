@@ -103,7 +103,7 @@ const Homepage = ({
                       } as CSSProperties
                     }
                   >
-                    {categories.map((item, i) => {
+                    {categories?.map((item, i) => {
                       return (
                         <SwiperSlide
                           key={i}
@@ -115,7 +115,7 @@ const Homepage = ({
                         >
                           <Imagecontainer
                             onClick={() =>
-                              handleCategoryClicked(item.category_slug)
+                              handleCategoryClicked(item?.category_slug)
                             }
                           >
                             <Image
@@ -140,21 +140,23 @@ const Homepage = ({
               <Title>POPULER</Title>
               <PopularContainer>
                 <ProductListContainer>
-                  {products.map((product) => (
+                  {products?.map((product) => (
                     <ProductCard
-                      key={product.id}
-                      onClick={() => handleProductClicked(product.product_slug)}
+                      key={product?.id}
+                      onClick={() =>
+                        handleProductClicked(product?.product_slug)
+                      }
                     >
                       <Imagecontainer>
                         <Image
                           height={150}
                           width={150}
-                          src={product.image_url}
+                          src={product?.image_url}
                           alt='banner'
                         />
                       </Imagecontainer>
-                      <Bold>{product.name}</Bold>
-                      <Smallfont>{product.selling_unit}</Smallfont>
+                      <Bold>{product?.name}</Bold>
+                      <Smallfont>{product?.selling_unit}</Smallfont>
                       <Price>
                         Rp{product?.min_price.toLocaleString()} - Rp
                         {product?.max_price.toLocaleString()}
