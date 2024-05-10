@@ -11,8 +11,8 @@ import {
   CategoryContent,
 } from '@/styles/pages/homepage/Homepage.styles';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { ProductType } from '@/types/Product';
-import { Keyboard, Mousewheel, Navigation, Pagination } from 'swiper/modules';
+import { CategoryType, ProductType } from '@/types/Product';
+import { Keyboard, Mousewheel, Navigation } from 'swiper/modules';
 import { CSSProperties } from 'styled-components';
 import Navbar from '../../organisms/navbar/Navbar';
 import Footer from '../../organisms/footer/Footer';
@@ -22,8 +22,6 @@ import toko from '@/assets/homepage/Pharmacist-pana 1.svg';
 import konsul from '@/assets/homepage/Researching-amico 1(1).svg';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import { Container } from '@/styles/Global.styles';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { ProductListContainer } from '@/styles/pages/product/ProductListPage.styles';
 import { useRouter } from 'next/navigation';
 import {
@@ -34,46 +32,29 @@ import {
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
 
-const CategoryImg = [
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/42753_12-4-2023_9-48-50.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/10080_12-4-2023_9-50-39.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/353198_30-10-2023_18-53-54.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/876467_12-4-2023_9-51-14.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/102678_4-3-2020_14-9-50-1-1-1.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/591887_12-4-2023_9-41-41.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/894816_12-4-2023_9-52-27.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/457303_12-4-2023_9-42-26.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/810949_18-1-2023_16-48-21.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/667210_12-4-2023_9-41-10.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/602092_3-8-2020_17-20-55-1.jpeg',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/734224_19-11-2021_12-13-1-1.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/790299_12-4-2023_9-43-5.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/546575_12-4-2023_9-45-7.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/282182_12-4-2023_9-47-54.png',
-  'https://d2qjkwm11akmwu.cloudfront.net/categories/508805_12-4-2023_9-42-2.png',
-];
-
-const Homepage = (): React.ReactElement => {
-  const [products, setProducts] = useState<ProductType[]>([]);
+const Homepage = ({
+  categories,
+  products,
+}: {
+  categories: CategoryType[];
+  products: ProductType[];
+}): React.ReactElement => {
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data: response } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?limit=5`,
-        );
-        setProducts(() => [...response.data]);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const handleProductClicked = (slug: string) => {
     router.push(`/products/${slug}`);
+  };
+
+  const handleCategoryClicked = (slug: string) => {
+    router.push(`/products?category=${slug}`);
+  };
+
+  const handleConsultationClicked = () => {
+    router.push(`/doctors`);
+  };
+
+  const handleShopClicked = () => {
+    router.push('/products');
   };
 
   return (
@@ -84,11 +65,11 @@ const Homepage = (): React.ReactElement => {
           <Body>
             <Banner />
             <FiturContainer>
-              <Fitur>
+              <Fitur onClick={() => handleConsultationClicked()}>
                 <Image priority src={konsul} alt='obatin' height={150} />
                 <p>Konsultasi Dokter</p>
               </Fitur>
-              <Fitur>
+              <Fitur onClick={() => handleShopClicked()}>
                 <Image priority src={toko} alt='obatin' height={150} />
                 <p>Toko Kesehatan</p>
               </Fitur>
@@ -100,19 +81,18 @@ const Homepage = (): React.ReactElement => {
                   <Swiper
                     cssMode={true}
                     navigation={true}
-                    pagination={true}
                     scrollbar={true}
                     mousewheel={true}
-                    modules={[Navigation, Pagination, Mousewheel, Keyboard]}
+                    modules={[Navigation, Mousewheel, Keyboard]}
                     breakpoints={{
                       320: {
                         slidesPerView: 1,
                       },
                       768: {
-                        slidesPerView: 3,
+                        slidesPerView: 4,
                       },
-                      1400: {
-                        slidesPerView: 7,
+                      1440: {
+                        slidesPerView: 5,
                       },
                     }}
                     style={
@@ -123,14 +103,29 @@ const Homepage = (): React.ReactElement => {
                       } as CSSProperties
                     }
                   >
-                    {CategoryImg.map((image, i) => {
+                    {categories.map((item, i) => {
                       return (
-                        <SwiperSlide key={i} style={{ padding: '2rem' }}>
-                          <Imagecontainer>
+                        <SwiperSlide
+                          key={i}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Imagecontainer
+                            onClick={() =>
+                              handleCategoryClicked(item.category_slug)
+                            }
+                          >
                             <Image
                               height={150}
                               width={150}
-                              src={image}
+                              src={
+                                item.image_url !== ''
+                                  ? item.image_url
+                                  : 'https://img.freepik.com/free-vector/virus-cure-concept_23-2148488766.jpg?t=st=1715234591~exp=1715238191~hmac=7d5be4a2f251beedead023dbac5e7c87179fdbb05ff4be5c609ed7bd873b213f&w=826'
+                              }
                               alt='banner'
                             />
                           </Imagecontainer>
@@ -142,7 +137,7 @@ const Homepage = (): React.ReactElement => {
               </CategoryContent>
             </NewSection>
             <NewSection>
-              <Title>POPULAR</Title>
+              <Title>POPULER</Title>
               <PopularContainer>
                 <ProductListContainer>
                   {products.map((product) => (
