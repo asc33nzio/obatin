@@ -12,6 +12,7 @@ import {
   PaginationInfoItf,
   TxFilterItf,
   TxItf,
+  apiFilterMapTypes,
 } from '@/types/transactionTypes';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEffect, useState } from 'react';
@@ -23,6 +24,7 @@ import { useToast } from '@/hooks/useToast';
 import TransactionCard from '@/components/molecules/cards/TransactionCard';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import Axios from 'axios';
+import PaginationComponent from '@/components/organisms/pagination/PaginationComponent';
 
 const TransactionHistoryPage = (): React.ReactElement => {
   const dispatch = useObatinDispatch();
@@ -46,17 +48,35 @@ const TransactionHistoryPage = (): React.ReactElement => {
     page_count: 0,
     total_records: 0,
   });
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const apiFilterMap = {
+    all: '',
+    waitingUserPayment: 'waiting_payment',
+    waitingConfirmation: 'waiting_confirmation',
+    processed: 'processed',
+    sent: 'sent',
+    received: 'confirmed',
+    cancelled: 'cancelled',
+  };
 
   const fetchOrders = async () => {
     try {
-      const response = await Axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/orders`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+      setIsLoading(true);
+
+      const statusFilter = Object.keys(chosenFilter)
+        .filter((key: keyof TxFilterItf) => chosenFilter[key])
+        .map((key: string) => apiFilterMap[key as apiFilterMapTypes])
+        .toString();
+
+      let apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/orders?limit=3&page=${currentPage}`;
+      if (statusFilter !== '') apiUrl += `&status=${statusFilter}`;
+
+      const response = await Axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      );
+      });
       setPaginationInfo(response.data.pagination);
       setOrders(response.data.data);
     } catch (error) {
@@ -68,6 +88,10 @@ const TransactionHistoryPage = (): React.ReactElement => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     }
   };
 
@@ -80,24 +104,16 @@ const TransactionHistoryPage = (): React.ReactElement => {
       return;
     }
 
-    if (type === 'all') {
-      setChosenFilter({
-        all: true,
-        waitingUserPayment: false,
-        waitingConfirmation: false,
-        processed: false,
-        sent: false,
-        received: false,
-        cancelled: false,
-      });
-      return;
-    }
-
-    setChosenFilter((prevState) => ({
-      ...prevState,
+    setChosenFilter({
       all: false,
+      waitingUserPayment: false,
+      waitingConfirmation: false,
+      processed: false,
+      sent: false,
+      received: false,
+      cancelled: false,
       [type]: true,
-    }));
+    });
   };
 
   const handleResetFilter = () => {
@@ -112,10 +128,24 @@ const TransactionHistoryPage = (): React.ReactElement => {
     });
   };
 
+  const handlePrevPage = () => {
+    if (currentPage === 1) return;
+    setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage === paginationInfo?.page_count) return;
+    setCurrentPage(currentPage + 1);
+  };
+
+  const handlePageJump = (i: number) => {
+    setCurrentPage(i);
+  };
+
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPage, chosenFilter]);
 
   return (
     <TxHistoryPageContainer $isDesktopDisplay={isDesktopDisplay}>
@@ -210,7 +240,8 @@ const TransactionHistoryPage = (): React.ReactElement => {
 
             return (
               <TransactionCard
-                key={`txCard${order.invoice_number}${index}`}
+                key={`txCard${order.invoice_number}_${index}`}
+                isLoading={isLoading}
                 status={order.status}
                 subtotal={order.subtotal}
                 invoice_number={order.invoice_number}
@@ -227,7 +258,15 @@ const TransactionHistoryPage = (): React.ReactElement => {
           })}
         </TxMainContainer>
 
-        <PaginationDiv>{paginationInfo?.page_count} PAGINATION</PaginationDiv>
+        <PaginationDiv>
+          <PaginationComponent
+            page={paginationInfo?.page}
+            totalPages={paginationInfo?.page_count - 1}
+            handlePrevPage={handlePrevPage}
+            handleNextPage={handleNextPage}
+            goToPage={handlePageJump}
+          />
+        </PaginationDiv>
       </TxHistoryContentContainer>
     </TxHistoryPageContainer>
   );

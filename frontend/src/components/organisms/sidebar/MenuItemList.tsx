@@ -35,8 +35,8 @@ export default function MenuItemsList({
 
           return (
             <MenuItem
-              menuItem={option}
               key={option.id}
+              menuItem={option}
               handler={handleLogout}
             />
           );

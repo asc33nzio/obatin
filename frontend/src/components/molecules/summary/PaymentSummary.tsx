@@ -81,6 +81,10 @@ const PaymentSummaryComponent = (props: {
     }
   };
 
+  // const handleCheckout = async () => {
+  // dispatch(clearCart()) saat tidak ada error di post req
+  // }
+
   return (
     <>
       <PaymentSummaryContainer>

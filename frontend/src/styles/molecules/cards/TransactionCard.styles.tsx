@@ -89,24 +89,21 @@ export const TxProductBreakdown = styled.div`
     cursor: pointer;
     object-fit: cover;
     background-color: #efffff;
-    height: 100%;
-    width: 80px;
+    height: 80%;
+    width: 75px;
     border: 1px solid ${COLORS.primary_color};
     border-radius: 12px;
     padding: 5px;
+    margin-left: 10px;
   }
 `;
 
 export const FillerDiv = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  opacity: 0;
 
   width: 100%;
-  height: 33.3%;
-
-  border: 1px solid ${COLORS.input_border};
-  border-radius: 15px;
+  height: 100%;
 `;
 
 export const BreakdownCenterDiv = styled.div<{ $isModal?: boolean }>`
@@ -198,13 +195,16 @@ export const SeeMoreDiv = styled.div`
   }
 `;
 
-export const DeliveryStatusBadge = styled.div<{ $color: string }>`
+export const DeliveryStatusBadge = styled.div<{
+  $color: string;
+  $isModal?: boolean;
+}>`
   display: flex;
   align-items: center;
   justify-content: center;
 
   width: 225px;
-  height: 100%;
+  height: ${({ $isModal }) => (!$isModal ? '100%' : '25%')};
 
   border: ${({ $color }) => `2.5px solid ${$color}`};
   border-radius: 5px;
@@ -224,4 +224,15 @@ export const DeliveryStatusBadge = styled.div<{ $color: string }>`
     font-weight: 600;
     color: ${({ $color }) => `${$color}`};
   }
+`;
+
+export const SkeletonDiv = styled.div<{ $width?: string }>`
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  width: ${({ $width }) => ($width ? $width : '100%')};
+  height: 100%;
 `;

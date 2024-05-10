@@ -167,6 +167,15 @@ const Modal = () => {
       };
       break;
 
+    case 'view-more-tx':
+      modalContent = <ViewMoreTxModalContent />;
+      title = 'Detail Transaksi';
+      modalProps = {
+        $containerWidth: '1000px',
+        $containerHeight: '775px',
+      };
+      break;
+
     default:
       modalContent = null;
       title = null;

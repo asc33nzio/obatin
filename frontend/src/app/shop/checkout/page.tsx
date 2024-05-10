@@ -21,6 +21,7 @@ import { useObatinSelector } from '@/redux/store/store';
 import Image from 'next/image';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+// eslint-disable-next-line
 import { setPharmacies } from '@/redux/reducers/pharmacySlice';
 
 const Checkout = () => {
@@ -30,7 +31,8 @@ const Checkout = () => {
 
   console.log('paymentid:', paymentId);
 
-  const [setImageSrc] = useState<string>();
+  // eslint-disable-next-line
+  const [imageSrc, setImageSrc] = useState<string>();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
 
@@ -41,7 +43,7 @@ const Checkout = () => {
   const uploadPaymentProof = async () => {
     try {
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      // formData.append('file', selectedFile);
 
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/${paymentId}`,
