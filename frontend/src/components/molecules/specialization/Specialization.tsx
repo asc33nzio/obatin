@@ -55,7 +55,10 @@ const SpecializationComponent = ({
           <Image
             height={50}
             width={50}
-            src={data.image_url}
+            src={
+              data.image_url ||
+              'https://res.cloudinary.com/dzoleanvi/image/upload/v1715332101/surgeon-doctor-svgrepo-com_yq3sxj.svg'
+            }
             alt='specialization'
           />
           <a
