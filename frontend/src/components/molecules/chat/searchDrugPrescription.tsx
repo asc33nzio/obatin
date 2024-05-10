@@ -40,6 +40,7 @@ const SearchDrugPres = ({
 
   useEffect(() => {
     setDeleteFunction(() => handleDeleteSelectedProduct);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDrug]);
 
   const handleDeleteSelectedProduct = () => {

@@ -3,29 +3,18 @@ import styled from 'styled-components';
 
 export const ModalOverlay = styled.div<ModalPropsItf>`
   position: fixed;
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: center;
 
   width: 100vw;
-
   height: 100vh;
-
   top: 0;
-
   left: 0;
-
   right: 0;
-
   bottom: 0;
-
   background: rgba(128, 128, 128, 0.5);
-
   backdrop-filter: blur(4px);
 
   z-index: 20001;

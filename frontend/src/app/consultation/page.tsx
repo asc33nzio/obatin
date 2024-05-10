@@ -444,6 +444,8 @@ function TesChat(): React.ReactElement {
 
   useEffect(() => {
     updateIsTyping();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTyping]);
 
   useEffect(() => {
@@ -526,9 +528,11 @@ function TesChat(): React.ReactElement {
     }
     return () => {
       if (observerRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(observerRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataChatRoom, halaman]);
 
   const fetchNextPage = async () => {

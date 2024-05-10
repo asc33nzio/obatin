@@ -48,6 +48,7 @@ const pharmacySlice = createSlice({
       state.selectedPharmacy = action.payload;
     },
     clearSelectedPharmacy(state) {
+      state.pharmacies = [];
       state.selectedPharmacy = null;
     },
     updateSelectedPharmacy(

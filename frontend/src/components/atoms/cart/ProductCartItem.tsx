@@ -5,11 +5,7 @@ import {
   setSelectedPharmacy,
 } from '@/redux/reducers/pharmacySlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
-import {
-  CartItem,
-  addItemToCart,
-  removeItemFromCart,
-} from '@/redux/reducers/cartSlice';
+import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
 import Image from 'next/image';
 import React, { useEffect } from 'react';
 import CustomButton from '../button/CustomButton';
@@ -32,6 +28,7 @@ import {
 const ProductCartItem = () => {
   const dispatch = useObatinDispatch();
   const accessToken = getCookie('access_token');
+  const pharmaciesState = useObatinSelector((state) => state?.pharmacy);
   const pharmacies = useObatinSelector((state) => state?.pharmacy?.pharmacies);
   const { items } = useObatinSelector((state) => state?.cart);
   const { openModal } = useModal();
@@ -51,9 +48,12 @@ const ProductCartItem = () => {
           },
         );
 
-        const pharmaciesCart = response.data.data;
-        dispatch(setPharmacies({ pharmacies: pharmaciesCart }));
+        const pharmaciesCart = response.data.data.pharmacies_cart;
+        dispatch(
+          setPharmacies({ ...pharmaciesState, pharmacies: pharmaciesCart }),
+        );
       } catch (error) {
+        console.log('called');
         console.error(error);
       }
     };
@@ -106,7 +106,7 @@ const ProductCartItem = () => {
     }
   };
 
-  const handleSubtract = (productId: Partial<CartItem>) => {
+  const handleSubtract = (productId: number) => {
     const existingItem = items.find((item) => item.product_id === productId);
     if (existingItem && existingItem.quantity > 1) {
       dispatch(
@@ -116,7 +116,7 @@ const ProductCartItem = () => {
         }),
       );
     } else {
-      dispatch(removeItemFromCart(productId));
+      dispatch(removeItemFromCart({ product_id: productId }));
     }
   };
 
@@ -132,7 +132,7 @@ const ProductCartItem = () => {
   return (
     pharmacies && (
       <>
-        {pharmacies['pharmacies_cart']?.map((pharmacy: PharmacyCart) => (
+        {pharmacies?.map((pharmacy: PharmacyCart) => (
           <CartItemContainer key={pharmacy.id}>
             <PharmacyName>
               <PharmacyICO />
