@@ -12,7 +12,7 @@ import (
 type ProductFilter struct {
 	Search         string  `form:"search"`
 	Category       string  `form:"category"`
-	SortBy         *string `form:"sort_by" binding:"omitempty,oneof='name' 'price'"`
+	SortBy         *string `form:"sort_by" binding:"omitempty,oneof='name' 'price' 'sales'"`
 	Classification *string `form:"classification" binding:"omitempty,oneof='obat_bebas' 'obat_bebas_terbatas' 'non_obat' 'obat_keras'"`
 	Order          *string `form:"order" binding:"omitempty,oneof='asc' 'desc'"`
 	Page           int     `form:"page" binding:"omitempty,min=1"`

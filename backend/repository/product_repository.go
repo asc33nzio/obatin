@@ -38,7 +38,21 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 	var queryDataCount strings.Builder
 	var data []interface{}
 
-	sb.WriteString(`
+	selectQuery := `
+	WITH sales_data AS (
+		SELECT
+			pp.product_id,
+			SUM(CASE WHEN sm.movement_type = 'sale' THEN sm.delta ELSE 0 END) AS total_sales
+		FROM
+			pharmacies_products pp
+		JOIN
+			stock_movements sm ON pp.id = sm.pharmacy_product_id
+		WHERE
+			pp.deleted_at IS NULL
+			AND sm.deleted_at IS NULL
+		GROUP BY
+			pp.product_id
+	)
 		SELECT DISTINCT 
 			p.id, 
 			p.name, 
@@ -47,15 +61,35 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 			p.min_price, 
 			p.max_price, 
 			p.image_url, 
-			p.is_prescription_required 
+			p.is_prescription_required,
+			COALESCE(sd.total_sales, 0) AS sales `
+	joinQuery := `
 		FROM 
 			products p 
-		JOIN 
-			products_categories pc 
-		ON
-			p.id = pc.product_id 
-	`)
+		JOIN
+			products_categories pc ON p.id = pc.product_id
+		LEFT JOIN
+			sales_data sd ON p.id = sd.product_id`
+
 	queryParams, paramsData := convertProductQueryParamstoSql(params)
+	sb.WriteString(selectQuery)
+	if params.Search != "" {
+		searchParamsCount := constant.StartingParamsCount
+		if params.Category != "" {
+			searchParamsCount += 1
+		}
+		sb.WriteString(fmt.Sprintf(`
+		, CASE
+			WHEN 
+				p.name ILIKE '%%' ||$%v|| '%%'  THEN 1
+			WHEN 
+				p.generic_name ILIKE '%%' ||$%v|| '%%'  THEN 2
+			WHEN 
+				p.content ILIKE '%%' ||$%v|| '%%'  THEN 3
+			ELSE 4
+			END AS search_priority`, searchParamsCount, searchParamsCount, searchParamsCount))
+	}
+	sb.WriteString(joinQuery)
 	sb.WriteString(queryParams)
 	data = append(data, paramsData...)
 	queryDataCount.WriteString(fmt.Sprintf(` SELECT COUNT (*) FROM ( %v )`, sb.String()))
@@ -80,12 +114,42 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 
 	for rows.Next() {
 		product := entity.ProductList{}
-		err := rows.Scan(&product.Id, &product.Name, &product.Slug, &product.SellingUnit,
-			&product.MinPrice, &product.MaxPrice, &product.ImageUrl, &product.IsPrescriptionRequired)
-		if err != nil {
-			return nil, apperror.NewInternal(err)
+		if params.Search == "" {
+			err := rows.Scan(
+				&product.Id,
+				&product.Name,
+				&product.Slug,
+				&product.SellingUnit,
+				&product.MinPrice,
+				&product.MaxPrice,
+				&product.ImageUrl,
+				&product.IsPrescriptionRequired,
+				&product.Sales,
+			)
+			if err != nil {
+				return nil, apperror.NewInternal(err)
+			}
+			res = append(res, product)
 		}
-		res = append(res, product)
+		if params.Search != "" {
+			err := rows.Scan(
+				&product.Id,
+				&product.Name,
+				&product.Slug,
+				&product.SellingUnit,
+				&product.MinPrice,
+				&product.MaxPrice,
+				&product.ImageUrl,
+				&product.IsPrescriptionRequired,
+				&product.Sales,
+				&product.SearchPriority,
+			)
+			if err != nil {
+				return nil, apperror.NewInternal(err)
+			}
+			res = append(res, product)
+		}
+
 	}
 	return &entity.ProductListPage{
 		Products:  res,
