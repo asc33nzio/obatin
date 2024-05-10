@@ -226,7 +226,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndpointCart, h.CartHandler.Bulk)
 	r.GET(appconstant.EndpointCartDetails, h.CartHandler.GetCartDetails)
 	r.PUT(appconstant.EndpointCart, h.CartHandler.UpdateOneCartItemQuantity)
-	r.DELETE(appconstant.EndpointCartDelete, h.CartHandler.DeleteOneCartItem)
+	r.POST(appconstant.EndpointCartDelete, h.CartHandler.DeleteOneCartItem)
 	r.POST(appconstant.EndpointPrescription, h.PrescriptionHandler.CreatePrescription)
 	r.GET(appconstant.EndpointNearbyPharmaciesByProduct, h.PharmacyProductHandler.GetNearbyPharmacies)
 	r.POST(appconstant.EndpointProductTotalStock, h.PharmacyProductHandler.TotalStockPerPartner)

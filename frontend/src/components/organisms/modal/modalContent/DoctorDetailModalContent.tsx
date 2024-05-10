@@ -1,4 +1,4 @@
-import { NavigateToChat } from '@/app/actions';
+import { navigateToChat } from '@/app/actions';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useToast } from '@/hooks/useToast';
@@ -40,7 +40,7 @@ const DoctorDetailModalContent = (props: { $doctorDetail: any }) => {
         orientation: 'center',
       });
       setTimeout(() => {
-        NavigateToChat();
+        navigateToChat();
       }, 2000);
     } catch (error: any) {
       const errorMessage = error.response.data.message;
@@ -53,7 +53,7 @@ const DoctorDetailModalContent = (props: { $doctorDetail: any }) => {
           orientation: 'center',
         });
         setTimeout(() => {
-          NavigateToChat();
+          navigateToChat();
         }, 2000);
         return;
       }

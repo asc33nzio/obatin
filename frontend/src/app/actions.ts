@@ -41,10 +41,10 @@ export const navigateToProductList = async () => {
   redirect('/products');
 };
 
-export const NavigateToTxHistory = async () => {
+export const navigateToTxHistory = async () => {
   redirect('/dashboard/user/transactions');
 };
 
-export const NavigateToChat = async () => {
+export const navigateToChat = async () => {
   redirect('/consultation');
 };
