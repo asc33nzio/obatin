@@ -44,3 +44,7 @@ export const navigateToProductList = async () => {
 export const NavigateToTxHistory = async () => {
   redirect('/dashboard/user/transactions');
 };
+
+export const NavigateToChat = async () => {
+  redirect('/consultation');
+};

@@ -13,7 +13,11 @@ import {
   ProductCard,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
-import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
+import {
+  addItemToCart,
+  clearCart,
+  removeItemFromCart,
+} from '@/redux/reducers/cartSlice';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Body, Container } from '@/styles/Global.styles';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,6 +25,9 @@ import { useEffect, useState } from 'react';
 import { Inter } from 'next/font/google';
 import { ButtonAdd } from '@/styles/pages/product/ProductDetail.styles';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useToast } from '@/hooks/useToast';
+import { NavigateToChat } from '../actions';
 import axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Navbar from '@/components/organisms/navbar/Navbar';
@@ -39,7 +46,8 @@ const ProductsPage = () => {
   const router = useRouter();
   const dispatch = useObatinDispatch();
   const items = useObatinSelector((state) => state?.cart?.items);
-
+  const { isDesktopDisplay } = useClientDisplayResolution();
+  const { setToast } = useToast();
   const [products, setProducts] = useState<ProductType[]>([]);
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [page, setPage] = useState(1);
@@ -107,42 +115,58 @@ const ProductsPage = () => {
 
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
   const handleAddToCart = (product: ProductType) => {
-    const existingItem = items.find((item) => {
-      item.product_id === product.id;
-    });
-    if (existingItem) {
+    if (product.is_prescription_required) {
+      setToast({
+        showToast: true,
+        toastMessage: 'product ini membutuhkan prescription',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      dispatch(clearCart);
+      NavigateToChat();
+    } else {
+      const existingItem = items.find((item) => {
+        item.product_id === product.id;
+      });
+      if (existingItem) {
+        dispatch(
+          addItemToCart({
+            ...existingItem,
+            quantity: +1,
+          }),
+        );
+        setSelectedProduct(product);
+        return;
+      }
       dispatch(
         addItemToCart({
-          ...existingItem,
-          quantity: +1,
+          product_id: product.id,
+          prescription_id: null,
+          pharmacy_id: null,
+          quantity: 1,
         }),
       );
       setSelectedProduct(product);
-      return;
     }
-
-    dispatch(
-      addItemToCart({
-        product_id: product.id,
-        prescription_id: null,
-        pharmacy_id: null,
-        quantity: 1,
-      }),
-    );
-    setSelectedProduct(product);
   };
 
   const handleSubtract = (productId: number) => {
     const existingItem = items.find((item) => item.product_id === productId);
+
     if (existingItem && existingItem.quantity > 1) {
       dispatch(
-        addItemToCart({
+        removeItemFromCart({
           ...existingItem,
           quantity: -1,
         }),
       );
     } else {
-      dispatch(removeItemFromCart(productId));
+      dispatch(
+        removeItemFromCart({
+          ...existingItem,
+        }),
+      );
       setSelectedProduct(null);
     }
   };

@@ -72,6 +72,10 @@ export interface ShippingItf {
 export interface TxItf {
   order_id: number;
   payment_id: number;
+  user_id?: number;
+  user_authentication_id?: number;
+  user_name?: string;
+  payment_proof_url?: string;
   invoice_number: string;
   status: TxStatusTypes;
   number_items: number;

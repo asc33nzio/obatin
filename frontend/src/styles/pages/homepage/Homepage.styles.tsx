@@ -2,20 +2,16 @@ import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
 export const Body = styled.div`
-  min-width: 100vh;
-  padding: 2rem 5rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 1rem;
   @media (max-width: 769px) {
-    min-width: 100%;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-  }
-  @media (max-width: 769px) {
-    min-width: 100%;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
+    margin: 0;
+    padding: 1rem;
   }
 `;
 
@@ -29,32 +25,18 @@ export const CategoryContent = styled.div`
   width: 100%;
   height: 100%;
   align-items: center;
-  img {
-    margin: 10px;
-  }
-  @media (max-width: 1440px) {
-    width: 100%;
-    img {
-      margin: 10px 15px;
-    }
-  }
-  @media (max-width: 768px) {
-    align-items: center;
-    width: 80%;
-    img {
-      margin: 10px 50px;
-    }
-  }
+  justify-content: center;
 `;
 
 export const FiturContainer = styled.div`
-  padding: 5rem;
   display: flex;
+  padding: 2rem 0;
   justify-content: center;
   gap: 2rem;
-  @media (max-width: 769px) {
-    display: flex;
-    flex-direction: column;
+  cursor: pointer;
+  :hover {
+    transition: all 0.3s;
+    scale: 1.05;
   }
   @media (max-width: 769px) {
     display: flex;
@@ -108,15 +90,6 @@ export const NewSection = styled.div`
 
 export const PopularContainer = styled.div`
   width: 100%;
-  padding: 1rem 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  align-content: center;
-  @media (max-width: 1440px) {
-    padding: 1rem 5rem;
-  }
   @media (max-width: 768px) {
     align-items: center;
   }

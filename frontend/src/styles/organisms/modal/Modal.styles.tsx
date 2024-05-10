@@ -14,13 +14,11 @@ export const ModalOverlay = styled.div<ModalPropsItf>`
   left: 0;
   right: 0;
   bottom: 0;
-
   background: rgba(128, 128, 128, 0.5);
   backdrop-filter: blur(4px);
 
   z-index: 20001;
 `;
-
 export const ModalContainer = styled.div<ModalPropsItf>`
   display: flex;
   flex-direction: column;

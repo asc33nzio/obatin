@@ -21,4 +21,5 @@ export type ModalType =
   | 'select-address'
   | 'detail-pharmacy'
   | 'view-more-tx'
+  | 'add-shipping'
   | '';

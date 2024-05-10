@@ -323,11 +323,11 @@ func convertUpdatePharmacyProductQueryParamstoSql(params entity.UpdatePharmacyPr
 	return query.String(), args
 }
 
-func convertManufacturerQueryParamstoSql(params entity.ManufacturerFilter)(string, []interface{}){
+func convertManufacturerQueryParamstoSql(params entity.ManufacturerFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
 	var countParams = constant.StartingParamsCount
-	if params.Search != ""{
+	if params.Search != "" {
 		query.WriteString(" WHERE ")
 	}
 	if params.Search != "" {
@@ -498,23 +498,46 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 	}
 	query.WriteString(` p.deleted_at IS NULL `)
 
+	if params.SortBy == nil {
+		if params.Order == nil {
+			if params.Search != "" {
+				query.WriteString(`ORDER BY search_priority ASC `)
+			}
+		}
+	}
+
 	if params.SortBy != nil {
+		query.WriteString(` ORDER BY `)
 		if *params.SortBy == constant.SortByName {
-			query.WriteString(` ORDER BY p.name `)
+			query.WriteString(` p.name `)
 		} else if *params.SortBy == constant.SortByPrice {
-			query.WriteString(" ORDER BY p.min_price  ")
+			query.WriteString(" p.min_price  ")
+		} else if *params.SortBy == constant.SortBySales {
+			query.WriteString(` sales `)
+		}
+		if params.Order == nil {
+			query.WriteString(` DESC `)
 		}
 	}
 
 	if params.Order != nil {
 		if params.SortBy == nil {
-			query.WriteString(` ORDER BY p.id `)
+			query.WriteString(` ORDER BY `)
+			if params.Search != "" {
+				query.WriteString(` search_priority ASC, `)
+			}
+			query.WriteString(` p.id `)
 		}
 		switch order := *params.Order; order {
 		case constant.OrderAscending:
 			query.WriteString(`ASC`)
 		case constant.OrderDescending:
 			query.WriteString(`DESC`)
+		}
+		if params.SortBy != nil {
+			if params.Search != "" {
+				query.WriteString(`, search_priority ASC `)
+			}
 		}
 	}
 	return query.String(), filters
@@ -659,6 +682,50 @@ func convertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interf
 			query.WriteString(`DESC`)
 		}
 	}
+	return query.String(), filters
+
+}
+
+func convertPharmacyQueryParamstoSql(params entity.PharmacyFilter) (string, []interface{}) {
+	var query strings.Builder
+	var filters []interface{}
+	var countParams = constant.StartingParamsCount
+	if params.City != nil || params.Search != "" || params.PartnerId != nil {
+		query.WriteString(" WHERE ")
+	}
+
+	if params.Search != "" {
+		query.WriteString(fmt.Sprintf(` p.name ILIKE '%%' ||$%v|| '%%' `, countParams))
+		filters = append(filters, params.Search)
+		countParams++
+	}
+
+	if params.City != nil {
+		if countParams > constant.StartingParamsCount {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` c.name ILIKE '%%' ||$%v|| '%%'  `, countParams))
+		filters = append(filters, &params.City)
+		countParams++
+	}
+
+	if params.PartnerId != nil {
+		if countParams > constant.StartingParamsCount {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` p.partner_id = $%v `, countParams))
+		filters = append(filters, &params.PartnerId)
+		countParams++
+	}
+
+	if countParams > constant.StartingParamsCount {
+		query.WriteString(` AND `)
+	}
+	if countParams == constant.StartingParamsCount {
+		query.WriteString(` WHERE `)
+	}
+	query.WriteString(` p.deleted_at IS NULL `)
+
 	return query.String(), filters
 
 }
@@ -946,6 +1013,8 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 					o.shipping_cost,
 					o.subtotal,
 					o.payment_id,
+					p.invoice_number,
+					p.payment_proof_url,
 					TO_CHAR(o.created_at, 'DD-MM-YYYY HH24:MI') as created_at		
 				FROM
 					orders o
@@ -953,6 +1022,10 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 					users u
 				ON
 					o.user_id = u.id
+				JOIN
+					payments p
+				ON
+					o.payment_id = p.id
 					%v
 				ORDER BY o.created_at DESC , o.id ASC
 				%v
@@ -975,6 +1048,8 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 			od.shipping_cost,
 			od.subtotal,
 			od.payment_id,
+			od.invoice_number,
+			od.payment_proof_url,
 			od.created_at,
 			sm.code,
 			sm.name,

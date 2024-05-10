@@ -27,20 +27,35 @@ import Image from 'next/image';
 import DoctorFilterComponent from '@/components/atoms/filter/DoctorFilter';
 import Footer from '@/components/organisms/footer/Footer';
 import InvokableModal from '@/components/organisms/modal/InvokableModal';
+import Pagination from '@/components/molecules/admin/Pagination';
 
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
 });
 
+export interface IResponseDoctorPagination {
+  page: number;
+  page_count: number;
+  total_records: number;
+  limit: number;
+}
+
+export interface IResponseDoctor {
+  message: string;
+  pagination: IResponseDoctorPagination;
+  data: DoctorType[];
+}
+
 const DoctorsPage = () => {
-  const [doctors, setDoctors] = useState<DoctorType[]>([]);
+  const [doctors, setDoctors] = useState<IResponseDoctor>();
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorType | null>(null);
   const [specializations, setSpecializations] = useState<DoctorSpecType[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [specSlug, setSpecSlug] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string | null>(null);
+  // const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [isOnline] = useState<string | null>(null);
   const [orderBy, setOrderBy] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -55,34 +70,52 @@ const DoctorsPage = () => {
     setIsModalOpen(false);
   };
 
+  const handleClickPage = async (page: number) => {
+    setPage(page);
+    setLoading(false);
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
+
+  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors?`;
+
+  const pageParam = page ? `page=${page}&` : '';
+  const sortByParam = sortBy ? `sort_by=${sortBy}&` : '';
+  const isOnlineParam = isOnline ? `is_online=${isOnline}&` : '';
+  const orderByParam = orderBy ? `order=${orderBy}&` : '';
+
+  const fullUrl = url + pageParam + sortByParam + isOnlineParam + orderByParam;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const { data: response } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors?`,
-          {
-            params: {
-              limit: 12,
-              page,
-              specialization: specSlug,
-              sort_by: sortBy,
-              is_online: isOnline,
-              order: orderBy,
-            },
+        const { data: response } = await axios.get(fullUrl, {
+          params: {
+            limit: 12,
+            page,
+            specialization: specSlug,
+            sort_by: sortBy,
+            is_online: isOnline,
+            order: orderBy,
           },
-        );
+        });
 
-        setDoctors([...response.data]);
+        setDoctors(response);
         setLoading(false);
       } catch (error) {
         console.error(error);
         setLoading(false);
       }
     };
-
     fetchData();
-  }, [page, specSlug, sortBy, isOnline, orderBy]);
+  }, [page, sortBy, isOnline, orderBy, fullUrl, specSlug]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [sortBy, orderBy]);
 
   useEffect(() => {
     const fetchSpecialization = async () => {
@@ -99,10 +132,6 @@ const DoctorsPage = () => {
     fetchSpecialization();
   }, []);
 
-  const handleLoadMore = () => {
-    setPage((prevPage) => prevPage + 1);
-  };
-
   return (
     <Container className={inter.className}>
       <Navbar />
@@ -112,6 +141,7 @@ const DoctorsPage = () => {
             <SpecializationComponent
               specializations={specializations}
               setSpecSlug={setSpecSlug}
+              setParentPage={() => setPage(1)}
             />
           </CategoryContainer>
           <ProductContent>
@@ -119,10 +149,11 @@ const DoctorsPage = () => {
               <DoctorFilterComponent
                 setSortBy={setSortBy}
                 setOrderBy={setOrderBy}
+                onClickClear={() => setSpecSlug(null)}
               />
             </FilterContainer>
             <ProductListContainer>
-              {doctors.map((doctor) => (
+              {doctors?.data?.map((doctor) => (
                 <ProductCard
                   key={doctor.id}
                   onClick={() => handleModalOpen(doctor)}
@@ -136,9 +167,9 @@ const DoctorsPage = () => {
                     />
                   </Imagecontainer>
                   {doctor.is_online ? (
-                    <IsOnline>Sedang Aktif</IsOnline>
+                    <IsOnline>Aktif</IsOnline>
                   ) : (
-                    <IsOffline>Sedang Tidak Aktif</IsOffline>
+                    <IsOffline>Tidak Aktif</IsOffline>
                   )}
                   <Bold>{doctor.name}</Bold>
                   <Smallfont>{doctor.specialization}</Smallfont>
@@ -146,26 +177,29 @@ const DoctorsPage = () => {
                   <CustomButton
                     $width='150px'
                     $height='32px'
-                    content='Hubungi Dokter'
+                    content='Detail dan Konsultasi'
                     $fontSize='12px'
                   />
                 </ProductCard>
               ))}
             </ProductListContainer>
 
-            <CustomButton
-              onClick={handleLoadMore}
-              disabled={loading}
-              content='load more'
-              $width='150px'
-              $fontSize='18px'
-            />
+            {!loading && doctors && doctors.pagination && (
+              <div style={{ padding: '30px 0' }}>
+                <Pagination
+                  currentPage={doctors.pagination.page}
+                  totalPages={doctors.pagination.page_count}
+                  onPageChange={(page) => handleClickPage(page)}
+                />
+              </div>
+            )}
           </ProductContent>
         </Content>
         <Footer />
 
         <InvokableModal
           $doctorDetail={{
+            id: selectedDoctor?.id,
             name: selectedDoctor?.name,
             specialization: selectedDoctor?.specialization,
             experiences: selectedDoctor?.experiences,

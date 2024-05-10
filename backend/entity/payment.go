@@ -16,3 +16,14 @@ type Payment struct {
 	CreatedAt        string
 	ExpiredAt        string
 }
+
+type PaymentFilter struct {
+	Page  int
+	Limit int
+}
+
+type PaymentsPagination struct {
+	Payments   []*Payment
+	TotalRows  int64
+	Pagination PaginationResponse
+}
