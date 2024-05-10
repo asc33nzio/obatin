@@ -15,7 +15,7 @@ const fetchCategories = async () => {
 const fetchProducts = async () => {
   try {
     const { data: res } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?limit=5`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?limit=5&sort_by=sales`,
     );
     return res.data;
   } catch (error) {
