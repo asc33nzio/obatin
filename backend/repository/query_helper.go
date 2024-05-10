@@ -686,6 +686,50 @@ func convertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interf
 
 }
 
+func convertPharmacyQueryParamstoSql(params entity.PharmacyFilter) (string, []interface{}) {
+	var query strings.Builder
+	var filters []interface{}
+	var countParams = constant.StartingParamsCount
+	if params.City != nil || params.Search != "" || params.PartnerId != nil {
+		query.WriteString(" WHERE ")
+	}
+
+	if params.Search != "" {
+		query.WriteString(fmt.Sprintf(` p.name ILIKE '%%' ||$%v|| '%%' `, countParams))
+		filters = append(filters, params.Search)
+		countParams++
+	}
+
+	if params.City != nil {
+		if countParams > constant.StartingParamsCount {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` c.name ILIKE '%%' ||$%v|| '%%'  `, countParams))
+		filters = append(filters, &params.City)
+		countParams++
+	}
+
+	if params.PartnerId != nil {
+		if countParams > constant.StartingParamsCount {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` p.partner_id = $%v `, countParams))
+		filters = append(filters, &params.PartnerId)
+		countParams++
+	}
+
+	if countParams > constant.StartingParamsCount {
+		query.WriteString(` AND `)
+	}
+	if countParams == constant.StartingParamsCount {
+		query.WriteString(` WHERE `)
+	}
+	query.WriteString(` p.deleted_at IS NULL `)
+
+	return query.String(), filters
+
+}
+
 func convertPaginationParamsToSql(limit int, page int, paramsCount int) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}

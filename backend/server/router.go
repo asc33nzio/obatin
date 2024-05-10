@@ -39,6 +39,7 @@ type RouterOpt struct {
 	OrderHandler                *handler.OrderHandler
 	PaymentHandler              *handler.PaymentHandler
 	ManufacturerHandler         *handler.ManufacturerHandler
+	PharmacyHandler             *handler.PharmacyHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -104,6 +105,9 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	manufacturerUseCase := usecase.NewManufacturerUsecaseImpl(dbStore, config)
 	manufacturerHandler := handler.NewManufacturerHandler(manufacturerUseCase)
 
+	pharmacyUseCase := usecase.NewPharmacyUsecaseImpl(dbStore, config)
+	pharmacyHandler := handler.NewPharmacyHandler(pharmacyUseCase)
+
 	thirdPartyHandler := handler.NewThirdPartyHandler(config)
 
 	return NewRouter(RouterOpt{
@@ -127,6 +131,7 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 		OrderHandler:                orderHandler,
 		PaymentHandler:              paymentHandler,
 		ManufacturerHandler:         manufacturerHandler,
+		PharmacyHandler:             pharmacyHandler,
 	})
 }
 
@@ -188,6 +193,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 
 	r.GET(appconstant.EndpointManufacturerList, h.ManufacturerHandler.GetAllManufacturers)
 	r.PATCH(appconstant.EndpointGetProductDetail, h.ProductHandler.UpdateProductDetaiBySlug)
+	r.GET(appconstant.EndpointAllPharmacies, h.PharmacyHandler.GetAllPharmacy)
 	r.GET(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.GetAllPartnerPharmacyProduct)
 	r.POST(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.CreateOnePharmacyProduct)
 	r.PATCH(appconstant.EndpointDetailPartnerPharmacyProducts, h.PharmacyProductHandler.UpdatePharmacyProduct)

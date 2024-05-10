@@ -22,3 +22,17 @@ type Pharmacy struct {
 	Distance          *int
 	ShippingMethods   []*ShippingMethod
 }
+
+type PharmacyListPage struct {
+	Pharmacies   []Pharmacy
+	TotalRows  int
+	Pagination PaginationResponse
+}
+
+type PharmacyFilter struct {
+	Search    string
+	City      *string
+	PartnerId *int64
+	Page      int
+	Limit     int
+}
