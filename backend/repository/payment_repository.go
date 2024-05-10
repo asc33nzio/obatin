@@ -12,7 +12,7 @@ import (
 type PaymentRepository interface {
 	CreateOnePayment(ctx context.Context, p *entity.Payment) (*entity.Payment, error)
 	UpdateOnePayment(ctx context.Context, p *entity.Payment) error
-	FindAllPendingPayments(ctx context.Context) ([]*entity.Payment, error)
+	FindAllPendingPayments(ctx context.Context, params *entity.PaymentFilter) (*entity.PaymentsPagination, error)
 }
 
 type paymentRepositoryPostgres struct {
@@ -109,10 +109,14 @@ func (r *paymentRepositoryPostgres) UpdateOnePayment(ctx context.Context, p *ent
 	return nil
 }
 
-func (r *paymentRepositoryPostgres) FindAllPendingPayments(ctx context.Context) ([]*entity.Payment, error) {
-	res := []*entity.Payment{}
-	query := `
-		SELECT
+func (r *paymentRepositoryPostgres) FindAllPendingPayments(ctx context.Context, params *entity.PaymentFilter) (*entity.PaymentsPagination, error) {
+	res := entity.PaymentsPagination{}
+	var query strings.Builder
+	var queryTotalRows strings.Builder
+	var totalRows int64
+
+	query.WriteString(`
+		SELECT DISTINCT ON (p.id)
 			p.id,
 			p.invoice_number,
 			p.user_id,
@@ -124,20 +128,41 @@ func (r *paymentRepositoryPostgres) FindAllPendingPayments(ctx context.Context) 
 		FROM
 			payments p
 		JOIN
+			orders o
+		ON
+			o.payment_id = p.id
+		AND
+			o.status = 'waiting_confirmation'
+		JOIN
 			users u
 		ON
 			p.user_id = u.id
 		WHERE
-			p.is_confirmed = true
+			p.is_confirmed = false
 		AND
 			p.deleted_at IS NULL
-	`
+		ORDER BY
+			p.id ASC, p.created_at ASC
+	`)
+
+	queryTotalRows.WriteString(fmt.Sprintf(" SELECT COUNT(*) FROM (%v) ", query.String()))
+	err := r.db.QueryRowContext(
+		ctx,
+		queryTotalRows.String(),
+	).Scan(&totalRows)
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+
+	paginationParams, _ := convertPaginationParamsToSql(params.Limit, params.Page, 1)
+	query.WriteString(paginationParams)
 
 	rows, err := r.db.QueryContext(
 		ctx,
-		query,
+		query.String(),
+		params.Limit,
+		params.Page-1,
 	)
-
 	if err != nil {
 		return nil, apperror.NewInternal(err)
 	}
@@ -153,15 +178,15 @@ func (r *paymentRepositoryPostgres) FindAllPendingPayments(ctx context.Context) 
 			&p.TotalPayment,
 			&p.PaymentProofUrl,
 			&p.IsConfirmed,
-			&p.ExpiredAt,
 			&p.CreatedAt,
 		)
 		if err != nil {
 			return nil, apperror.NewInternal(err)
 		}
 
-		res = append(res, &p)
+		res.Payments = append(res.Payments, &p)
 	}
 
-	return res, nil
+	res.TotalRows = totalRows
+	return &res, nil
 }

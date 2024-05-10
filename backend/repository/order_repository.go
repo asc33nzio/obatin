@@ -187,6 +187,8 @@ func (r *orderRepositoryPostgres) FindAllOrders(ctx context.Context, params *ent
 			&o.ShippingCost,
 			&o.Subtotal,
 			&o.Payment.Id,
+			&o.Payment.InvoiceNumber,
+			&o.Payment.PaymentProofUrl,
 			&o.CreatedAt,
 			&o.Shipping.ShippingMethod.Code,
 			&o.Shipping.ShippingMethod.Name,
