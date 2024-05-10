@@ -57,6 +57,7 @@ const ProductCartItem = () => {
           setPharmacies({ ...pharmaciesState, pharmacies: pharmaciesCart }),
         );
       } catch (error) {
+        console.log('called');
         console.error(error);
       }
     };

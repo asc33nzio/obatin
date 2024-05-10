@@ -121,16 +121,12 @@ const ProductsPage = () => {
 
   const handleSubtract = (productId: number) => {
     const existingItem = items.find((item) => item.product_id === productId);
-    console.log(existingItem);
 
     if (existingItem === undefined) {
       return;
     }
-    console.log(typeof existingItem);
-    console.log('called');
 
     dispatch(deduceOneFromCart(existingItem));
-
     if (existingItem.quantity === 0) {
       setSelectedProduct(null);
     }
