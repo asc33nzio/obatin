@@ -23,7 +23,6 @@ interface DoctorDetailItf {
 }
 
 export interface ModalPropsItf {
-  $overlayHeight?: string;
   $containerWidth: string;
   $containerHeight: string;
   $containerBgColor?: string;
@@ -46,7 +45,6 @@ const Modal = () => {
   let modalContent: React.ReactElement | null;
   let title: string | null = null;
   let modalProps: ModalPropsItf = {
-    $overlayHeight: '100vh',
     $containerWidth: '500px',
     $containerHeight: '500px',
     $containerBgColor: '#ffffff',
@@ -60,7 +58,6 @@ const Modal = () => {
       modalContent = <ChangePasswordModalContent />;
       title = 'Tolong konfirmasi sandi baru anda';
       modalProps = {
-        $overlayHeight: '135vh',
         $containerWidth: '500px',
         $containerHeight: '325px',
       };
@@ -70,7 +67,6 @@ const Modal = () => {
       modalContent = <ChangePasswordModalContent />;
       title = 'Tolong konfirmasi sandi baru anda';
       modalProps = {
-        $overlayHeight: '135vh',
         $containerWidth: '500px',
         $containerHeight: '325px',
       };
@@ -80,7 +76,6 @@ const Modal = () => {
       modalContent = <RegisterConfirmPasswordModalContent />;
       title = 'Tolong konfirmasi sandi anda';
       modalProps = {
-        $overlayHeight: '100vh',
         $containerWidth: '500px',
         $containerHeight: '250px',
       };
@@ -90,7 +85,6 @@ const Modal = () => {
       modalContent = <AddAddressModalContent />;
       title = 'Tambahkan Alamat';
       modalProps = {
-        $overlayHeight: '170vh',
         $containerWidth: '650px',
         $containerHeight: '850px',
       };
@@ -100,7 +94,6 @@ const Modal = () => {
       modalContent = <UploadPembayaranModal />;
       title = 'Upload Bukti Pembayaran';
       modalProps = {
-        $overlayHeight: '100vh',
         $containerWidth: '500px',
         $containerHeight: '500px',
       };
@@ -110,7 +103,6 @@ const Modal = () => {
       modalContent = <SelectAddressModalContent />;
       title = 'Pilih atau tambahkan alamat';
       modalProps = {
-        $overlayHeight: '100vh',
         $containerWidth: '500px',
         $containerHeight: '500px',
       };
@@ -120,7 +112,6 @@ const Modal = () => {
       modalContent = <SelectDetailPharmacyModalContent />;
       title = 'Detail Pharmacy';
       modalProps = {
-        $overlayHeight: '170vh',
         $containerWidth: '650px',
         $containerHeight: '850px',
       };
@@ -130,7 +121,6 @@ const Modal = () => {
       modalContent = <UpdateAddressModalContent />;
       title = 'Ubah Informasi Alamat';
       modalProps = {
-        $overlayHeight: '170vh',
         $containerWidth: '650px',
         $containerHeight: '850px',
       };
@@ -140,9 +130,8 @@ const Modal = () => {
       modalContent = <ViewMoreTxModalContent />;
       title = 'Detail Transaksi';
       modalProps = {
-        $overlayHeight: '170vh',
-        $containerWidth: '1050px',
-        $containerHeight: '850px',
+        $containerWidth: '1000px',
+        $containerHeight: '775px',
       };
       break;
 

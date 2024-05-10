@@ -1,3 +1,12 @@
+export type apiFilterMapTypes =
+  | 'all'
+  | 'waitingUserPayment'
+  | 'waitingConfirmation'
+  | 'processed'
+  | 'sent'
+  | 'received'
+  | 'cancelled';
+
 export type TxStatusTypes =
   | 'waiting_payment'
   | 'waiting_confirmation'
@@ -14,6 +23,7 @@ export interface TxFilterItf {
   sent: boolean;
   received: boolean;
   cancelled: boolean;
+  [key: string]: boolean;
 }
 
 export interface CartItemItf {
@@ -71,6 +81,7 @@ export interface TxItf {
   pharmacy: PharmacyItf;
   cart_items: Array<CartItemItf>;
   handleOpenViewMore?: () => void;
+  isLoading?: boolean;
 }
 
 export interface PaginationInfoItf {

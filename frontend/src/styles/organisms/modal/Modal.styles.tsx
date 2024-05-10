@@ -2,15 +2,14 @@ import { ModalPropsItf } from '@/components/organisms/modal/Modal';
 import styled from 'styled-components';
 
 export const ModalOverlay = styled.div<ModalPropsItf>`
-  position: absolute;
+  position: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
   width: 100vw;
-  height: ${({ $overlayHeight }) =>
-    $overlayHeight ? $overlayHeight : '100vh'};
+  height: 100vh;
   top: 0;
   left: 0;
   right: 0;

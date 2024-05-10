@@ -1,12 +1,14 @@
+'use client';
+import 'react-loading-skeleton/dist/skeleton.css';
 import 'moment/locale/id';
 import {
   BreakdownCenterDiv,
   BreakdownRightDiv,
   DeliveryStatusBadge,
-  //eslint-disable-next-line
   FillerDiv,
   SeeMoreDiv,
   SeparatorDiv,
+  SkeletonDiv,
   TransactionCardContainer,
   TxCardPharmacyName,
   TxHeaders,
@@ -17,8 +19,10 @@ import { TxItf } from '@/types/transactionTypes';
 import { useRouter } from 'next/navigation';
 import DetailICO from '@/assets/icons/DetailICO';
 import Image from 'next/image';
-import moment from 'moment';
 import DotICO from '@/assets/icons/DotICO';
+import moment from 'moment';
+import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 moment.locale('id');
 
 const TransactionCard = (props: TxItf): React.ReactElement => {
@@ -58,64 +62,229 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
         <TxCardPharmacyName>
           <DetailICO onClick={handleOpenDetail} />
           <DeliveryStatusBadge $color={deliveryStatusColorMap[props?.status]}>
-            <h1>{deliveryStatusMap[props?.status]}</h1>
+            {props.isLoading ? (
+              <SkeletonDiv>
+                <Skeleton
+                  count={1}
+                  direction='ltr'
+                  enableAnimation={true}
+                  baseColor='#ffffff'
+                  highlightColor='#00b5c0'
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  }}
+                />
+              </SkeletonDiv>
+            ) : (
+              <h1>{deliveryStatusMap[props?.status]}</h1>
+            )}
           </DeliveryStatusBadge>
         </TxCardPharmacyName>
 
         <h2>
-          {formattedDate} {orderTime}
+          {props.isLoading ? (
+            <SkeletonDiv>
+              <Skeleton
+                count={1}
+                direction='ltr'
+                enableAnimation={true}
+                baseColor='#ffffff'
+                highlightColor='#00b5c0'
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: '200px',
+                }}
+              />
+            </SkeletonDiv>
+          ) : (
+            <>
+              {formattedDate} {orderTime}
+            </>
+          )}
         </h2>
-        <h3>{props.invoice_number}</h3>
+        {props.isLoading ? (
+          <SkeletonDiv>
+            <Skeleton
+              count={1}
+              direction='ltr'
+              enableAnimation={true}
+              baseColor='#ffffff'
+              highlightColor='#00b5c0'
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: '400px',
+                marginLeft: '675px',
+              }}
+            />
+          </SkeletonDiv>
+        ) : (
+          <h3>{props.invoice_number}</h3>
+        )}
       </TxHeaders>
 
       {props?.cart_items?.map((product, index) => {
         if (index > 1) return null;
-        // if (props?.cart_items?.length === 1) {
-        //   return <FillerDiv key={`txProductCard${index}`} />;
-        // }
-
         return (
-          <TxProductBreakdown key={`txProductCard${index}`}>
-            <Image
-              src={product.thumbnail_url}
-              alt={`txProductIMG${index}`}
-              width={75}
-              height={75}
-              onClick={() => router.replace(`/products/${product.slug}`)}
-            />
+          <React.Fragment
+            key={`txProductCard${product.pharmacy_product_id}_${index}`}
+          >
+            <TxProductBreakdown>
+              {props.isLoading ? (
+                <SkeletonDiv $width='100px'>
+                  <Skeleton
+                    count={1}
+                    direction='ltr'
+                    enableAnimation={true}
+                    baseColor='#ffffff'
+                    highlightColor='#00b5c0'
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: '75px',
+                      height: '40px',
+                      marginTop: '10px',
+                      marginLeft: '10px',
+                    }}
+                  />
+                </SkeletonDiv>
+              ) : (
+                <Image
+                  src={product.thumbnail_url}
+                  alt={`txProductIMG${index}`}
+                  width={250}
+                  height={250}
+                  onClick={() => router.replace(`/products/${product.slug}`)}
+                />
+              )}
 
-            <BreakdownCenterDiv>
-              <h1>
-                {product.name.charAt(0).toUpperCase()}
-                {product.name.slice(1, product.name.length - 1)}
-              </h1>
-              <span>
-                {product.quantity} unit x Rp.&nbsp;
-                {product.price.toLocaleString('id-ID')} {product.selling_unit}
-              </span>
-              <span>
-                {product.weight > 1000
-                  ? `${product.weight / 1000} kg`
-                  : `${product.weight} g`}
-                &nbsp;
-                {product.selling_unit}
-              </span>
-            </BreakdownCenterDiv>
+              {props.isLoading ? (
+                <SkeletonDiv $width='80%'>
+                  <Skeleton
+                    count={1}
+                    direction='ltr'
+                    enableAnimation={true}
+                    baseColor='#ffffff'
+                    highlightColor='#00b5c0'
+                    style={{
+                      position: 'absolute',
+                      top: 5,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: '18px',
+                      width: '300px',
+                    }}
+                  />
+                  <Skeleton
+                    count={1}
+                    direction='ltr'
+                    enableAnimation={true}
+                    baseColor='#ffffff'
+                    highlightColor='#00b5c0'
+                    style={{
+                      position: 'absolute',
+                      top: 25,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: '12.5px',
+                      width: '300px',
+                    }}
+                  />
+                  <Skeleton
+                    count={1}
+                    direction='ltr'
+                    enableAnimation={true}
+                    baseColor='#ffffff'
+                    highlightColor='#00b5c0'
+                    style={{
+                      position: 'absolute',
+                      top: 40,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: '12.5px',
+                      width: '300px',
+                    }}
+                  />
+                </SkeletonDiv>
+              ) : (
+                <BreakdownCenterDiv>
+                  <h1>
+                    {product.name.charAt(0).toUpperCase()}
+                    {product.name.slice(1, product.name.length - 1)}
+                  </h1>
+                  <span>
+                    {product.quantity} unit x Rp.&nbsp;
+                    {product.price.toLocaleString('id-ID')}{' '}
+                    {product.selling_unit}
+                  </span>
+                  <span>
+                    {product.weight > 1000
+                      ? `${product.weight / 1000} kg`
+                      : `${product.weight} g`}
+                    &nbsp;
+                    {product.selling_unit}
+                  </span>
+                </BreakdownCenterDiv>
+              )}
 
-            <SeparatorDiv />
+              {index === 0 && !props.isLoading ? (
+                <>
+                  <SeparatorDiv />
+                  <BreakdownRightDiv>
+                    Total Belanja
+                    <span>Rp. {props.subtotal.toLocaleString('id-ID')}</span>
+                  </BreakdownRightDiv>
+                </>
+              ) : index === 0 && props.isLoading ? (
+                <SkeletonDiv $width='250px'>
+                  <Skeleton
+                    count={1}
+                    direction='ltr'
+                    enableAnimation={true}
+                    baseColor='#ffffff'
+                    highlightColor='#00b5c0'
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      width: '225px',
+                      height: '35px',
+                    }}
+                  />
+                </SkeletonDiv>
+              ) : null}
+            </TxProductBreakdown>
 
-            <BreakdownRightDiv>
-              Total untuk produk ini:
-              <span>
-                Rp. {(product.price * product.quantity).toLocaleString('id-ID')}
-              </span>
-            </BreakdownRightDiv>
-          </TxProductBreakdown>
+            {props?.cart_items?.length === 1 && (
+              <FillerDiv
+                key={`txProductCardFiller${product.pharmacy_product_id}_${index}`}
+              />
+            )}
+          </React.Fragment>
         );
       })}
 
       <SeeMoreDiv onClick={props.handleOpenViewMore}>
-        {props?.cart_items?.length < 2 ? (
+        {props?.cart_items?.length <= 2 ? (
           <h4>Lihat Detail Transaksi</h4>
         ) : (
           <h4>Lihat {props?.cart_items?.length - 2} produk lainnya</h4>
