@@ -1,9 +1,11 @@
 'use client';
+
 import {
   ModalContainer,
   ModalOverlay,
   ModalHeader,
 } from '@/styles/organisms/modal/Modal.styles';
+
 import { useEventEmitter } from '@/hooks/useEventEmitter';
 import { useModal } from '@/hooks/useModal';
 import { useObatinDispatch } from '@/redux/store/store';
@@ -16,6 +18,7 @@ import UploadPembayaranModal from '@/components/organisms/modal/modalContent/Upl
 import SelectAddressModalContent from './modalContent/SelectAddressModalContent';
 import SelectDetailPharmacyModalContent from './modalContent/SelectDetailPharmacyModalContent';
 import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
+import AddShippingModalContent from './modalContent/AddShippingModalContent';
 import ViewMoreTxModalContent from './modalContent/ViewMoreTxModalContent';
 
 interface DoctorDetailItf {
@@ -23,7 +26,6 @@ interface DoctorDetailItf {
 }
 
 export interface ModalPropsItf {
-  $overlayHeight?: string;
   $containerWidth: string;
   $containerHeight: string;
   $containerBgColor?: string;
@@ -36,7 +38,6 @@ const Modal = () => {
   const { isOpen, modalType, closeModal } = useModal();
   const dispatch = useObatinDispatch();
   const emitter = useEventEmitter();
-
   const handleModalClose = () => {
     emitter.emit('close-modal-fail');
     dispatch(resetTxState());
@@ -46,7 +47,6 @@ const Modal = () => {
   let modalContent: React.ReactElement | null;
   let title: string | null = null;
   let modalProps: ModalPropsItf = {
-    $overlayHeight: '100vh',
     $containerWidth: '500px',
     $containerHeight: '500px',
     $containerBgColor: '#ffffff',
@@ -60,7 +60,6 @@ const Modal = () => {
       modalContent = <ChangePasswordModalContent />;
       title = 'Tolong konfirmasi sandi baru anda';
       modalProps = {
-        $overlayHeight: '135vh',
         $containerWidth: '500px',
         $containerHeight: '325px',
       };
@@ -70,57 +69,53 @@ const Modal = () => {
       modalContent = <ChangePasswordModalContent />;
       title = 'Tolong konfirmasi sandi baru anda';
       modalProps = {
-        $overlayHeight: '135vh',
         $containerWidth: '500px',
         $containerHeight: '325px',
       };
       break;
-
     case 'confirm-password-register':
       modalContent = <RegisterConfirmPasswordModalContent />;
       title = 'Tolong konfirmasi sandi anda';
       modalProps = {
-        $overlayHeight: '100vh',
         $containerWidth: '500px',
         $containerHeight: '250px',
       };
+
       break;
 
     case 'add-address':
       modalContent = <AddAddressModalContent />;
       title = 'Tambahkan Alamat';
       modalProps = {
-        $overlayHeight: '170vh',
         $containerWidth: '650px',
         $containerHeight: '850px',
       };
+
       break;
 
     case 'payment-upload':
       modalContent = <UploadPembayaranModal />;
       title = 'Upload Bukti Pembayaran';
       modalProps = {
-        $overlayHeight: '100vh',
         $containerWidth: '500px',
         $containerHeight: '500px',
       };
-      break;
 
+      break;
     case 'select-address':
       modalContent = <SelectAddressModalContent />;
       title = 'Pilih atau tambahkan alamat';
       modalProps = {
-        $overlayHeight: '100vh',
         $containerWidth: '500px',
         $containerHeight: '500px',
       };
+
       break;
 
     case 'detail-pharmacy':
       modalContent = <SelectDetailPharmacyModalContent />;
       title = 'Detail Pharmacy';
       modalProps = {
-        $overlayHeight: '170vh',
         $containerWidth: '650px',
         $containerHeight: '850px',
       };
@@ -130,8 +125,35 @@ const Modal = () => {
       modalContent = <UpdateAddressModalContent />;
       title = 'Ubah Informasi Alamat';
       modalProps = {
-        $overlayHeight: '170vh',
         $containerWidth: '650px',
+        $containerHeight: '850px',
+      };
+
+      break;
+
+    case 'view-more-tx':
+      modalContent = <ViewMoreTxModalContent />;
+      title = 'Detail Transaksi';
+      modalProps = {
+        $containerWidth: '1050px',
+        $containerHeight: '850px',
+      };
+      break;
+
+    case 'add-shipping':
+      modalContent = <AddShippingModalContent />;
+      title = 'Tambahkan Metode Pengiriman';
+      modalProps = {
+        $containerWidth: '1050px',
+        $containerHeight: 'max-content',
+      };
+      break;
+
+    case 'view-more-tx':
+      modalContent = <ViewMoreTxModalContent />;
+      title = 'Detail Transaksi';
+      modalProps = {
+        $containerWidth: '1050px',
         $containerHeight: '850px',
       };
       break;
@@ -140,7 +162,6 @@ const Modal = () => {
       modalContent = <ViewMoreTxModalContent />;
       title = 'Detail Transaksi';
       modalProps = {
-        $overlayHeight: '170vh',
         $containerWidth: '1050px',
         $containerHeight: '850px',
       };
@@ -158,8 +179,10 @@ const Modal = () => {
         <ModalContainer {...modalProps}>
           <ModalHeader>
             <h1>{title}</h1>
+
             <CloseICO onClick={handleModalClose} />
           </ModalHeader>
+
           {modalContent}
         </ModalContainer>
       </ModalOverlay>

@@ -19,12 +19,11 @@ export const CartSection = styled.div`
   width: 100%;
   height: max-content;
   border-radius: 12px;
-  padding: 20px 30px;
 
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  gap: 2rem;
+  /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
 `;
 
 export const OrderSummary = styled.div`
@@ -35,9 +34,7 @@ export const OrderSummary = styled.div`
   margin-top: 5.5rem;
   padding: 30px;
 
-  box-shadow:
-    0 10px 20px rgba(197, 197, 197, 0.19),
-    0 6px 6px rgba(0, 0, 0, 0.23);
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 `;
 
 export const SectionTitle = styled.h1`
@@ -208,4 +205,16 @@ export const OngkosKirim = styled.div`
   p {
     color: ${COLORS.primary_color};
   }
+`;
+
+export const CartItemContainer = styled.div`
+  width: 100%;
+  height: max-content;
+  border-radius: 12px;
+  padding: 20px 30px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 `;

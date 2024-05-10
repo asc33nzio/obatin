@@ -13,7 +13,12 @@ import {
   ProductCard,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
-import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
+import {
+  CartItem,
+  addItemToCart,
+  clearCart,
+  removeItemFromCart,
+} from '@/redux/reducers/cartSlice';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Body, Container } from '@/styles/Global.styles';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -28,6 +33,10 @@ import CategoryComponent from '@/components/molecules/category/Category';
 import FilterComponent from '@/components/atoms/filter/DropdownFIlter';
 import Image from 'next/image';
 import Footer from '@/components/organisms/footer/Footer';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useToast } from '@/hooks/useToast';
+import { getCookie } from 'cookies-next';
+import { navigateToTelemedicine } from '../actions';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -39,6 +48,8 @@ const ProductsPage = () => {
   const router = useRouter();
   const dispatch = useObatinDispatch();
   const items = useObatinSelector((state) => state?.cart?.items);
+  const { isDesktopDisplay } = useClientDisplayResolution();
+  const { setToast } = useToast();
 
   const [products, setProducts] = useState<ProductType[]>([]);
   const [categories, setCategories] = useState<CategoryType[]>([]);
@@ -107,42 +118,57 @@ const ProductsPage = () => {
 
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
   const handleAddToCart = (product: ProductType) => {
-    const existingItem = items.find((item) => {
-      item.product_id === product.id;
-    });
-    if (existingItem) {
+    if (product.is_prescription_required) {
+      setToast({
+        showToast: true,
+        toastMessage: 'product ini membutuhkan prescription',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      dispatch(clearCart);
+      navigateToTelemedicine();
+    } else {
+      const existingItem = items.find((item) => {
+        item.product_id === product.id;
+      });
+      if (existingItem) {
+        dispatch(
+          addItemToCart({
+            ...existingItem,
+            quantity: +1,
+          }),
+        );
+        setSelectedProduct(product);
+        return;
+      }
       dispatch(
         addItemToCart({
-          ...existingItem,
-          quantity: +1,
+          product_id: product.id,
+          prescription_id: null,
+          pharmacy_id: null,
+          quantity: 1,
         }),
       );
       setSelectedProduct(product);
-      return;
     }
-
-    dispatch(
-      addItemToCart({
-        product_id: product.id,
-        prescription_id: null,
-        pharmacy_id: null,
-        quantity: 1,
-      }),
-    );
-    setSelectedProduct(product);
   };
 
-  const handleSubtract = (productId: number) => {
+  const handleSubtract = (productId: Partial<CartItem>) => {
     const existingItem = items.find((item) => item.product_id === productId);
     if (existingItem && existingItem.quantity > 1) {
       dispatch(
-        addItemToCart({
+        removeItemFromCart({
           ...existingItem,
           quantity: -1,
         }),
       );
     } else {
-      dispatch(removeItemFromCart(productId));
+      dispatch(
+        removeItemFromCart({
+          product_id,
+        }),
+      );
       setSelectedProduct(null);
     }
   };

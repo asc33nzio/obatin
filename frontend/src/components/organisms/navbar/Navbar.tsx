@@ -49,7 +49,7 @@ const Navbar = (): React.ReactElement => {
   const userInfo = useObatinSelector((state) => state?.auth);
   const userGender = useObatinSelector((state) => state?.auth?.gender);
   const avatarUrlUser = useObatinSelector((state) => state?.auth?.avatarUrl);
-  const quantity = useObatinSelector((state) => state?.cart);
+  const quantity = useObatinSelector((state) => state?.cart.totalQuantity);
   const avatarUrlDoctor = useObatinSelector(
     (state) => state?.authDoctor?.avatarUrl,
   );
@@ -227,7 +227,7 @@ const Navbar = (): React.ReactElement => {
             <>
               <CartContainer onClick={() => handleCartClick()}>
                 <CartICO />
-                <Quantity>{quantity.totalQuantity}</Quantity>
+                <Quantity>{quantity}</Quantity>
               </CartContainer>
               <ImgBg>
                 <Image

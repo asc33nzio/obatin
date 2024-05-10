@@ -17,11 +17,13 @@ import Navbar from '@/components/organisms/navbar/Navbar';
 import Footer from '@/components/organisms/footer/Footer';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Image from 'next/image';
+import { getCookie } from 'cookies-next';
 
 const ProductDetailPage = () => {
   const pathname = usePathname();
   const product_slug = pathname.split('/').pop();
   const [product, setProduct] = useState<ProductType>();
+  const accessToken = getCookie('access_token');
 
   useEffect(() => {
     const fetchData = async () => {
