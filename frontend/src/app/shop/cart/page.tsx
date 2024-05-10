@@ -1,6 +1,4 @@
 'use client';
-import Navbar from '@/components/organisms/navbar/Navbar';
-import { Container } from '@/styles/Global.styles';
 import {
   Cart,
   CartItemContainer,
@@ -9,20 +7,21 @@ import {
   OrderSummary,
   SectionTitle,
 } from '@/styles/pages/product/Cart.styles';
-import React from 'react';
 import {
   Body,
   SubmitSection,
 } from '@/styles/pages/checkout/CheckoutPage.styles';
-import CustomButton from '@/components/atoms/button/CustomButton';
 import { navigateToProductList } from '@/app/actions';
+import { Container } from '@/styles/Global.styles';
+import { useObatinSelector } from '@/redux/store/store';
+import Navbar from '@/components/organisms/navbar/Navbar';
+import LocationICO from '@/assets/icons/LocationICO';
+import CustomButton from '@/components/atoms/button/CustomButton';
 import ProductCartItem from '@/components/atoms/cart/ProductCartItem';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
-import LocationICO from '@/assets/icons/LocationICO';
-import { useObatinSelector } from '@/redux/store/store';
 
-const CartPage = () => {
+const CartPage = (): React.ReactElement => {
   const userInfo = useObatinSelector((state) => state?.auth);
   return (
     <Container>

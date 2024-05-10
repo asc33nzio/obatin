@@ -21,7 +21,7 @@ const nextConfig = {
       ],
     },
   },
-  basePath: '/vm4',
+  // basePath: '/vm4',
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
 };

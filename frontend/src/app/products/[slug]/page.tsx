@@ -5,13 +5,16 @@ import {
   ProductDetail,
   ProductDetailContainer,
 } from '@/styles/pages/product/ProductDetail.styles';
+import { addItemToCart, deduceOneFromCart } from '@/redux/reducers/cartSlice';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Body, Container } from '@/styles/Global.styles';
 import { ProductType } from '@/types/Product';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
-import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
 import { RingLoader } from 'react-spinners';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { navigateToChat } from '@/app/actions';
+import { useToast } from '@/hooks/useToast';
 import axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import Footer from '@/components/organisms/footer/Footer';
@@ -22,6 +25,8 @@ const ProductDetailPage = () => {
   const pathname = usePathname();
   const product_slug = pathname.split('/').pop();
   const [product, setProduct] = useState<ProductType>();
+  const { isDesktopDisplay } = useClientDisplayResolution();
+  const { setToast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,38 +50,46 @@ const ProductDetailPage = () => {
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
 
   const handleAddToCart = (product: ProductType) => {
+    if (product.is_prescription_required) {
+      setToast({
+        showToast: true,
+        toastMessage:
+          'product ini membutuhkan resep, silahkan melakukan konsultasi',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      navigateToChat();
+      return;
+    }
+
     const existingItem = items.find((item) => item.product_id === product.id);
     if (existingItem) {
-      dispatch(
-        addItemToCart({
-          ...existingItem,
-          quantity: +1,
-        }),
-      );
-    } else {
-      dispatch(
-        addItemToCart({
-          product_id: product.id,
-          prescription_id: null,
-          pharmacy_id: 55524,
-          quantity: 1,
-        }),
-      );
+      dispatch(addItemToCart(existingItem));
+      setSelectedProduct(product);
+      return;
     }
+
     setSelectedProduct(product);
+    dispatch(
+      addItemToCart({
+        product_id: product.id,
+        prescription_id: null,
+        pharmacy_id: null,
+        quantity: 1,
+      }),
+    );
   };
 
   const handleSubtract = (productId: number) => {
     const existingItem = items.find((item) => item.product_id === productId);
-    if (existingItem && existingItem.quantity > 1) {
-      dispatch(
-        addItemToCart({
-          ...existingItem,
-          quantity: -1,
-        }),
-      );
-    } else {
-      dispatch(removeItemFromCart({ product_id: productId }));
+
+    if (existingItem === undefined) {
+      return;
+    }
+
+    dispatch(deduceOneFromCart(existingItem));
+    if (existingItem.quantity === 0) {
       setSelectedProduct(null);
     }
   };
@@ -104,7 +117,10 @@ const ProductDetailPage = () => {
             </Price>
             <h3>{product?.selling_unit}</h3>
 
-            {selectedProduct?.id === product?.id ? (
+            {selectedProduct?.id === product?.id &&
+            product &&
+            items.find((item) => item.product_id === product.id)?.quantity !==
+              undefined ? (
               <ButtonAdd>
                 <CustomButton
                   content='-'

@@ -4,13 +4,13 @@ import {
   Summary,
 } from '@/styles/pages/product/Cart.styles';
 import { navigateToCheckout } from '@/app/actions';
-import { updateQuantityCart } from '@/redux/reducers/cartSlice';
 import { setPaymentId } from '@/redux/reducers/pharmacySlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { getCookie } from 'cookies-next';
+import { useToast } from '@/hooks/useToast';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import axios from 'axios';
-import React from 'react';
 
 const PaymentSummaryComponent = (props: {
   isNext: boolean;
@@ -24,66 +24,64 @@ const PaymentSummaryComponent = (props: {
   const totalShoppingCost = totalPrice + shippingCost;
   const accessToken = getCookie('access_token');
   const dispatch = useObatinDispatch();
+  const { setToast } = useToast();
+  const { isDesktopDisplay } = useClientDisplayResolution();
 
-  const postCheckout = async () => {
+  const handleCheckout = async () => {
     try {
-      if (selectedPharmacy) {
-        const payload = {
-          pharmacies_cart: [
-            {
-              id: selectedPharmacy.id,
-              name: selectedPharmacy.name,
-              address: selectedPharmacy.address,
-              city_id: selectedPharmacy.city_id,
-              lat: selectedPharmacy.lat,
-              lng: selectedPharmacy.lng,
-              pharmacist_name: selectedPharmacy.pharmacist_name,
-              pharmacist_license: selectedPharmacy.pharmacist_license,
-              pharmacist_phone: selectedPharmacy.pharmacist_phone,
-              opening_time: selectedPharmacy.opening_time,
-              closing_time: selectedPharmacy.closing_time,
-              operational_days: selectedPharmacy.operational_days,
-              partner_id: selectedPharmacy.partner_id,
-              distance: selectedPharmacy.distance,
-              total_weight: selectedPharmacy.total_weight,
-              subtotal_pharmacy: selectedPharmacy.subtotal_pharmacy,
-              shipping_id: selectedPharmacy.shipping_id,
-              shipping_cost: selectedPharmacy.shipping_cost,
-              cart_items: selectedPharmacy.cart_items,
-            },
-          ],
-        };
-
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/checkout`,
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          },
-        );
-        const { payment_id } = response.data.data;
-        dispatch(setPaymentId(payment_id));
-        dispatch(updateQuantityCart);
-        navigateToCheckout();
+      if (!selectedPharmacy) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Pilihlah metode pengiriman',
+          toastType: 'warning',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
       }
+
+      const payload = {
+        pharmacies_cart: [
+          {
+            id: selectedPharmacy.id,
+            name: selectedPharmacy.name,
+            address: selectedPharmacy.address,
+            city_id: selectedPharmacy.city_id,
+            lat: selectedPharmacy.lat,
+            lng: selectedPharmacy.lng,
+            pharmacist_name: selectedPharmacy.pharmacist_name,
+            pharmacist_license: selectedPharmacy.pharmacist_license,
+            pharmacist_phone: selectedPharmacy.pharmacist_phone,
+            opening_time: selectedPharmacy.opening_time,
+            closing_time: selectedPharmacy.closing_time,
+            operational_days: selectedPharmacy.operational_days,
+            partner_id: selectedPharmacy.partner_id,
+            distance: selectedPharmacy.distance,
+            total_weight: selectedPharmacy.total_weight,
+            subtotal_pharmacy: selectedPharmacy.subtotal_pharmacy,
+            shipping_id: selectedPharmacy.shipping_id,
+            shipping_cost: selectedPharmacy.shipping_cost,
+            cart_items: selectedPharmacy.cart_items,
+          },
+        ],
+      };
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/checkout`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      const { payment_id } = response.data.data;
+      dispatch(setPaymentId(payment_id));
+      navigateToCheckout();
     } catch (error) {
       console.error(error);
     }
   };
-
-  const handleTransactionClick = async () => {
-    try {
-      await postCheckout();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // const handleCheckout = async () => {
-  // dispatch(clearCart()) saat tidak ada error di post req
-  // }
 
   return (
     <>
@@ -114,7 +112,7 @@ const PaymentSummaryComponent = (props: {
                 $width='250px'
                 $height='50px'
                 $fontSize='16px'
-                onClick={() => handleTransactionClick()}
+                onClick={handleCheckout}
               />
             </div>
           )}

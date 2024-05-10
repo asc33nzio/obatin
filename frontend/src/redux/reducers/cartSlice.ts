@@ -42,8 +42,8 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addItemToCart: (state, action: PayloadAction<CartItem>) => {
-      const { product_id } = action.payload;
+    addItemToCart: (state, action: PayloadAction<number>) => {
+      const product_id = action.payload;
       const existingItem = state.items.find(
         (item) => item.product_id === product_id,
       );
@@ -51,38 +51,46 @@ export const cartSlice = createSlice({
       if (existingItem) {
         existingItem.quantity += 1;
       } else {
-        state.items.push({ ...action.payload, quantity: 1 });
+        state.items.push({
+          product_id: product_id,
+          prescription_id: null,
+          pharmacy_id: null,
+          quantity: 1,
+        });
       }
 
       state.totalQuantity += 1;
     },
 
     deduceOneFromCart: (state, action: PayloadAction<CartItem>) => {
-      const { product_id } = action.payload;
+      const product_id = action.payload.product_id;
       const existingItemIndex = state.items.findIndex(
         (item) => item.product_id === product_id,
       );
 
       if (existingItemIndex === -1) return;
       const existingItem = state.items[existingItemIndex];
+      existingItem.quantity -= 1;
+      state.totalQuantity -= 1;
 
-      if (existingItem?.quantity <= 1) {
-        state.items = state.items.filter(
-          (item) => item.product_id !== existingItem.product_id,
-        );
+      if (existingItem?.quantity === 0) {
+        state.items.splice(existingItemIndex, 1);
         return;
       }
     },
 
     removeItemFromCart: (state, action: PayloadAction<CartItem>) => {
       const { product_id } = action.payload;
-      const item = state.items.find((item) => item.product_id === product_id);
 
-      if (item === undefined) return;
+      const removedItem = state.items.find(
+        (item) => item.product_id === product_id,
+      );
+      if (removedItem) {
+        state.totalQuantity -= removedItem.quantity;
+      }
 
-      state.totalQuantity -= item.quantity;
       state.items = state.items.filter(
-        (item) => item.product_id !== item.product_id,
+        (item) => item.product_id !== product_id,
       );
     },
 

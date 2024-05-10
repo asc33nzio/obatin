@@ -1,8 +1,4 @@
 'use client';
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Container } from '@/styles/Global.styles';
-import { Body } from '@/styles/pages/checkout/CheckoutPage.styles';
 import {
   Cart,
   CartSection,
@@ -10,31 +6,30 @@ import {
   OrderSummary,
   SectionTitle,
 } from '@/styles/pages/product/Cart.styles';
+import { useState } from 'react';
+import { Container } from '@/styles/Global.styles';
+import { Body } from '@/styles/pages/checkout/CheckoutPage.styles';
 import { ImageContainer } from '@/styles/organisms/modal/modalContent/UploadPayment.styles';
+import { getCookie } from 'cookies-next';
+import { navigateToCart, navigateToTxHistory } from '@/app/actions';
+import { useObatinSelector } from '@/redux/store/store';
+import { useToast } from '@/hooks/useToast';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import CustomButton from '@/components/atoms/button/CustomButton';
-import { getCookie } from 'cookies-next';
-import { navigateToCart } from '@/app/actions';
-import { useObatinSelector } from '@/redux/store/store';
 import Image from 'next/image';
-import { useToast } from '@/hooks/useToast';
-import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-// eslint-disable-next-line
-import { setPharmacies } from '@/redux/reducers/pharmacySlice';
 
-const Checkout = () => {
+const Checkout = (): React.ReactElement => {
   const [selectedFile, setSelectedFile] = useState();
   const accessToken = getCookie('access_token');
   const paymentId = useObatinSelector((state) => state.pharmacy.paymentId);
-
-  console.log('paymentid:', paymentId);
-
-  // eslint-disable-next-line
-  const [imageSrc, setImageSrc] = useState<string>();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
+  // eslint-disable-next-line
+  const [imageSrc, setImageSrc] = useState<string>();
 
   const handlePdfChange = (e: any) => {
     setSelectedFile(e.target.files[0]);
@@ -62,17 +57,18 @@ const Checkout = () => {
       }
       setToast({
         showToast: true,
-        toastMessage: 'Berhasil Upload',
+        toastMessage:
+          'Pesanan kamu akan diproses paling lambat dalam 2 x 24 jam',
         toastType: 'ok',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
-      navigateToCart();
+      navigateToTxHistory();
     } catch (error) {
       console.error(error);
       setToast({
         showToast: true,
-        toastMessage: 'Maaf, upload payment gagal',
+        toastMessage: 'Maaf, upload pembayaran gagal',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',

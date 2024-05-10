@@ -71,7 +71,6 @@ const ProductsPage = () => {
   const [isPrescriptionRequied] = useState<boolean>();
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
   const search = searchParams.get('search');
-  console.log(items);
 
   const handlePageJump = (i: number) => {
     setPage(i);
@@ -101,22 +100,8 @@ const ProductsPage = () => {
       return;
     }
 
-    const existingItem = items.find((item) => item.product_id === product.id);
-    if (existingItem) {
-      dispatch(addItemToCart(existingItem));
-      setSelectedProduct(product);
-      return;
-    }
-
+    dispatch(addItemToCart(product.id));
     setSelectedProduct(product);
-    dispatch(
-      addItemToCart({
-        product_id: product.id,
-        prescription_id: null,
-        pharmacy_id: null,
-        quantity: 1,
-      }),
-    );
   };
 
   const handleSubtract = (productId: number) => {
