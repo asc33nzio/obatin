@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { CartItem } from './cartSlice';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ProductItemItf } from './cartSlice';
 
 export interface PharmacyCart {
   id: number;
@@ -18,27 +18,61 @@ export interface PharmacyCart {
   partner_id: number;
   distance: number;
   total_weight: number;
+  shipping_id: number;
+  shipping_name: string;
+  shipping_cost: number;
   subtotal_pharmacy: number;
-  cart_items: CartItem[];
+  cart_items: ProductItemItf[];
 }
 
 export interface PharmacyState {
   pharmacies: PharmacyCart[];
+  selectedPharmacy: PharmacyCart | null;
+  paymentId: number | null;
 }
 
 const initialState: PharmacyState = {
   pharmacies: [],
+  selectedPharmacy: null,
+  paymentId: null,
 };
 
 const pharmacySlice = createSlice({
   name: 'pharmacy',
   initialState,
   reducers: {
-    setPharmacies(state, action) {
-      state.pharmacies = action.payload;
+    setPharmacies(state, action: PayloadAction<PharmacyState>) {
+      state.pharmacies = action.payload.pharmacies;
+    },
+    setSelectedPharmacy(state, action: PayloadAction<PharmacyCart>) {
+      state.selectedPharmacy = action.payload;
+    },
+    clearSelectedPharmacy(state) {
+      state.selectedPharmacy = null;
+    },
+    updateSelectedPharmacy(
+      state,
+      action: PayloadAction<Partial<PharmacyCart>>,
+    ) {
+      if (state.selectedPharmacy) {
+        state.selectedPharmacy = {
+          ...state.selectedPharmacy,
+          ...action.payload,
+        };
+      }
+    },
+    setPaymentId(state, action: PayloadAction<number>) {
+      state.paymentId = action.payload;
     },
   },
 });
 
-export const { setPharmacies } = pharmacySlice.actions;
+export const {
+  setPharmacies,
+  setSelectedPharmacy,
+  clearSelectedPharmacy,
+  updateSelectedPharmacy,
+  setPaymentId,
+} = pharmacySlice.actions;
+
 export default pharmacySlice.reducer;
