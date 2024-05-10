@@ -8,9 +8,11 @@ import { useRouter, usePathname } from 'next/navigation';
 const CategoryComponent = ({
   categories,
   setCategoryId,
+  setParentPage,
 }: {
   categories: CategoryType[];
   setCategoryId: (categoryId: number) => void;
+  setParentPage: () => void;
 }): React.ReactElement => {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const router = useRouter();
@@ -37,6 +39,7 @@ const CategoryComponent = ({
 
   const handleCategoryClicked = (categoryId: number, categorySlug: string) => {
     setCategoryId(categoryId);
+    setParentPage();
 
     router.push(
       pathname + '?' + createQueryString('category', `${categorySlug}`),

@@ -12,10 +12,14 @@ const DoctorFilterComponent = ({
   setSortBy,
   setOrderBy,
   onClickClear,
+  sortValue,
+  orderValue,
 }: {
   setSortBy: (sortBy: string | null) => void;
   setOrderBy: (orderBy: string | null) => void;
   onClickClear: () => void;
+  sortValue: string | null;
+  orderValue: string | null;
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -72,6 +76,7 @@ const DoctorFilterComponent = ({
     setSortBy(null);
     setOrderBy(null);
     onClickClear();
+    onClickClear();
 
     const queryString = newParams.toString();
     router.push(`${pathname}${queryString ? `?${queryString}` : ''}`);
@@ -81,7 +86,13 @@ const DoctorFilterComponent = ({
     <FilterContainer>
       <FilterButtonStyle>
         <CustomButton
-          content='Urut berdasarkan'
+          content={
+            sortValue === 'name'
+              ? 'Nama'
+              : sortValue === 'true'
+                ? 'Online'
+                : 'Urut berdasarkan'
+          }
           onClick={toggleFilterSortBy}
           $fontSize='16px'
         />
@@ -91,6 +102,7 @@ const DoctorFilterComponent = ({
               onClick={() => {
                 handleFilterClicked('sort_by', 'name');
                 handleSortByClicked('name');
+                setIsOpenSortBy(false);
                 setIsOpenSortBy(false);
               }}
             >
@@ -111,7 +123,13 @@ const DoctorFilterComponent = ({
 
       <FilterButtonStyle>
         <CustomButton
-          content='Urutan'
+          content={
+            orderValue === 'desc'
+              ? 'Atas ke bawah'
+              : orderValue === 'asc'
+                ? 'Bawah ke atas'
+                : 'Urutan'
+          }
           onClick={toggleFilterOrderBy}
           $fontSize='16px'
         />
@@ -121,6 +139,7 @@ const DoctorFilterComponent = ({
               onClick={() => {
                 handleFilterClicked('order', 'asc');
                 handleOrderClicked('asc');
+                setIsOpenOrderBy(false);
               }}
             >
               Dari bawah ke atas
@@ -129,6 +148,7 @@ const DoctorFilterComponent = ({
               onClick={() => {
                 handleFilterClicked('order', 'desc');
                 handleOrderClicked('desc');
+                setIsOpenOrderBy(false);
               }}
             >
               Dari atas ke bawah
