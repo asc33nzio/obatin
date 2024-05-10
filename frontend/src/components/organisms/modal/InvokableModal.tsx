@@ -8,7 +8,8 @@ import { ModalType } from '@/types/modalTypes';
 import DoctorDetailModalContent from './modalContent/DoctorDetailModalContent';
 import CloseICO from '@/assets/icons/CloseICO';
 
-interface DoctorDetailItf {
+export interface DoctorDetailItf {
+  id?: number | undefined;
   name: string | undefined;
   specialization: string | undefined;
   experiences: number | undefined;

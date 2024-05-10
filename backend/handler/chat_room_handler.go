@@ -79,10 +79,12 @@ func (h *ChatRoomHandler) GetAllMessageByChatRoomId(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseGetAllMessageInOneChatRoomMsg,
 		Data: dto.OneChatRoom{
-			Message: res,
-			Id:      idParam.Id,
-			User:    dto.ToUserDetailRes(user),
-			Doctor:  dto.ToDoctorDetailResponse(doctor),
+			Message:        res,
+			Id:             idParam.Id,
+			User:           dto.ToUserDetailRes(user),
+			Doctor:         dto.ToDoctorDetailResponse(doctor),
+			IsDoctorTyping: chatRoom.IsDoctorTyping,
+			IsUserTyping:   chatRoom.IsUserTyping,
 		},
 	})
 }
@@ -105,10 +107,26 @@ func (h *ChatRoomHandler) UpdateIsTyping(ctx *gin.Context) {
 		return
 	}
 
-	err = h.chatRoomUsecase.UpdateIsTyping(ctx, body.ToUpdateIsTyping(), body.ChatRoomId)
-	if err != nil {
-		ctx.Error(err)
+	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	if !ok {
+		apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 		return
+	}
+
+	if authenticationRole == constant.RoleDoctor {
+		err = h.chatRoomUsecase.UpdateIsTyping(ctx, body.ToUpdateIsTypingDoctor(), body.ChatRoomId)
+		if err != nil {
+			ctx.Error(err)
+			return
+		}
+	}
+
+	if authenticationRole == constant.RoleUser {
+		err = h.chatRoomUsecase.UpdateIsTyping(ctx, body.ToUpdateIsTypingUser(), body.ChatRoomId)
+		if err != nil {
+			ctx.Error(err)
+			return
+		}
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{

@@ -45,6 +45,6 @@ export const NavigateToTxHistory = async () => {
   redirect('/dashboard/user/transactions');
 };
 
-export const navigateToTelemedicine = async () => {
-  redirect('/telemidicine');
+export const NavigateToChat = async () => {
+  redirect('/consultation');
 };

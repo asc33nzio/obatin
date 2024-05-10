@@ -1,4 +1,7 @@
+import { NavigateToChat } from '@/app/actions';
 import CustomButton from '@/components/atoms/button/CustomButton';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useToast } from '@/hooks/useToast';
 import { DoctorModalContainer } from '@/styles/organisms/modal/modalContent/DoctorDetailModalContent.styles';
 import {
   Bold,
@@ -6,11 +9,63 @@ import {
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
 import { Experience } from '@/styles/pages/product/ProductListPage.styles';
+import axios from 'axios';
+import { getCookie } from 'cookies-next';
 // import axios from 'axios';
 import Image from 'next/image';
 import React from 'react';
 
 const DoctorDetailModalContent = (props: { $doctorDetail: any }) => {
+  const accessToken = getCookie('access_token');
+  const { isDesktopDisplay } = useClientDisplayResolution();
+  const { setToast } = useToast();
+
+  const handleCreateChatRoom = async () => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room`,
+        JSON.stringify({ doctor_id: props.$doctorDetail.id }),
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage: 'Berhasil membuat ruang chat dengan dokter',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      setTimeout(() => {
+        NavigateToChat();
+      }, 2000);
+    } catch (error: any) {
+      const errorMessage = error.response.data.message;
+      if (errorMessage.includes('chat room already exist')) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Berhasil membuat ruang chat dengan dokter',
+          toastType: 'ok',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        setTimeout(() => {
+          NavigateToChat();
+        }, 2000);
+        return;
+      }
+      setToast({
+        showToast: true,
+        toastMessage: 'Gagal membuat ruang chat',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    }
+  };
   return (
     <>
       <DoctorModalContainer>
@@ -39,6 +94,7 @@ const DoctorDetailModalContent = (props: { $doctorDetail: any }) => {
           $height='32px'
           content='Hubungi Dokter'
           $fontSize='12px'
+          onClick={handleCreateChatRoom}
         />
       </DoctorModalContainer>
     </>

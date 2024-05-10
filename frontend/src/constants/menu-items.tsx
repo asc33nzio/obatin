@@ -44,7 +44,7 @@ const MENU_USER: MenuOption[] = [
   {
     name: 'Konsultasi',
     icon: ConsulICO,
-    url: '/telemidicine',
+    url: '/consultation',
   },
   {
     name: 'List Dokter',
