@@ -18,6 +18,8 @@ const userOnlyRoutes = ['/dashboard/user', '/dashboard/user/transactions'];
 const doctorOnlyRoutes = ['/dashboard/doctor'];
 
 export default async function middleware(request: NextRequest) {
+  const prefix = process.env.NODE_ENV === 'production' ? '/vm4' : '';
+
   const response = NextResponse.next();
 
   //! Prolong access_token if refresh token is valid
@@ -69,17 +71,17 @@ export default async function middleware(request: NextRequest) {
   // const redirectToHome = new URL('/', request.nextUrl.href).toString();
 
   const redirectToLogin = new URL(
-    '/auth/login',
+    prefix + '/auth/login',
     request.nextUrl.href,
   ).toString();
 
   const redirectToUserDashboard = new URL(
-    '/dashboard/user',
+    prefix + '/dashboard/user',
     request.nextUrl.href,
   ).toString();
 
   const redirectToDoctorDashboard = new URL(
-    '/dashboard/doctor',
+    prefix + '/dashboard/doctor',
     request.nextUrl.href,
   ).toString();
 

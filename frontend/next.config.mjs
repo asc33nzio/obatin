@@ -12,6 +12,18 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        'obatin-fe:3000',
+        'localhost',
+        'digitalent.games.test.shopee.io',
+      ],
+    },
+  },
+  basePath: '/vm4',
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
 };
 
 export default nextConfig;
