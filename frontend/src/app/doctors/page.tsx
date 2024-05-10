@@ -55,7 +55,6 @@ const DoctorsPage = () => {
   const [loading, setLoading] = useState(false);
   const [specSlug, setSpecSlug] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string | null>(null);
-  // const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [isOnline] = useState<string | null>(null);
   const [orderBy, setOrderBy] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -150,6 +149,8 @@ const DoctorsPage = () => {
                 setSortBy={setSortBy}
                 setOrderBy={setOrderBy}
                 onClickClear={() => setSpecSlug(null)}
+                sortValue={sortBy}
+                orderValue={orderBy}
               />
             </FilterContainer>
             <ProductListContainer>

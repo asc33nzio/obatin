@@ -31,11 +31,25 @@ import CategoryComponent from '@/components/molecules/category/Category';
 import FilterComponent from '@/components/atoms/filter/DropdownFIlter';
 import Image from 'next/image';
 import Footer from '@/components/organisms/footer/Footer';
+import Pagination from '@/components/molecules/admin/Pagination';
 
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
 });
+
+export interface IResponseProductPagination {
+  page: number;
+  page_count: number;
+  total_records: number;
+  limit: number;
+}
+
+export interface IResponseProduct {
+  message: string;
+  pagination: IResponseProductPagination;
+  data: ProductType[];
+}
 
 const ProductsPage = () => {
   const searchParams = useSearchParams();
@@ -44,7 +58,7 @@ const ProductsPage = () => {
   const items = useObatinSelector((state) => state?.cart?.items);
   const { isDesktopDisplay } = useClientDisplayResolution();
   const { setToast } = useToast();
-  const [products, setProducts] = useState<ProductType[]>([]);
+  const [products, setProducts] = useState<IResponseProduct>();
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -74,8 +88,7 @@ const ProductsPage = () => {
             },
           },
         );
-
-        setProducts([...response.data]);
+        setProducts(response);
       } catch (error) {
         console.error(error);
       } finally {
@@ -95,6 +108,10 @@ const ProductsPage = () => {
   ]);
 
   useEffect(() => {
+    setPage(1);
+  }, [sortBy, orderBy, classification]);
+
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
         const { data: response } = await axios.get(
@@ -108,6 +125,15 @@ const ProductsPage = () => {
 
     fetchCategories();
   }, []);
+
+  const handleClickPage = async (page: number) => {
+    setPage(page);
+    setLoading(false);
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
 
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
   const handleAddToCart = (product: ProductType) => {
@@ -170,20 +196,16 @@ const ProductsPage = () => {
     router.push(`products/${slug}`);
   };
 
-  const handleLoadMore = () => {
-    setPage((prevPage) => prevPage + 1);
-  };
-
   return (
     <Container className={inter.className}>
       <Navbar />
-
       <Body>
         <Content>
           <CategoryContainer>
             <CategoryComponent
               categories={categories}
               setCategoryId={setCategoryId}
+              setParentPage={() => setPage(1)}
             />
           </CategoryContainer>
           <ProductContent>
@@ -192,10 +214,14 @@ const ProductsPage = () => {
                 setSortBy={setSortBy}
                 setClassification={setClassification}
                 setOrderBy={setOrderBy}
+                onClickClear={() => setCategoryId(null)}
+                sortValue={sortBy}
+                orderValue={orderBy}
+                classificationValue={classification}
               />
             </FilterContainer>
             <ProductListContainer>
-              {products.map((product) => (
+              {products?.data?.map((product) => (
                 <ProductCard key={product.id}>
                   <div
                     onClick={() => handleProductClicked(product.product_slug)}
@@ -256,13 +282,16 @@ const ProductsPage = () => {
                 </ProductCard>
               ))}
             </ProductListContainer>
-            <CustomButton
-              onClick={handleLoadMore}
-              disabled={loading}
-              content='Lebih Banyak'
-              $width='150px'
-              $fontSize='18px'
-            />
+
+            {!loading && products && products.pagination && (
+              <div style={{ padding: '30px 0' }}>
+                <Pagination
+                  currentPage={products.pagination.page}
+                  totalPages={products.pagination.page_count}
+                  onPageChange={(page) => handleClickPage(page)}
+                />
+              </div>
+            )}
           </ProductContent>
         </Content>
         <Footer />
