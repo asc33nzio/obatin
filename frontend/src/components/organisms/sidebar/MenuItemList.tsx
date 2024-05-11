@@ -4,6 +4,8 @@ import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { resetAuthState } from '@/redux/reducers/authSlice';
 import { navigateToLogin } from '@/app/actions';
 import { resetAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
+import { clearCart } from '@/redux/reducers/cartSlice';
+import { resetPharmacyStates } from '@/redux/reducers/pharmacySlice';
 import MenuItem from './MenuItem';
 
 type MenuItemsListProps = {
@@ -24,6 +26,8 @@ export default function MenuItemsList({
     deleteCookie('refresh_token');
     dispatch(resetAuthState());
     dispatch(resetAuthDoctorState());
+    dispatch(clearCart());
+    dispatch(resetPharmacyStates());
     navigateToLogin();
   };
 

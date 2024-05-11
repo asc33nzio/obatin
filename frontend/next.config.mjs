@@ -24,6 +24,10 @@ const nextConfig = {
   basePath: process.env.NODE_ENV === 'production' ? '/vm4' : '',
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+  webpack: (config) => {
+    config.resolve.alias.canvas = false;
+    return config;
+  },
 };
 
 export default nextConfig;

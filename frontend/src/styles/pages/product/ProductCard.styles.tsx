@@ -8,6 +8,7 @@ export const Imagecontainer = styled.div`
 `;
 
 export const ProductCard = styled.a`
+  position: relative;
   width: 270px;
   display: flex;
   flex-direction: column;
@@ -47,6 +48,27 @@ export const Price = styled.p`
   font-size: 14px;
   text-align: center;
 `;
+
 export const ArrowRight = styled.div`
   color: ${COLORS.primary_color};
+`;
+
+export const PrescriptionBadge = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 15px;
+  left: 15px;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+
+  width: 115px;
+  height: 25px;
+
+  border: 2.5px solid orange;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 650;
 `;

@@ -9,23 +9,26 @@ import {
 import {
   Bold,
   Imagecontainer,
+  PrescriptionBadge,
   Price,
   ProductCard,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
-import { addItemToCart, deduceOneFromCart } from '@/redux/reducers/cartSlice';
+import {
+  increaseOneToCart,
+  deduceOneFromCart,
+} from '@/redux/reducers/cartSlice';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Body, Container } from '@/styles/Global.styles';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Inter } from 'next/font/google';
 import { ButtonAdd } from '@/styles/pages/product/ProductDetail.styles';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useToast } from '@/hooks/useToast';
 import { navigateToChat } from '../actions';
 import { PaginationDiv } from '@/styles/pages/dashboard/transactions/Transactions.styles';
-import axios from 'axios';
+import Axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import CategoryComponent from '@/components/molecules/category/Category';
@@ -33,11 +36,6 @@ import FilterComponent from '@/components/atoms/filter/DropdownFIlter';
 import Image from 'next/image';
 import Footer from '@/components/organisms/footer/Footer';
 import PaginationComponent from '@/components/organisms/pagination/PaginationComponent';
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-});
 
 export interface IResponseProductPagination {
   page: number;
@@ -100,7 +98,7 @@ const ProductsPage = () => {
       return;
     }
 
-    dispatch(addItemToCart(product.id));
+    dispatch(increaseOneToCart(product.id));
     setSelectedProduct(product);
   };
 
@@ -125,7 +123,7 @@ const ProductsPage = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const { data: response } = await axios.get(
+        const { data: response } = await Axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?`,
           {
             params: {
@@ -168,7 +166,7 @@ const ProductsPage = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data: response } = await axios.get(
+        const { data: response } = await Axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/categories`,
         );
         setCategories(response.data);
@@ -181,7 +179,7 @@ const ProductsPage = () => {
   }, []);
 
   return (
-    <Container className={inter.className}>
+    <Container>
       <Navbar />
       <Body>
         <Content>
@@ -210,6 +208,9 @@ const ProductsPage = () => {
             <ProductListContainer>
               {products?.data?.map((product) => (
                 <ProductCard key={product.id}>
+                  {product.is_prescription_required && (
+                    <PrescriptionBadge>Membutuhkan Resep</PrescriptionBadge>
+                  )}
                   <div
                     onClick={() => handleProductClicked(product.product_slug)}
                   >

@@ -23,6 +23,7 @@ import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSumma
 
 const CartPage = (): React.ReactElement => {
   const userInfo = useObatinSelector((state) => state?.auth);
+
   return (
     <Container>
       <Navbar />
@@ -41,19 +42,21 @@ const CartPage = (): React.ReactElement => {
                 let fullAddress = address.detail;
                 fullAddress += `, ${address.city.province.name}, ${address.city.type} ${address.city.name}, ${address.city.postal_code}`;
                 return (
-                  <AddressCard
-                    $id={address.id === null ? 0 : address.id}
-                    key={`userAddressCard${index}`}
-                    isMainAddress={false}
-                    alias={address.alias}
-                    details={fullAddress}
-                    $disableButtons
-                    $justify='space-between'
-                    $padding='20px 0'
-                    $fontSize={16}
-                    $borderDisable={true}
-                    $height={100}
-                  />
+                  userInfo.activeAddressId === address.id && (
+                    <AddressCard
+                      $id={address.id === null ? 0 : address.id}
+                      key={`userAddressCard${index}`}
+                      isMainAddress={false}
+                      alias={address.alias}
+                      details={fullAddress}
+                      $disableButtons
+                      $justify='space-between'
+                      $padding='20px 0'
+                      $fontSize={16}
+                      $borderDisable={true}
+                      $height={100}
+                    />
+                  )
                 );
               })}
             </CartItemContainer>
@@ -62,7 +65,7 @@ const CartPage = (): React.ReactElement => {
             </CartSection>
             <SubmitSection>
               <CustomButton
-                content='Tambah ke keranjang'
+                content='Tambahkan Barang Lain'
                 $width='300px'
                 $fontSize='16px'
                 onClick={() => navigateToProductList()}

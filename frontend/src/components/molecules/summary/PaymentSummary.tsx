@@ -75,6 +75,7 @@ const PaymentSummaryComponent = (props: {
           },
         },
       );
+
       const { payment_id } = response.data.data;
       dispatch(setPaymentId(payment_id));
       navigateToCheckout();

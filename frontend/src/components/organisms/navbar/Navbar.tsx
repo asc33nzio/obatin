@@ -22,8 +22,8 @@ import { useNavbar } from '@/hooks/useNavbar';
 import { decodeJWTSync } from '@/utils/decodeJWT';
 import { useToast } from '@/hooks/useToast';
 import { navigateToCart } from '@/app/actions';
-import { CartItem } from '@/redux/reducers/cartSlice';
 import { usePathname } from 'next/navigation';
+import { CartItemItf } from '@/redux/reducers/cartSlice';
 import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
 import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
 import DefaultDoctorAvatar from '@/assets/DefaultDoctorAvatar.svg';
@@ -126,7 +126,7 @@ const Navbar = (): React.ReactElement => {
         return;
       }
 
-      const cartItems: CartItem[] = userCart.items.map((item) => {
+      const cartItems: CartItemItf[] = userCart.items.map((item) => {
         if (item.product_id === undefined)
           throw new Error('Product ID is undefined');
         return {

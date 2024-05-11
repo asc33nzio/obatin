@@ -60,6 +60,22 @@ const pharmacySlice = createSlice({
           ...state.selectedPharmacy,
           ...action.payload,
         };
+
+        const { shipping_id, shipping_cost, shipping_name } = action.payload;
+        const existingPharmacyIndex = state.pharmacies.findIndex(
+          (pharmacy) => pharmacy.id === state.selectedPharmacy?.id,
+        );
+
+        if (
+          existingPharmacyIndex === -1 ||
+          shipping_id === undefined ||
+          shipping_cost === undefined ||
+          shipping_name === undefined
+        )
+          return;
+        state.pharmacies[existingPharmacyIndex].shipping_id = shipping_id;
+        state.pharmacies[existingPharmacyIndex].shipping_cost = shipping_cost;
+        state.pharmacies[existingPharmacyIndex].shipping_name = shipping_name;
       }
     },
     setPaymentId(state, action: PayloadAction<number>) {
@@ -76,29 +92,48 @@ const pharmacySlice = createSlice({
     increaseByOne(state, action: PayloadAction<number>) {
       if (state.selectedPharmacy) {
         const productId = action.payload;
-        const cartItem = state.selectedPharmacy.cart_items.find(
-          (item) => item.product_id === productId,
+
+        const pharmacyIndex = state.pharmacies.findIndex(
+          (pharmacy) => pharmacy.id === state.selectedPharmacy?.id,
         );
-        if (cartItem) {
-          cartItem.quantity += 1;
-        }
+        if (pharmacyIndex === -1) return;
+
+        const productIndex = state.pharmacies[
+          pharmacyIndex
+        ].cart_items.findIndex((product) => product.product_id === productId);
+        if (productIndex === -1) return;
+
+        state.pharmacies[pharmacyIndex].cart_items[productIndex].quantity =
+          state.pharmacies[pharmacyIndex].cart_items[productIndex].quantity +=
+            1;
       }
     },
     deduceByOne(state, action: PayloadAction<number>) {
       if (state.selectedPharmacy) {
         const productId = action.payload;
-        const updatedCartItems = state.selectedPharmacy.cart_items.map(
-          (item) => {
-            if (item.product_id === productId && item.quantity > 1) {
-              return {
-                ...item,
-                quantity: item.quantity - 1,
-              };
-            }
-            return item;
-          },
+
+        const pharmacyIndex = state.pharmacies.findIndex(
+          (pharmacy) => pharmacy.id === state.selectedPharmacy?.id,
         );
-        state.selectedPharmacy.cart_items = updatedCartItems;
+        if (pharmacyIndex === -1) return;
+
+        const productIndex = state.pharmacies[
+          pharmacyIndex
+        ].cart_items.findIndex((product) => product.product_id === productId);
+        if (productIndex === -1) return;
+
+        state.pharmacies[pharmacyIndex].cart_items[productIndex].quantity =
+          state.pharmacies[pharmacyIndex].cart_items[productIndex].quantity -=
+            1;
+
+        if (
+          state.pharmacies[pharmacyIndex].cart_items[productIndex].quantity ===
+          0
+        ) {
+          state.pharmacies[pharmacyIndex].cart_items = state.pharmacies[
+            pharmacyIndex
+          ].cart_items.filter((product) => product.product_id !== productId);
+        }
       }
     },
     resetPharmacyStates(state) {
@@ -118,6 +153,7 @@ export const {
   removeItemFromPharmacyCart,
   increaseByOne,
   deduceByOne,
+  resetPharmacyStates,
 } = pharmacySlice.actions;
 
 export default pharmacySlice.reducer;

@@ -2,10 +2,10 @@ import { useModal } from '@/hooks/useModal';
 import { updateSelectedPharmacy } from '@/redux/reducers/pharmacySlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { ShippingMethodsType } from '@/types/shippingType';
-import axios from 'axios';
 import { getCookie } from 'cookies-next';
 import { useEffect, useState } from 'react';
 import { PacmanLoader } from 'react-spinners';
+import Axios from 'axios';
 import styled from 'styled-components';
 
 const ContainerShip = styled.div`
@@ -16,12 +16,13 @@ const ContainerShip = styled.div`
   align-items: center;
   gap: 5px;
 `;
+
 const ShippingOption = styled.div`
+  cursor: pointer;
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 12px;
-  cursor: pointer;
   width: 300px;
 
   &:hover {
@@ -32,20 +33,21 @@ const ShippingOption = styled.div`
 
 const AddShippingModalContent = () => {
   const dispatch = useObatinDispatch();
+  const accessToken = getCookie('access_token');
+  const { closeModal } = useModal();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const selectedPharmacy = useObatinSelector(
     (state) => state?.pharmacy?.selectedPharmacy,
   );
-  const accessToken = getCookie('access_token');
   const [shippingMethods, setShippingMethods] = useState<ShippingMethodsType[]>(
     [],
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { closeModal } = useModal();
 
   useEffect(() => {
     const fetchShippingMethods = async () => {
       try {
-        const response = await axios.post(
+        setIsLoading(true);
+        const response = await Axios.post(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/pharmacy/shippings`,
           {
             pharmacy_id: selectedPharmacy?.id,
@@ -62,17 +64,19 @@ const AddShippingModalContent = () => {
 
         const data = response.data.data;
         setShippingMethods(data.shipping_methods);
-        // dispatch(setSelectedPharmacy({ data: data }));
       } catch (error) {
         console.error(error);
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchShippingMethods();
   }, [accessToken, selectedPharmacy]);
 
   const handleSelectShippingMethod = (method: ShippingMethodsType) => {
+    console.log(method.shipping_id);
+
     dispatch(
       updateSelectedPharmacy({
         shipping_id: method.shipping_id,
@@ -80,7 +84,6 @@ const AddShippingModalContent = () => {
         shipping_name: method.name,
       }),
     );
-    setIsLoading(true);
     closeModal();
   };
 
@@ -89,9 +92,9 @@ const AddShippingModalContent = () => {
       {isLoading ? (
         <PacmanLoader size={50} color={'#00B5C0'} />
       ) : (
-        shippingMethods.map((method: ShippingMethodsType) => (
+        shippingMethods.map((method: ShippingMethodsType, index) => (
           <ShippingOption
-            key={method.shipping_id}
+            key={`shippingMethodCard${method.shipping_id}_${method.code}_${index}`}
             onClick={() => handleSelectShippingMethod(method)}
           >
             <h4>{method.name}</h4>

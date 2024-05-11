@@ -1,4 +1,6 @@
 'use client';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 import {
   Cart,
   CartSection,
@@ -6,41 +8,76 @@ import {
   OrderSummary,
   SectionTitle,
 } from '@/styles/pages/product/Cart.styles';
-import { useState } from 'react';
+import { ChangeEvent } from 'react';
 import { Container } from '@/styles/Global.styles';
 import { Body } from '@/styles/pages/checkout/CheckoutPage.styles';
-import { ImageContainer } from '@/styles/organisms/modal/modalContent/UploadPayment.styles';
+import {
+  ImageContainer,
+  PdfContainer,
+} from '@/styles/organisms/modal/modalContent/UploadPayment.styles';
 import { getCookie } from 'cookies-next';
 import { navigateToCart, navigateToTxHistory } from '@/app/actions';
-import { useObatinSelector } from '@/redux/store/store';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import axios from 'axios';
+import { useUploadValidation } from '@/hooks/useUploadValidation';
+import { Document, Page, pdfjs } from 'react-pdf';
+import { resetPharmacyStates } from '@/redux/reducers/pharmacySlice';
+import { clearCart } from '@/redux/reducers/cartSlice';
+import Axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Image from 'next/image';
 
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url,
+).toString();
+
 const Checkout = (): React.ReactElement => {
-  const [selectedFile, setSelectedFile] = useState();
+  const {
+    userUpload,
+    handleImageChange,
+    handlePdfChange,
+    userUploadValidationError,
+  } = useUploadValidation();
   const accessToken = getCookie('access_token');
   const paymentId = useObatinSelector((state) => state.pharmacy.paymentId);
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  // eslint-disable-next-line
-  const [imageSrc, setImageSrc] = useState<string>();
+  const dispatch = useObatinDispatch();
 
-  const handlePdfChange = (e: any) => {
-    setSelectedFile(e.target.files[0]);
+  const handleUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files === null) return;
+
+    const uploadedFile = e.target.files[0];
+    if (uploadedFile.type === 'application/pdf') {
+      handlePdfChange(e);
+      return;
+    }
+
+    handleImageChange(e);
   };
 
-  const uploadPaymentProof = async () => {
+  const handleCheckout = async () => {
     try {
-      const formData = new FormData();
-      // formData.append('file', selectedFile);
+      if (userUpload === undefined) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Mohon untuk mengunggah file terlebih dahulu',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
 
-      const response = await axios.patch(
+      const formData = new FormData();
+      formData.append('file', userUpload);
+
+      await Axios.patch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/${paymentId}`,
         formData,
         {
@@ -51,10 +88,6 @@ const Checkout = (): React.ReactElement => {
         },
       );
 
-      const { data } = response;
-      if (data && data.url) {
-        setImageSrc(data.url);
-      }
       setToast({
         showToast: true,
         toastMessage:
@@ -63,37 +96,20 @@ const Checkout = (): React.ReactElement => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
+      dispatch(clearCart());
+      dispatch(resetPharmacyStates());
       navigateToTxHistory();
     } catch (error) {
       console.error(error);
       setToast({
         showToast: true,
-        toastMessage: 'Maaf, upload pembayaran gagal',
+        toastMessage: 'Maaf, gagal mengunggah bukti pembayaran',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
     }
   };
-
-  // const confirmPayment = async () => {
-  //   try {
-  //     await axios.post(
-  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/confirmation`,
-  //       {
-  //         paymentId:
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //         },
-  //       },
-  //     );
-  //     console.log('payment success');
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   return (
     <Container>
@@ -108,27 +124,36 @@ const Checkout = (): React.ReactElement => {
               </SectionTitle>
               <RegularInput
                 type='file'
-                placeholder='Unggah file'
-                onChange={handlePdfChange}
-                validationMessage='masukkan gambar atau pdf'
+                placeholder='Unggah Pembayaran'
+                onChange={handleUpload}
+                validationMessage={userUploadValidationError}
                 accept='image/*,.pdf'
                 $fontSize={18}
+                $isSet={userUpload !== undefined}
               />
+
               <ImageContainer>
-                {selectedFile && (
+                {userUpload && userUpload.type === 'application/pdf' ? (
+                  <PdfContainer>
+                    <Document file={userUpload} loading={<div>Loading...</div>}>
+                      <Page pageNumber={1} width={300} height={300} />
+                    </Document>
+                  </PdfContainer>
+                ) : userUpload ? (
                   <Image
-                    src={URL.createObjectURL(selectedFile)}
-                    alt='bukti'
+                    src={URL.createObjectURL(userUpload)}
+                    alt='bukti-pembayaran'
                     width={600}
                     height={500}
                   />
-                )}
+                ) : null}
               </ImageContainer>
+
               <CustomButton
                 $width='100%'
                 $fontSize='16px'
                 content='Proses Pembayaran'
-                onClick={uploadPaymentProof}
+                onClick={handleCheckout}
               />
             </CartSection>
           </Cart>

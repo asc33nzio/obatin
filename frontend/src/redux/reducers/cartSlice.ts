@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PharmacyCart } from './pharmacySlice';
 
 export interface ProductItemItf {
   id: number;
@@ -18,22 +17,26 @@ export interface ProductItemItf {
   is_prescription_required: boolean;
 }
 
-export interface CartItem {
+export interface CartItemItf {
   product_id: number;
   prescription_id: number | null;
   pharmacy_id: number | null;
   quantity: number;
 }
-export interface CartState {
-  items: CartItem[];
-  product: PharmacyCart[];
+
+export interface CartStateItf {
+  items: CartItemItf[];
   totalQuantity: number;
   totalPrice: number;
 }
 
-const initialState: CartState = {
+export interface SyncCartItf {
+  product_id: number;
+  quantity: number;
+}
+
+const initialState: CartStateItf = {
   items: [],
-  product: [],
   totalQuantity: 0,
   totalPrice: 0,
 };
@@ -42,7 +45,26 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addItemToCart: (state, action: PayloadAction<number>) => {
+    syncCartItem: (state, action: PayloadAction<SyncCartItf>) => {
+      const { product_id, quantity } = action.payload;
+
+      state.items.push({
+        product_id,
+        prescription_id: null,
+        pharmacy_id: null,
+        quantity,
+      });
+
+      state.totalQuantity += quantity;
+    },
+
+    syncTotalPrice: (state, action: PayloadAction<number>) => {
+      const totalPrice = action.payload;
+
+      state.totalPrice = totalPrice;
+    },
+
+    increaseOneToCart: (state, action: PayloadAction<number>) => {
       const product_id = action.payload;
       const existingItem = state.items.find(
         (item) => item.product_id === product_id,
@@ -62,8 +84,8 @@ export const cartSlice = createSlice({
       state.totalQuantity += 1;
     },
 
-    deduceOneFromCart: (state, action: PayloadAction<CartItem>) => {
-      const product_id = action.payload.product_id;
+    deduceOneFromCart: (state, action: PayloadAction<CartItemItf>) => {
+      const { product_id } = action.payload;
       const existingItemIndex = state.items.findIndex(
         (item) => item.product_id === product_id,
       );
@@ -79,7 +101,7 @@ export const cartSlice = createSlice({
       }
     },
 
-    removeItemFromCart: (state, action: PayloadAction<CartItem>) => {
+    removeItemFromCart: (state, action: PayloadAction<CartItemItf>) => {
       const { product_id } = action.payload;
 
       const removedItem = state.items.find(
@@ -101,14 +123,15 @@ export const cartSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
       state.totalQuantity = 0;
-      state.product = [];
       state.totalPrice = 0;
     },
   },
 });
 
 export const {
-  addItemToCart,
+  syncCartItem,
+  syncTotalPrice,
+  increaseOneToCart,
   deduceOneFromCart,
   removeItemFromCart,
   clearCart,

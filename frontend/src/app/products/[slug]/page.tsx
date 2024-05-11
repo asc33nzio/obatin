@@ -5,7 +5,10 @@ import {
   ProductDetail,
   ProductDetailContainer,
 } from '@/styles/pages/product/ProductDetail.styles';
-import { addItemToCart, deduceOneFromCart } from '@/redux/reducers/cartSlice';
+import {
+  increaseOneToCart,
+  deduceOneFromCart,
+} from '@/redux/reducers/cartSlice';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Body, Container } from '@/styles/Global.styles';
@@ -15,7 +18,7 @@ import { RingLoader } from 'react-spinners';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { navigateToChat } from '@/app/actions';
 import { useToast } from '@/hooks/useToast';
-import axios from 'axios';
+import Axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import Footer from '@/components/organisms/footer/Footer';
 import CustomButton from '@/components/atoms/button/CustomButton';
@@ -27,11 +30,15 @@ const ProductDetailPage = () => {
   const [product, setProduct] = useState<ProductType>();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const { setToast } = useToast();
+  const dispatch = useObatinDispatch();
+  const items = useObatinSelector((state) => state.cart.items);
+  const [isProductSelected, setIsProductSelected] =
+    useState<ProductType | null>();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data: response } = await axios.get(
+        const { data: response } = await Axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products/${product_slug}`,
         );
         setProduct(response.data);
@@ -44,10 +51,6 @@ const ProductDetailPage = () => {
       fetchData();
     }
   }, [product_slug]);
-
-  const dispatch = useObatinDispatch();
-  const items = useObatinSelector((state) => state.cart.items);
-  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
 
   const handleAddToCart = (product: ProductType) => {
     if (product.is_prescription_required) {
@@ -63,22 +66,8 @@ const ProductDetailPage = () => {
       return;
     }
 
-    const existingItem = items.find((item) => item.product_id === product.id);
-    if (existingItem) {
-      dispatch(addItemToCart(existingItem));
-      setSelectedProduct(product);
-      return;
-    }
-
-    setSelectedProduct(product);
-    dispatch(
-      addItemToCart({
-        product_id: product.id,
-        prescription_id: null,
-        pharmacy_id: null,
-        quantity: 1,
-      }),
-    );
+    dispatch(increaseOneToCart(product.id));
+    setIsProductSelected(product);
   };
 
   const handleSubtract = (productId: number) => {
@@ -90,7 +79,7 @@ const ProductDetailPage = () => {
 
     dispatch(deduceOneFromCart(existingItem));
     if (existingItem.quantity === 0) {
-      setSelectedProduct(null);
+      setIsProductSelected(null);
     }
   };
 
@@ -117,7 +106,7 @@ const ProductDetailPage = () => {
             </Price>
             <h3>{product?.selling_unit}</h3>
 
-            {selectedProduct?.id === product?.id &&
+            {isProductSelected?.id === product?.id &&
             product &&
             items.find((item) => item.product_id === product.id)?.quantity !==
               undefined ? (
