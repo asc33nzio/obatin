@@ -198,7 +198,10 @@ const ProductsPage = () => {
                 setSortBy={setSortBy}
                 setClassification={setClassification}
                 setOrderBy={setOrderBy}
-                onClickClear={() => setCategoryId(null)}
+                onClickClear={() => {
+                  setPage(1);
+                  setCategoryId(null);
+                }}
                 sortValue={sortBy}
                 orderValue={orderBy}
                 classificationValue={classification}
