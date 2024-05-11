@@ -1,8 +1,5 @@
-import { useToast } from '@/hooks/useToast';
 import AO from '@/styles/pages/admin/AdminOrders.styles';
 import { TxItf } from '@/types/transactionTypes';
-import axios from 'axios';
-import { getCookie } from 'cookies-next';
 import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
@@ -48,52 +45,7 @@ const ProductListTable = styled.table`
   width: 100%;
 `;
 
-const CustomButton = styled.button`
-  border: none;
-  padding: 1rem;
-  cursor: pointer;
-  color: white;
-
-  &.danger {
-    background-color: #a00b0b;
-  }
-
-  &.green {
-    background-color: #00b5c0;
-  }
-`;
-
 const AdminOrderCard = (props: TxItf): React.ReactElement => {
-  const accessToken = getCookie('access_token');
-  const { setToast } = useToast();
-
-  const handleConfirm = async (isAccepted: boolean) => {
-    try {
-      const _ = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/confirmation`,
-        {
-          payment_id: props?.payment_id,
-          user_id: props?.user_id,
-          is_confirmed: isAccepted,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      );
-    } catch (error) {
-      console.error(error);
-      setToast({
-        showToast: true,
-        toastMessage: 'Maaf terjadi kesalahan',
-        toastType: 'error',
-        resolution: 'desktop',
-        orientation: 'center',
-      });
-    }
-  };
-
   return (
     <AO.DetailCardContainer>
       <Title>{props?.invoice_number}</Title>
@@ -169,12 +121,6 @@ const AdminOrderCard = (props: TxItf): React.ReactElement => {
           ))}
         </tbody>
       </ProductListTable>
-      <CustomButton className='danger' onClick={() => handleConfirm(false)}>
-        Tolak
-      </CustomButton>
-      <CustomButton className='green' onClick={() => handleConfirm(true)}>
-        Terima
-      </CustomButton>
     </AO.DetailCardContainer>
   );
 };

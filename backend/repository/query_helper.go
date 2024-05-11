@@ -1015,6 +1015,7 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 					o.payment_id,
 					p.invoice_number,
 					p.payment_proof_url,
+					o.created_at as created_at_unformatted,
 					TO_CHAR(o.created_at, 'DD-MM-YYYY HH24:MI') as created_at		
 				FROM
 					orders o
@@ -1027,7 +1028,6 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 				ON
 					o.payment_id = p.id
 					%v
-				ORDER BY o.created_at DESC , o.id ASC
 				%v
 			)
 	`,
@@ -1109,6 +1109,7 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 			ci.pharmacy_product_id = pp.id
 	`)
 	query.WriteString(subqueryRowsCount.String())
+	query.WriteString("ORDER BY od.created_at_unformatted DESC , od.id ASC")
 
 	return query.String(), args
 }

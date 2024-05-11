@@ -39,13 +39,17 @@ func ToGetAllPendingPayments(payments []*entity.Payment) []PaymentRes {
 	res := []PaymentRes{}
 
 	for _, p := range payments {
+		var paymentProof string
+		if p.PaymentProofUrl != nil {
+			paymentProof = *p.PaymentProofUrl
+		}
 		res = append(res, PaymentRes{
 			Id:              p.Id,
 			InvoiceNumber:   p.InvoiceNumber,
 			UserId:          *p.User.Id,
 			PaymentMethod:   p.PaymentMethod,
 			TotalPayment:    p.TotalPayment,
-			PaymentProofUrl: *p.PaymentProofUrl,
+			PaymentProofUrl: paymentProof,
 			IsConfirmed:     *p.IsConfirmed,
 			CreatedAt:       p.CreatedAt,
 		})

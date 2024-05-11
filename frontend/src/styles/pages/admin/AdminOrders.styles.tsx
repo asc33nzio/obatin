@@ -56,7 +56,23 @@ const Table = styled.table`
   }
 `;
 
-const FilterStatus = styled.select`
+const CustomButton = styled.button`
+  width: 100%;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: white;
+
+  &.danger {
+    background-color: #a00b0b;
+  }
+
+  &.green {
+    background-color: #00b5c0;
+  }
+`;
+
+const CustomSelect = styled.select`
   font-size: 16px;
   padding: 0.3rem;
 `;
@@ -93,15 +109,40 @@ const DetailCardContainer = styled.div`
   border-radius: 2rem;
 `;
 
+const CustomButtonsWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+`;
+
+const TitleText = styled.p`
+  font-size: 20px;
+  text-align: center;
+`;
+
+const ModalConfirmationContainer = styled.div`
+  width: 400px;
+  height: fit-content;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: white;
+`;
+
 const AdminOrdersStyledComponents = {
   TableContainer,
   Table,
   FilterContainer,
-  FilterStatus,
+  CustomSelect,
+  CustomButton,
   LimitInput,
   CustomSection,
   TableFilterWrapper,
   DetailCardContainer,
+  CustomButtonsWrapper,
+  TitleText,
+  ModalConfirmationContainer,
 };
 
 export default AdminOrdersStyledComponents;

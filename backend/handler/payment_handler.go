@@ -151,6 +151,12 @@ func (h *PaymentHandler) GetAllPendingPayment(ctx *gin.Context) {
 		return
 	}
 
+	err := ctx.ShouldBindQuery(&params)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+
 	payments, err := h.paymentUsecase.GetAllPendingPayments(ctx, params.ToPaymentFilterEntity())
 	if err != nil {
 		ctx.Error(err)

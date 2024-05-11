@@ -21,7 +21,7 @@ const nextConfig = {
       ],
     },
   },
-  basePath: '/vm4',
+  basePath: process.env.NODE_ENV === 'production' ? '/vm4' : '',
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
 };

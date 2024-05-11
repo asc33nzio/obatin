@@ -153,6 +153,9 @@ func (u *paymentUsecaseImpl) CancelPayment(ctx context.Context, p *entity.Paymen
 		pr := rs.PaymentRepository()
 		or := rs.OrderRepository()
 		ur := rs.UserRepository()
+		ppr := rs.PharmacyProductRepository()
+		cr := rs.CartRepository()
+		smr := rs.StockMovementRepository()
 
 		userId, err := ur.FindUserIdByAuthId(ctx, p.User.Authentication.Id)
 		if err != nil {
@@ -179,6 +182,38 @@ func (u *paymentUsecaseImpl) CancelPayment(ctx context.Context, p *entity.Paymen
 			err := or.UpdateOrderById(ctx, o)
 			if err != nil {
 				return nil, err
+			}
+
+			items, err := cr.FindCartItemsByOrderId(ctx, *o.Id)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, i := range items {
+				stock, err := ppr.FindStockAndLockById(ctx, *i.PharmacyProductId)
+				if err != nil {
+					return nil, err
+				}
+
+				currentStock := *stock
+				currentStock += *i.Quantity
+
+				err = ppr.UpdateStockPharmacyProduct(ctx, &entity.PharmacyProduct{Id: *i.PharmacyProductId, Stock: &currentStock})
+				if err != nil {
+					return nil, err
+				}
+
+				pharmacyMutation := &entity.StockMovement{
+					PharmacyProduct: entity.PharmacyProduct{Id: *i.PharmacyProductId},
+					MovementType:    appconstant.SaleStockMovementType,
+					IsAddition:      true,
+					Delta:           *i.Quantity,
+				}
+
+				err = smr.CreateOneStockMovement(ctx, pharmacyMutation)
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 
