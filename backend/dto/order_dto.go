@@ -6,12 +6,13 @@ import (
 )
 
 type OrdersFilter struct {
-	UserId     *int64  `form:"user_id" binding:"omitempty,gte=1"`
-	PharmacyId *int64  `form:"pharmacy_id" binding:"omitempty,gte=1"`
-	PartnerId  *int64  `form:"partner_id" binding:"omitempty,gte=1"`
-	Status     *string `form:"status" binding:"omitempty,oneof='waiting_payment' 'waiting_confirmation' 'processed' 'sent' 'confirmed' 'cancelled'"`
-	Page       int     `form:"page" binding:"omitempty,min=1"`
-	Limit      int     `form:"limit" binding:"omitempty,min=1,max=25"`
+	InvoiceNumber string  `form:"invoice_number" binding:"omitempty,min=19"`
+	UserId        *int64  `form:"user_id" binding:"omitempty,gte=1"`
+	PharmacyId    *int64  `form:"pharmacy_id" binding:"omitempty,gte=1"`
+	PartnerId     *int64  `form:"partner_id" binding:"omitempty,gte=1"`
+	Status        *string `form:"status" binding:"omitempty,oneof='waiting_payment' 'waiting_confirmation' 'processed' 'sent' 'confirmed' 'cancelled'"`
+	Page          int     `form:"page" binding:"omitempty,min=1"`
+	Limit         int     `form:"limit" binding:"omitempty,min=1,max=25"`
 }
 
 type UserOrderRes struct {
