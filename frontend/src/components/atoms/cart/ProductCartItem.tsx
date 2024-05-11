@@ -9,7 +9,7 @@ import {
 } from '@/styles/pages/product/Cart.styles';
 import {
   PharmacyCart,
-  clearSelectedPharmacy,
+  // clearSelectedPharmacy,
   deduceByOne,
   increaseByOne,
   removeItemFromPharmacyCart,
@@ -20,7 +20,7 @@ import {
   addItemToCart,
   removeItemFromCart,
   deduceOneFromCart,
-  clearCart,
+  // clearCart,
 } from '@/redux/reducers/cartSlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
@@ -85,8 +85,8 @@ const ProductCartItem = () => {
       product_id,
     };
 
-    dispatch(clearCart());
-    dispatch(clearSelectedPharmacy());
+    // dispatch(clearCart());
+    // dispatch(clearSelectedPharmacy());
 
     try {
       await Axios.post(

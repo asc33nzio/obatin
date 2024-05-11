@@ -14,6 +14,7 @@ type CartRepository interface {
 	IsItemExistInCart(ctx context.Context, c *entity.CartItem) (bool, error)
 	FindCartDetails(ctx context.Context, userId int64) (*entity.Cart, error)
 	DeleteOneCartItem(ctx context.Context, cartItem *entity.CartItem) error
+	FindCartItemsByOrderId(ctx context.Context, orderId int64) ([]*entity.CartItem, error)
 }
 
 type cartRepositoryPostgres struct {
@@ -386,4 +387,45 @@ func (r *cartRepositoryPostgres) DeleteOneCartItem(ctx context.Context, cartItem
 	}
 
 	return nil
+}
+
+func (r *cartRepositoryPostgres) FindCartItemsByOrderId(ctx context.Context, orderId int64) ([]*entity.CartItem, error) {
+	res := []*entity.CartItem{}
+
+	query := `
+		SELECT
+			ci.id,
+			ci.order_id,
+			ci.pharmacy_product_id,
+			ci.quantity
+		FROM
+			cart_items ci
+		WHERE
+			ci.order_id = $1
+		AND
+			ci.deleted_at IS NULL
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, orderId)
+	if err != nil {
+		return nil, apperror.NewInternal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		cartItem := entity.CartItem{}
+		err := rows.Scan(
+			&cartItem.Id,
+			&cartItem.OrderId,
+			&cartItem.PharmacyProductId,
+			&cartItem.Quantity,
+		)
+		if err != nil {
+			return nil, apperror.NewInternal(err)
+		}
+
+		res = append(res, &cartItem)
+	}
+
+	return res, nil
 }

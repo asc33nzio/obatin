@@ -209,8 +209,27 @@ func ToGetCartDetailsRes(c *entity.Cart) GetCartDetailsRes {
 	res.UserId = c.User.Id
 	res.Subtotal = &c.Subtotal
 	cartPharmacyRes := make(map[int64]entity.Pharmacy)
+	cartPharmacyNilRes := CartPharmacyRes{}
 
 	for _, item := range c.Items {
+		if item.Pharmacy.Id == nil {
+			cartPharmacyNilRes.Items = append(cartPharmacyNilRes.Items, &CartItemRes{
+				Id:                     item.Id,
+				ProductId:              &item.Product.Id,
+				Name:                   &item.Product.Name,
+				Quantity:               item.Quantity,
+				PrescriptionId:         item.PrescriptionId,
+				PharmacyProductId:      item.PharmacyProductId,
+				ThumbnailUrl:           &item.Product.ThumbnailUrl,
+				SellingUnit:            &item.Product.SellingUnit,
+				OrderId:                item.OrderId,
+				Stock:                  item.PharmacyProduct.Stock,
+				Weight:                 item.Product.Weight.IntPart(),
+				IsPrescriptionRequired: item.Product.IsPrescriptionRequired,
+				Price:                  item.PharmacyProduct.Price,
+			})
+			continue
+		}
 		cartPharmacyRes[*item.Pharmacy.Id] = item.Pharmacy
 	}
 
@@ -223,6 +242,9 @@ func ToGetCartDetailsRes(c *entity.Cart) GetCartDetailsRes {
 		operationalDays := strings.Split(operationalDaysString, ",")
 
 		for _, item := range c.Items {
+			if item.Pharmacy.Id == nil {
+				continue
+			}
 			if *pharmacy.Id == *item.Pharmacy.Id {
 				totalWeight += (item.Product.Weight.IntPart() * int64(*item.Quantity))
 				subtotalPharmacy += *item.Quantity * *item.PharmacyProduct.Price
@@ -265,5 +287,8 @@ func ToGetCartDetailsRes(c *entity.Cart) GetCartDetailsRes {
 		})
 	}
 
+	if len(cartPharmacyNilRes.Items) > 0 {
+		res.PharmaciesCart = append(res.PharmaciesCart, cartPharmacyNilRes)
+	}
 	return res
 }

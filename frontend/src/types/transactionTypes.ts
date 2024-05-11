@@ -94,3 +94,14 @@ export interface PaginationInfoItf {
   page_count: number;
   total_records: number;
 }
+
+export interface PaymentItf {
+  id: number;
+  invoice_number: string;
+  user_id: number;
+  payment_method: string;
+  total_payment: number;
+  payment_proof_url: string;
+  is_confirmed: boolean;
+  created_at: string;
+}
