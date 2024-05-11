@@ -57,7 +57,7 @@ const ProductDetailPage = () => {
       setToast({
         showToast: true,
         toastMessage:
-          'product ini membutuhkan resep, silahkan melakukan konsultasi',
+          'Produk ini membutuhkan resep, silahkan melakukan konsultasi',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
