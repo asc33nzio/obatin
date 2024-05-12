@@ -1,6 +1,4 @@
 'use client';
-import Navbar from '@/components/organisms/navbar/Navbar';
-import { Container } from '@/styles/Global.styles';
 import {
   Cart,
   CartItemContainer,
@@ -9,21 +7,23 @@ import {
   OrderSummary,
   SectionTitle,
 } from '@/styles/pages/product/Cart.styles';
-import React from 'react';
 import {
   Body,
   SubmitSection,
 } from '@/styles/pages/checkout/CheckoutPage.styles';
-import CustomButton from '@/components/atoms/button/CustomButton';
 import { navigateToProductList } from '@/app/actions';
+import { Container } from '@/styles/Global.styles';
+import { useObatinSelector } from '@/redux/store/store';
+import Navbar from '@/components/organisms/navbar/Navbar';
+import LocationICO from '@/assets/icons/LocationICO';
+import CustomButton from '@/components/atoms/button/CustomButton';
 import ProductCartItem from '@/components/atoms/cart/ProductCartItem';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
-import LocationICO from '@/assets/icons/LocationICO';
-import { useObatinSelector } from '@/redux/store/store';
 
-const CartPage = () => {
+const CartPage = (): React.ReactElement => {
   const userInfo = useObatinSelector((state) => state?.auth);
+
   return (
     <Container>
       <Navbar />
@@ -42,19 +42,21 @@ const CartPage = () => {
                 let fullAddress = address.detail;
                 fullAddress += `, ${address.city.province.name}, ${address.city.type} ${address.city.name}, ${address.city.postal_code}`;
                 return (
-                  <AddressCard
-                    $id={address.id === null ? 0 : address.id}
-                    key={`userAddressCard${index}`}
-                    isMainAddress={false}
-                    alias={address.alias}
-                    details={fullAddress}
-                    $disableButtons
-                    $justify='space-between'
-                    $padding='20px 0'
-                    $fontSize={16}
-                    $borderDisable={true}
-                    $height={100}
-                  />
+                  userInfo.activeAddressId === address.id && (
+                    <AddressCard
+                      $id={address.id === null ? 0 : address.id}
+                      key={`userAddressCard${index}`}
+                      isMainAddress={false}
+                      alias={address.alias}
+                      details={fullAddress}
+                      $disableButtons
+                      $justify='space-between'
+                      $padding='20px 0'
+                      $fontSize={16}
+                      $borderDisable={true}
+                      $height={100}
+                    />
+                  )
                 );
               })}
             </CartItemContainer>
@@ -63,7 +65,7 @@ const CartPage = () => {
             </CartSection>
             <SubmitSection>
               <CustomButton
-                content='Tambah ke keranjang'
+                content='Tambahkan Barang Lain'
                 $width='300px'
                 $fontSize='16px'
                 onClick={() => navigateToProductList()}

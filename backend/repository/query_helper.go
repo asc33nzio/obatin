@@ -1027,9 +1027,10 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 				ON
 					o.payment_id = p.id
 					%v
+				ORDER BY o.created_at DESC , o.id ASC
 				%v
 			)
-	`,
+		`,
 		queryConditionalPart.String(), paginationParams))
 
 	query.WriteString(subqueryOrder.String())

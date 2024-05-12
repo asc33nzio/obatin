@@ -22,8 +22,8 @@ import { useNavbar } from '@/hooks/useNavbar';
 import { decodeJWTSync } from '@/utils/decodeJWT';
 import { useToast } from '@/hooks/useToast';
 import { navigateToCart } from '@/app/actions';
-import { CartItem } from '@/redux/reducers/cartSlice';
 import { usePathname } from 'next/navigation';
+import { CartItemItf } from '@/redux/reducers/cartSlice';
 import DefaultMaleAvatar from '@/assets/DefaultMaleAvatar.svg';
 import DefaultFemaleAvatar from '@/assets/DefaultFemaleAvatar.svg';
 import DefaultDoctorAvatar from '@/assets/DefaultDoctorAvatar.svg';
@@ -49,7 +49,7 @@ const Navbar = (): React.ReactElement => {
   const userInfo = useObatinSelector((state) => state?.auth);
   const userGender = useObatinSelector((state) => state?.auth?.gender);
   const avatarUrlUser = useObatinSelector((state) => state?.auth?.avatarUrl);
-  const quantity = useObatinSelector((state) => state?.cart.totalQuantity);
+  const quantity = useObatinSelector((state) => state?.cart?.totalQuantity);
   const avatarUrlDoctor = useObatinSelector(
     (state) => state?.authDoctor?.avatarUrl,
   );
@@ -115,34 +115,43 @@ const Navbar = (): React.ReactElement => {
 
   const postToCart = async () => {
     try {
-      if (userCart.items.length > 0) {
-        const cartItems: CartItem[] = userCart.items.map((item) => {
-          if (item.product_id === undefined)
-            throw new Error('Product ID is undefined');
-          return {
-            product_id: item.product_id,
-            prescription_id: item.prescription_id ?? null,
-            pharmacy_id: item.pharmacy_id ?? null,
-            quantity: item.quantity,
-          };
+      if (!userCart.items.length) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Kamu belum menambahkan barang ke keranjang',
+          toastType: 'warning',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
         });
-
-        const payload = {
-          cart: cartItems,
-        };
-
-        await Axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          },
-        );
-
-        navigateToCart();
+        return;
       }
+
+      const cartItems: CartItemItf[] = userCart.items.map((item) => {
+        if (item.product_id === undefined)
+          throw new Error('Product ID is undefined');
+        return {
+          product_id: item.product_id,
+          prescription_id: item.prescription_id ?? null,
+          pharmacy_id: item.pharmacy_id ?? null,
+          quantity: item.quantity,
+        };
+      });
+
+      const payload = {
+        cart: cartItems,
+      };
+
+      await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      navigateToCart();
     } catch (error: any) {
       console.log(error);
       const resStatus = error?.response?.status;
@@ -153,7 +162,7 @@ const Navbar = (): React.ReactElement => {
             ? 'Anda belum memverifikasi akun anda'
             : resStatus === 404
               ? 'Buatlah alamat terlebih dahulu'
-              : '',
+              : 'Maaf, mohon coba kembali',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',

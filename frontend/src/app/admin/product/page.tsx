@@ -1336,7 +1336,7 @@ function AdminProduct() {
               <tbody>
                 {dataManufacturers?.data?.map((item, index: number) => (
                   <tr
-                    key={index}
+                    key={`${item.id}_${index}`}
                     style={{
                       backgroundColor:
                         index % 2 === 0 ? 'rgba(0, 181, 192, 0.05)' : 'white',

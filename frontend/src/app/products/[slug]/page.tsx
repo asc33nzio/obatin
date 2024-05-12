@@ -5,14 +5,20 @@ import {
   ProductDetail,
   ProductDetailContainer,
 } from '@/styles/pages/product/ProductDetail.styles';
+import {
+  increaseOneToCart,
+  deduceOneFromCart,
+} from '@/redux/reducers/cartSlice';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Body, Container } from '@/styles/Global.styles';
 import { ProductType } from '@/types/Product';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
-import { addItemToCart, removeItemFromCart } from '@/redux/reducers/cartSlice';
 import { RingLoader } from 'react-spinners';
-import axios from 'axios';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { navigateToChat } from '@/app/actions';
+import { useToast } from '@/hooks/useToast';
+import Axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import Footer from '@/components/organisms/footer/Footer';
 import CustomButton from '@/components/atoms/button/CustomButton';
@@ -22,11 +28,17 @@ const ProductDetailPage = () => {
   const pathname = usePathname();
   const product_slug = pathname.split('/').pop();
   const [product, setProduct] = useState<ProductType>();
+  const { isDesktopDisplay } = useClientDisplayResolution();
+  const { setToast } = useToast();
+  const dispatch = useObatinDispatch();
+  const items = useObatinSelector((state) => state.cart.items);
+  const [isProductSelected, setIsProductSelected] =
+    useState<ProductType | null>();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data: response } = await axios.get(
+        const { data: response } = await Axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products/${product_slug}`,
         );
         setProduct(response.data);
@@ -40,44 +52,34 @@ const ProductDetailPage = () => {
     }
   }, [product_slug]);
 
-  const dispatch = useObatinDispatch();
-  const items = useObatinSelector((state) => state.cart.items);
-  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>();
-
   const handleAddToCart = (product: ProductType) => {
-    const existingItem = items.find((item) => item.product_id === product.id);
-    if (existingItem) {
-      dispatch(
-        addItemToCart({
-          ...existingItem,
-          quantity: +1,
-        }),
-      );
-    } else {
-      dispatch(
-        addItemToCart({
-          product_id: product.id,
-          prescription_id: null,
-          pharmacy_id: 55524,
-          quantity: 1,
-        }),
-      );
+    if (product.is_prescription_required) {
+      setToast({
+        showToast: true,
+        toastMessage:
+          'Produk ini membutuhkan resep, silahkan melakukan konsultasi',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      navigateToChat();
+      return;
     }
-    setSelectedProduct(product);
+
+    dispatch(increaseOneToCart(product.id));
+    setIsProductSelected(product);
   };
 
   const handleSubtract = (productId: number) => {
     const existingItem = items.find((item) => item.product_id === productId);
-    if (existingItem && existingItem.quantity > 1) {
-      dispatch(
-        addItemToCart({
-          ...existingItem,
-          quantity: -1,
-        }),
-      );
-    } else {
-      dispatch(removeItemFromCart({ product_id: productId }));
-      setSelectedProduct(null);
+
+    if (existingItem === undefined) {
+      return;
+    }
+
+    dispatch(deduceOneFromCart(existingItem));
+    if (existingItem.quantity === 0) {
+      setIsProductSelected(null);
     }
   };
 
@@ -104,7 +106,10 @@ const ProductDetailPage = () => {
             </Price>
             <h3>{product?.selling_unit}</h3>
 
-            {selectedProduct?.id === product?.id ? (
+            {isProductSelected?.id === product?.id &&
+            product &&
+            items.find((item) => item.product_id === product.id)?.quantity !==
+              undefined ? (
               <ButtonAdd>
                 <CustomButton
                   content='-'
