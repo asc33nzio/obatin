@@ -1,11 +1,9 @@
 'use client';
-
 import {
   ModalContainer,
   ModalOverlay,
   ModalHeader,
 } from '@/styles/organisms/modal/Modal.styles';
-
 import { useEventEmitter } from '@/hooks/useEventEmitter';
 import { useModal } from '@/hooks/useModal';
 import { useObatinDispatch } from '@/redux/store/store';
@@ -16,10 +14,11 @@ import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmP
 import AddAddressModalContent from '@/components/organisms/modal/modalContent/AddAddressModalContent';
 import UploadPembayaranModal from '@/components/organisms/modal/modalContent/UploadPembayaranModal';
 import SelectAddressModalContent from './modalContent/SelectAddressModalContent';
-import SelectDetailPharmacyModalContent from './modalContent/SelectDetailPharmacyModalContent';
+// import SelectDetailPharmacyModalContent from './modalContent/SelectDetailPharmacyModalContent';
 import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
 import AddShippingModalContent from './modalContent/AddShippingModalContent';
 import ViewMoreTxModalContent from './modalContent/ViewMoreTxModalContent';
+import UnsetShippingModalContent from './modalContent/UnsetShippingModalContent';
 
 interface DoctorDetailItf {
   name: string;
@@ -73,6 +72,7 @@ const Modal = () => {
         $containerHeight: '325px',
       };
       break;
+
     case 'confirm-password-register':
       modalContent = <RegisterConfirmPasswordModalContent />;
       title = 'Tolong konfirmasi sandi anda';
@@ -80,7 +80,6 @@ const Modal = () => {
         $containerWidth: '500px',
         $containerHeight: '250px',
       };
-
       break;
 
     case 'add-address':
@@ -90,7 +89,6 @@ const Modal = () => {
         $containerWidth: '650px',
         $containerHeight: '850px',
       };
-
       break;
 
     case 'payment-upload':
@@ -100,24 +98,14 @@ const Modal = () => {
         $containerWidth: '500px',
         $containerHeight: '500px',
       };
-
       break;
+
     case 'select-address':
       modalContent = <SelectAddressModalContent />;
       title = 'Pilih atau tambahkan alamat';
       modalProps = {
         $containerWidth: '500px',
         $containerHeight: '500px',
-      };
-
-      break;
-
-    case 'detail-pharmacy':
-      modalContent = <SelectDetailPharmacyModalContent />;
-      title = 'Detail Pharmacy';
-      modalProps = {
-        $containerWidth: '650px',
-        $containerHeight: '850px',
       };
       break;
 
@@ -128,7 +116,6 @@ const Modal = () => {
         $containerWidth: '650px',
         $containerHeight: '850px',
       };
-
       break;
 
     case 'view-more-tx':
@@ -176,6 +163,15 @@ const Modal = () => {
       };
       break;
 
+    case 'unset-shipment':
+      modalContent = <UnsetShippingModalContent />;
+      title = 'Ada pengiriman yang belum diatur dalam keranjang';
+      modalProps = {
+        $containerWidth: '650px',
+        $containerHeight: '150px',
+      };
+      break;
+
     default:
       modalContent = null;
       title = null;
@@ -188,10 +184,8 @@ const Modal = () => {
         <ModalContainer {...modalProps}>
           <ModalHeader>
             <h1>{title}</h1>
-
             <CloseICO onClick={handleModalClose} />
           </ModalHeader>
-
           {modalContent}
         </ModalContainer>
       </ModalOverlay>

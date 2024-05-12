@@ -69,7 +69,7 @@ const TransactionHistoryPage = (): React.ReactElement => {
         .map((key: string) => apiFilterMap[key as apiFilterMapTypes])
         .toString();
 
-      let apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/orders?limit=10&page=${currentPage}`;
+      let apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/orders?limit=3&page=${currentPage}`;
       if (statusFilter !== '') apiUrl += `&status=${statusFilter}`;
 
       const response = await Axios.get(apiUrl, {

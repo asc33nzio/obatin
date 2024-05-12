@@ -4,28 +4,53 @@ import {
   Summary,
 } from '@/styles/pages/product/Cart.styles';
 import { navigateToCheckout } from '@/app/actions';
-import { PharmacyCart, setPaymentId } from '@/redux/reducers/pharmacySlice';
+import { setPaymentId } from '@/redux/reducers/pharmacySlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { getCookie } from 'cookies-next';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import axios from 'axios';
+// import { useEventEmitter } from '@/hooks/useEventEmitter';
+// import { useModal } from '@/hooks/useModal';
 
 const PaymentSummaryComponent = (props: {
   isNext: boolean;
 }): React.ReactElement => {
-  const pharmacies = useObatinSelector((state) => state?.pharmacy.pharmacies);
+  // const pharmacies = useObatinSelector((state) => state?.pharmacy.pharmacies);
   const totalQuantity = useObatinSelector((state) => state.cart.totalQuantity);
   // const totalPrice = useObatinSelector((state) => state.cart.totalPrice);
   // const totalShoppingCost = totalPrice + shippingCost;
   const accessToken = getCookie('access_token');
   const dispatch = useObatinDispatch();
   const { setToast } = useToast();
+  // const { openModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
+  // const emitter = useEventEmitter();
 
   const handleCheckout = async () => {
     try {
+      // console.log(pharmacies[0].shipping_id);
+      // let payloadArr: Array<Partial<PharmacyCart>> = [];
+      // let allShippingSelected = false;
+      // let unsetShippingProductsCount = 0;
+      // pharmacies.map((pharmacy) => {
+      //   if (!pharmacy.shipping_id) {
+      //     allShippingSelected = false;
+      //     openModal('unset-shipment')
+      //     unsetShippingProductsCount += pharmacy.cart_items.length;
+      //     return;
+      //   }
+
+      //   payloadArr.push(pharmacy);
+      // });
+      // console.log(payloadArr);
+
+      // const pharmaciesArr: Array<PharmacyCart> = [];
+      // pharmacies.map((pharmacy) => pharmaciesArr.push(pharmacy));
+      // console.log(pharmaciesArr);
+      // return;
+
       // if (!selectedPharmacy) {
       //   setToast({
       //     showToast: true,
@@ -37,14 +62,11 @@ const PaymentSummaryComponent = (props: {
       //   return;
       // }
 
-      const pharmaciesArr: Array<PharmacyCart> = [];
-      pharmacies.map((pharmacy) => pharmaciesArr.push(pharmacy));
+      // const payload = {
+      //   pharmacies_cart: pharmaciesArr,
+      // };
 
-      const payload = {
-        pharmacies_cart: pharmaciesArr,
-      };
-
-      console.log(payload);
+      // console.log(payload);
 
       // {
       //   id: selectedPharmacy.id,
@@ -70,7 +92,7 @@ const PaymentSummaryComponent = (props: {
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/checkout`,
-        payload,
+        // payload,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

@@ -10,6 +10,8 @@ export const FilterContainer = styled.div`
     width: 50vh;
     justify-content: space-between;
   }
+
+  z-index: 10;
 `;
 
 export const FilterButtonStyle = styled.div`
