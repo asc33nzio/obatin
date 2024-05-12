@@ -12,7 +12,6 @@ import {
   deduceByOne,
   increaseByOne,
   removeItemFromPharmacyCart,
-  // resetPharmacyStates,
   setPharmacies,
   setSelectedPharmacy,
 } from '@/redux/reducers/pharmacySlice';
@@ -20,7 +19,6 @@ import {
   removeItemFromCart,
   deduceOneFromCart,
   increaseOneToCart,
-  // clearCart,
 } from '@/redux/reducers/cartSlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
@@ -113,10 +111,6 @@ const ProductCartItem = () => {
       id: cart_id,
       product_id,
     };
-
-    //! DEBUG
-    // dispatch(resetPharmacyStates());
-    // dispatch(clearCart());
 
     try {
       await Axios.post(
