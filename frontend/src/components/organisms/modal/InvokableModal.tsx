@@ -81,7 +81,7 @@ const InvokableModal = (props: {
       modalProps = {
         $overlayHeight: '200vh',
         $containerWidth: '450px',
-        $containerHeight: '450px',
+        $containerHeight: 'max-content',
         onOpen: () => {},
         isOpen: false,
         onClose: () => {},
