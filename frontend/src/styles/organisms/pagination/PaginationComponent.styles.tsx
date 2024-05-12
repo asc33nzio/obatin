@@ -7,6 +7,9 @@ export const PaginationContainer = styled.div`
   gap: 1rem;
   width: 100%;
   height: 75px;
+  @media (max-width: 1440px) {
+    gap: 0;
+  }
 `;
 
 export const PagingButton = styled.button<{
