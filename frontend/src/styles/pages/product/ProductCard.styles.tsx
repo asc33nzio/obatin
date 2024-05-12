@@ -20,13 +20,16 @@ export const ProductCard = styled.a`
   color: ${COLORS.primary_text};
   text-align: center;
   text-decoration: none;
-  gap: 5px;
+  height: 350px;
 
   &:hover {
-    zoom: 101%;
     border: 1px solid ${COLORS.primary_color};
   }
   @media (max-width: 1440px) {
+    gap: 5px;
+    width: 250px;
+  }
+  @media (max-width: 768px) {
     gap: 5px;
     width: 250px;
   }
