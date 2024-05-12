@@ -22,4 +22,5 @@ export type ModalType =
   | 'view-more-tx'
   | 'add-shipping'
   | 'unset-shipment'
+  | 'pharmacy-detail'
   | '';

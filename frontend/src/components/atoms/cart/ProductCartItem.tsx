@@ -33,6 +33,8 @@ import DetailICO from '@/assets/icons/DetailICO';
 import DeleteICO from '@/assets/dashboard/DeleteICO';
 import BikeICO from '@/assets/icons/BikeICO';
 import Axios from 'axios';
+import InvokableModal from '@/components/organisms/modal/InvokableModal';
+import { PharmacyItf } from '@/types/pharmacyTypes';
 
 const ProductCartItem = () => {
   const dispatch = useObatinDispatch();
@@ -45,6 +47,9 @@ const ProductCartItem = () => {
   const { isDesktopDisplay } = useClientDisplayResolution();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
+  const [selectedPharmacyDetail, setSelectedPharmacyDetail] =
+    useState<PharmacyItf | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const fetchCartItems = async () => {
     try {
@@ -200,8 +205,15 @@ const ProductCartItem = () => {
     }
   };
 
-  const openDetailPharmacyInterface = () => {
+  const handlePharmacyDetailOpen = (pharmacy: PharmacyCart) => {
     //! todo: invoke invokable modal
+    setSelectedPharmacyDetail(pharmacy);
+    setIsModalOpen(true);
+  };
+
+  const handlePharmacyDetailClose = () => {
+    setSelectedPharmacyDetail(null);
+    setIsModalOpen(false);
   };
 
   const openAddShippingInterface = (pharmacy: PharmacyCart) => {
@@ -230,7 +242,7 @@ const ProductCartItem = () => {
               <PharmacyName>
                 <PharmacyICO />
                 <p>{pharmacy.name}</p>
-                <DetailICO onClick={() => openDetailPharmacyInterface()} />
+                <DetailICO onClick={() => handlePharmacyDetailOpen(pharmacy)} />
               </PharmacyName>
 
               {pharmacy.cart_items.map((item, index) => (
@@ -308,6 +320,24 @@ const ProductCartItem = () => {
             </CartItemContainer>
           );
         })}
+        <InvokableModal
+          $pharmacyDetail={{
+            id: selectedPharmacyDetail?.id,
+            name: selectedPharmacyDetail?.name,
+            address: selectedPharmacyDetail?.address,
+            distance: selectedPharmacyDetail?.distance,
+            pharmacist_name: selectedPharmacyDetail?.pharmacist_name,
+            pharmacist_phone: selectedPharmacyDetail?.pharmacist_phone,
+            pharmacist_license: selectedPharmacyDetail?.pharmacist_license,
+            operational_days: selectedPharmacyDetail?.operational_days,
+            opening_time: selectedPharmacyDetail?.opening_time,
+            closing_time: selectedPharmacyDetail?.closing_time,
+          }}
+          modalType='pharmacy-detail'
+          onOpen={handlePharmacyDetailOpen}
+          isOpen={isModalOpen}
+          onClose={handlePharmacyDetailClose}
+        />
       </>
     )
   );
