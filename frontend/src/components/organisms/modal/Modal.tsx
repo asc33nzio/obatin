@@ -14,7 +14,6 @@ import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmP
 import AddAddressModalContent from '@/components/organisms/modal/modalContent/AddAddressModalContent';
 import UploadPembayaranModal from '@/components/organisms/modal/modalContent/UploadPembayaranModal';
 import SelectAddressModalContent from './modalContent/SelectAddressModalContent';
-// import SelectDetailPharmacyModalContent from './modalContent/SelectDetailPharmacyModalContent';
 import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
 import AddShippingModalContent from './modalContent/AddShippingModalContent';
 import ViewMoreTxModalContent from './modalContent/ViewMoreTxModalContent';
