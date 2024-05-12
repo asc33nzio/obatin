@@ -77,11 +77,11 @@ const InvokableModal = (props: {
           $pharmacyDetail={props.$pharmacyDetail}
         />
       );
-      title = 'Detail Apotek';
+      title = '';
       modalProps = {
         $overlayHeight: '200vh',
         $containerWidth: '450px',
-        $containerHeight: '500px',
+        $containerHeight: '450px',
         onOpen: () => {},
         isOpen: false,
         onClose: () => {},
