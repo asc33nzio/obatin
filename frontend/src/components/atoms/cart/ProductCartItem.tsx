@@ -201,7 +201,7 @@ const ProductCartItem = () => {
   };
 
   const openDetailPharmacyInterface = () => {
-    openModal('detail-pharmacy');
+    //! todo: invoke invokable modal
   };
 
   const openAddShippingInterface = (pharmacy: PharmacyCart) => {
@@ -218,7 +218,7 @@ const ProductCartItem = () => {
     pharmacies && (
       <>
         {pharmacies?.map((pharmacy: PharmacyCart, index) => {
-          if (pharmacy.cart_items.length === 0) return null;
+          if (pharmacy.cart_items?.length === 0) return null;
           const realPharmaState = pharmacies.find(
             (pharma) => pharma.id === pharmacy.id,
           );

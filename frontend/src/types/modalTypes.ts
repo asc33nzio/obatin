@@ -19,7 +19,6 @@ export type ModalType =
   | 'update-address'
   | 'payment-upload'
   | 'select-address'
-  | 'detail-pharmacy'
   | 'view-more-tx'
   | 'add-shipping'
   | 'unset-shipment'
