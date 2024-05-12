@@ -7,6 +7,7 @@ import {
 import { ModalType } from '@/types/modalTypes';
 import DoctorDetailModalContent from './modalContent/DoctorDetailModalContent';
 import CloseICO from '@/assets/icons/CloseICO';
+import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
 
 export interface DoctorDetailItf {
   id?: number | undefined;
@@ -32,7 +33,8 @@ export interface ModalPropsItf {
 }
 
 const InvokableModal = (props: {
-  $doctorDetail: DoctorDetailItf;
+  $doctorDetail?: DoctorDetailItf;
+  $pharmacyDetail?: PharmacyCart;
   modalType: ModalType;
   onOpen: Function;
   isOpen: boolean;
@@ -67,6 +69,23 @@ const InvokableModal = (props: {
         onClose: () => {},
       };
       break;
+
+    // case 'pharmacy-detail':
+    //   modalContent = (
+    //     <SelectDetailPharmacyModalContent
+    //       $pharmacyDetail={props.$pharmacyDetail}
+    //     />
+    //   );
+    //   title = 'Detail Apotek';
+    //   modalProps = {
+    //     $overlayHeight: '200vh',
+    //     $containerWidth: '450px',
+    //     $containerHeight: '500px',
+    //     onOpen: () => {},
+    //     isOpen: false,
+    //     onClose: () => {},
+    //   };
+    //   break;
 
     default:
       modalContent = null;
