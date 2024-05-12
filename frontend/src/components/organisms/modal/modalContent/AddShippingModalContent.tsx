@@ -75,6 +75,8 @@ const AddShippingModalContent = () => {
   }, [accessToken, selectedPharmacy]);
 
   const handleSelectShippingMethod = (method: ShippingMethodsType) => {
+    console.log(method.shipping_id);
+
     dispatch(
       updateSelectedPharmacy({
         shipping_id: method.shipping_id,
