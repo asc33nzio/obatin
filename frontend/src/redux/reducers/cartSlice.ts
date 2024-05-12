@@ -41,7 +41,7 @@ const initialState: CartStateItf = {
   totalPrice: 0,
 };
 
-export const cartSlice = createSlice({
+const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
@@ -137,5 +137,4 @@ export const {
   clearCart,
   updateQuantityCart,
 } = cartSlice.actions;
-
-export default cartSlice.reducer;
+export const cartReducer = cartSlice.reducer;

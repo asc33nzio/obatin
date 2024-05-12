@@ -122,11 +122,17 @@ export const Summary = styled.div`
   color: ${COLORS.primary_text};
   display: flex;
   flex-direction: column;
+
   div {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 0;
+
+    h3 {
+      font-size: 20px;
+    }
+
     p {
       font-weight: 600;
     }
@@ -143,14 +149,23 @@ export const PaymentSummaryContainer = styled.div`
 export const PharmacyName = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
   padding-bottom: 20px;
   border-bottom: 0.2px solid ${COLORS.input_border};
-  svg {
-    width: 30px;
-  }
+
   div {
-    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    svg {
+      cursor: pointer;
+      width: 25px;
+      height: 25px;
+      object-fit: cover;
+    }
   }
 `;
 
@@ -169,6 +184,7 @@ export const DeliveryItem = styled.div`
   &:hover {
     border: 0.5px solid ${COLORS.primary_color};
   }
+
   svg {
     width: 30px;
   }
@@ -178,11 +194,21 @@ export const DeliveryItem = styled.div`
     font-size: 14px;
     color: ${COLORS.primary_text};
     gap: 20px;
+
     div {
       flex-direction: column;
       gap: 5px;
+
+      div {
+        flex-direction: row;
+
+        :first-child {
+          width: 60px;
+        }
+      }
     }
   }
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 10px;
@@ -197,11 +223,13 @@ export const Cart = styled.div`
 `;
 
 export const OngkosKirim = styled.div`
+  cursor: pointer;
   min-width: 100px;
   padding: 10px;
   border-radius: 8px;
   border: 1px solid ${COLORS.primary_color};
   align-items: center;
+
   p {
     color: ${COLORS.primary_color};
   }

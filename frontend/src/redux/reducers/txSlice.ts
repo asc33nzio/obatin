@@ -39,7 +39,7 @@ const initialState: ReduxTxItf = {
   products: [],
 };
 
-export const txSlice = createSlice({
+const txSlice = createSlice({
   name: 'tx',
   initialState,
   reducers: {
