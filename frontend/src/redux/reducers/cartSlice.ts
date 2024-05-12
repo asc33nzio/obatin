@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PharmacyCart } from './pharmacySlice';
 
 export interface ProductItemItf {
   id: number;
@@ -18,22 +17,26 @@ export interface ProductItemItf {
   is_prescription_required: boolean;
 }
 
-export interface CartItem {
+export interface CartItemItf {
   product_id: number;
   prescription_id: number | null;
   pharmacy_id: number | null;
   quantity: number;
 }
-export interface CartState {
-  items: CartItem[];
-  product: PharmacyCart[];
+
+export interface CartStateItf {
+  items: CartItemItf[];
   totalQuantity: number;
   totalPrice: number;
 }
 
-const initialState: CartState = {
+export interface SyncCartItf {
+  product_id: number;
+  quantity: number;
+}
+
+const initialState: CartStateItf = {
   items: [],
-  product: [],
   totalQuantity: 0,
   totalPrice: 0,
 };
@@ -42,8 +45,27 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addItemToCart: (state, action: PayloadAction<CartItem>) => {
-      const { product_id } = action.payload;
+    syncCartItem: (state, action: PayloadAction<SyncCartItf>) => {
+      const { product_id, quantity } = action.payload;
+
+      state.items.push({
+        product_id,
+        prescription_id: null,
+        pharmacy_id: null,
+        quantity,
+      });
+
+      state.totalQuantity += quantity;
+    },
+
+    syncTotalPrice: (state, action: PayloadAction<number>) => {
+      const totalPrice = action.payload;
+
+      state.totalPrice = totalPrice;
+    },
+
+    increaseOneToCart: (state, action: PayloadAction<number>) => {
+      const product_id = action.payload;
       const existingItem = state.items.find(
         (item) => item.product_id === product_id,
       );
@@ -51,13 +73,18 @@ export const cartSlice = createSlice({
       if (existingItem) {
         existingItem.quantity += 1;
       } else {
-        state.items.push({ ...action.payload, quantity: 1 });
+        state.items.push({
+          product_id: product_id,
+          prescription_id: null,
+          pharmacy_id: null,
+          quantity: 1,
+        });
       }
 
       state.totalQuantity += 1;
     },
 
-    deduceOneFromCart: (state, action: PayloadAction<CartItem>) => {
+    deduceOneFromCart: (state, action: PayloadAction<CartItemItf>) => {
       const { product_id } = action.payload;
       const existingItemIndex = state.items.findIndex(
         (item) => item.product_id === product_id,
@@ -65,24 +92,27 @@ export const cartSlice = createSlice({
 
       if (existingItemIndex === -1) return;
       const existingItem = state.items[existingItemIndex];
+      existingItem.quantity -= 1;
+      state.totalQuantity -= 1;
 
-      if (existingItem?.quantity <= 1) {
-        state.items = state.items.filter(
-          (item) => item.product_id !== existingItem.product_id,
-        );
+      if (existingItem?.quantity === 0) {
+        state.items.splice(existingItemIndex, 1);
         return;
       }
     },
 
-    removeItemFromCart: (state, action: PayloadAction<CartItem>) => {
+    removeItemFromCart: (state, action: PayloadAction<CartItemItf>) => {
       const { product_id } = action.payload;
-      const item = state.items.find((item) => item.product_id === product_id);
 
-      if (item === undefined) return;
+      const removedItem = state.items.find(
+        (item) => item.product_id === product_id,
+      );
+      if (removedItem) {
+        state.totalQuantity -= removedItem.quantity;
+      }
 
-      state.totalQuantity -= item.quantity;
       state.items = state.items.filter(
-        (item) => item.product_id !== item.product_id,
+        (item) => item.product_id !== product_id,
       );
     },
 
@@ -93,14 +123,15 @@ export const cartSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
       state.totalQuantity = 0;
-      state.product = [];
       state.totalPrice = 0;
     },
   },
 });
 
 export const {
-  addItemToCart,
+  syncCartItem,
+  syncTotalPrice,
+  increaseOneToCart,
   deduceOneFromCart,
   removeItemFromCart,
   clearCart,

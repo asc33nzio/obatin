@@ -27,6 +27,8 @@ import { setAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedJwtItf } from '@/types/jwtTypes';
 import { PropagateLoader } from 'react-spinners';
+import { syncCartItem, syncTotalPrice } from '@/redux/reducers/cartSlice';
+import { CartItemItf } from '@/types/transactionTypes';
 import Axios from 'axios';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
@@ -118,6 +120,27 @@ const LoginForm = (): React.ReactElement => {
             addresses: userData.addresses,
           }),
         );
+
+        const cartDataResponse = await Axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
+          {
+            headers: { Authorization: `Bearer ${access_token}` },
+          },
+        );
+
+        const userCartData = cartDataResponse.data.data.cart;
+        const userCartSubotal = cartDataResponse.data.data.subtotal;
+        if (userCartData && userCartData.length !== 0) {
+          dispatch(syncTotalPrice(userCartSubotal));
+          userCartData.forEach((cartItem: CartItemItf) => {
+            dispatch(
+              syncCartItem({
+                product_id: cartItem.product_id,
+                quantity: cartItem.quantity,
+              }),
+            );
+          });
+        }
 
         navigateToUserDashboard();
       }

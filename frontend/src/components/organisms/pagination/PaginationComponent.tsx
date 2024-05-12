@@ -21,24 +21,15 @@ const PaginationComponent = ({
 }: PaginationItf) => {
   const renderButtons = () => {
     const pageButtons = [];
-    const pagesToShow = 6;
+    const buttonsToShow = 6;
     let startPage = Math.max(
       1,
       Math.min(
-        page - Math.floor(pagesToShow / 2),
-        totalPages - pagesToShow + 1,
+        page - Math.floor(buttonsToShow / 2),
+        totalPages - buttonsToShow + 1,
       ),
     );
-    let endPage = Math.min(totalPages, startPage + pagesToShow - 1);
-
-    const pagesDiff = pagesToShow - (endPage - startPage + 1);
-    if (pagesDiff > 0 && endPage < totalPages) {
-      if (startPage === 1) {
-        endPage += pagesDiff;
-      } else {
-        startPage -= pagesDiff;
-      }
-    }
+    let endPage = Math.min(totalPages, startPage + buttonsToShow - 1);
 
     if (page > 1) {
       pageButtons.push(
@@ -65,7 +56,7 @@ const PaginationComponent = ({
       const isCurrentPage = i === page;
       if (i === middlePageIndex) {
         pageButtons.push(
-          <PagingInfo key='show-current-page'>
+          <PagingInfo key='current-page-info'>
             Page {page} / {totalPages}
           </PagingInfo>,
         );

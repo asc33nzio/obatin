@@ -27,5 +27,6 @@ func CheckImageExtension(filename string) bool {
 	return parts[extensionIndex] == "jpg" ||
 		parts[extensionIndex] == "jpeg" ||
 		parts[extensionIndex] == "png" ||
-		parts[extensionIndex] == "webp"
+		parts[extensionIndex] == "webp" ||
+		parts[extensionIndex] == "pdf"
 }

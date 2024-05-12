@@ -7,7 +7,7 @@ import { resetAuthState } from './redux/reducers/authSlice';
 import { resetAuthDoctorState } from './redux/reducers/authDoctorSlice';
 
 //! Route group definitions
-const publicRoutes = ['/', '/shop'];
+const publicRoutes = ['/', '/products'];
 const authRoutes = ['/auth/login', '/auth/register'];
 const protectedRoutes = [
   '/dashboard/user',
@@ -68,7 +68,7 @@ export default async function middleware(request: NextRequest) {
   }
 
   //! Redirect URL definitionsAuthDoc
-  // const redirectToHome = new URL('/', request.nextUrl.href).toString();
+  // const redirectToHome = new URL(prefix + '/', request.nextUrl.href).toString();
 
   const redirectToLogin = new URL(
     prefix + '/auth/login',
@@ -82,6 +82,11 @@ export default async function middleware(request: NextRequest) {
 
   const redirectToDoctorDashboard = new URL(
     prefix + '/dashboard/doctor',
+    request.nextUrl.href,
+  ).toString();
+
+  const redirectToShop = new URL(
+    prefix + '/products',
     request.nextUrl.href,
   ).toString();
 
@@ -112,6 +117,14 @@ export default async function middleware(request: NextRequest) {
 
     if (restrictedPaths.includes(request.nextUrl.pathname)) {
       return NextResponse.redirect(redirectToLogin);
+    }
+  }
+
+  if (request.nextUrl.pathname.startsWith('/shop')) {
+    const restrictedPaths = ['/shop', '/shop/'];
+
+    if (restrictedPaths.includes(request.nextUrl.pathname)) {
+      return NextResponse.redirect(redirectToShop);
     }
   }
 
