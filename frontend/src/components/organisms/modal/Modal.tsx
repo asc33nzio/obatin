@@ -181,6 +181,15 @@ const Modal = () => {
       };
       break;
 
+    // case 'select-nearby-pharmacy':
+    //   modalContent = <SelectNearbyPharmacy />;
+    //   title = '';
+    //   modalProps = {
+    //     $containerWidth: '650px',
+    //     $containerHeight: 'max-content',
+    //   };
+    //   break;
+
     default:
       modalContent = null;
       title = null;

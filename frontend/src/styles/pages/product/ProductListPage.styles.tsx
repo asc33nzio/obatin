@@ -20,6 +20,7 @@ export const ProductListContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding-top: 13rem;
   }
 `;
 
@@ -96,8 +97,11 @@ export const FilterContainer = styled.div`
     justify-content: center;
   }
   @media (max-width: 768px) {
-    justify-content: center;
-    width: 80%;
+    justify-content: flex-start;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    align-items: center;
   }
 `;
 

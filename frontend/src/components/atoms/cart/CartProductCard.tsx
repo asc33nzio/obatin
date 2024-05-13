@@ -33,6 +33,8 @@ import DetailICO from '@/assets/icons/DetailICO';
 import DeleteICO from '@/assets/dashboard/DeleteICO';
 import BikeICO from '@/assets/icons/BikeICO';
 import Axios from 'axios';
+import { PharmacyItf } from '@/types/pharmacyTypes';
+import InvokableModal from '@/components/organisms/modal/InvokableModal';
 
 const CartProductCard = () => {
   const dispatch = useObatinDispatch();
@@ -44,6 +46,9 @@ const CartProductCard = () => {
   const { isDesktopDisplay } = useClientDisplayResolution();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
+  const [selectedPharmacyDetail, setSelectedPharmacyDetail] =
+    useState<PharmacyItf | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const fetchCartItems = async () => {
     try {
@@ -203,8 +208,14 @@ const CartProductCard = () => {
     }
   };
 
-  const openDetailPharmacyInterface = () => {
-    //! todo: invoke invokable modal
+  const handlePharmacyDetailOpen = (pharmacy: PharmacyCart) => {
+    setSelectedPharmacyDetail(pharmacy);
+    setIsModalOpen(true);
+  };
+
+  const handlePharmacyDetailClose = () => {
+    setSelectedPharmacyDetail(null);
+    setIsModalOpen(false);
   };
 
   const openAddShippingInterface = (pharmacy: PharmacyCart) => {
@@ -243,7 +254,9 @@ const CartProductCard = () => {
                     {pharmacy?.name?.charAt(0).toUpperCase()}
                     {pharmacy?.name?.slice(1, pharmacy.name.length)}
                   </p>
-                  <DetailICO onClick={() => openDetailPharmacyInterface()} />
+                  <DetailICO
+                    onClick={() => handlePharmacyDetailOpen(pharmacy)}
+                  />
                 </div>
                 <p>Total : Rp. {totalPrice?.toLocaleString('id-ID')}</p>
               </PharmacyName>
@@ -335,6 +348,24 @@ const CartProductCard = () => {
             </CartItemContainer>
           );
         })}
+        <InvokableModal
+          $pharmacyDetail={{
+            id: selectedPharmacyDetail?.id,
+            name: selectedPharmacyDetail?.name,
+            address: selectedPharmacyDetail?.address,
+            distance: selectedPharmacyDetail?.distance,
+            pharmacist_name: selectedPharmacyDetail?.pharmacist_name,
+            pharmacist_phone: selectedPharmacyDetail?.pharmacist_phone,
+            pharmacist_license: selectedPharmacyDetail?.pharmacist_license,
+            operational_days: selectedPharmacyDetail?.operational_days,
+            opening_time: selectedPharmacyDetail?.opening_time,
+            closing_time: selectedPharmacyDetail?.closing_time,
+          }}
+          modalType='pharmacy-detail'
+          onOpen={handlePharmacyDetailOpen}
+          isOpen={isModalOpen}
+          onClose={handlePharmacyDetailClose}
+        />
       </>
     )
   );

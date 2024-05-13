@@ -1,13 +1,21 @@
 'use client';
 import {
   ButtonAdd,
+  Buttoncontainer,
+  Column,
+  PharmacyCard,
+  PharmacyItem,
+  PharmacyNameContainer,
   Price,
   ProductDetail,
   ProductDetailContainer,
+  Row,
+  SelectPharmacy,
 } from '@/styles/pages/product/ProductDetail.styles';
 import {
   increaseOneToCart,
   deduceOneFromCart,
+  changePharmacy,
 } from '@/redux/reducers/cartSlice';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -18,22 +26,39 @@ import { RingLoader } from 'react-spinners';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { navigateToChat, navigateToProductList } from '@/app/actions';
 import { useToast } from '@/hooks/useToast';
+import { PharmacyItf } from '@/types/pharmacyTypes';
+import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
+import { getCookie } from 'cookies-next';
+import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
 import Axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import Footer from '@/components/organisms/footer/Footer';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Image from 'next/image';
+import HomeICO from '@/assets/icons/HomeICO';
+import ConsulICO from '@/assets/icons/ConsulICO';
+import PhoneICO from '@/assets/icons/PhoneICO';
 
 const ProductDetailPage = () => {
   const pathname = usePathname();
   const product_slug = pathname.split('/').pop();
-  const [product, setProduct] = useState<ProductType>();
+  const [product, setProduct] = useState<ProductType | undefined>();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const { setToast } = useToast();
   const dispatch = useObatinDispatch();
   const items = useObatinSelector((state) => state.cart.items);
   const [isProductSelected, setIsProductSelected] =
     useState<ProductType | null>();
+  // eslint-disable-next-line
+  const [productId, setProductId] = useState<PharmacyItf | undefined>(
+    undefined,
+  );
+  const [nearbyPharmacies, setNearbyPharmacies] = useState<PharmacyCart[]>([]);
+  const [PharmacyName, setPharmacyName] = useState<PharmacyCart>();
+
+  const userInfo = useObatinSelector((state) => state.auth);
+  const accessToken = getCookie('access_token');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,6 +77,49 @@ const ProductDetailPage = () => {
       fetchData();
     }
   }, [product_slug]);
+
+  useEffect(() => {
+    const fetchNearbyPharmacies = async () => {
+      try {
+        const userAddress = userInfo?.addresses?.find(
+          (address) => address.id === userInfo.activeAddressId,
+        );
+        if (!userInfo) {
+          setToast({
+            showToast: true,
+            toastMessage: 'Maaf, anda masuk/login terlebih dahulu',
+            toastType: 'error',
+            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+            orientation: 'center',
+          });
+        } else if (!userAddress) {
+          setToast({
+            showToast: true,
+            toastMessage: 'Maaf, anda harus mengisi alamat terlebih dahulu',
+            toastType: 'warning',
+            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+            orientation: 'center',
+          });
+        }
+        const { data } = await Axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/nearby-pharmacies/products/${product?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          },
+        );
+        setNearbyPharmacies(data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (product && userInfo) {
+      fetchNearbyPharmacies();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product, userInfo]);
 
   const handleAddToCart = (product: ProductType) => {
     if (product.is_prescription_required) {
@@ -84,6 +152,19 @@ const ProductDetailPage = () => {
     }
   };
 
+  const handleSelectedPharmacy = (pharmacy: PharmacyCart) => {
+    if (product?.id === undefined) return;
+    dispatch(
+      changePharmacy({
+        product_id: product?.id,
+        pharmacy_id: pharmacy?.id,
+      }),
+    );
+
+    setPharmacyName(pharmacy);
+    setIsModalOpen(false);
+  };
+
   return (
     <Container>
       <Navbar />
@@ -99,6 +180,7 @@ const ProductDetailPage = () => {
           ) : (
             <RingLoader loading={product === undefined} />
           )}
+
           <ProductDetail>
             <h1>{product?.name}</h1>
             <Price>
@@ -106,60 +188,78 @@ const ProductDetailPage = () => {
               {product?.max_price.toLocaleString()}
             </Price>
             <h3>{product?.selling_unit}</h3>
-
-            {isProductSelected?.id === product?.id &&
-            product &&
-            items.find((item) => item.product_id === product.id)?.quantity !==
-              undefined ? (
-              <ButtonAdd>
+            <Buttoncontainer>
+              <CustomButton
+                content={'Pilih Apotek'}
+                onClick={() => setIsModalOpen(true)}
+                $width='150px'
+                $height='50px'
+                $fontSize='18px'
+                $color='#00B5C0'
+                $bgColor='white'
+                $border='#00B5C0'
+              />
+              {isProductSelected?.id === product?.id &&
+              product &&
+              items.find((item) => item.product_id === product.id)?.quantity !==
+                undefined ? (
+                <ButtonAdd>
+                  <CustomButton
+                    content='-'
+                    onClick={
+                      product !== undefined
+                        ? () => handleSubtract(product?.id)
+                        : () => {}
+                    }
+                    $width='80px'
+                    $height='50px'
+                    $fontSize='18px'
+                    $color='#00B5C0'
+                    $bgColor='white'
+                    $border='#00B5C0'
+                  />
+                  <p>
+                    {
+                      items.find((item) => item.product_id === product?.id)
+                        ?.quantity
+                    }
+                  </p>
+                  <CustomButton
+                    content='+'
+                    onClick={
+                      product !== undefined
+                        ? () => handleAddToCart(product)
+                        : () => {}
+                    }
+                    $width='80px'
+                    $height='50px'
+                    $fontSize='18px'
+                    $color='#00B5C0'
+                    $bgColor='white'
+                    $border='#00B5C0'
+                  />
+                </ButtonAdd>
+              ) : (
                 <CustomButton
-                  content='-'
-                  onClick={
-                    product !== undefined
-                      ? () => handleSubtract(product?.id)
-                      : () => {}
-                  }
-                  $width='80px'
-                  $height='30px'
-                  $fontSize='18px'
-                  $color='#00B5C0'
-                  $bgColor='white'
-                  $border='#00B5C0'
-                />
-                <p>
-                  {
-                    items.find((item) => item.product_id === product?.id)
-                      ?.quantity
-                  }
-                </p>
-                <CustomButton
-                  content='+'
+                  content='Tambah ke keranjang'
                   onClick={
                     product !== undefined
                       ? () => handleAddToCart(product)
                       : () => {}
                   }
-                  $width='80px'
-                  $height='30px'
-                  $fontSize='18px'
-                  $color='#00B5C0'
-                  $bgColor='white'
-                  $border='#00B5C0'
+                  $width='150px'
+                  $height='50px'
+                  $fontSize='16px'
                 />
-              </ButtonAdd>
-            ) : (
-              <CustomButton
-                content='Add to Cart'
-                onClick={
-                  product !== undefined
-                    ? () => handleAddToCart(product)
-                    : () => {}
-                }
-                $width='150px'
-                $height='50px'
-                $fontSize='16px'
-              />
-            )}
+              )}
+              {PharmacyName ? (
+                <PharmacyNameContainer>
+                  {PharmacyName?.name}
+                </PharmacyNameContainer>
+              ) : (
+                ''
+              )}
+            </Buttoncontainer>
 
             {product?.description && (
               <div>
@@ -203,6 +303,52 @@ const ProductDetailPage = () => {
                 <p>{product?.packaging}</p>
               </div>
             )}
+            <DialogModal
+              isOpen={isModalOpen}
+              hasCloseBtn
+              onClose={() => setIsModalOpen(false)}
+            >
+              <SelectPharmacy>
+                <h2>Apotek terdekat:</h2>
+                <PharmacyCard>
+                  {nearbyPharmacies?.map((pharmacy) => (
+                    <PharmacyItem
+                      key={pharmacy.id}
+                      onClick={() => handleSelectedPharmacy(pharmacy)}
+                    >
+                      <Row>
+                        <HomeICO />
+                        <p>{pharmacy.name}</p>
+                      </Row>
+                      <Row>
+                        <p>{pharmacy.address}</p>
+                        <p>{pharmacy.distance} km dari rumahmu</p>
+                      </Row>
+                      <Row>
+                        <Column>
+                          <p>Buka: {pharmacy.opening_time}</p>
+                          <p>Tutup: {pharmacy.closing_time}</p>
+                          <p>
+                            Hari Operasional:{' '}
+                            {pharmacy.operational_days.join(', ')}
+                          </p>
+                        </Column>
+                        <Column>
+                          <div>
+                            <ConsulICO />
+                            <p>{pharmacy.pharmacist_name}</p>
+                          </div>
+                          <div>
+                            <PhoneICO />
+                            <p>{pharmacy.pharmacist_phone}</p>
+                          </div>
+                        </Column>
+                      </Row>
+                    </PharmacyItem>
+                  ))}
+                </PharmacyCard>
+              </SelectPharmacy>
+            </DialogModal>
           </ProductDetail>
         </ProductDetailContainer>
         <Footer />
