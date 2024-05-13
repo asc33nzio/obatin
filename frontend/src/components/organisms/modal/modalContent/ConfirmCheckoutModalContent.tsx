@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/useToast';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import styled from 'styled-components';
 
-export const UnsetShippingModalContentContainer = styled.div`
+export const ConfirmCheckoutContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -13,11 +13,6 @@ export const UnsetShippingModalContentContainer = styled.div`
 
   width: 100%;
   height: 100%;
-  gap: 3px;
-
-  span {
-    font-size: 16px;
-  }
 `;
 
 const UnsetShippingModalButtonsContainer = styled.div`
@@ -33,23 +28,35 @@ const UnsetShippingModalButtonsContainer = styled.div`
   margin-top: 25px;
 `;
 
-const UnsetShippingModalContent = (): React.ReactElement => {
+const ConfirmCheckoutModalContent = (): React.ReactElement => {
   const emitter = useEventEmitter();
   const { setToast } = useToast();
   const { closeModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  const unsetShipping = localStorage.getItem('unsetShipping');
+  const checkoutBreakdown = localStorage.getItem('checkout');
+  const totalQuantity = checkoutBreakdown?.split(',')?.[0];
+  const totalShippingCost = parseInt(checkoutBreakdown?.split(',')?.[1]!, 10);
+  const totalCheckout = parseInt(checkoutBreakdown?.split(',')?.[2]!, 10);
 
   return (
-    <UnsetShippingModalContentContainer>
-      <span>Anda yakin untuk melanjutkan?</span>
-      <span>
-        Ada {unsetShipping} produk dalam keranjang yang belum ditetapkan metode
-        pengirimannya
-      </span>
-      <span>
-        Bila kamu melanjutkan, produk-produk dari apotik tersebut tidak diproses
-      </span>
+    <ConfirmCheckoutContainer>
+      <div>
+        <p>Checkout</p>
+        <p>{totalQuantity} produk</p>
+      </div>
+      <div>
+        <h3>Harge Produk</h3>
+        <p>Rp. {totalCheckout?.toLocaleString('id-ID')}</p>
+      </div>
+      <div>
+        <p>Biaya Pengiriman</p>
+        <p>Rp. {totalShippingCost?.toLocaleString('id-ID')}</p>
+      </div>
+      <div>
+        <p>Total Belanja</p>
+        <p>Rp. {(totalCheckout + totalShippingCost).toLocaleString('id-ID')}</p>
+      </div>
+
       <UnsetShippingModalButtonsContainer>
         <CustomButton
           content='Batal'
@@ -58,7 +65,7 @@ const UnsetShippingModalContent = (): React.ReactElement => {
           $fontSize='22px'
           $bgColor='#de161c'
           onClick={() => {
-            localStorage.removeItem('unsetShipping');
+            localStorage.removeItem('checkout');
             emitter.emit('close-modal-fail');
             closeModal();
 
@@ -77,14 +84,14 @@ const UnsetShippingModalContent = (): React.ReactElement => {
           $height='50px'
           $fontSize='22px'
           onClick={() => {
-            localStorage.removeItem('unsetShipping');
+            localStorage.removeItem('checkout');
             emitter.emit('close-modal-ok');
             closeModal();
           }}
         />
       </UnsetShippingModalButtonsContainer>
-    </UnsetShippingModalContentContainer>
+    </ConfirmCheckoutContainer>
   );
 };
 
-export default UnsetShippingModalContent;
+export default ConfirmCheckoutModalContent;

@@ -6,7 +6,7 @@ const initialState: ProvincesItf = {
   provinces: [],
 };
 
-export const provincesSlice = createSlice({
+const provincesSlice = createSlice({
   name: 'provinces',
   initialState,
   reducers: {
