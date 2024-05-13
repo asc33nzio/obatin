@@ -181,14 +181,14 @@ const Modal = () => {
       };
       break;
 
-    // case 'select-nearby-pharmacy':
-    //   modalContent = <SelectNearbyPharmacy />;
-    //   title = '';
-    //   modalProps = {
-    //     $containerWidth: '650px',
-    //     $containerHeight: 'max-content',
-    //   };
-    //   break;
+    case 'confirm-checkout':
+      modalContent = <ConfirmCheckoutModalContent />;
+      title = 'Berikut perincian pembelanjaan anda';
+      modalProps = {
+        $containerWidth: '650px',
+        $containerHeight: '650px',
+      };
+      break;
 
     default:
       modalContent = null;

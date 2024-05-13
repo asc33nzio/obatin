@@ -55,6 +55,11 @@ const pharmacySlice = createSlice({
   initialState,
   reducers: {
     setPharmacies(state, action: PayloadAction<Array<PharmacyCart>>) {
+      if (action.payload === null) {
+        state.pharmacies = [];
+        return;
+      }
+
       state.pharmacies = action.payload.map((pharmacy) => {
         const prevPharmaIndex = state.pharmacies.findIndex((prevPharmacy) => {
           return prevPharmacy.id === pharmacy.id;

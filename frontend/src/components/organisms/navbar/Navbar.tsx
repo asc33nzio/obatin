@@ -233,10 +233,12 @@ const Navbar = (): React.ReactElement => {
             />
           ) : (
             <>
-              <CartContainer onClick={() => handleCartClick()}>
-                <CartICO />
-                <Quantity>{quantity}</Quantity>
-              </CartContainer>
+              {userRole === 'user' && (
+                <CartContainer onClick={() => handleCartClick()}>
+                  <CartICO />
+                  <Quantity>{quantity}</Quantity>
+                </CartContainer>
+              )}
               <ImgBg>
                 <Image
                   src={
@@ -257,7 +259,9 @@ const Navbar = (): React.ReactElement => {
                   onClick={() =>
                     userRole === 'user'
                       ? navigateToUserDashboard()
-                      : navigateToDoctorDashboard()
+                      : userRole === 'doctor'
+                        ? navigateToDoctorDashboard()
+                        : {}
                   }
                 />
               </ImgBg>

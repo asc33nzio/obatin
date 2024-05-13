@@ -25,6 +25,7 @@ import { useModal } from '@/hooks/useModal';
 import { getCookie } from 'cookies-next';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { PharmacyItf } from '@/types/pharmacyTypes';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import CustomButton from '../button/CustomButton';
@@ -33,7 +34,6 @@ import DetailICO from '@/assets/icons/DetailICO';
 import DeleteICO from '@/assets/dashboard/DeleteICO';
 import BikeICO from '@/assets/icons/BikeICO';
 import Axios from 'axios';
-import { PharmacyItf } from '@/types/pharmacyTypes';
 import InvokableModal from '@/components/organisms/modal/InvokableModal';
 
 const CartProductCard = () => {
@@ -63,7 +63,7 @@ const CartProductCard = () => {
       );
 
       const { pharmacies_cart } = response.data.data;
-      if (pharmacies_cart.length > 0) dispatch(setPharmacies(pharmacies_cart));
+      dispatch(setPharmacies(pharmacies_cart));
     } catch (error) {
       console.error(error);
     } finally {
@@ -362,9 +362,9 @@ const CartProductCard = () => {
             closing_time: selectedPharmacyDetail?.closing_time,
           }}
           modalType='pharmacy-detail'
-          onOpen={handlePharmacyDetailOpen}
-          isOpen={isModalOpen}
-          onClose={handlePharmacyDetailClose}
+          $onOpen={handlePharmacyDetailOpen}
+          $isOpen={isModalOpen}
+          $onClose={handlePharmacyDetailClose}
         />
       </>
     )
