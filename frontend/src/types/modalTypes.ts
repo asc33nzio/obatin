@@ -23,4 +23,5 @@ export type ModalType =
   | 'add-shipping'
   | 'unset-shipment'
   | 'pharmacy-detail'
+  | 'select-nearby-pharmacy'
   | '';

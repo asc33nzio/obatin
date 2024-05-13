@@ -49,6 +49,9 @@ export const ProductDetail = styled.div`
       padding: 10px 0;
     }
   }
+  svg {
+    width: 50px;
+  }
 `;
 
 export const ButtonAdd = styled.div`
@@ -63,17 +66,36 @@ export const Price = styled.p`
 `;
 
 export const SelectPharmacy = styled.div`
-  select {
-    background-color: ${COLORS.primary_color};
+  padding: 20px;
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
     color: white;
     padding: 10px;
     font-size: 14px;
     font-weight: 600;
     border: none;
-    option {
+
+    div {
       background-color: ${COLORS.primary_color};
+      border-radius: 12px;
       color: white;
       padding: 10px;
+      gap: 0;
+
+      &:hover {
+        background-color: white;
+        color: ${COLORS.primary_color};
+        border: 1px solid ${COLORS.primary_color};
+      }
     }
   }
+`;
+
+export const Buttoncontainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
 `;

@@ -1,6 +1,7 @@
 'use client';
 import {
   ButtonAdd,
+  Buttoncontainer,
   Price,
   ProductDetail,
   ProductDetailContainer,
@@ -24,22 +25,29 @@ import Navbar from '@/components/organisms/navbar/Navbar';
 import Footer from '@/components/organisms/footer/Footer';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Image from 'next/image';
+import { PharmacyItf } from '@/types/pharmacyTypes';
 import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
 import { getCookie } from 'cookies-next';
+import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
 
 const ProductDetailPage = () => {
   const pathname = usePathname();
   const product_slug = pathname.split('/').pop();
-  const [product, setProduct] = useState<ProductType>();
+  const [product, setProduct] = useState<ProductType | undefined>();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const { setToast } = useToast();
   const dispatch = useObatinDispatch();
   const items = useObatinSelector((state) => state.cart.items);
   const [isProductSelected, setIsProductSelected] =
     useState<ProductType | null>();
+  // eslint-disable-next-line
+  const [productId, setProductId] = useState<PharmacyItf | undefined>(
+    undefined,
+  );
   const [nearbyPharmacies, setNearbyPharmacies] = useState<PharmacyCart[]>([]);
   const userInfo = useObatinSelector((state) => state.auth);
   const accessToken = getCookie('access_token');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,8 +127,9 @@ const ProductDetailPage = () => {
     }
   };
 
-  // const handleSelectPharmacy = (pharmacy) => {
-  //   console.log('selected pharmacy:', pharmacy);
+  // const openSelectPharmacyInterface = (pharmacy: PharmacyCart) => {
+  //   dispatch(setSelectedPharmacy(pharmacy));
+  //   openModal('select-nearby-pharmacy');
   // };
 
   return (
@@ -138,18 +147,7 @@ const ProductDetailPage = () => {
           ) : (
             <RingLoader loading={product === undefined} />
           )}
-          {nearbyPharmacies?.length > 0 && (
-            <SelectPharmacy>
-              <h2>Apotek terdekat:</h2>
-              <select>
-                {nearbyPharmacies?.map((pharmacy) => (
-                  <option key={pharmacy.id}>
-                    <p>{pharmacy.name}</p>
-                  </option>
-                ))}
-              </select>
-            </SelectPharmacy>
-          )}
+
           <ProductDetail>
             <h1>{product?.name}</h1>
             <Price>
@@ -157,60 +155,72 @@ const ProductDetailPage = () => {
               {product?.max_price.toLocaleString()}
             </Price>
             <h3>{product?.selling_unit}</h3>
-
-            {isProductSelected?.id === product?.id &&
-            product &&
-            items.find((item) => item.product_id === product.id)?.quantity !==
-              undefined ? (
-              <ButtonAdd>
+            <Buttoncontainer>
+              <CustomButton
+                content='Pilih Apotek'
+                onClick={() => setIsModalOpen(true)}
+                $width='150px'
+                $height='50px'
+                $fontSize='18px'
+                $color='#00B5C0'
+                $bgColor='white'
+                $border='#00B5C0'
+              />
+              {isProductSelected?.id === product?.id &&
+              product &&
+              items.find((item) => item.product_id === product.id)?.quantity !==
+                undefined ? (
+                <ButtonAdd>
+                  <CustomButton
+                    content='-'
+                    onClick={
+                      product !== undefined
+                        ? () => handleSubtract(product?.id)
+                        : () => {}
+                    }
+                    $width='80px'
+                    $height='30px'
+                    $fontSize='18px'
+                    $color='#00B5C0'
+                    $bgColor='white'
+                    $border='#00B5C0'
+                  />
+                  <p>
+                    {
+                      items.find((item) => item.product_id === product?.id)
+                        ?.quantity
+                    }
+                  </p>
+                  <CustomButton
+                    content='+'
+                    onClick={
+                      product !== undefined
+                        ? () => handleAddToCart(product)
+                        : () => {}
+                    }
+                    $width='80px'
+                    $height='30px'
+                    $fontSize='18px'
+                    $color='#00B5C0'
+                    $bgColor='white'
+                    $border='#00B5C0'
+                  />
+                </ButtonAdd>
+              ) : (
                 <CustomButton
-                  content='-'
-                  onClick={
-                    product !== undefined
-                      ? () => handleSubtract(product?.id)
-                      : () => {}
-                  }
-                  $width='80px'
-                  $height='30px'
-                  $fontSize='18px'
-                  $color='#00B5C0'
-                  $bgColor='white'
-                  $border='#00B5C0'
-                />
-                <p>
-                  {
-                    items.find((item) => item.product_id === product?.id)
-                      ?.quantity
-                  }
-                </p>
-                <CustomButton
-                  content='+'
+                  content='Tambah ke keranjang'
                   onClick={
                     product !== undefined
                       ? () => handleAddToCart(product)
                       : () => {}
                   }
-                  $width='80px'
-                  $height='30px'
-                  $fontSize='18px'
-                  $color='#00B5C0'
-                  $bgColor='white'
-                  $border='#00B5C0'
+                  $width='150px'
+                  $height='50px'
+                  $fontSize='16px'
                 />
-              </ButtonAdd>
-            ) : (
-              <CustomButton
-                content='Add to Cart'
-                onClick={
-                  product !== undefined
-                    ? () => handleAddToCart(product)
-                    : () => {}
-                }
-                $width='150px'
-                $height='50px'
-                $fontSize='16px'
-              />
-            )}
+              )}
+            </Buttoncontainer>
+
             {product?.description && (
               <div>
                 <h2>Deskripsi</h2>
@@ -253,6 +263,24 @@ const ProductDetailPage = () => {
                 <p>{product?.packaging}</p>
               </div>
             )}
+            <DialogModal
+              isOpen={isModalOpen}
+              hasCloseBtn
+              onClose={() => setIsModalOpen(false)}
+            >
+              <SelectPharmacy>
+                <h2>Apotek terdekat:</h2>
+                <div>
+                  {nearbyPharmacies?.map((pharmacy) => (
+                    <div key={pharmacy.id}>
+                      <p>{pharmacy.name}</p>
+                      <p>{pharmacy.address}</p>
+                      <p>{pharmacy.distance} km dari rumahmu</p>
+                    </div>
+                  ))}
+                </div>
+              </SelectPharmacy>
+            </DialogModal>
           </ProductDetail>
         </ProductDetailContainer>
         <Footer />

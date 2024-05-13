@@ -36,6 +36,7 @@ export interface ModalPropsItf {
 const InvokableModal = (props: {
   $doctorDetail?: DoctorDetailItf;
   $pharmacyDetail?: PharmacyItf;
+  $productId?: PharmacyItf;
   modalType: ModalType;
   onOpen: Function;
   isOpen: boolean;
@@ -87,6 +88,19 @@ const InvokableModal = (props: {
         onClose: () => {},
       };
       break;
+
+    // case 'select-nearby-pharmacy':
+    //   modalContent = <SelectNearbyPharmacy $productId={props.$productId} />;
+    //   title = '';
+    //   modalProps = {
+    //     $overlayHeight: '200vh',
+    //     $containerWidth: '450px',
+    //     $containerHeight: 'max-content',
+    //     onOpen: () => {},
+    //     isOpen: false,
+    //     onClose: () => {},
+    //   };
+    //   break;
 
     default:
       modalContent = null;
