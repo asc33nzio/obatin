@@ -4,7 +4,10 @@ import {
   PaymentSummaryContainer,
   Summary,
 } from '@/styles/pages/product/Cart.styles';
-import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
+import {
+  PharmacyCart,
+  resetPharmacyStates,
+} from '@/redux/reducers/pharmacySlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { getCookie } from 'cookies-next';
 import { useToast } from '@/hooks/useToast';
@@ -145,6 +148,8 @@ const PaymentSummaryComponent = (): React.ReactElement => {
           );
         });
       });
+
+      dispatch(resetPharmacyStates());
       router.replace(`/shop/checkout/${encodedEncryptedPID}`);
     } catch (error) {
       console.error(error);

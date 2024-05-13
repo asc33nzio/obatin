@@ -28,9 +28,9 @@ export interface ModalPropsItf {
   $containerBgColor?: string;
   $fontSize?: string | undefined;
   $color?: string | undefined;
-  onOpen: () => void;
-  isOpen: boolean;
-  onClose: () => void;
+  $onOpen: () => void;
+  $isOpen: boolean;
+  $onClose: () => void;
 }
 
 const InvokableModal = (props: {
@@ -38,9 +38,9 @@ const InvokableModal = (props: {
   $pharmacyDetail?: PharmacyItf;
   $productId?: PharmacyItf;
   modalType: InvokableModalType;
-  onOpen: Function;
-  isOpen: boolean;
-  onClose: () => void;
+  $onOpen: Function;
+  $isOpen: boolean;
+  $onClose: () => void;
 }) => {
   let modalContent: React.ReactElement | null;
   let title: string | null = null;
@@ -51,9 +51,9 @@ const InvokableModal = (props: {
     $containerBgColor: '#ffffff',
     $fontSize: '18px',
     $color: '#4a5568',
-    onOpen: () => {},
-    isOpen: false,
-    onClose: () => {},
+    $onOpen: () => {},
+    $isOpen: false,
+    $onClose: () => {},
   };
 
   switch (props.modalType) {
@@ -66,9 +66,9 @@ const InvokableModal = (props: {
         $overlayHeight: '200vh',
         $containerWidth: '450px',
         $containerHeight: '500px',
-        onOpen: () => {},
-        isOpen: false,
-        onClose: () => {},
+        $onOpen: () => {},
+        $isOpen: false,
+        $onClose: () => {},
       };
       break;
 
@@ -83,9 +83,9 @@ const InvokableModal = (props: {
         $overlayHeight: '200vh',
         $containerWidth: '450px',
         $containerHeight: 'max-content',
-        onOpen: () => {},
-        isOpen: false,
-        onClose: () => {},
+        $onOpen: () => {},
+        $isOpen: false,
+        $onClose: () => {},
       };
       break;
 
@@ -96,12 +96,12 @@ const InvokableModal = (props: {
   }
 
   return (
-    props.isOpen && (
+    props.$isOpen && (
       <ModalOverlay {...modalProps}>
         <ModalContainer {...modalProps}>
           <ModalHeader>
             <h1>{title}</h1>
-            <CloseICO onClick={props.onClose} />
+            <CloseICO onClick={props.$onClose} />
           </ModalHeader>
           {modalContent}
         </ModalContainer>
