@@ -85,7 +85,15 @@ const ProductDetailPage = () => {
         const userAddress = userInfo?.addresses?.find(
           (address) => address.id === userInfo.activeAddressId,
         );
-        if (!userAddress) {
+        if (!userInfo) {
+          setToast({
+            showToast: true,
+            toastMessage: 'Maaf, anda masuk/login terlebih dahulu',
+            toastType: 'error',
+            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+            orientation: 'center',
+          });
+        } else if (!userAddress) {
           setToast({
             showToast: true,
             toastMessage: 'Maaf, anda harus mengisi alamat terlebih dahulu',
@@ -238,9 +246,13 @@ const ProductDetailPage = () => {
                   $fontSize='16px'
                 />
               )}
-              <PharmacyNameContainer>
-                {PharmacyName?.name}
-              </PharmacyNameContainer>
+              {PharmacyName ? (
+                <PharmacyNameContainer>
+                  {PharmacyName?.name}
+                </PharmacyNameContainer>
+              ) : (
+                ''
+              )}
             </Buttoncontainer>
 
             {product?.description && (
