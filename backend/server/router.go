@@ -192,7 +192,9 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.Use(h.Middleware.JWTAuth)
 
 	r.GET(appconstant.EndpointManufacturerList, h.ManufacturerHandler.GetAllManufacturers)
+	r.GET(appconstant.EndpointGetProductsListAdmin, h.ProductHandler.GetAllProducts)
 	r.PATCH(appconstant.EndpointGetProductDetail, h.ProductHandler.UpdateProductDetaiBySlug)
+	r.GET(appconstant.EndpointAdminGetProductDetail, h.ProductHandler.GetProductDetailBySlug)
 	r.GET(appconstant.EndpointAllPharmacies, h.PharmacyHandler.GetAllPharmacy)
 	r.GET(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.GetAllPartnerPharmacyProduct)
 	r.POST(appconstant.EndpointPartnerPharmacyProducts, h.PharmacyProductHandler.CreateOnePharmacyProduct)

@@ -5,6 +5,7 @@ import (
 	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
+	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 	"obatin/util"
@@ -48,6 +49,12 @@ func (u *productUsecaseImpl) GetAllProducts(ctx context.Context, params entity.P
 	if err != nil {
 		return nil, err
 	}
+	role, _ := ctx.Value(constant.AuthenticationRole).(string)
+	if role != constant.RoleAdmin {
+		for _, v := range res.Products {
+			v.Sales = 0
+		}
+	}
 
 	res.Pagination = entity.PaginationResponse{
 		Page:         params.Page,
@@ -65,8 +72,14 @@ func (u *productUsecaseImpl) GetAllProducts(ctx context.Context, params entity.P
 func (u *productUsecaseImpl) GetProductDetailBySlug(ctx context.Context, slug string) (*entity.ProductDetail, error) {
 	pr := u.repoStore.ProductRepository()
 	cr := u.repoStore.CategoryRepository()
+	var forSales bool
 
-	product, err := pr.FindProductDetailBySlug(ctx, slug)
+	role, _ := ctx.Value(constant.AuthenticationRole).(string)
+	if role == constant.RoleAdmin {
+		forSales = true
+	}
+	
+	product, err := pr.FindProductDetailBySlug(ctx, slug, forSales)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +99,7 @@ func (u *productUsecaseImpl) UpdateProductDetaiBySlug(ctx context.Context, body 
 		cr := rs.CategoryRepository()
 		pcr := rs.ProductCategoriesRepository()
 
-		product, err := pr.FindProductDetailBySlug(ctx, slug)
+		product, err := pr.FindProductDetailBySlug(ctx, slug, false)
 		if err != nil {
 			return nil, err
 		}
@@ -94,7 +107,7 @@ func (u *productUsecaseImpl) UpdateProductDetaiBySlug(ctx context.Context, body 
 			return nil, apperror.NewProductNotFound(apperror.ErrStlNotFound)
 		}
 		if body.Slug != nil {
-			productSlug, err := pr.FindProductDetailBySlug(ctx, *body.Slug)
+			productSlug, err := pr.FindProductDetailBySlug(ctx, *body.Slug, false)
 			if err != nil {
 				if err.Error() != apperror.ProductNotFoundMsg {
 					return nil, err
@@ -179,7 +192,7 @@ func (u *productUsecaseImpl) CreateProduct(ctx context.Context, body entity.AddP
 				return nil, apperror.ErrCategoryNotFound(apperror.ErrStlNotFound)
 			}
 		}
-		prdct, err := pr.FindProductDetailBySlug(ctx, body.Product.Slug)
+		prdct, err := pr.FindProductDetailBySlug(ctx, body.Product.Slug, false)
 		if err != nil {
 			if err.Error() != apperror.ProductNotFoundMsg {
 				return nil, err

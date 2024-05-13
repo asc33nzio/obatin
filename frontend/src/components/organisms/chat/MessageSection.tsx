@@ -1,5 +1,4 @@
 import { Message } from '@/styles/atoms/Message.styles';
-// import { MessageContainer } from '@/styles/molecules/MessageContainer.styles';
 import { MessageBungkus } from '@/styles/organisms/ChatRoomListContainer.styles';
 import { IMessage } from '@/types/messageItf';
 import Image from 'next/image';
@@ -34,9 +33,7 @@ function MessageSection(props: IPropsMessage): React.ReactElement {
     <div
       ref={scrollRef}
       style={{
-        // height: '100%',
         height: '65vh',
-        // flex: '1',
         overflowY: 'auto',
         width: '90%',
         display: 'flex',
@@ -115,6 +112,24 @@ function MessageSection(props: IPropsMessage): React.ReactElement {
                   </div>
                 </div>
               </div>
+            </div>
+          ) : msg.message.includes('https://res.cloudinary.com/') ? (
+            <div>
+              {msg.message.endsWith('.pdf') ? (
+                <div>
+                  <a
+                    href={msg.message}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    Lihat PDF
+                  </a>
+                </div>
+              ) : (
+                <div>
+                  <Image src={msg.message} alt='' height={150} width={150} />
+                </div>
+              )}
             </div>
           ) : (
             <Message

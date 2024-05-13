@@ -12,7 +12,7 @@ import (
 
 type ProductRepository interface {
 	GetProductsList(ctx context.Context, params entity.ProductFilter) (*entity.ProductListPage, error)
-	FindProductDetailBySlug(ctx context.Context, slug string) (*entity.ProductDetail, error)
+	FindProductDetailBySlug(ctx context.Context, slug string, forSales bool) (*entity.ProductDetail, error)
 	FindProductDetailById(ctx context.Context, productId int64) (*entity.ProductDetail, error)
 	CreateOne(ctx context.Context, product entity.ProductDetail) (*int64, error)
 	IsProductExistById(ctx context.Context, productId int64) (bool, error)
@@ -50,6 +50,7 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 		WHERE
 			pp.deleted_at IS NULL
 			AND sm.deleted_at IS NULL
+			AND sm.is_addition IS FALSE
 		GROUP BY
 			pp.product_id
 	)
@@ -157,10 +158,10 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 	}, nil
 }
 
-func (r *productRepositoryPostgres) FindProductDetailBySlug(ctx context.Context, slug string) (*entity.ProductDetail, error) {
+func (r *productRepositoryPostgres) FindProductDetailBySlug(ctx context.Context, slug string, forSales bool) (*entity.ProductDetail, error) {
 	res := entity.ProductDetail{}
-
-	q := `
+	var fullQuery strings.Builder
+	queryColumns := `
 		SELECT 
 			p.id,     
 			p.name,
@@ -189,22 +190,12 @@ func (r *productRepositoryPostgres) FindProductDetailBySlug(ctx context.Context,
 			p.is_active,
 			p.is_prescription_required,
 			m.id,
-			m.name  
-		FROM 
-			products p 
-		JOIN
-			manufacturers m
-		ON 
-			p.manufacturer_id = m.id
-		WHERE
-			p.product_slug = $1
-		AND
-		    p.deleted_at IS NULL
-		AND 
-			p.is_active IS TRUE
-
+			m.name
 	`
-	err := r.db.QueryRowContext(ctx, q, slug).Scan(
+	fullQuery.WriteString(convertQuerySalesFromProductDetail(forSales, queryColumns))
+
+	var data []interface{}
+	data = append(data,
 		&res.Id,
 		&res.Name,
 		&res.MinPrice,
@@ -234,6 +225,24 @@ func (r *productRepositoryPostgres) FindProductDetailBySlug(ctx context.Context,
 		&res.Manufacturer.ID,
 		&res.Manufacturer.Name,
 	)
+	if forSales {
+		data = append(data,
+			&res.Sales.January,
+			&res.Sales.February,
+			&res.Sales.March,
+			&res.Sales.April,
+			&res.Sales.May,
+			&res.Sales.June,
+			&res.Sales.July,
+			&res.Sales.August,
+			&res.Sales.September,
+			&res.Sales.October,
+			&res.Sales.November,
+			&res.Sales.December,
+		)
+	}
+
+	err := r.db.QueryRowContext(ctx, fullQuery.String(), slug).Scan(data...)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, apperror.NewProductNotFound(err)
