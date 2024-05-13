@@ -61,3 +61,19 @@ export const Price = styled.p`
   font-size: 24px;
   font-weight: 700;
 `;
+
+export const SelectPharmacy = styled.div`
+  select {
+    background-color: ${COLORS.primary_color};
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    option {
+      background-color: ${COLORS.primary_color};
+      color: white;
+      padding: 10px;
+    }
+  }
+`;

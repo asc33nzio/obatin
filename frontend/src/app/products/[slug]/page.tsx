@@ -4,6 +4,7 @@ import {
   Price,
   ProductDetail,
   ProductDetailContainer,
+  SelectPharmacy,
 } from '@/styles/pages/product/ProductDetail.styles';
 import {
   increaseOneToCart,
@@ -138,16 +139,16 @@ const ProductDetailPage = () => {
             <RingLoader loading={product === undefined} />
           )}
           {nearbyPharmacies?.length > 0 && (
-            <div>
-              <h2>apotek terdekat:</h2>
-              <ul>
+            <SelectPharmacy>
+              <h2>Apotek terdekat:</h2>
+              <select>
                 {nearbyPharmacies?.map((pharmacy) => (
-                  <li key={pharmacy.id}>
-                    <p>apotek:{pharmacy.name}</p>
-                  </li>
+                  <option key={pharmacy.id}>
+                    <p>{pharmacy.name}</p>
+                  </option>
                 ))}
-              </ul>
-            </div>
+              </select>
+            </SelectPharmacy>
           )}
           <ProductDetail>
             <h1>{product?.name}</h1>
