@@ -31,6 +31,7 @@ func NewPharmacyUsecaseImpl(
 
 func (u *pharmacyUsecaseImpl) GetAllPharmacies(ctx context.Context, params entity.PharmacyFilter) (*entity.PharmacyListPage, error) {
 	pr := u.repoStore.PharmacyRepository()
+	partnerR := u.repoStore.PartnerRepository()
 	pnr := u.repoStore.PartnerRepository()
 
 	if params.Limit < appconstant.DefaultMinLimit {
@@ -56,6 +57,23 @@ func (u *pharmacyUsecaseImpl) GetAllPharmacies(ctx context.Context, params entit
 			return nil, err
 		}
 
+		params.PartnerId = partnerId
+	}
+
+	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if !ok {
+		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+	}
+	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	if !ok {
+		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+	}
+
+	if authenticationRole == constant.RoleManager {
+		partnerId, err := partnerR.FindPartnerIdByAuthId(ctx, authenticationId)
+		if err != nil {
+			return nil, err
+		}
 		params.PartnerId = partnerId
 	}
 

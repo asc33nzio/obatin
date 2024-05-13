@@ -25,3 +25,14 @@ type UpdateUser struct {
 	AvatarUrl        *string
 	ActiveAddressId  *int64
 }
+
+type UserListPage struct {
+	Users      []User
+	TotalRows  int
+	Pagination PaginationResponse
+}
+
+type UserFilter struct {
+	Search    string
+	
+}

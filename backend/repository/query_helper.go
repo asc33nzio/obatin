@@ -637,7 +637,7 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 	var query strings.Builder
 	var filters []interface{}
 	var countParams = constant.StartingParamsCount + 1
-	if params.Search != "" || params.Classification != nil || params.PharmacyId != 0 || params.ProductId != nil {
+	if params.Search != "" || params.SearchPharmacy != "" || params.Classification != nil || params.PharmacyId != 0 || params.ProductId != nil {
 		query.WriteString(" WHERE ")
 	}
 
@@ -647,6 +647,15 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 		filters = append(filters, params.Search)
 		countParams++
 	}
+	if params.SearchPharmacy != "" {
+		if countParams > constant.StartingParamsCount+1 {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` ppc.pharmacy_name ILIKE '%%' ||$%v|| '%%' `, countParams))
+		filters = append(filters, &params.SearchPharmacy)
+		countParams++
+	}
+
 	if params.PharmacyId != 0 {
 		if countParams > constant.StartingParamsCount+1 {
 			query.WriteString(` AND `)
@@ -698,6 +707,11 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 			query.WriteString(`ASC`)
 		case constant.OrderDescending:
 			query.WriteString(`DESC`)
+		}
+	}
+	if params.Order == nil {
+		if params.SortBy == nil {
+			query.WriteString(` ORDER BY pp.updated_at DESC`)
 		}
 	}
 	return query.String(), filters
