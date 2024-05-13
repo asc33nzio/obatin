@@ -986,12 +986,21 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 		args = append(args, *params.UserId)
 	}
 
+	if params.InvoiceNumber != nil {
+		queryConditionalPart.WriteString(fmt.Sprintf(" AND p.invoice_number = $%d ", len(args)+1))
+		args = append(args, *params.InvoiceNumber)
+	}
+
 	subqueryRowsCount.WriteString(fmt.Sprintf(`
 		CROSS JOIN (
 			SELECT
 				COUNT(*) as total_rows
 			FROM
 				orders o
+			JOIN
+				payments p
+			ON
+				o.payment_id = p.id
 			%v
 		) AS tr
 `, queryConditionalPart.String()))

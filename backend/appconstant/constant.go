@@ -34,6 +34,7 @@ const (
 	OrderWaitingConfirmation                = "waiting_confirmation"
 	OrderProcessed                          = "processed"
 	OrderWaitingPayment                     = "waiting_payment"
+	OrderConfirmed                          = "confirmed"
 	OrderCancel                             = "cancelled"
 	UpdatePharmacyProductTypeStockMutation  = "stock_mutation"
 	UpdatePharmacyProductTypeManualMutation = "manual_addition"

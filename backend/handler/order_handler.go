@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/constant"
 	"obatin/dto"
@@ -119,7 +120,7 @@ func (h *OrderHandler) UpdateOrderStatus(ctx *gin.Context) {
 	}
 
 	if role != constant.RoleAdmin {
-		if role != constant.RoleManager {
+		if role != constant.RoleManager && role != constant.RoleUser {
 			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
 		}
@@ -146,6 +147,13 @@ func (h *OrderHandler) UpdateOrderStatus(ctx *gin.Context) {
 	if err != nil {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
+	}
+
+	if role == constant.RoleUser {
+		if body.Status != appconstant.OrderConfirmed {
+			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
+			return
+		}
 	}
 
 	err = h.orderUsecase.UpdateOrderStatus(ctx, &entity.Order{
