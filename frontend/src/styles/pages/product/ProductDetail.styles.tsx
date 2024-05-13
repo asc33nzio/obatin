@@ -97,10 +97,6 @@ export const PharmacyCard = styled.div`
   font-size: 14px;
   font-weight: 600;
 
-  &:hover {
-    background-color: white;
-    color: ${COLORS.primary_color};
-  }
   svg {
     stroke: ${COLORS.primary_color};
     width: 30px;

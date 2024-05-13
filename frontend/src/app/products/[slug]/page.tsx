@@ -38,7 +38,6 @@ import {
 import { getCookie } from 'cookies-next';
 import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
 import HomeICO from '@/assets/icons/HomeICO';
-import LocationICO from '@/assets/icons/LocationICO';
 import ConsulICO from '@/assets/icons/ConsulICO';
 import PhoneICO from '@/assets/icons/PhoneICO';
 
@@ -86,14 +85,19 @@ const ProductDetailPage = () => {
         const userAddress = userInfo?.addresses?.find(
           (address) => address.id === userInfo.activeAddressId,
         );
-        if (!userAddress) return;
+
+        if (!userAddress) {
+          setToast({
+            showToast: true,
+            toastMessage: 'Maaf, anda harus mengisi alamat terlebih dahulu',
+            toastType: 'warning',
+            resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+            orientation: 'center',
+          });
+        }
         const { data } = await Axios.get(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/nearby-pharmacies/products/${product?.id}`,
           {
-            params: {
-              latitude: userAddress.latitude,
-              longitude: userAddress.longitude,
-            },
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
