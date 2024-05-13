@@ -4,8 +4,7 @@ import {
   PaymentSummaryContainer,
   Summary,
 } from '@/styles/pages/product/Cart.styles';
-import { navigateToCheckout } from '@/app/actions';
-import { PharmacyCart, setPaymentId } from '@/redux/reducers/pharmacySlice';
+import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { getCookie } from 'cookies-next';
 import { useToast } from '@/hooks/useToast';
@@ -13,20 +12,22 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEventEmitter } from '@/hooks/useEventEmitter';
 import { useModal } from '@/hooks/useModal';
 import { ModalType } from '@/types/modalTypes';
+import { useRouter } from 'next/navigation';
+import { clearCart, syncCartItem } from '@/redux/reducers/cartSlice';
+import { encrypt } from '@/utils/crypto';
 import Axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 
-const PaymentSummaryComponent = (props: {
-  isNext: boolean;
-}): React.ReactElement => {
+const PaymentSummaryComponent = (): React.ReactElement => {
   const pharmacies = useObatinSelector((state) => state?.pharmacy.pharmacies);
   const pharmacyState = useObatinSelector((state) => state?.pharmacy);
   const accessToken = getCookie('access_token');
-  const dispatch = useObatinDispatch();
   const { setToast } = useToast();
   const { openModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const emitter = useEventEmitter();
+  const router = useRouter();
+  const dispatch = useObatinDispatch();
 
   const triggerModal = async (type: ModalType) => {
     return new Promise<boolean>((resolve) => {
@@ -107,7 +108,7 @@ const PaymentSummaryComponent = (props: {
         pharmacies_cart,
       };
 
-      const response = await Axios.post(
+      const checkoutResponse = await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/checkout`,
         payload,
         {
@@ -117,9 +118,34 @@ const PaymentSummaryComponent = (props: {
         },
       );
 
-      const { payment_id } = response.data.data;
-      dispatch(setPaymentId(payment_id));
-      navigateToCheckout();
+      const { payment_id } = checkoutResponse.data.data;
+      const encryptedPID = await encrypt(payment_id);
+      const encodedEncryptedPID = encodeURIComponent(encryptedPID);
+
+      dispatch(clearCart());
+      const updatedCartResponse = await Axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/details`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      const newPharmaciesCart: Array<PharmacyCart> =
+        updatedCartResponse.data.data.pharmacies_cart;
+      newPharmaciesCart?.forEach((pharmacy) => {
+        pharmacy?.cart_items?.forEach((cartItem) => {
+          dispatch(
+            syncCartItem({
+              product_id: cartItem.product_id,
+              prescription_id: cartItem.prescription_id ?? null,
+              pharmacy_id: pharmacy.id ?? null,
+              quantity: cartItem.quantity,
+            }),
+          );
+        });
+      });
+      router.replace(`/shop/checkout/${encodedEncryptedPID}`);
     } catch (error) {
       console.error(error);
       setToast({
@@ -165,17 +191,16 @@ const PaymentSummaryComponent = (props: {
               )?.toLocaleString('id-ID')}
             </p>
           </div>
-          {props.isNext && (
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <CustomButton
-                content='Proses Transaksi'
-                $width='250px'
-                $height='50px'
-                $fontSize='16px'
-                onClick={handleCheckout}
-              />
-            </div>
-          )}
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <CustomButton
+              content='Proses Transaksi'
+              $width='250px'
+              $height='50px'
+              $fontSize='16px'
+              onClick={handleCheckout}
+            />
+          </div>
         </Summary>
       </PaymentSummaryContainer>
     </>

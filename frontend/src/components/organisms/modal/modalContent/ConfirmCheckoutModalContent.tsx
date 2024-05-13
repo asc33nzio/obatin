@@ -34,7 +34,6 @@ const ConfirmCheckoutModalContent = (): React.ReactElement => {
   const { closeModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const checkoutBreakdown = localStorage.getItem('checkout');
-
   const totalQuantity = checkoutBreakdown?.split(',')?.[0];
   const totalShippingCost = parseInt(checkoutBreakdown?.split(',')?.[1]!, 10);
   const totalCheckout = parseInt(checkoutBreakdown?.split(',')?.[2]!, 10);

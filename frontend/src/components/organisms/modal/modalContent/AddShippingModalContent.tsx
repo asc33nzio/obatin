@@ -1,8 +1,8 @@
-import { useModal } from '@/hooks/useModal';
 import {
   updateCheckoutInfo,
   updateShippingInfo,
 } from '@/redux/reducers/pharmacySlice';
+import { useModal } from '@/hooks/useModal';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { ShippingMethodsType } from '@/types/shippingType';
 import { getCookie } from 'cookies-next';

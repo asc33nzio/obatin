@@ -73,7 +73,7 @@ const CartPage = (): React.ReactElement => {
             </SubmitSection>
           </Cart>
           <OrderSummary>
-            <PaymentSummaryComponent isNext />
+            <PaymentSummaryComponent />
           </OrderSummary>
         </Content>
       </Body>

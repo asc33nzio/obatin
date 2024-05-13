@@ -246,3 +246,18 @@ export const CartItemContainer = styled.div`
   gap: 20px;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 `;
+
+export const CheckoutPageSubcontainer = styled.div`
+  width: 75vw;
+  min-height: 80vh;
+  color: ${COLORS.primary_text};
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    width: 80vw;
+  }
+`;
