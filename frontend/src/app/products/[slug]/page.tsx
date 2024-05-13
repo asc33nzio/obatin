@@ -29,7 +29,10 @@ import Footer from '@/components/organisms/footer/Footer';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Image from 'next/image';
 import { PharmacyItf } from '@/types/pharmacyTypes';
-import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
+import {
+  PharmacyCart,
+  setSelectedPharmacy,
+} from '@/redux/reducers/pharmacySlice';
 import { getCookie } from 'cookies-next';
 import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
 import HomeICO from '@/assets/icons/HomeICO';
@@ -53,7 +56,6 @@ const ProductDetailPage = () => {
   const userInfo = useObatinSelector((state) => state.auth);
   const accessToken = getCookie('access_token');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  // const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyCart>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -133,10 +135,11 @@ const ProductDetailPage = () => {
     }
   };
 
-  // const openSelectPharmacyInterface = (pharmacy: PharmacyCart) => {
-  //   dispatch(setSelectedPharmacy(pharmacy));
-  //   openModal('select-nearby-pharmacy');
-  // };
+  const handleSelectedPharmacy = (pharmacy: PharmacyCart) => {
+    dispatch(setSelectedPharmacy(pharmacy));
+    setIsModalOpen(false);
+    console.log(pharmacy);
+  };
 
   return (
     <Container>
@@ -278,7 +281,10 @@ const ProductDetailPage = () => {
                 <h2>Apotek terdekat:</h2>
                 <PharmacyCard>
                   {nearbyPharmacies?.map((pharmacy) => (
-                    <PharmacyItem key={pharmacy.id}>
+                    <PharmacyItem
+                      key={pharmacy.id}
+                      onClick={() => handleSelectedPharmacy(pharmacy)}
+                    >
                       <Row>
                         <HomeICO />
                         <p>{pharmacy.name}</p>
