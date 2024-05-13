@@ -110,6 +110,9 @@ export const PharmacyItem = styled.div`
     background-color: ${COLORS.primary_color};
     color: white;
   }
+  @media (max-width: 768px) {
+    width: 280px;
+  }
 `;
 
 export const Row = styled.div`
@@ -122,6 +125,12 @@ export const Row = styled.div`
   gap: 20px;
   border-bottom: 0px solid white;
   font-size: 16px;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 0;
+    gap: 5px;
+  }
 `;
 
 export const Column = styled.div`
@@ -155,5 +164,11 @@ export const Column = styled.div`
     border: 1px solid white;
     svg {
     }
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 5px;
+    height: max-content;
   }
 `;

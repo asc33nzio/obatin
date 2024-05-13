@@ -85,7 +85,6 @@ const ProductDetailPage = () => {
         const userAddress = userInfo?.addresses?.find(
           (address) => address.id === userInfo.activeAddressId,
         );
-
         if (!userAddress) {
           setToast({
             showToast: true,
