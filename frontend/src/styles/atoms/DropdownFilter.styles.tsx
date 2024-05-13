@@ -7,8 +7,20 @@ export const FilterContainer = styled.div`
   position: absolute;
 
   @media (max-width: 1440px) {
-    width: 50vh;
+    width: max-content;
     justify-content: space-between;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  @media (max-width: 768px) {
+    width: max-content;
+    justify-content: space-between;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
   }
 
   z-index: 10;
@@ -18,18 +30,20 @@ export const FilterButtonStyle = styled.div`
   display: flex;
   flex-direction: column;
   background-color: ${COLORS.primary_color};
-  width: 150px;
+  width: 200px;
   height: max-content;
   border-radius: 12px;
 
   button {
-    padding: 15px;
+    width: 200px;
+    height: 55px;
     background-color: transparent;
     color: white;
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
-    text-align: left;
+    text-align: center;
+    padding: 15px;
   }
 `;

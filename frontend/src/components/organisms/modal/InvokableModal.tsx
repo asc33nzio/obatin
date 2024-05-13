@@ -4,10 +4,11 @@ import {
   ModalOverlay,
   ModalHeader,
 } from '@/styles/organisms/modal/Modal.styles';
-import { ModalType } from '@/types/modalTypes';
+import { InvokableModalType } from '@/types/modalTypes';
 import DoctorDetailModalContent from './modalContent/DoctorDetailModalContent';
 import CloseICO from '@/assets/icons/CloseICO';
-import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
+import SelectDetailPharmacyModalContent from './modalContent/SelectDetailPharmacyModalContent';
+import { PharmacyItf } from '@/types/pharmacyTypes';
 
 export interface DoctorDetailItf {
   id?: number | undefined;
@@ -34,8 +35,9 @@ export interface ModalPropsItf {
 
 const InvokableModal = (props: {
   $doctorDetail?: DoctorDetailItf;
-  $pharmacyDetail?: PharmacyCart;
-  modalType: ModalType;
+  $pharmacyDetail?: PharmacyItf;
+  $productId?: PharmacyItf;
+  modalType: InvokableModalType;
   onOpen: Function;
   isOpen: boolean;
   onClose: () => void;
@@ -70,22 +72,22 @@ const InvokableModal = (props: {
       };
       break;
 
-    // case 'pharmacy-detail':
-    //   modalContent = (
-    //     <SelectDetailPharmacyModalContent
-    //       $pharmacyDetail={props.$pharmacyDetail}
-    //     />
-    //   );
-    //   title = 'Detail Apotek';
-    //   modalProps = {
-    //     $overlayHeight: '200vh',
-    //     $containerWidth: '450px',
-    //     $containerHeight: '500px',
-    //     onOpen: () => {},
-    //     isOpen: false,
-    //     onClose: () => {},
-    //   };
-    //   break;
+    case 'pharmacy-detail':
+      modalContent = (
+        <SelectDetailPharmacyModalContent
+          $pharmacyDetail={props.$pharmacyDetail}
+        />
+      );
+      title = '';
+      modalProps = {
+        $overlayHeight: '200vh',
+        $containerWidth: '450px',
+        $containerHeight: 'max-content',
+        onOpen: () => {},
+        isOpen: false,
+        onClose: () => {},
+      };
+      break;
 
     default:
       modalContent = null;
