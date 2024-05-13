@@ -12,6 +12,7 @@ type PharmacyProduct struct {
 
 type PharmacyProductFilter struct {
 	Search         string
+	SearchPharmacy string
 	ProductId      *int64
 	PharmacyId     int64
 	SortBy         *string

@@ -19,6 +19,7 @@ type PharmacyProductParam struct {
 
 type PharmacyProductFilter struct {
 	Search         string  `form:"search"`
+	SearchPharmacy string  `form:"search_pharmacy"`
 	ProductId      *int64  `form:"product_id" binding:"omitempty"`
 	PharmacyId     int64   `form:"pharmacy_id" binding:"omitempty"`
 	SortBy         *string `form:"sort_by" binding:"omitempty,oneof='name' 'price' 'pharmacy'"`
@@ -30,7 +31,7 @@ type PharmacyProductFilter struct {
 
 type UpdatePharmacyProductReq struct {
 	UpdateType              string `form:"update_type" binding:"required,oneof='stock_mutation' 'manual_addition' 'detail'"`
-	Price                   *int   `form:"price,omitempty" binding:"min=500"`
+	Price                   *int   `form:"price" binding:"omitempty,min=500"`
 	Delta                   *int   `form:"delta"`
 	IsActive                *bool  `form:"is_active"`
 	SourcePharmacyProductId *int64 `form:"source_pharmacy_product_id"`
@@ -38,26 +39,25 @@ type UpdatePharmacyProductReq struct {
 }
 
 type PharmacyProduct struct {
-	Id           int64   `json:"id"`
-	ProductId    int64   `json:"product_id"`
-	ProductName  string  `json:"product_name"`
-	ProductSlug  string  `json:"slug"`
-	ImageUrl     *string `json:"image_url"`
-	PharmacyId   int64   `json:"pharmacy_id"`
-	PharmacyName string  `json:"pharmacy_name"`
-	Price        *int    `json:"price"`
-	Stock        *int    `json:"stock"`
-	IsActive     bool    `json:"is_active"`
+	Id           int64  `json:"id"`
+	ProductId    int64  `json:"product_id"`
+	ProductName  string `json:"product_name"`
+	ProductSlug  string `json:"slug"`
+	ImageUrl     string `json:"image_url"`
+	PharmacyId   int64  `json:"pharmacy_id"`
+	PharmacyName string `json:"pharmacy_name"`
+	Price        *int   `json:"price"`
+	Stock        *int   `json:"stock"`
+	IsActive     bool   `json:"is_active"`
 }
 
 type CreatePharmacyProduct struct {
-	ProductId    int64   `form:"product_id" binding:"required"`
-	PharmacyId   int64   `form:"pharmacy_id" binding:"required"`
-	Price        int    `form:"price" binding:"required"`
-	Stock        int    `form:"stock" binding:"required"`
-	IsActive     bool    `form:"is_active" binding:"required"`
+	ProductId  int64 `form:"product_id" binding:"required"`
+	PharmacyId int64 `form:"pharmacy_id" binding:"required"`
+	Price      int   `form:"price" binding:"required"`
+	Stock      int   `form:"stock" binding:"required"`
+	IsActive   bool  `form:"is_active" binding:"required"`
 }
-
 
 type PharmacyProductListPageResponse struct {
 	Pagination *PaginationResponse `json:"pagination,omitempty"`
@@ -82,19 +82,20 @@ func (body UpdatePharmacyProductReq) ToEntityUpdatePharmacyProduct() *entity.Upd
 	}
 }
 
-func (body CreatePharmacyProduct) ToEntityPharmacyProductFromCreate() *entity.PharmacyProduct{
+func (body CreatePharmacyProduct) ToEntityPharmacyProductFromCreate() *entity.PharmacyProduct {
 	return &entity.PharmacyProduct{
 		Product:  entity.ProductDetail{Id: body.ProductId},
-        Pharmacy: entity.Pharmacy{Id: &body.PharmacyId},
-        Price:    &body.Price,
-        Stock:    &body.Stock,
-        IsActive: body.IsActive,
+		Pharmacy: entity.Pharmacy{Id: &body.PharmacyId},
+		Price:    &body.Price,
+		Stock:    &body.Stock,
+		IsActive: body.IsActive,
 	}
 }
 
 func (p PharmacyProductFilter) ToPharmacyProductFilterEntity() entity.PharmacyProductFilter {
 	return entity.PharmacyProductFilter{
 		Search:         p.Search,
+		SearchPharmacy: p.SearchPharmacy,
 		ProductId:      p.ProductId,
 		PharmacyId:     p.PharmacyId,
 		SortBy:         p.SortBy,
@@ -121,7 +122,7 @@ func ToPharmacyProductResponse(pp []entity.PharmacyProduct) []PharmacyProduct {
 			ProductId:    pharmacyProduct.Product.Id,
 			ProductName:  pharmacyProduct.Product.Name,
 			ProductSlug:  pharmacyProduct.Product.Slug,
-			ImageUrl:     &pharmacyProduct.Product.ImageUrl,
+			ImageUrl:     pharmacyProduct.Product.ImageUrl,
 			PharmacyId:   *pharmacyProduct.Pharmacy.Id,
 			PharmacyName: *pharmacyProduct.Pharmacy.Name,
 			Price:        pharmacyProduct.Price,
