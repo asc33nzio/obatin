@@ -8,6 +8,7 @@ export const Imagecontainer = styled.div`
 `;
 
 export const ProductCard = styled.a`
+  cursor: pointer;
   position: relative;
   width: 270px;
   display: flex;
@@ -25,6 +26,7 @@ export const ProductCard = styled.a`
   &:hover {
     border: 1px solid ${COLORS.primary_color};
   }
+
   @media (max-width: 1440px) {
     gap: 5px;
     width: 250px;

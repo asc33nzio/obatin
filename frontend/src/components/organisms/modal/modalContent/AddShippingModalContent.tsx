@@ -18,6 +18,10 @@ const ContainerShip = styled.div`
   justify-content: center;
   align-items: center;
   gap: 5px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const ShippingOption = styled.div`

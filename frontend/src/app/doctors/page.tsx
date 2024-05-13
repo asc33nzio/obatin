@@ -210,9 +210,9 @@ const DoctorsPage = () => {
             operationalDays: selectedDoctor?.operational_days,
           }}
           modalType='doctor-detail'
-          onOpen={handleModalOpen}
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
+          $onOpen={handleModalOpen}
+          $isOpen={isModalOpen}
+          $onClose={handleModalClose}
         />
       </Body>
     </Container>

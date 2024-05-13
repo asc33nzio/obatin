@@ -146,8 +146,6 @@ const Checkout = (): React.ReactElement => {
       try {
         if (cipherPID === undefined) throw new Error('invalid path');
         const decodedPID = decodeURIComponent(cipherPID);
-        console.log(decodedPID);
-
         const decryptedPID = await decrypt(decodedPID);
         setPlaintextPID(decryptedPID);
       } catch (_e: any) {

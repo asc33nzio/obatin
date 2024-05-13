@@ -48,3 +48,7 @@ export const navigateToTxHistory = async () => {
 export const navigateToChat = async () => {
   redirect('/consultation');
 };
+
+export const navigateToProductDetail = async (slug: string) => {
+  redirect(`/products/${slug}`);
+};
