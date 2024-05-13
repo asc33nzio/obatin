@@ -58,7 +58,7 @@ const CartProductCard = () => {
       );
 
       const { pharmacies_cart } = response.data.data;
-      if (pharmacies_cart.length > 0) dispatch(setPharmacies(pharmacies_cart));
+      dispatch(setPharmacies(pharmacies_cart));
     } catch (error) {
       console.error(error);
     } finally {

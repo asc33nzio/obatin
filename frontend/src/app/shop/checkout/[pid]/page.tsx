@@ -51,7 +51,7 @@ const Checkout = (): React.ReactElement => {
   } = useUploadValidation();
   const accessToken = getCookie('access_token');
   const pathname = usePathname();
-  const pid = pathname.split('/').pop();
+  const cipherPID = pathname.split('/').pop();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const [plaintextPID, setPlaintextPID] = useState<string>('');
@@ -120,7 +120,7 @@ const Checkout = (): React.ReactElement => {
       if (error.response.request.status === 404) {
         setToast({
           showToast: true,
-          toastMessage: 'Transaksi yang anda cari tidak ada',
+          toastMessage: 'Transaksi yang anda cari tidak ditemukan',
           toastType: 'error',
           resolution: isDesktopDisplay ? 'desktop' : 'mobile',
           orientation: 'center',
@@ -144,18 +144,28 @@ const Checkout = (): React.ReactElement => {
   useEffect(() => {
     const validatePID = async () => {
       try {
-        if (pid === undefined) throw new Error('invalid path');
-        const decodedPID = decodeURIComponent(pid);
+        if (cipherPID === undefined) throw new Error('invalid path');
+        const decodedPID = decodeURIComponent(cipherPID);
+        console.log(decodedPID);
+
         const decryptedPID = await decrypt(decodedPID);
         setPlaintextPID(decryptedPID);
       } catch (_e: any) {
         console.error('this transaction does not exist');
+        setToast({
+          showToast: true,
+          toastMessage: 'Transaksi yang anda cari tidak ditemukan',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
         navigateToHome();
       }
     };
 
     validatePID();
-  }, [pid]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cipherPID]);
 
   return (
     <Container>
