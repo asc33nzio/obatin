@@ -36,6 +36,11 @@ export interface SyncCartItf {
   quantity: number;
 }
 
+export interface AddToCartWithPharmaItf {
+  product_id: number;
+  pharmacy_id: number;
+}
+
 const initialState: CartStateItf = {
   items: [],
   totalQuantity: 0,
@@ -121,6 +126,26 @@ export const cartSlice = createSlice({
       state.totalQuantity = action.payload;
     },
 
+    changePharmacy: (state, action: PayloadAction<AddToCartWithPharmaItf>) => {
+      const { product_id, pharmacy_id } = action.payload;
+      const existingItem = state.items.find(
+        (item) => item.product_id === product_id,
+      );
+
+      if (existingItem) {
+        existingItem.pharmacy_id = pharmacy_id;
+      } else {
+        state.items.push({
+          product_id: product_id,
+          prescription_id: null,
+          pharmacy_id: pharmacy_id,
+          quantity: 1,
+        });
+      }
+
+      state.totalQuantity += 1;
+    },
+
     clearCart: (state) => {
       state.items = [];
       state.totalQuantity = 0;
@@ -137,6 +162,7 @@ export const {
   removeItemFromCart,
   clearCart,
   updateQuantityCart,
+  changePharmacy,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

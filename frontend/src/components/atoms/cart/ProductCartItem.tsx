@@ -259,7 +259,9 @@ const ProductCartItem = () => {
                   <Details>
                     <h1
                       onClick={() =>
-                        navigateToProductDetail(item.name.toLocaleLowerCase())
+                        navigateToProductDetail(
+                          item.name.split(' ').join('-').toLowerCase(),
+                        )
                       }
                     >
                       {item?.name}

@@ -15,6 +15,7 @@ import {
 import {
   increaseOneToCart,
   deduceOneFromCart,
+  changePharmacy,
 } from '@/redux/reducers/cartSlice';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -119,6 +120,7 @@ const ProductDetailPage = () => {
     if (product && userInfo) {
       fetchNearbyPharmacies();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, userInfo]);
 
   const handleAddToCart = (product: ProductType) => {
@@ -153,7 +155,13 @@ const ProductDetailPage = () => {
   };
 
   const handleSelectedPharmacy = (pharmacy: PharmacyCart) => {
-    dispatch(setSelectedPharmacy(pharmacy));
+    if (product?.id === undefined) return;
+    dispatch(
+      changePharmacy({
+        product_id: product?.id,
+        pharmacy_id: pharmacy?.id,
+      }),
+    );
     setPharmacyName(pharmacy);
     setIsModalOpen(false);
     console.log(pharmacy);

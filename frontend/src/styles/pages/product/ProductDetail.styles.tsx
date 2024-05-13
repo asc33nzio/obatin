@@ -74,6 +74,11 @@ export const Buttoncontainer = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 export const PharmacyNameContainer = styled.div`
@@ -100,6 +105,10 @@ export const PharmacyCard = styled.div`
   svg {
     stroke: ${COLORS.primary_color};
     width: 30px;
+  }
+  @media (max-width: 768px) {
+    align-items: center;
+    justify-content: center;
   }
 `;
 
