@@ -2,9 +2,12 @@
 import {
   ButtonAdd,
   Buttoncontainer,
+  PharmacyCard,
+  PharmacyItem,
   Price,
   ProductDetail,
   ProductDetailContainer,
+  Row,
   SelectPharmacy,
 } from '@/styles/pages/product/ProductDetail.styles';
 import {
@@ -29,6 +32,8 @@ import { PharmacyItf } from '@/types/pharmacyTypes';
 import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
 import { getCookie } from 'cookies-next';
 import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
+import HomeICO from '@/assets/icons/HomeICO';
+import LocationICO from '@/assets/icons/LocationICO';
 
 const ProductDetailPage = () => {
   const pathname = usePathname();
@@ -48,6 +53,7 @@ const ProductDetailPage = () => {
   const userInfo = useObatinSelector((state) => state.auth);
   const accessToken = getCookie('access_token');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  // const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyCart>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -270,15 +276,21 @@ const ProductDetailPage = () => {
             >
               <SelectPharmacy>
                 <h2>Apotek terdekat:</h2>
-                <div>
+                <PharmacyCard>
                   {nearbyPharmacies?.map((pharmacy) => (
-                    <div key={pharmacy.id}>
-                      <p>{pharmacy.name}</p>
-                      <p>{pharmacy.address}</p>
-                      <p>{pharmacy.distance} km dari rumahmu</p>
-                    </div>
+                    <PharmacyItem key={pharmacy.id}>
+                      <Row>
+                        <HomeICO />
+                        <p>{pharmacy.name}</p>
+                      </Row>
+                      <Row>
+                        <LocationICO />
+                        <p>{pharmacy.address}</p>
+                        <p>{pharmacy.distance} km dari rumahmu</p>
+                      </Row>
+                    </PharmacyItem>
                   ))}
-                </div>
+                </PharmacyCard>
               </SelectPharmacy>
             </DialogModal>
           </ProductDetail>
