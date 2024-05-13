@@ -24,6 +24,7 @@ import Footer from '@/components/organisms/footer/Footer';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Image from 'next/image';
 import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
+import { getCookie } from 'cookies-next';
 
 const ProductDetailPage = () => {
   const pathname = usePathname();
@@ -37,6 +38,7 @@ const ProductDetailPage = () => {
     useState<ProductType | null>();
   const [nearbyPharmacies, setNearbyPharmacies] = useState<PharmacyCart[]>([]);
   const userInfo = useObatinSelector((state) => state.auth);
+  const accessToken = getCookie('access_token');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,6 +70,9 @@ const ProductDetailPage = () => {
             params: {
               latitude: userAddress.latitude,
               longitude: userAddress.longitude,
+            },
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
             },
           },
         );
