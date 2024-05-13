@@ -98,6 +98,9 @@ export interface IDataDetailOneProduct {
   thumbnail_url: string;
   is_active: boolean;
   is_prescription_required: boolean;
+  manufacturer: IManufacturer;
+  categories: ICategories[];
+  sales: ISales[];
 }
 
 export interface IPaginationProduct {
@@ -122,4 +125,20 @@ export interface IDataProduct {
   min_price: number;
   max_price: number;
   image_url: string;
+  sales: number;
+}
+
+export interface IManufacturer {
+  id: number;
+  name: string;
+}
+
+export interface ICategories {
+  id: number;
+  name: string;
+}
+
+export interface ISales {
+  month: number;
+  total_sales: string;
 }

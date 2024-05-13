@@ -7,11 +7,14 @@ import AttachFileICO from '@/assets/icons/AttachFileICO';
 import SendChatICO from '@/assets/icons/SendChatICO';
 import { ChatRoomContainer } from '@/styles/molecules/ChatRoom.styles';
 import { AvatarImage } from '@/styles/atoms/AvatarImage.styles';
-import { ChatRoomSection } from '@/styles/organisms/ChatRoomListContainer.styles';
+import {
+  ArrowButtonMobileOnly,
+  ChatRoomSection,
+  MessageRoomSection,
+} from '@/styles/organisms/ChatRoomListContainer.styles';
 import { ChatRoomPage } from '@/styles/pages/ChatRoomListContainer.styles';
 import { IChatRoom } from '@/types/chatRoomItf';
 import axios from 'axios';
-// import useSWR, { mutate } from 'swr';
 import useSWR from 'swr';
 import { getCookie } from 'cookies-next';
 import MessageSection from '@/components/organisms/chat/MessageSection';
@@ -33,8 +36,17 @@ import {
   OneItemPrescriptionItf,
 } from '@/types/chat';
 import { NoRoomSelectedImage } from '@/assets/chat/NoRoomSelectedImage';
+import UploadFile from '@/assets/chat/UploadFile';
+import { Document, Page, pdfjs } from 'react-pdf';
+import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
+import RightArrowICO from '@/assets/arrows/RightArrowICO ';
 
-function TesChat(): React.ReactElement {
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url,
+).toString();
+
+function ChatPage(): React.ReactElement {
   const accessToken = getCookie('access_token');
   const decoded: DecodedJwtItf | null = accessToken
     ? jwtDecode(accessToken)
@@ -42,6 +54,9 @@ function TesChat(): React.ReactElement {
   const role = decoded?.Payload?.role;
   const [inputValues, setInputValues] = useState<{
     [key: string]: string | number;
+  }>({});
+  const [inputFile, setInputFile] = useState<{
+    [key: string]: Blob;
   }>({});
   const [selectedIdChatRoom, setSelectedIdChatRoom] = useState<number>();
   const [isChatRoomActive, setIsChatRoomActive] = useState<boolean>(false);
@@ -62,8 +77,6 @@ function TesChat(): React.ReactElement {
     useState<CompactProductItf | null>();
   const [isDropdownAttachFileOpen, setIsDropdownAttachFileOpen] =
     useState<boolean>(false);
-  const [dataSetelahMutasi, setDataSetelahMutasi] = useState<IChatRoom[]>([]);
-  const [halaman, setHalaman] = useState<number>(1);
   const [isPrescriptionOpen, setIsPrescriptionOpen] = useState<boolean>(false);
   const [selectedPrescriptionId, setSelectedPrescriptionId] = useState<
     number | null
@@ -72,7 +85,6 @@ function TesChat(): React.ReactElement {
     isModalConfirmAddPrescriptionToCartOpen,
     setIsModalConfirmAddPrescriptionToCartOpen,
   ] = useState<boolean>(false);
-
   const handleSelectedDrugChange = (
     newSelectedDrug: CompactProductItf | null,
   ) => {
@@ -83,6 +95,11 @@ function TesChat(): React.ReactElement {
     }
   };
 
+  const [isChatRoomShowOnMobile, setIsChatRoomShowOnMobile] =
+    useState<boolean>(true);
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newQuantity = event.target.value;
     setQuantity(newQuantity);
@@ -121,6 +138,12 @@ function TesChat(): React.ReactElement {
   const handleClickDropdownAddPrescription = () => {
     setIsModalPrescriptionOpen(true);
     setIsDropdownAttachFileOpen(!isDropdownAttachFileOpen);
+  };
+
+  const handleClickClose = () => {
+    setIsModalOpen(false);
+    setFileCoba(null);
+    setPreviewUrl(null);
   };
 
   const convertAddPrescriptionToPayload = (
@@ -168,9 +191,6 @@ function TesChat(): React.ReactElement {
           },
         },
       );
-
-      console.log('ini response create prescription', response);
-      console.log('ini response create prescription', response.data.data.id);
 
       const timeNow = Date.now();
       selectedIdChatRoom &&
@@ -264,7 +284,7 @@ function TesChat(): React.ReactElement {
   const { data: dataChatRoom, error: errorChatRoom } = useSWR<IGetAllChatRoom>(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room`,
     fetcherChatRoom,
-    { refreshInterval: 5000 },
+    { refreshInterval: 4000 },
   );
 
   const fetcherPrescriptionById = (url: string) =>
@@ -278,7 +298,9 @@ function TesChat(): React.ReactElement {
 
   const { data: dataPrescriptionById, error: errorGetPrescriptionById } =
     useSWR<IResponseOneDetailPrescription>(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/prescriptions/${selectedPrescriptionId}`,
+      selectedPrescriptionId
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/prescriptions/${selectedPrescriptionId}`
+        : null,
       fetcherPrescriptionById,
     );
 
@@ -292,9 +314,11 @@ function TesChat(): React.ReactElement {
       .then((res) => res.data.data);
 
   const { data: dataMessage, error: errorGetMessage } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room/${selectedIdChatRoom}`,
+    selectedIdChatRoom
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room/${selectedIdChatRoom}`
+      : null,
     fetcherMessage,
-    { refreshInterval: 100 },
+    { refreshInterval: 1000 },
   );
 
   const observerRef = useRef(null);
@@ -310,22 +334,6 @@ function TesChat(): React.ReactElement {
       dataMessage?.user?.avatar_url ||
       'https://res.cloudinary.com/dzoleanvi/image/upload/v1714800537/go-cloudinary/user_ch6wxc.png';
   }
-
-  // const updateIsTyping = async () => {
-  //   try {
-  //     await axios.patch(
-  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room/${selectedIdChatRoom}`,
-  //       { is_typing: isTyping },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${accessToken}`,
-  //         },
-  //       },
-  //     );
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   const updateIsTyping = useCallback(async () => {
     try {
@@ -345,8 +353,6 @@ function TesChat(): React.ReactElement {
 
   const postMessage = async (id: number, message: string | number) => {
     try {
-      // let message = inputValues['message'];
-
       if (typeof message === 'string') {
         if (!message.trim()) {
           setTimeout(() => {
@@ -410,34 +416,17 @@ function TesChat(): React.ReactElement {
     });
   }, []);
 
-  // useEffect(() => {
-  //   let message = inputValues['message'];
-  //   console.log(message);
-
-  //   if (message !== '') {
-  //     setIsTyping(true);
-  //   } else {
-  //     setIsTyping(false);
-  //   }
-  // }, [inputValues]);
-
   useEffect(() => {
     const handleIsTypingChange = () => {
       const message = inputValues['message'];
-      console.log(message);
       setIsTyping(message !== '');
     };
 
-    handleIsTypingChange(); // Call initially to handle empty state
+    handleIsTypingChange();
 
-    // Cleanup function to prevent memory leaks (optional)
     return () => {};
   }, [inputValues]);
 
-  // useEffect(() => {
-  //   setIsTyping(false);
-  //   updateIsTyping();
-  // }, [selectedIdChatRoom]);
   useEffect(() => {
     setIsTyping(false);
   }, []);
@@ -476,10 +465,6 @@ function TesChat(): React.ReactElement {
     }
   }, [role, dataMessage]);
 
-  const handleInputChange = (name: string, value: string) => {
-    setInputValues({ ...inputValues, [name]: value });
-  };
-
   const handleInputValueChange = (
     name: string,
     event: React.ChangeEvent<HTMLInputElement>,
@@ -498,82 +483,85 @@ function TesChat(): React.ReactElement {
       user_id: userId,
       items: [],
     });
+    setIsChatRoomShowOnMobile(false);
   };
 
-  // const fileInputRef = useRef<HTMLInputElement>(null);
-  // const [showFileInputField, setShowFileInputField] = useState(false);
-
-  const handleFileChange = (event: any) => {
-    const selectedFile = event.target.files[0];
-    console.log('Selected file:', selectedFile);
+  const handleInputChange = (name: string, value: string) => {
+    setInputValues({ ...inputValues, [name]: value });
   };
 
-  useEffect(() => {
-    const handleObserver = async (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0];
-      if (target.isIntersecting) {
-        if (dataChatRoom) {
-          if (halaman < dataChatRoom?.pagination?.page_count) {
-            setHalaman((prev) => prev + 1);
-            await fetchNextPage();
-          }
-        }
+  const handleInputFileChange = (name: string, value: File) => {
+    setInputFile({ ...inputFile, [name]: value });
+  };
+
+  const [fileCoba, setFileCoba] = useState<File | null>(null);
+
+  const handleInputValueFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event?.target?.files?.[0];
+    if (file) {
+      const type = file.type;
+
+      if (type.startsWith('image/')) {
+        setFileCoba(null);
+        handleInputFileChange('image', file);
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      } else if (type.startsWith('application/pdf')) {
+        setPreviewUrl(null);
+        setFileCoba(file);
+        handleInputFileChange('file', file);
+      } else {
+        setToast({
+          showToast: true,
+          toastMessage: 'file tidak didukung',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
       }
-    };
-    const observer = new IntersectionObserver(handleObserver, {
-      threshold: 0,
-    });
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
     }
-    return () => {
-      if (observerRef.current) {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        observer.unobserve(observerRef.current);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataChatRoom, halaman]);
+  };
 
-  const fetchNextPage = async () => {
-    if (
-      dataChatRoom &&
-      dataChatRoom.data
-      // halaman < dataChatRoom?.pagination?.page_count
-    ) {
-      const response = await fetcherChatRoom(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room?page=${halaman + 1}`,
+  const postCloudinary = async () => {
+    try {
+      const formData = new FormData();
+      for (const key in inputFile) {
+        formData.append(key, inputFile[key]);
+      }
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/cloudinary/image`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
       );
-      // console.log(
-      //   `FETCHING KE====> ${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room?page=${halaman + 1}`,
-      // );
-      // console.log(response);
-      if (Array.isArray(dataChatRoom.data) && Array.isArray(response.data)) {
-        // mutate(
-        //   `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room?page=${halaman + 1}`,
-        //   [...dataChatRoom?.data, ...response?.data],
-        //   false,
-        // );
-        // console.log('Data setelah mutasi:', [
-        //   ...dataChatRoom?.data,
-        //   ...response?.data,
-        // ]);
 
-        if (halaman === 1) {
-          const newData = [...dataChatRoom.data, ...response.data];
-          setDataSetelahMutasi(newData);
-        }
-        if (halaman > 1 && dataSetelahMutasi) {
-          console.log('yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy');
-          console.log('Data setelah mutasi:', [
-            ...dataSetelahMutasi,
-            ...response?.data,
-          ]);
-          const newData = [...dataSetelahMutasi, ...response?.data];
-          console.log('INI NEW DATA', newData);
-          setDataSetelahMutasi(newData);
-        }
-      }
+      selectedIdChatRoom &&
+        postMessage(
+          selectedIdChatRoom,
+          response.data.data.image_url || response?.data?.data?.file_url,
+        );
+      setToast({
+        showToast: true,
+        toastMessage: fileCoba
+          ? 'berhasil upload file'
+          : 'berhasil upload gambar',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      setIsModalOpen(false);
+      setInputFile({});
+      setPreviewUrl(null);
+      setFileCoba(null);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -583,7 +571,11 @@ function TesChat(): React.ReactElement {
         <Navbar />
         <div style={{ display: 'flex', flexGrow: '1', marginTop: '-25px' }}>
           {/* kiri */}
-          <ChatRoomSection width='30%' height='100%'>
+          <ChatRoomSection
+            width='30%'
+            height='100%'
+            isDisplay={isChatRoomShowOnMobile}
+          >
             <div
               style={{
                 width: '100%',
@@ -591,7 +583,7 @@ function TesChat(): React.ReactElement {
                 backgroundColor: '#00B5C0',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'space-around',
               }}
             >
               <div
@@ -608,11 +600,21 @@ function TesChat(): React.ReactElement {
                 <MagnifyBlueICO onClick={() => console.log('click di icon')} />
                 <input style={{ padding: '10px', flexGrow: '1' }}></input>
               </div>
+
+              <ArrowButtonMobileOnly
+                onClick={() => setIsChatRoomShowOnMobile(false)}
+              >
+                <RightArrowICO />
+              </ArrowButtonMobileOnly>
             </div>
 
             {/* list chat room */}
             {/* --------------- ini organism */}
-            <ChatRoomSection height='75vh' overFlowY='auto'>
+            <ChatRoomSection
+              height='75vh'
+              overFlowY='auto'
+              isDisplay={isChatRoomShowOnMobile}
+            >
               {/* ------------- ini molecul */}
               {dataChatRoom?.data?.length !== 0 ? (
                 dataChatRoom?.data?.map((el: IChatRoom, index: number) => (
@@ -708,245 +710,101 @@ function TesChat(): React.ReactElement {
                   Tidak ada ruang percakapan
                 </div>
               )}
-              {/* {!dataSetelahMutasi &&
-                dataChatRoom?.data?.map((el: IChatRoom, index: number) => (
-                  <ChatRoomContainer
-                    key={index}
-                    width='100%'
-                    gap='10px'
-                    padding='10px 20px'
-                    align_items='center'
-                    border_bottom='1px solid grey'
-                    background_color={
-                      el.chat_room_id == selectedIdChatRoom
-                        ? '#d7d7d7'
-                        : 'inherit'
-                    }
-                    onClick={() =>
-                      handleClickChatRoom(
-                        el?.chat_room_id,
-                        el?.is_active,
-                        el?.user_id,
-                      )
-                    }
-                    hoverEffect
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                        }}
-                      >
-                        <AvatarImage height='60px' width='60px'>
-                          <Image
-                            src={
-                              el?.avatar_url_doctor ||
-                              el?.avatar_url_user ||
-                              'https://res.cloudinary.com/dzoleanvi/image/upload/v1714800537/go-cloudinary/user_ch6wxc.png'
-                            }
-                            alt=''
-                            layout='fill'
-                            objectFit='contain'
-                          />
-                        </AvatarImage>
-                        <ChatRoomContainer
-                          width='100%'
-                          flex_direction='column'
-                          gap='5px'
-                          background_color='inherit'
-                        >
-                          <div style={{ fontSize: '20px', fontWeight: '600' }}>
-                            {el?.doctor_name || el?.user_name}
-                          </div>
-                          <div style={{ fontSize: '14px', fontWeight: '400' }}>
-                            {el?.last_message}
-                          </div>
-                        </ChatRoomContainer>
-                      </div>
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <div
-                          style={{
-                            width: '15px',
-                            height: '15px',
-                            backgroundColor: el?.is_active
-                              ? '#90D26D'
-                              : '#C7C8CC',
-                            borderRadius: '50%',
-                          }}
-                        ></div>
-                        <div>{el?.is_active ? 'Active' : 'Inactive'}</div>
-                      </div>
-                    </div>
-                  </ChatRoomContainer>
-                ))}
-              {dataSetelahMutasi &&
-                dataSetelahMutasi?.map((el: IChatRoom, index: number) => (
-                  <ChatRoomContainer
-                    key={index}
-                    width='100%'
-                    gap='10px'
-                    padding='10px 20px'
-                    align_items='center'
-                    border_bottom='1px solid grey'
-                    background_color={
-                      el.chat_room_id == selectedIdChatRoom
-                        ? '#d7d7d7'
-                        : 'inherit'
-                    }
-                    onClick={() =>
-                      handleClickChatRoom(
-                        el?.chat_room_id,
-                        el?.is_active,
-                        el?.user_id,
-                      )
-                    }
-                    hoverEffect
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                        }}
-                      >
-                        <AvatarImage height='60px' width='60px'>
-                          <Image
-                            src={
-                              el?.avatar_url_doctor ||
-                              el?.avatar_url_user ||
-                              'https://res.cloudinary.com/dzoleanvi/image/upload/v1714800537/go-cloudinary/user_ch6wxc.png'
-                            }
-                            alt=''
-                            layout='fill'
-                            objectFit='contain'
-                          />
-                        </AvatarImage>
-                        <ChatRoomContainer
-                          width='100%'
-                          flex_direction='column'
-                          gap='5px'
-                          background_color='inherit'
-                        >
-                          <div style={{ fontSize: '20px', fontWeight: '600' }}>
-                            {el?.doctor_name || el?.user_name}
-                          </div>
-                          <div style={{ fontSize: '14px', fontWeight: '400' }}>
-                            {el?.last_message}
-                          </div>
-                        </ChatRoomContainer>
-                      </div>
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <div
-                          style={{
-                            width: '15px',
-                            height: '15px',
-                            backgroundColor: el?.is_active
-                              ? '#90D26D'
-                              : '#C7C8CC',
-                            borderRadius: '50%',
-                          }}
-                        ></div>
-                        <div>{el?.is_active ? 'Active' : 'Inactive'}</div>
-                      </div>
-                    </div>
-                  </ChatRoomContainer>
-                ))} */}
-              <div ref={observerRef}></div>
-              {/* pakai use Ref disini */}
 
-              {/* {JSON.stringify(dataChatRoom)} */}
+              <div ref={observerRef}></div>
             </ChatRoomSection>
-            {/* {JSON.stringify(dataChatRoom)} */}
           </ChatRoomSection>
           {/* kanan */}
-          <ChatRoomSection width='70%' height='100%'>
-            {/* --------------- ini molecule */}
+          <MessageRoomSection
+            width='70%'
+            height='100%'
+            isDisplay={!isChatRoomShowOnMobile}
+          >
             {dataMessage?.message ? (
               <>
                 <ChatRoomContainer
                   width='100%'
-                  gap='20px'
                   padding='20px'
                   is_shadow_active={true}
                   height='12%'
+                  justify_content='space-between'
+                  align_items='center'
                 >
-                  <AvatarImage height='60px' width='60px'>
-                    <Image
-                      src={avatarSrc}
-                      alt=''
-                      layout='fill'
-                      objectFit='contain'
-                    />
-                  </AvatarImage>
-                  <ChatRoomContainer
-                    width='100%'
-                    flex_direction='column'
-                    gap='5px'
-                    background_color='inherit'
-                    justify_content='center'
-                  >
-                    <div>
+                  <div style={{ display: 'flex', gap: '20px' }}>
+                    <AvatarImage height='60px' width='60px'>
+                      <Image
+                        src={avatarSrc}
+                        alt=''
+                        layout='fill'
+                        objectFit='contain'
+                      />
+                    </AvatarImage>
+                    <ChatRoomContainer
+                      width='100%'
+                      flex_direction='column'
+                      gap='5px'
+                      background_color='inherit'
+                      justify_content='center'
+                    >
+                      <div>
+                        {role === 'user' && (
+                          <div style={{ fontSize: '20px', fontWeight: '600' }}>
+                            {dataMessage?.doctor?.name}
+                          </div>
+                        )}
+                        {role === 'doctor' && (
+                          <>
+                            <div>
+                              <div
+                                style={{ fontSize: '20px', fontWeight: '600' }}
+                              >
+                                {dataMessage?.user?.name || 'User'}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
                       {role === 'user' && (
-                        <div style={{ fontSize: '20px', fontWeight: '600' }}>
-                          {dataMessage?.doctor?.name}
+                        <div style={{ fontSize: '14px', fontWeight: '400' }}>
+                          {dataMessage?.doctor?.specialization}
                         </div>
                       )}
-                      {role === 'doctor' && (
-                        <div>
-                          <div style={{ fontSize: '20px', fontWeight: '600' }}>
-                            {dataMessage?.user?.name}
+                      {role === 'user' && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: '10px',
+                              height: '10px',
+                              backgroundColor: dataMessage?.doctor?.is_online
+                                ? '#90D26D'
+                                : '#C7C8CC',
+                              borderRadius: '50%',
+                            }}
+                          ></div>
+                          <div>
+                            {dataMessage?.doctor?.is_online
+                              ? 'Online'
+                              : 'Offline'}
                           </div>
                         </div>
                       )}
-                    </div>
-                    {role === 'user' && (
-                      <div style={{ fontSize: '14px', fontWeight: '400' }}>
-                        {dataMessage?.doctor?.specialization}
-                      </div>
-                    )}
-                    {role === 'user' && (
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: '10px',
-                            height: '10px',
-                            backgroundColor: dataMessage?.doctor?.is_online
-                              ? '#90D26D'
-                              : '#C7C8CC',
-                            borderRadius: '50%',
-                          }}
-                        ></div>
-                        <div>
-                          {dataMessage?.doctor?.is_online
-                            ? 'Online'
-                            : 'Offline'}
-                        </div>
-                      </div>
-                    )}
-                  </ChatRoomContainer>
+                    </ChatRoomContainer>
+                  </div>
+                  {/* <div>
+                    {dataMessage.doctor.certificate}
+                  </div> */}
+                  <ArrowButtonMobileOnly
+                    onClick={() => setIsChatRoomShowOnMobile(true)}
+                    background='#00B5C0'
+                  >
+                    <LeftArrowICO />
+                  </ArrowButtonMobileOnly>
                 </ChatRoomContainer>
                 <div style={{ backgroundColor: '#e3e3e3', flexGrow: '1' }}>
                   <div
@@ -1013,76 +871,69 @@ function TesChat(): React.ReactElement {
                             padding: '15px',
                           }}
                         >
-                          {role == 'doctor' && (
-                            <div
-                              style={{
-                                position: 'relative',
-                              }}
-                            >
-                              <AttachFileICO
-                                onClick={() =>
-                                  setIsDropdownAttachFileOpen(
-                                    !isDropdownAttachFileOpen,
-                                  )
+                          {/* {role == 'doctor' && ( */}
+                          <div
+                            style={{
+                              position: 'relative',
+                            }}
+                          >
+                            <AttachFileICO
+                              onClick={() =>
+                                setIsDropdownAttachFileOpen(
+                                  !isDropdownAttachFileOpen,
+                                )
+                              }
+                            />
+                            {isDropdownAttachFileOpen && (
+                              <div
+                                style={{
+                                  width: '200px',
+                                  height: role === 'user' ? '50px' : '100px',
+                                  position: 'absolute',
+                                  top: role === 'user' ? '-50px' : '-105px',
+                                  zIndex: '10',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  color: '#00B5C0',
+                                  backgroundColor: 'white',
+                                  borderRadius: '18px',
+                                  overflow: 'hidden',
+                                  boxShadow:
+                                    '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                                }}
+                                onFocus={() =>
+                                  setIsDropdownAttachFileOpen(true)
                                 }
-                              />
-                              {isDropdownAttachFileOpen && (
+                                onBlur={() =>
+                                  setIsDropdownAttachFileOpen(false)
+                                }
+                              >
                                 <div
                                   style={{
-                                    width: '200px',
-                                    height: '100px',
-                                    position: 'absolute',
-                                    top: '-105px',
-                                    zIndex: '10',
+                                    height: role === 'user' ? '100%' : '50%',
                                     display: 'flex',
-                                    flexDirection: 'column',
-                                    color: '#00B5C0',
-                                    backgroundColor: 'white',
-                                    borderRadius: '18px',
-                                    overflow: 'hidden',
-                                    boxShadow:
-                                      '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
                                   }}
-                                  onFocus={() =>
-                                    setIsDropdownAttachFileOpen(true)
+                                  onClick={() =>
+                                    setIsDropdownAttachFileOpen(
+                                      !isDropdownAttachFileOpen,
+                                    )
                                   }
-                                  onBlur={() =>
-                                    setIsDropdownAttachFileOpen(false)
-                                  }
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background =
+                                      '#ededed';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'white';
+                                  }}
                                 >
-                                  <div
-                                    style={{
-                                      height: '50%',
-                                      display: 'flex',
-                                      justifyContent: 'center',
-                                      alignItems: 'center',
-                                      cursor: 'pointer',
-                                    }}
-                                    onClick={() =>
-                                      setIsDropdownAttachFileOpen(
-                                        !isDropdownAttachFileOpen,
-                                      )
-                                    }
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.background =
-                                        '#ededed';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.background =
-                                        'white';
-                                    }}
-                                  >
-                                    <input
-                                      id='file-input' // Add the id here
-                                      type='file'
-                                      style={{ display: 'none' }}
-                                      onChange={(e) => handleFileChange(e)}
-                                    />
-
-                                    <label htmlFor='file-input'>
-                                      lampirkan file
-                                    </label>
+                                  <div onClick={() => setIsModalOpen(true)}>
+                                    lampirkan file
                                   </div>
+                                </div>
+                                {role === 'doctor' && (
                                   <div
                                     style={{
                                       height: '50%',
@@ -1103,10 +954,11 @@ function TesChat(): React.ReactElement {
                                   >
                                     buat resep
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          {/*)}*/}
                           <input
                             style={{
                               flexGrow: '1',
@@ -1164,15 +1016,24 @@ function TesChat(): React.ReactElement {
                   fontWeight: '600',
                   fontSize: '24px',
                   flexDirection: 'column',
+                  gap: '20px',
                 }}
               >
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+                >
+                  <ArrowButtonMobileOnly
+                    onClick={() => setIsChatRoomShowOnMobile(true)}
+                    background='#00B5C0'
+                  >
+                    <LeftArrowICO />
+                  </ArrowButtonMobileOnly>
+                </div>
                 <NoRoomSelectedImage />
                 Pilih ruang percakapan
-                {/* {JSON.stringify(dataChatRoom?.pagination?.page_count)} */}
-                {/* Halaman : {JSON.stringify(halaman)} */}
               </div>
             )}
-          </ChatRoomSection>
+          </MessageRoomSection>
         </div>
         {isModalPrescriptionOpen && (
           <div
@@ -1215,8 +1076,6 @@ function TesChat(): React.ReactElement {
                 )}
                 <SearchDrugPres
                   setSelectedDrugParent={handleSelectedDrugChange}
-                  // clearSelectedDrug={handleClearSelectedDrug}
-                  // setDeleteFunction={setDeleteFunction}
                   setDeleteFunction={(func) => setDeleteFunction(func)}
                 />
               </div>
@@ -1468,7 +1327,6 @@ function TesChat(): React.ReactElement {
                   padding: '0 5px',
                 }}
               >
-                {/* {JSON.stringify(dataPrescriptionById)} */}
                 {dataPrescriptionById?.data?.items?.map((el, index: number) => (
                   <div
                     key={index + 1}
@@ -1478,7 +1336,6 @@ function TesChat(): React.ReactElement {
                       alignItems: 'center',
                       margin: '10px 0',
                       padding: '0 10px',
-                      // border: '1px solid red',
                       height: '20vh',
                       backgroundColor: '#ebebeb',
                       boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
@@ -1630,12 +1487,112 @@ function TesChat(): React.ReactElement {
                 }}
                 onMouseDown={(e) => {
                   handlePostCartFromPrescription();
-                  // handlePostPrescription();
                   e.preventDefault();
-                  // setIsModalConfirmAddPrescriptionToCartOpen(false);
                 }}
               >
                 ya, masukkan ke keranjang..
+              </div>
+            </div>
+          </div>
+        )}
+        {isModalOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              height: 'max-content',
+              width: 'max-content',
+              backgroundColor: 'white',
+              padding: '100px',
+              borderRadius: '5px',
+              boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+              zIndex: '15',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              gap: '10px',
+            }}
+          >
+            <input
+              id='file-input'
+              type='file'
+              style={{
+                display: 'none',
+              }}
+              onChange={(e) => handleInputValueFileChange(e)}
+            />
+
+            <label
+              htmlFor='file-input'
+              style={{
+                border: '1px dashed red',
+                width: '200',
+                height: '200',
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '30px',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '10px',
+              }}
+            >
+              <UploadFile />
+              <div>{previewUrl || fileCoba ? '' : 'lampirkan file'}</div>
+            </label>
+            {previewUrl && (
+              <Image
+                height={130}
+                width={130}
+                src={previewUrl}
+                alt='Preview Gambar'
+              />
+            )}
+            {fileCoba && (
+              <div
+                style={{ width: '300px', height: '300px', overflow: 'hidden' }}
+              >
+                <Document file={fileCoba} loading={<div>Loading...</div>}>
+                  <Page pageNumber={1} width={300} height={300} />
+                </Document>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '10px 20px',
+                  backgroundColor: 'white',
+                  color: 'red',
+                  borderRadius: '6px',
+                  boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                  cursor: 'pointer',
+                  width: '50%',
+                }}
+                onClick={() => handleClickClose()}
+              >
+                tutup
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '10px 20px',
+                  backgroundColor: '#00B5C0',
+                  color: 'white',
+                  borderRadius: '6px',
+                  boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                  cursor: 'pointer',
+                }}
+                onClick={() => postCloudinary()}
+              >
+                kirim
               </div>
             </div>
           </div>
@@ -1645,4 +1602,4 @@ function TesChat(): React.ReactElement {
   );
 }
 
-export default TesChat;
+export default ChatPage;
