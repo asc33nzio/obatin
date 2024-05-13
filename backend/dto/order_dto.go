@@ -6,7 +6,7 @@ import (
 )
 
 type OrdersFilter struct {
-	InvoiceNumber string  `form:"invoice_number" binding:"omitempty,min=19"`
+	InvoiceNumber *string `form:"invoice_number" binding:"omitempty,min=19"`
 	UserId        *int64  `form:"user_id" binding:"omitempty,gte=1"`
 	PharmacyId    *int64  `form:"pharmacy_id" binding:"omitempty,gte=1"`
 	PartnerId     *int64  `form:"partner_id" binding:"omitempty,gte=1"`
@@ -49,12 +49,13 @@ type OrderIdUriParams struct {
 
 func (f OrdersFilter) ToUserOrdersFilterEntity() *entity.OrdersFilter {
 	return &entity.OrdersFilter{
-		UserId:     f.UserId,
-		PharmacyId: f.PharmacyId,
-		PartnerId:  f.PartnerId,
-		Status:     f.Status,
-		Limit:      f.Limit,
-		Page:       f.Page,
+		InvoiceNumber: f.InvoiceNumber,
+		UserId:        f.UserId,
+		PharmacyId:    f.PharmacyId,
+		PartnerId:     f.PartnerId,
+		Status:        f.Status,
+		Limit:         f.Limit,
+		Page:          f.Page,
 	}
 }
 

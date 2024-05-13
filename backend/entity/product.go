@@ -48,6 +48,7 @@ type ProductDetail struct {
 	IsPrescriptionRequired bool
 	Manufacturer           Manufacturer
 	Categories             []Category
+	Sales                  MonthlySales
 }
 
 type UpdateProduct struct {
@@ -85,6 +86,21 @@ type AddProduct struct {
 	Product    ProductDetail
 	Categories []int64
 	Image      *multipart.File
+}
+
+type MonthlySales struct {
+	January   *int
+	February  *int
+	March     *int
+	April     *int
+	May       *int
+	June      *int
+	July      *int
+	August    *int
+	September *int
+	October   *int
+	November  *int
+	December  *int
 }
 
 type ProductListPage struct {

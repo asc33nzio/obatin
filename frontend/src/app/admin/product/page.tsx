@@ -8,7 +8,6 @@ import EditIcon from '@/assets/admin/EditIcon';
 import MagnifyBlueICO from '@/assets/icons/MagnifyBlueICO';
 import Image from 'next/image';
 import RegularInput from '@/components/atoms/input/RegularInput';
-// import DropdownAdmin from '@/components/molecules/admin/Dropdown';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useToast } from '@/hooks/useToast';
 import Pagination from '@/components/molecules/admin/Pagination';
@@ -18,9 +17,10 @@ import {
   IResponseGetAllProduct,
   IResponseGetDetailProduct,
 } from '@/types/Product';
+import SeeDetail from '@/assets/admin/SeeDetail';
+import ModalDetailProduct from '@/components/organisms/admin/ModalDetailProduct';
+import CascadeDropdown from '@/components/molecules/admin/DropdownCascade';
 import DropdownTest from '@/components/molecules/admin/DropdownTest';
-import DropdownAdmin from '@/components/molecules/admin/Dropdown';
-// import CascadeDropdown from '@/components/molecules/admin/DropdownCascade';
 
 export interface ICategoryResponse {
   message: string;
@@ -34,7 +34,7 @@ export interface ICategoryDataResponse {
   image_url: string;
   has_child: boolean;
   category_level: number;
-  children?: ICategoryDataResponse[];
+  children?: any[];
   parentId?: number;
 }
 
@@ -84,36 +84,52 @@ function AdminProduct() {
     { value: 'obat_bebas_terbatas', label: 'obat_bebas_terbatas' },
   ];
 
-  // const convertBackendResponseToOptions = (data: ICategoryDataResponse[]) => {
-  //   const options: IOptionsDropdown[] = [];
+  const convertBackendResponseToOptions = (data: ICategoryDataResponse[]) => {
+    const options: IOptionsDropdown[] = [];
 
-  //   data?.forEach((category) => {
-  //     const categoryOption = {
-  //       value: category.category_slug,
-  //       label: category.name,
-  //       children: category.children,
-  //     };
+    data?.forEach((category) => {
+      const categoryOption = {
+        value: category.category_slug,
+        label: category.name,
+        children: category.children,
+      };
 
-  //     if (category?.children && category?.children?.length > 0) {
-  //       const childrenOptions: IOptionsDropdown[] = [];
+      if (category?.children && category?.children?.length > 0) {
+        const childrenOptions: IOptionsDropdown[] = [];
 
-  //       category?.children?.forEach((child) => {
-  //         const childOption: IOptionsDropdown = {
-  //           value: child.id.toString(),
-  //           label: child.name,
-  //         };
-  //         childrenOptions.push(childOption);
-  //       });
+        category?.children?.forEach((child) => {
+          const childOption: IOptionsDropdown = {
+            value: child.id.toString(),
+            label: child.name,
+          };
+          childrenOptions.push(childOption);
+        });
 
-  //       categoryOption.children = childrenOptions;
-  //     }
+        categoryOption.children = childrenOptions;
+      }
 
-  //     options.push(categoryOption);
-  //   });
+      options.push(categoryOption);
+    });
 
-  //   console.log('FRANKYYYY', options);
-  //   return options;
-  // };
+    return options;
+  };
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string[]>([]);
+  const onChangeCategory = (categoryId: string) => {
+    if (categoryId) {
+      const index = selectedCategoryId.indexOf(categoryId);
+      if (index === -1) {
+        setSelectedCategoryId([...selectedCategoryId, categoryId]);
+      } else {
+        const updatedCategoryIds = [...selectedCategoryId];
+        updatedCategoryIds.splice(index, 1);
+        setSelectedCategoryId(updatedCategoryIds);
+      }
+    }
+  };
+
+  const handleInputChange = (name: string, value: string | File) => {
+    setInputValues({ ...inputValues, [name]: value });
+  };
 
   const handleSelectType = (objectKey: string, value: any) => {
     handleInputChange(objectKey, value);
@@ -237,13 +253,17 @@ function AdminProduct() {
     }
   };
 
-  const handleInputChange = (name: string, value: string | File) => {
-    setInputValues({ ...inputValues, [name]: value });
-  };
-
   const handleClickEditProduct = (slug: string) => {
     setIsModalEditProductOpen(true);
     setIsModalOpen(true);
+    setSelectedSlugProduct(slug);
+  };
+
+  const [isModalDetailProductOpen, setIsModalDetailProductOpen] =
+    useState<boolean>(false);
+
+  const handleClickDetailProduct = (slug: string) => {
+    setIsModalDetailProductOpen(true);
     setSelectedSlugProduct(slug);
   };
 
@@ -289,20 +309,6 @@ function AdminProduct() {
       fetcherGetManufacturers,
     );
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number[]>([]);
-  const onChangeCategory = (categoryId: number | null) => {
-    if (categoryId) {
-      const index = selectedCategoryId.indexOf(categoryId);
-      if (index === -1) {
-        setSelectedCategoryId([...selectedCategoryId, categoryId]);
-      } else {
-        const updatedCategoryIds = [...selectedCategoryId];
-        updatedCategoryIds.splice(index, 1);
-        setSelectedCategoryId(updatedCategoryIds);
-      }
-    }
-  };
-
   const fetcherGetCategory = (url: string) =>
     axios
       .get(url, {
@@ -318,19 +324,7 @@ function AdminProduct() {
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/categories`
         : null,
       fetcherGetCategory,
-      // { refreshInterval: 5000 },
     );
-
-  // if (dataCategory) {
-  // const optionsCategory = convertBackendResponseToOptions(dataCategory?.data);
-
-  //   setDataCategoryConvert(optionsCategory);
-  // setSimpanDataCategory(dataCategory);
-  // }
-
-  // const handleDropdownChange = (value) => {
-  //   console.log('Selected value:', value);
-  // };
 
   const fetcherGetOneProduct = (url: string) =>
     axios
@@ -344,12 +338,10 @@ function AdminProduct() {
   const { data: dataOneProduct, error: errorGetOneProduct } =
     useSWR<IResponseGetDetailProduct>(
       selectedSlugProduct && refetchOneProduct
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products/${selectedSlugProduct}`
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/products/${selectedSlugProduct}`
         : null,
       fetcherGetOneProduct,
     );
-
-  // const { data } = useSWR(shouldFetch ? '/api/data' : null, fetcher)
 
   function formatRupiah(data: number) {
     const formatter = new Intl.NumberFormat('id-ID', {
@@ -378,16 +370,16 @@ function AdminProduct() {
       for (const key in inputValues) {
         formData.append(key, inputValues[key]);
       }
-      // await axios.patch(
-      //   `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products/${selectedSlugProduct}`,
-      //   formData,
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${accessToken}`,
-      //       'Content-Type': 'multipart/form-data',
-      //     },
-      //   },
-      // );
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products/${selectedSlugProduct}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
       setToast({
         showToast: true,
         toastMessage: 'Berhasil edit produk',
@@ -436,9 +428,7 @@ function AdminProduct() {
         formData.append(key, inputValues[key]);
       }
 
-      const selectedCategoryIdString = selectedCategoryId.join(',');
-      formData.append('categories', selectedCategoryIdString);
-      console.log(formData);
+      formData.append('categories', selectedCategoryId.toString());
       if (
         inputValues['name'] == '' ||
         inputValues['min_price'] == '' ||
@@ -519,7 +509,40 @@ function AdminProduct() {
       setIsModalAddProductOpen(false);
       setIsModalOpen(false);
       setInputValues({});
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.response.data.message;
+      if (errorMessage.includes('internal server')) {
+        setToast({
+          showToast: true,
+          toastMessage: 'nama obat sudah digunakan pada produk lain',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
+      if (errorMessage.includes('duplicate slug')) {
+        setToast({
+          showToast: true,
+          toastMessage: 'slug sudah digunakan pada produk lain',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
+      if (
+        errorMessage.includes('duplicate key value violates unique constraint')
+      ) {
+        setToast({
+          showToast: true,
+          toastMessage: 'nama sudah digunakan pada produk lain',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
       setToast({
         showToast: true,
         toastMessage: 'Gagal tambah produk',
@@ -561,7 +584,6 @@ function AdminProduct() {
       <div
         style={{
           width: '100vw',
-          height: '100vh',
           display: 'flex',
           flexDirection: 'column',
           gap: '10px',
@@ -594,7 +616,6 @@ function AdminProduct() {
             <input
               value={inputSearchValue}
               onChange={(e) => setInputSearchValue(e.target.value)}
-              // onChange={(e) => e.target.value}
               style={{ padding: '10px', flexGrow: '1' }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -663,13 +684,13 @@ function AdminProduct() {
                   Slug Produk
                 </th>
                 <th style={{ backgroundColor: '#00B5C0', color: 'white' }}>
-                  Unit Penjualan
-                </th>
-                <th style={{ backgroundColor: '#00B5C0', color: 'white' }}>
                   Harga Minimum
                 </th>
                 <th style={{ backgroundColor: '#00B5C0', color: 'white' }}>
                   Harga Maksimum
+                </th>
+                <th style={{ backgroundColor: '#00B5C0', color: 'white' }}>
+                  Jumlah Unit Terjual
                 </th>
                 <th style={{ backgroundColor: '#00B5C0', color: 'white' }}>
                   Aksi
@@ -690,7 +711,7 @@ function AdminProduct() {
                   <td
                     style={{
                       padding: '0 10px',
-                      width: '',
+                      width: '10%',
                     }}
                   >
                     <Image height={60} width={60} alt='' src={item.image_url} />
@@ -698,6 +719,7 @@ function AdminProduct() {
                   <td
                     style={{
                       padding: '0 10px',
+                      width: '20%',
                     }}
                   >
                     {item.name}
@@ -705,6 +727,7 @@ function AdminProduct() {
                   <td
                     style={{
                       padding: '0 10px',
+                      width: '20%',
                     }}
                   >
                     {item.product_slug}
@@ -712,13 +735,7 @@ function AdminProduct() {
                   <td
                     style={{
                       padding: '0 10px',
-                    }}
-                  >
-                    {item.selling_unit}
-                  </td>
-                  <td
-                    style={{
-                      padding: '0 10px',
+                      width: '10%',
                     }}
                   >
                     {formatRupiah(item.min_price)}
@@ -726,20 +743,41 @@ function AdminProduct() {
                   <td
                     style={{
                       padding: '0 10px',
+                      width: '10%',
                     }}
                   >
                     {formatRupiah(item.max_price)}
+                  </td>
+                  <td
+                    style={{
+                      padding: '0 10px',
+                      width: '10%',
+                    }}
+                  >
+                    {item.sales || 0} pc(s)
                   </td>
 
                   <td
                     style={{
                       padding: '0 10px',
+                      width: '10%',
                     }}
                   >
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '10px',
+                        justifyContent: 'center',
+                      }}
+                    >
                       <EditIcon
                         onClick={() =>
                           handleClickEditProduct(item.product_slug)
+                        }
+                      />
+                      <SeeDetail
+                        onClick={() =>
+                          handleClickDetailProduct(item.product_slug)
                         }
                       />
                     </div>
@@ -1216,21 +1254,17 @@ function AdminProduct() {
                   />
                 )}
               </div>
-              {/*{dataCategory && (
-                <CascadeDropdown
-                  options={convertBackendResponseToOptions(dataCategory?.data)}
-                  onChange={(e) => handleSelectType('testt', e)}
-                />
-              )}
-
-              {/* {JSON.stringify(
-                convertBackendResponseToOptions(dataCategory?.data),
-              )} */}
               {dataCategory && (
-                <DropdownAdmin
-                  data={dataCategory?.data}
-                  onChangeFromDropdown={onChangeCategory}
-                />
+                <>
+                  <div>Kategori Terpilih</div>
+                  <CascadeDropdown
+                    options={convertBackendResponseToOptions(
+                      dataCategory?.data,
+                    )}
+                    onChange={onChangeCategory}
+                    padding='10px'
+                  />
+                </>
               )}
             </div>
 
@@ -1390,6 +1424,13 @@ function AdminProduct() {
               Tutup
             </div>
           </div>
+        )}
+
+        {isModalDetailProductOpen && dataOneProduct && (
+          <ModalDetailProduct
+            data={dataOneProduct}
+            onCancel={() => setIsModalDetailProductOpen(false)}
+          />
         )}
       </div>
     </>

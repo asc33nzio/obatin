@@ -1,5 +1,5 @@
 interface MagnifyBlueICOProps {
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 const MagnifyBlueICO: React.FC<MagnifyBlueICOProps> = ({ onClick }) => {

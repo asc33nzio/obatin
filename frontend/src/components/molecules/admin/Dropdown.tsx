@@ -44,7 +44,11 @@ const DropdownAdmin: React.FC<DropdownAdminProps> = ({
             padding: '10px',
           }}
         >
-          <CategoryComponent categories={data} setCategoryId={setCategoryId} />
+          <CategoryComponent
+            categories={data}
+            setCategoryId={setCategoryId}
+            setParentPage={() => console.log('hahaha')}
+          />
         </div>
       )}
     </div>

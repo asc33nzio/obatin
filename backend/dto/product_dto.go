@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/entity"
 	"strconv"
@@ -88,34 +89,35 @@ type UpdateProductRequest struct {
 }
 
 type ProductDetailResponse struct {
-	Id                     int64                `json:"id"`
-	Name                   string               `json:"name"`
-	MinPrice               int                  `json:"min_price"`
-	MaxPrice               int                  `json:"max_price"`
-	Slug                   string               `json:"product_slug"`
-	GenericName            string               `json:"generic_name"`
-	GeneralIndication      string               `json:"general_indication"`
-	Dosage                 string               `json:"dosage"`
-	HowToUse               string               `json:"how_to_use"`
-	SideEffects            string               `json:"side_effects"`
-	Contraindication       string               `json:"contraindication"`
-	Warning                string               `json:"warning"`
-	BpomNumber             string               `json:"bpom_number"`
-	Content                string               `json:"content"`
-	Description            string               `json:"description"`
-	Classification         string               `json:"classification"`
-	Packaging              string               `json:"packaging"`
-	SellingUnit            string               `json:"selling_unit"`
-	Weight                 decimal.Decimal      `json:"weight"`
-	Height                 decimal.Decimal      `json:"height"`
-	Length                 decimal.Decimal      `json:"length"`
-	Width                  decimal.Decimal      `json:"width"`
-	ImageUrl               string               `json:"image_url"`
-	ThumbnailUrl           string               `json:"thumbnail_url"`
-	IsActive               bool                 `json:"is_active"`
-	IsPrescriptionRequired bool                 `json:"is_prescription_required"`
-	Manufacturer           ManufacturerResponse `json:"manufacturer"`
-	Categories             []CategoryResponse   `json:"categories"`
+	Id                     int64                  `json:"id"`
+	Name                   string                 `json:"name"`
+	MinPrice               int                    `json:"min_price"`
+	MaxPrice               int                    `json:"max_price"`
+	Slug                   string                 `json:"product_slug"`
+	GenericName            string                 `json:"generic_name"`
+	GeneralIndication      string                 `json:"general_indication"`
+	Dosage                 string                 `json:"dosage"`
+	HowToUse               string                 `json:"how_to_use"`
+	SideEffects            string                 `json:"side_effects"`
+	Contraindication       string                 `json:"contraindication"`
+	Warning                string                 `json:"warning"`
+	BpomNumber             string                 `json:"bpom_number"`
+	Content                string                 `json:"content"`
+	Description            string                 `json:"description"`
+	Classification         string                 `json:"classification"`
+	Packaging              string                 `json:"packaging"`
+	SellingUnit            string                 `json:"selling_unit"`
+	Weight                 decimal.Decimal        `json:"weight"`
+	Height                 decimal.Decimal        `json:"height"`
+	Length                 decimal.Decimal        `json:"length"`
+	Width                  decimal.Decimal        `json:"width"`
+	ImageUrl               string                 `json:"image_url"`
+	ThumbnailUrl           string                 `json:"thumbnail_url"`
+	IsActive               bool                   `json:"is_active"`
+	IsPrescriptionRequired bool                   `json:"is_prescription_required"`
+	Manufacturer           ManufacturerResponse   `json:"manufacturer"`
+	Categories             []CategoryResponse     `json:"categories"`
+	Sales                  []MonthlySalesResponse `json:"sales,omitempty"`
 }
 
 type ProductListResponse struct {
@@ -127,11 +129,17 @@ type ProductListResponse struct {
 	MaxPrice               int    `json:"max_price"`
 	ImageUrl               string `json:"image_url"`
 	IsPrescriptionRequired bool   `json:"is_prescription_required"`
+	Sales                  int    `json:"sales,omitempty"`
 }
 
 type ProductListPageResponse struct {
 	Pagination *PaginationResponse   `json:"pagination,omitempty"`
-	Data       []ProductListResponse `json:"data,omitempty"`
+	Data       []ProductListResponse `json:"data"`
+}
+
+type MonthlySalesResponse struct {
+	Month      string `json:"month"`
+	TotalSales int    `json:"total_sales"`
 }
 
 func (p ProductFilter) ToProductFilterEntity() entity.ProductFilter {
@@ -146,8 +154,10 @@ func (p ProductFilter) ToProductFilterEntity() entity.ProductFilter {
 	}
 }
 
-func ToProductDetailResponse(product *entity.ProductDetail) ProductDetailResponse {
+func ToProductDetailResponse(product *entity.ProductDetail, forSales bool) ProductDetailResponse {
 	var categories []CategoryResponse
+	monthRes := []MonthlySalesResponse{}
+
 	for _, values := range product.Categories {
 		category := CategoryResponse{
 			Id:       values.Id,
@@ -159,6 +169,50 @@ func ToProductDetailResponse(product *entity.ProductDetail) ProductDetailRespons
 			Level:    values.Level,
 		}
 		categories = append(categories, category)
+	}
+	if forSales {
+		for _, v := range appconstant.MonthSlice {
+			monthRes = append(monthRes, MonthlySalesResponse{
+				Month: v,
+			})
+		}
+		if product.Sales.January != nil {
+			monthRes[0].TotalSales = *product.Sales.January
+		}
+		if product.Sales.February != nil {
+			monthRes[1].TotalSales = *product.Sales.February
+		}
+		if product.Sales.March != nil {
+			monthRes[2].TotalSales = *product.Sales.March
+		}
+		if product.Sales.April != nil {
+			monthRes[3].TotalSales = *product.Sales.April
+		}
+		if product.Sales.May != nil {
+			monthRes[4].TotalSales = *product.Sales.May
+		}
+		if product.Sales.June != nil {
+			monthRes[5].TotalSales = *product.Sales.June
+		}
+		if product.Sales.July != nil {
+			monthRes[6].TotalSales = *product.Sales.July
+		}
+		if product.Sales.August != nil {
+			monthRes[7].TotalSales = *product.Sales.August
+		}
+		if product.Sales.September != nil {
+			monthRes[8].TotalSales = *product.Sales.September
+		}
+		if product.Sales.October != nil {
+			monthRes[9].TotalSales = *product.Sales.October
+		}
+		if product.Sales.November != nil {
+			monthRes[10].TotalSales = *product.Sales.November
+		}
+		if product.Sales.December != nil {
+			monthRes[11].TotalSales = *product.Sales.December
+		}
+
 	}
 
 	return ProductDetailResponse{
@@ -193,6 +247,7 @@ func ToProductDetailResponse(product *entity.ProductDetail) ProductDetailRespons
 			Name: product.Manufacturer.Name,
 		},
 		Categories: categories,
+		Sales:      monthRes,
 	}
 }
 
@@ -208,6 +263,7 @@ func ToProductListResponse(products *entity.ProductListPage) []ProductListRespon
 			MaxPrice:               values.MaxPrice,
 			ImageUrl:               values.ImageUrl,
 			IsPrescriptionRequired: values.IsPrescriptionRequired,
+			Sales:                  values.Sales,
 		})
 	}
 	return response

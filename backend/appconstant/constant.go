@@ -1,5 +1,7 @@
 package appconstant
 
+var MonthSlice = []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+
 const (
 	DefaultProductLimit                     = 10
 	DefaultMinPage                          = 1
@@ -34,6 +36,7 @@ const (
 	OrderWaitingConfirmation                = "waiting_confirmation"
 	OrderProcessed                          = "processed"
 	OrderWaitingPayment                     = "waiting_payment"
+	OrderConfirmed                          = "confirmed"
 	OrderCancel                             = "cancelled"
 	UpdatePharmacyProductTypeStockMutation  = "stock_mutation"
 	UpdatePharmacyProductTypeManualMutation = "manual_addition"
