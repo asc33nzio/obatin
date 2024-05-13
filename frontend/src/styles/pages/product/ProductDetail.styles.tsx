@@ -64,7 +64,10 @@ export const Price = styled.p`
 `;
 
 export const SelectPharmacy = styled.div`
-  padding: 20px;
+  padding: 5px;
+  margin: 30px;
+  width: 500px;
+  height: 600px;
 `;
 
 export const Buttoncontainer = styled.div`
@@ -88,7 +91,7 @@ export const PharmacyCard = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  color: ${COLORS.primary_color};
+  color: ${COLORS.primary_text};
   background-color: white;
 
   font-size: 14px;
@@ -131,15 +134,30 @@ export const Column = styled.div`
   border: 1px solid ${COLORS.primary_color};
   border-radius: 12px;
   width: 100%;
-  height: 170px;
+  height: 200px;
 
   div {
+    display: flex;
     flex-direction: row;
+    align-items: center;
+    padding: 0;
+    gap: 20px;
+    svg {
+      opacity: 70%;
+    }
+    &:hover {
+      color: white;
+      svg {
+        stroke: white;
+      }
+    }
   }
 
   &:hover {
     background-color: ${COLORS.primary_color};
     color: white;
     border: 1px solid white;
+    svg {
+    }
   }
 `;

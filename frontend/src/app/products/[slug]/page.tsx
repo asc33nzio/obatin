@@ -39,6 +39,8 @@ import { getCookie } from 'cookies-next';
 import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
 import HomeICO from '@/assets/icons/HomeICO';
 import LocationICO from '@/assets/icons/LocationICO';
+import ConsulICO from '@/assets/icons/ConsulICO';
+import PhoneICO from '@/assets/icons/PhoneICO';
 
 const ProductDetailPage = () => {
   const pathname = usePathname();
@@ -298,7 +300,6 @@ const ProductDetailPage = () => {
                         <p>{pharmacy.name}</p>
                       </Row>
                       <Row>
-                        <LocationICO />
                         <p>{pharmacy.address}</p>
                         <p>{pharmacy.distance} km dari rumahmu</p>
                       </Row>
@@ -312,8 +313,14 @@ const ProductDetailPage = () => {
                           </p>
                         </Column>
                         <Column>
-                          <p>{pharmacy.pharmacist_name}</p>
-                          <p>{pharmacy.pharmacist_phone}</p>
+                          <div>
+                            <ConsulICO />
+                            <p>{pharmacy.pharmacist_name}</p>
+                          </div>
+                          <div>
+                            <PhoneICO />
+                            <p>{pharmacy.pharmacist_phone}</p>
+                          </div>
                         </Column>
                       </Row>
                     </PharmacyItem>
