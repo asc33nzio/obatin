@@ -213,7 +213,7 @@ const PaymentSummaryComponent = (): React.ReactElement => {
           </div>
 
           {isLoading ? (
-            <LoaderDiv>
+            <LoaderDiv style={{ marginLeft: '185px' }}>
               <PropagateLoader
                 color='#dd1b50'
                 speedMultiplier={0.8}

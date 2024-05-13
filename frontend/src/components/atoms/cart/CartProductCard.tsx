@@ -34,6 +34,8 @@ import DeleteICO from '@/assets/dashboard/DeleteICO';
 import BikeICO from '@/assets/icons/BikeICO';
 import Axios from 'axios';
 import InvokableModal from '@/components/organisms/modal/InvokableModal';
+import { LoaderDiv } from '@/styles/pages/auth/Auth.styles';
+import { PuffLoader } from 'react-spinners';
 
 const CartProductCard = () => {
   const dispatch = useObatinDispatch();
@@ -44,6 +46,7 @@ const CartProductCard = () => {
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
   const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
   const [selectedPharmacyDetail, setSelectedPharmacyDetail] =
     useState<PharmacyCart | null>(null);
@@ -51,7 +54,7 @@ const CartProductCard = () => {
 
   const fetchCartItems = async () => {
     try {
-      setIsLoading(true);
+      setIsFetching(true);
       const response = await Axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/details`,
         {
@@ -66,7 +69,7 @@ const CartProductCard = () => {
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -227,147 +230,147 @@ const CartProductCard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldUpdate]);
 
-  return (
-    pharmacies.length !== 0 && (
-      <>
-        {pharmacies?.map((pharmacy: PharmacyCart, index) => {
-          if (pharmacy.cart_items?.length === 0) return null;
-          const realPharmaState = pharmacies.find(
-            (pharma) => pharma.id === pharmacy.id,
-          );
+  return pharmacies.length !== 0 && !isFetching ? (
+    <>
+      {pharmacies?.map((pharmacy: PharmacyCart, index) => {
+        if (pharmacy.cart_items?.length === 0) return null;
+        const realPharmaState = pharmacies.find(
+          (pharma) => pharma.id === pharmacy.id,
+        );
 
-          const totalPrice = realPharmaState?.cart_items?.reduce(
-            (total, product) => {
-              return total + product.quantity * product.price;
-            },
-            0,
-          );
-          return (
-            <CartItemContainer
-              key={`cartCard${pharmacy.id}_${index}_${pharmacy.shipping_cost}`}
-            >
-              <PharmacyName>
-                <div>
-                  <PharmacyICO />
-                  <p>
-                    {pharmacy?.name?.charAt(0).toUpperCase()}
-                    {pharmacy?.name?.slice(1, pharmacy.name.length)}
-                  </p>
-                  <DetailICO
-                    onClick={() => handlePharmacyDetailOpen(pharmacy)}
+        const totalPrice = realPharmaState?.cart_items?.reduce(
+          (total, product) => {
+            return total + product.quantity * product.price;
+          },
+          0,
+        );
+        return (
+          <CartItemContainer
+            key={`cartCard${pharmacy.id}_${index}_${pharmacy.shipping_cost}`}
+          >
+            <PharmacyName>
+              <div>
+                <PharmacyICO />
+                <p>
+                  {pharmacy?.name?.charAt(0).toUpperCase()}
+                  {pharmacy?.name?.slice(1, pharmacy.name.length)}
+                </p>
+                <DetailICO onClick={() => handlePharmacyDetailOpen(pharmacy)} />
+              </div>
+              <p>Total : Rp. {totalPrice?.toLocaleString('id-ID')}</p>
+            </PharmacyName>
+
+            {pharmacy?.cart_items?.map((item, index) => (
+              <ProductItem
+                key={`cartProductItem${item?.id}_${index}_${item.pharmacy_product_id}`}
+              >
+                <Image
+                  alt='image'
+                  src={item.thumbnail_url}
+                  width={100}
+                  height={100}
+                />
+                <Details>
+                  <h1>{item?.name}</h1>
+                  <p>stock: {item?.stock}</p>
+                  <p>Rp. {item?.price?.toLocaleString('id-ID')}</p>
+                </Details>
+                <ButtonAddContainer>
+                  <CustomButton
+                    disabled={isLoading}
+                    content='-'
+                    $width='40px'
+                    $height='40px'
+                    $border='#00B5C0'
+                    onClick={() =>
+                      handleSubtract(
+                        item.product_id,
+                        pharmacy,
+                        item.id,
+                        item.name,
+                      )
+                    }
                   />
-                </div>
-                <p>Total : Rp. {totalPrice?.toLocaleString('id-ID')}</p>
-              </PharmacyName>
-
-              {pharmacy?.cart_items?.map((item, index) => (
-                <ProductItem
-                  key={`cartProductItem${item?.id}_${index}_${item.pharmacy_product_id}`}
-                >
-                  <Image
-                    alt='image'
-                    src={item.thumbnail_url}
-                    width={100}
-                    height={100}
+                  <p>{item.quantity}</p>
+                  <CustomButton
+                    disabled={isLoading}
+                    content='+'
+                    $width='40px'
+                    $height='40px'
+                    $border='#00B5C0'
+                    onClick={() => handleIncrease(item.product_id, pharmacy)}
                   />
-                  <Details>
-                    <h1>{item?.name}</h1>
-                    <p>stock: {item?.stock}</p>
-                    <p>Rp. {item?.price?.toLocaleString('id-ID')}</p>
-                  </Details>
-                  <ButtonAddContainer>
-                    <CustomButton
-                      disabled={isLoading}
-                      content='-'
-                      $width='40px'
-                      $height='40px'
-                      $border='#00B5C0'
-                      onClick={() =>
-                        handleSubtract(
-                          item.product_id,
-                          pharmacy,
-                          item.id,
-                          item.name,
-                        )
-                      }
-                    />
-                    <p>{item.quantity}</p>
-                    <CustomButton
-                      disabled={isLoading}
-                      content='+'
-                      $width='40px'
-                      $height='40px'
-                      $border='#00B5C0'
-                      onClick={() => handleIncrease(item.product_id, pharmacy)}
-                    />
-                    <DeleteICO
-                      onClick={() =>
-                        handleCartDelete(
-                          item.id,
-                          item.product_id,
-                          pharmacy.id,
-                          item.name,
-                        )
-                      }
-                    />
-                  </ButtonAddContainer>
-                </ProductItem>
-              ))}
+                  <DeleteICO
+                    onClick={() =>
+                      handleCartDelete(
+                        item.id,
+                        item.product_id,
+                        pharmacy.id,
+                        item.name,
+                      )
+                    }
+                  />
+                </ButtonAddContainer>
+              </ProductItem>
+            ))}
 
-              <DeliveryItem onClick={() => openAddShippingInterface(pharmacy)}>
+            <DeliveryItem onClick={() => openAddShippingInterface(pharmacy)}>
+              <div>
+                <BikeICO />
                 <div>
-                  <BikeICO />
+                  <h3>Opsi Pengiriman</h3>
                   <div>
-                    <h3>Opsi Pengiriman</h3>
-                    <div>
-                      <p>Kurir</p>
-                      <p>:</p>
-                      <p>{realPharmaState?.shipping_name ?? '-'}</p>
-                    </div>
-                    <div>
-                      <p>Servis</p>
-                      <p>:</p>
-                      <p>{realPharmaState?.shipping_service ?? '-'}</p>
-                    </div>
-                    <div>
-                      <p>Estimasi</p>
-                      <p>:</p>
-                      <p>{realPharmaState?.shipping_estimation ?? '-'}</p>
-                    </div>
+                    <p>Kurir</p>
+                    <p>:</p>
+                    <p>{realPharmaState?.shipping_name ?? '-'}</p>
+                  </div>
+                  <div>
+                    <p>Servis</p>
+                    <p>:</p>
+                    <p>{realPharmaState?.shipping_service ?? '-'}</p>
+                  </div>
+                  <div>
+                    <p>Estimasi</p>
+                    <p>:</p>
+                    <p>{realPharmaState?.shipping_estimation ?? '-'}</p>
                   </div>
                 </div>
-                <OngkosKirim>
-                  <p>
-                    Rp.{' '}
-                    {realPharmaState?.shipping_cost?.toLocaleString('id-ID') ??
-                      `0`}
-                  </p>
-                </OngkosKirim>
-              </DeliveryItem>
-            </CartItemContainer>
-          );
-        })}
-        <InvokableModal
-          $pharmacyDetail={{
-            id: selectedPharmacyDetail?.id,
-            name: selectedPharmacyDetail?.name,
-            address: selectedPharmacyDetail?.address,
-            distance: selectedPharmacyDetail?.distance,
-            pharmacist_name: selectedPharmacyDetail?.pharmacist_name,
-            pharmacist_phone: selectedPharmacyDetail?.pharmacist_phone,
-            pharmacist_license: selectedPharmacyDetail?.pharmacist_license,
-            operational_days: selectedPharmacyDetail?.operational_days,
-            opening_time: selectedPharmacyDetail?.opening_time,
-            closing_time: selectedPharmacyDetail?.closing_time,
-          }}
-          modalType='pharmacy-detail'
-          $onOpen={handlePharmacyDetailOpen}
-          $isOpen={isModalOpen}
-          $onClose={handlePharmacyDetailClose}
-        />
-      </>
-    )
-  );
+              </div>
+              <OngkosKirim>
+                <p>
+                  Rp.{' '}
+                  {realPharmaState?.shipping_cost?.toLocaleString('id-ID') ??
+                    `0`}
+                </p>
+              </OngkosKirim>
+            </DeliveryItem>
+          </CartItemContainer>
+        );
+      })}
+      <InvokableModal
+        $pharmacyDetail={{
+          id: selectedPharmacyDetail?.id,
+          name: selectedPharmacyDetail?.name,
+          address: selectedPharmacyDetail?.address,
+          distance: selectedPharmacyDetail?.distance,
+          pharmacist_name: selectedPharmacyDetail?.pharmacist_name,
+          pharmacist_phone: selectedPharmacyDetail?.pharmacist_phone,
+          pharmacist_license: selectedPharmacyDetail?.pharmacist_license,
+          operational_days: selectedPharmacyDetail?.operational_days,
+          opening_time: selectedPharmacyDetail?.opening_time,
+          closing_time: selectedPharmacyDetail?.closing_time,
+        }}
+        modalType='pharmacy-detail'
+        $onOpen={handlePharmacyDetailOpen}
+        $isOpen={isModalOpen}
+        $onClose={handlePharmacyDetailClose}
+      />
+    </>
+  ) : isFetching ? (
+    <LoaderDiv style={{ marginTop: '50px', marginBottom: '25px' }}>
+      <PuffLoader size={100} loading={isFetching} color='#00b5c0' />
+    </LoaderDiv>
+  ) : null;
 };
 
 export default CartProductCard;

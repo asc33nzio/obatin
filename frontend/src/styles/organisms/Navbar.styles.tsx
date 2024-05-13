@@ -129,8 +129,8 @@ export const VerifyPopup = styled.div<{ $isPopupOpen: boolean }>`
   top: 125px;
   left: 0;
   right: 0;
-  padding-left: 250px;
-  padding-right: 100px;
+  padding-left: 50px;
+  padding-right: 15px;
   width: 100%;
   height: 25px;
   background-color: rgba(255, 0, 0, 0.5);
@@ -146,6 +146,10 @@ export const VerifyPopup = styled.div<{ $isPopupOpen: boolean }>`
     color: #ffffff;
     background-color: transparent;
     width: 100%;
+    text-overflow: hidden;
+    overflow: hidden;
+    word-wrap: break-word;
+    height: 100%;
     gap: 4px;
 
     u {
