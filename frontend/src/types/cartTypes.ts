@@ -15,6 +15,7 @@ export interface PharmacyItf {
   quantity: number;
   address: number;
   city_id: number;
+  city?: string;
   lat: string;
   lng: string;
   pharmacist_name: string;

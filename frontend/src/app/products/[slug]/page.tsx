@@ -24,20 +24,17 @@ import { ProductType } from '@/types/Product';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { RingLoader } from 'react-spinners';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { navigateToChat } from '@/app/actions';
+import { navigateToChat, navigateToProductList } from '@/app/actions';
 import { useToast } from '@/hooks/useToast';
+import { PharmacyItf } from '@/types/pharmacyTypes';
+import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
+import { getCookie } from 'cookies-next';
+import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
 import Axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import Footer from '@/components/organisms/footer/Footer';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Image from 'next/image';
-import { PharmacyItf } from '@/types/pharmacyTypes';
-import {
-  PharmacyCart,
-  setSelectedPharmacy,
-} from '@/redux/reducers/pharmacySlice';
-import { getCookie } from 'cookies-next';
-import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
 import HomeICO from '@/assets/icons/HomeICO';
 import ConsulICO from '@/assets/icons/ConsulICO';
 import PhoneICO from '@/assets/icons/PhoneICO';
@@ -72,6 +69,7 @@ const ProductDetailPage = () => {
         setProduct(response.data);
       } catch (error) {
         console.error(error);
+        navigateToProductList();
       }
     };
 
@@ -162,9 +160,9 @@ const ProductDetailPage = () => {
         pharmacy_id: pharmacy?.id,
       }),
     );
+
     setPharmacyName(pharmacy);
     setIsModalOpen(false);
-    console.log(pharmacy);
   };
 
   return (

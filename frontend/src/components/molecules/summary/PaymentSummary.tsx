@@ -1,98 +1,116 @@
+'use client';
 import {
   PaymentSummary,
   PaymentSummaryContainer,
   Summary,
 } from '@/styles/pages/product/Cart.styles';
-import { navigateToCheckout } from '@/app/actions';
-import { setPaymentId } from '@/redux/reducers/pharmacySlice';
+import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { getCookie } from 'cookies-next';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useEventEmitter } from '@/hooks/useEventEmitter';
+import { useModal } from '@/hooks/useModal';
+import { ModalType } from '@/types/modalTypes';
+import { useRouter } from 'next/navigation';
+import { clearCart, syncCartItem } from '@/redux/reducers/cartSlice';
+import { encrypt } from '@/utils/crypto';
+import Axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
-import axios from 'axios';
-// import { useEventEmitter } from '@/hooks/useEventEmitter';
-// import { useModal } from '@/hooks/useModal';
 
-const PaymentSummaryComponent = (props: {
-  isNext: boolean;
-}): React.ReactElement => {
-  // const pharmacies = useObatinSelector((state) => state?.pharmacy.pharmacies);
-  const totalQuantity = useObatinSelector((state) => state.cart.totalQuantity);
-  // const totalPrice = useObatinSelector((state) => state.cart.totalPrice);
-  // const totalShoppingCost = totalPrice + shippingCost;
+const PaymentSummaryComponent = (): React.ReactElement => {
+  const pharmacies = useObatinSelector((state) => state?.pharmacy.pharmacies);
+  const pharmacyState = useObatinSelector((state) => state?.pharmacy);
   const accessToken = getCookie('access_token');
-  const dispatch = useObatinDispatch();
   const { setToast } = useToast();
-  // const { openModal } = useModal();
+  const { openModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  // const emitter = useEventEmitter();
+  const emitter = useEventEmitter();
+  const router = useRouter();
+  const dispatch = useObatinDispatch();
+
+  const triggerModal = async (type: ModalType) => {
+    return new Promise<boolean>((resolve) => {
+      openModal(type);
+
+      emitter.once('close-modal-fail', () => {
+        resolve(false);
+      });
+
+      emitter.once('close-modal-ok', () => {
+        resolve(true);
+      });
+    });
+  };
 
   const handleCheckout = async () => {
     try {
-      // console.log(pharmacies[0].shipping_id);
-      // let payloadArr: Array<Partial<PharmacyCart>> = [];
-      // let allShippingSelected = false;
-      // let unsetShippingProductsCount = 0;
-      // pharmacies.map((pharmacy) => {
-      //   if (!pharmacy.shipping_id) {
-      //     allShippingSelected = false;
-      //     openModal('unset-shipment')
-      //     unsetShippingProductsCount += pharmacy.cart_items.length;
-      //     return;
-      //   }
+      let pharmacies_cart: Array<Partial<PharmacyCart>> = [];
+      let unsetShippingProductsCount = 0;
+      let atLeastOneShippingSet = false;
+      pharmacies.map((pharmacy) => {
+        if (!pharmacy.shipping_id) {
+          pharmacy.cart_items.forEach((product) => {
+            unsetShippingProductsCount += product.quantity;
+          });
+          localStorage.setItem(
+            'unsetShipping',
+            unsetShippingProductsCount.toString(),
+          );
+          return;
+        }
 
-      //   payloadArr.push(pharmacy);
-      // });
-      // console.log(payloadArr);
+        atLeastOneShippingSet = true;
+        const {
+          shipping_name,
+          shipping_service,
+          shipping_estimation,
+          ...rest
+        } = pharmacy;
+        pharmacies_cart.push(rest);
+      });
 
-      // const pharmaciesArr: Array<PharmacyCart> = [];
-      // pharmacies.map((pharmacy) => pharmaciesArr.push(pharmacy));
-      // console.log(pharmaciesArr);
-      // return;
+      if (!atLeastOneShippingSet) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Pilihlah metode pengiriman',
+          toastType: 'warning',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
 
-      // if (!selectedPharmacy) {
-      //   setToast({
-      //     showToast: true,
-      //     toastMessage: 'Pilihlah metode pengiriman',
-      //     toastType: 'warning',
-      //     resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-      //     orientation: 'center',
-      //   });
-      //   return;
-      // }
+      if (unsetShippingProductsCount > 0) {
+        const canProceed = await triggerModal('unset-shipment');
+        if (!canProceed) return;
+      }
 
-      // const payload = {
-      //   pharmacies_cart: pharmaciesArr,
-      // };
+      let totalQuantity: number = 0;
+      let totalCheckout: number = 0;
+      let totalShippingCost: number = 0;
+      pharmacies_cart.forEach((pharmacy) => {
+        pharmacy.cart_items?.forEach((product) => {
+          totalQuantity += product.quantity;
+          totalCheckout += product.price * product.quantity;
+        });
+        totalShippingCost += pharmacy?.shipping_cost ?? 0;
+      });
+      localStorage.setItem(
+        'checkout',
+        `${totalQuantity},${totalCheckout},${totalShippingCost}`,
+      );
 
-      // console.log(payload);
+      const canProceed = await triggerModal('confirm-checkout');
+      if (!canProceed) return;
 
-      // {
-      //   id: selectedPharmacy.id,
-      //   name: selectedPharmacy.name,
-      //   address: selectedPharmacy.address,
-      //   city_id: selectedPharmacy.city_id,
-      //   lat: selectedPharmacy.lat,
-      //   lng: selectedPharmacy.lng,
-      //   pharmacist_name: selectedPharmacy.pharmacist_name,
-      //   pharmacist_license: selectedPharmacy.pharmacist_license,
-      //   pharmacist_phone: selectedPharmacy.pharmacist_phone,
-      //   opening_time: selectedPharmacy.opening_time,
-      //   closing_time: selectedPharmacy.closing_time,
-      //   operational_days: selectedPharmacy.operational_days,
-      //   partner_id: selectedPharmacy.partner_id,
-      //   distance: selectedPharmacy.distance,
-      //   total_weight: selectedPharmacy.total_weight,
-      //   subtotal_pharmacy: selectedPharmacy.subtotal_pharmacy,
-      //   shipping_id: selectedPharmacy.shipping_id,
-      //   shipping_cost: selectedPharmacy.shipping_cost,
-      //   cart_items: selectedPharmacy.cart_items,
-      // },
+      const payload = {
+        pharmacies_cart,
+      };
 
-      const response = await axios.post(
+      const checkoutResponse = await Axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/checkout`,
-        // payload,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -100,9 +118,34 @@ const PaymentSummaryComponent = (props: {
         },
       );
 
-      const { payment_id } = response.data.data;
-      dispatch(setPaymentId(payment_id));
-      navigateToCheckout();
+      const { payment_id } = checkoutResponse.data.data;
+      const encryptedPID = await encrypt(payment_id);
+      const encodedEncryptedPID = encodeURIComponent(encryptedPID);
+
+      dispatch(clearCart());
+      const updatedCartResponse = await Axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart/details`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      const newPharmaciesCart: Array<PharmacyCart> =
+        updatedCartResponse.data.data.pharmacies_cart;
+      newPharmaciesCart?.forEach((pharmacy) => {
+        pharmacy?.cart_items?.forEach((cartItem) => {
+          dispatch(
+            syncCartItem({
+              product_id: cartItem.product_id,
+              prescription_id: cartItem.prescription_id ?? null,
+              pharmacy_id: pharmacy.id ?? null,
+              quantity: cartItem.quantity,
+            }),
+          );
+        });
+      });
+      router.replace(`/shop/checkout/${encodedEncryptedPID}`);
     } catch (error) {
       console.error(error);
       setToast({
@@ -120,34 +163,44 @@ const PaymentSummaryComponent = (props: {
       <PaymentSummaryContainer>
         <PaymentSummary>
           <div>
-            <p>Keranjang</p>
-            <p>{totalQuantity} item(s)</p>
+            <p>Checkout</p>
+            <p>{pharmacyState?.checkoutProductsQty} produk</p>
           </div>
           <div>
-            <p>Biaya Pengiriman XXX</p>
-            {/* <p>{shippingCost}</p> */}
+            <p>Harga Barang</p>
+            <p>
+              Rp. {pharmacyState?.checkoutSubtotal?.toLocaleString('id-ID')}
+            </p>
           </div>
           <div>
-            <p>Biaya Aplikasi</p>
-            <p></p>
+            <p>Biaya Pengiriman</p>
+            <p>
+              Rp.&nbsp;
+              {pharmacyState?.checkoutShipmentSubtotal?.toLocaleString('id-ID')}
+            </p>
           </div>
         </PaymentSummary>
         <Summary>
           <div>
-            <h3>Total Belanja XXX</h3>
-            {/* <p>{totalShoppingCost}</p> */}
+            <h3>Total Belanja</h3>
+            <p>
+              Rp.&nbsp;
+              {(
+                pharmacyState?.checkoutSubtotal +
+                pharmacyState?.checkoutShipmentSubtotal
+              )?.toLocaleString('id-ID')}
+            </p>
           </div>
-          {props.isNext && (
-            <div>
-              <CustomButton
-                content='Proses Transaksi'
-                $width='250px'
-                $height='50px'
-                $fontSize='16px'
-                onClick={handleCheckout}
-              />
-            </div>
-          )}
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <CustomButton
+              content='Proses Transaksi'
+              $width='250px'
+              $height='50px'
+              $fontSize='16px'
+              onClick={handleCheckout}
+            />
+          </div>
         </Summary>
       </PaymentSummaryContainer>
     </>

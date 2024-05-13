@@ -18,6 +18,7 @@ import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent'
 import AddShippingModalContent from './modalContent/AddShippingModalContent';
 import ViewMoreTxModalContent from './modalContent/ViewMoreTxModalContent';
 import UnsetShippingModalContent from './modalContent/UnsetShippingModalContent';
+import ConfirmCheckoutModalContent from './modalContent/ConfirmCheckoutModalContent';
 
 interface DoctorDetailItf {
   name: string;
@@ -167,7 +168,16 @@ const Modal = () => {
       title = 'Ada pengiriman yang belum diatur dalam keranjang';
       modalProps = {
         $containerWidth: '650px',
-        $containerHeight: '150px',
+        $containerHeight: '250px',
+      };
+      break;
+
+    case 'confirm-checkout':
+      modalContent = <ConfirmCheckoutModalContent />;
+      title = 'Berikut perincian pembelanjaan anda';
+      modalProps = {
+        $containerWidth: '650px',
+        $containerHeight: '650px',
       };
       break;
 

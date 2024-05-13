@@ -22,6 +22,8 @@ export type ModalType =
   | 'view-more-tx'
   | 'add-shipping'
   | 'unset-shipment'
-  | 'pharmacy-detail'
+  | 'confirm-checkout'
   | 'select-nearby-pharmacy'
   | '';
+
+export type InvokableModalType = 'pharmacy-detail' | 'doctor-detail';

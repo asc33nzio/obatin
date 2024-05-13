@@ -4,32 +4,38 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import {
   Cart,
   CartSection,
-  Content,
+  CheckoutPageSubcontainer,
   OrderSummary,
   SectionTitle,
 } from '@/styles/pages/product/Cart.styles';
-import { ChangeEvent } from 'react';
-import { Container } from '@/styles/Global.styles';
-import { Body } from '@/styles/pages/checkout/CheckoutPage.styles';
 import {
   ImageContainer,
   PdfContainer,
 } from '@/styles/organisms/modal/modalContent/UploadPayment.styles';
+import {
+  navigateToCart,
+  navigateToHome,
+  navigateToProductList,
+  navigateToTxHistory,
+} from '@/app/actions';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { Container } from '@/styles/Global.styles';
+import { Body } from '@/styles/pages/checkout/CheckoutPage.styles';
 import { getCookie } from 'cookies-next';
-import { navigateToCart, navigateToTxHistory } from '@/app/actions';
-import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useUploadValidation } from '@/hooks/useUploadValidation';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { resetPharmacyStates } from '@/redux/reducers/pharmacySlice';
-import { clearCart } from '@/redux/reducers/cartSlice';
+import { usePathname } from 'next/navigation';
+import { decrypt } from '@/utils/crypto';
+import { PropagateLoader } from 'react-spinners';
+import { LoaderDiv } from '@/styles/pages/auth/Auth.styles';
 import Axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
-import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Image from 'next/image';
+import PaymentSummaryUploadPayment from '@/components/molecules/summary/PaymentSummaryUploadPayment';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -44,10 +50,12 @@ const Checkout = (): React.ReactElement => {
     userUploadValidationError,
   } = useUploadValidation();
   const accessToken = getCookie('access_token');
-  const paymentId = useObatinSelector((state) => state.pharmacy.paymentId);
+  const pathname = usePathname();
+  const pid = pathname.split('/').pop();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
-  const dispatch = useObatinDispatch();
+  const [plaintextPID, setPlaintextPID] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleUpload = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files === null) return;
@@ -63,6 +71,7 @@ const Checkout = (): React.ReactElement => {
 
   const handleCheckout = async () => {
     try {
+      setIsLoading(true);
       if (userUpload === undefined) {
         setToast({
           showToast: true,
@@ -77,8 +86,16 @@ const Checkout = (): React.ReactElement => {
       const formData = new FormData();
       formData.append('file', userUpload);
 
+      setToast({
+        showToast: true,
+        toastMessage: 'Pembayaran kamu sedang kami proses',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+
       await Axios.patch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/${paymentId}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/${plaintextPID}`,
         formData,
         {
           headers: {
@@ -96,11 +113,22 @@ const Checkout = (): React.ReactElement => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
-      dispatch(clearCart());
-      dispatch(resetPharmacyStates());
+
       navigateToTxHistory();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      if (error.response.request.status === 404) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Transaksi yang anda cari tidak ada',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        navigateToProductList();
+        return;
+      }
+
       setToast({
         showToast: true,
         toastMessage: 'Maaf, gagal mengunggah bukti pembayaran',
@@ -108,16 +136,33 @@ const Checkout = (): React.ReactElement => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const validatePID = async () => {
+      try {
+        if (pid === undefined) throw new Error('invalid path');
+        const decodedPID = decodeURIComponent(pid);
+        const decryptedPID = await decrypt(decodedPID);
+        setPlaintextPID(decryptedPID);
+      } catch (_e: any) {
+        console.error('this transaction does not exist');
+        navigateToHome();
+      }
+    };
+
+    validatePID();
+  }, [pid]);
 
   return (
     <Container>
       <Navbar />
       <Body>
-        <Content>
+        <CheckoutPageSubcontainer>
           <Cart>
-            <SectionTitle>Opsi Pembayaran</SectionTitle>
             <CartSection>
               <SectionTitle>
                 <p>Upload Bukti Pembayaran</p>
@@ -149,24 +194,41 @@ const Checkout = (): React.ReactElement => {
                 ) : null}
               </ImageContainer>
 
-              <CustomButton
-                $width='100%'
-                $fontSize='16px'
-                content='Proses Pembayaran'
-                onClick={handleCheckout}
-              />
+              {isLoading ? (
+                <LoaderDiv>
+                  <PropagateLoader
+                    color='#dd1b50'
+                    speedMultiplier={0.8}
+                    size={'18px'}
+                    cssOverride={{
+                      alignSelf: 'center',
+                      justifySelf: 'center',
+                    }}
+                  />
+                </LoaderDiv>
+              ) : (
+                <CustomButton
+                  $width='100%'
+                  $height='75px'
+                  $fontSize='16px'
+                  content='Lanjutkan Pembayaran'
+                  onClick={handleCheckout}
+                  disabled={isLoading ? true : false}
+                />
+              )}
             </CartSection>
           </Cart>
           <OrderSummary>
-            <PaymentSummaryComponent isNext={false} />
+            <PaymentSummaryUploadPayment />
           </OrderSummary>
           <CustomButton
             content='Kembali'
             $fontSize='16px'
             $width='120px'
+            $bgColor='#de161c'
             onClick={() => navigateToCart()}
           />
-        </Content>
+        </CheckoutPageSubcontainer>
       </Body>
     </Container>
   );

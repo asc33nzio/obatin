@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 const TableContainer = styled.div`
   width: 100%;
+  min-height: 520px;
 `;
 
 const Table = styled.table`
@@ -84,7 +85,7 @@ const FilterContainer = styled.div`
   align-items: center;
 `;
 
-const LimitInput = styled.input`
+const CustomInput = styled.input`
   font-size: 16px;
   padding: 0.3rem;
 `;
@@ -99,14 +100,6 @@ const TableFilterWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-`;
-
-const DetailCardContainer = styled.div`
-  background-color: white;
-  width: 800px;
-  height: 700px;
-  padding: 2rem;
-  border-radius: 2rem;
 `;
 
 const CustomButtonsWrapper = styled.div`
@@ -136,10 +129,9 @@ const AdminOrdersStyledComponents = {
   FilterContainer,
   CustomSelect,
   CustomButton,
-  LimitInput,
+  CustomInput,
   CustomSection,
   TableFilterWrapper,
-  DetailCardContainer,
   CustomButtonsWrapper,
   TitleText,
   ModalConfirmationContainer,

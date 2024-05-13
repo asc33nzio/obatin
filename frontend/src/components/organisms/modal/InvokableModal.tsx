@@ -4,7 +4,7 @@ import {
   ModalOverlay,
   ModalHeader,
 } from '@/styles/organisms/modal/Modal.styles';
-import { ModalType } from '@/types/modalTypes';
+import { InvokableModalType } from '@/types/modalTypes';
 import DoctorDetailModalContent from './modalContent/DoctorDetailModalContent';
 import CloseICO from '@/assets/icons/CloseICO';
 import SelectDetailPharmacyModalContent from './modalContent/SelectDetailPharmacyModalContent';
@@ -37,7 +37,7 @@ const InvokableModal = (props: {
   $doctorDetail?: DoctorDetailItf;
   $pharmacyDetail?: PharmacyItf;
   $productId?: PharmacyItf;
-  modalType: ModalType;
+  modalType: InvokableModalType;
   onOpen: Function;
   isOpen: boolean;
   onClose: () => void;
@@ -88,19 +88,6 @@ const InvokableModal = (props: {
         onClose: () => {},
       };
       break;
-
-    // case 'select-nearby-pharmacy':
-    //   modalContent = <SelectNearbyPharmacy $productId={props.$productId} />;
-    //   title = '';
-    //   modalProps = {
-    //     $overlayHeight: '200vh',
-    //     $containerWidth: '450px',
-    //     $containerHeight: 'max-content',
-    //     onOpen: () => {},
-    //     isOpen: false,
-    //     onClose: () => {},
-    //   };
-    //   break;
 
     default:
       modalContent = null;

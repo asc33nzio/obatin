@@ -1,5 +1,8 @@
+import {
+  updateCheckoutInfo,
+  updateShippingInfo,
+} from '@/redux/reducers/pharmacySlice';
 import { useModal } from '@/hooks/useModal';
-import { updateSelectedPharmacy } from '@/redux/reducers/pharmacySlice';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { ShippingMethodsType } from '@/types/shippingType';
 import { getCookie } from 'cookies-next';
@@ -79,11 +82,19 @@ const AddShippingModalContent = () => {
   }, [accessToken, selectedPharmacy]);
 
   const handleSelectShippingMethod = (method: ShippingMethodsType) => {
+    const shipping_service = `${method.service.toUpperCase()} - ${method.description}`;
     dispatch(
-      updateSelectedPharmacy({
+      updateCheckoutInfo({
+        checkoutShipmentSubtotal: method.price,
+      }),
+    );
+    dispatch(
+      updateShippingInfo({
         shipping_id: method.shipping_id,
         shipping_cost: method.price,
         shipping_name: method.name,
+        shipping_estimation: method.estimated,
+        shipping_service,
       }),
     );
     closeModal();

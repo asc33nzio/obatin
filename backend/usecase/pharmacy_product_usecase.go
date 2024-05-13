@@ -124,7 +124,9 @@ func (u *pharmacyProductUsecaseImpl) UpdatePharmacyProduct(ctx context.Context, 
 			if err != nil {
 				return nil, err
 			}
-
+			if *params.Delta > *ppSource.Stock {
+				return nil, apperror.ErrInvalidReq(apperror.ErrStlBadRequest)
+			}
 			sourceStock, err := ppr.FindStockAndLockById(ctx, *params.SourcePharmacyProductId)
 			if err != nil {
 				return nil, err
@@ -233,7 +235,10 @@ func (u *pharmacyProductUsecaseImpl) UpdatePharmacyProduct(ctx context.Context, 
 				targetStockInt += *params.Delta
 			}
 			if !*params.IsAddition {
-				targetStockInt += *params.Delta
+				targetStockInt -= *params.Delta
+				if targetStockInt < 0 {
+					return nil, apperror.ErrInvalidReq(apperror.ErrStlBadRequest)
+				}
 			}
 
 			err = ppr.UpdateStockPharmacyProduct(ctx, &entity.PharmacyProduct{
@@ -263,7 +268,7 @@ func (u *pharmacyProductUsecaseImpl) CreatePharmacyProduct(ctx context.Context, 
 	}
 	phPr := u.repoStore.PharmacyProductRepository()
 	ar := u.repoStore.AuthenticationRepository()
-	
+
 	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
@@ -273,15 +278,15 @@ func (u *pharmacyProductUsecaseImpl) CreatePharmacyProduct(ctx context.Context, 
 	if err != nil {
 		return err
 	}
-	
+
 	pharma, err := phPr.FindIdPharmacyProductByProductAndPharmacyId(ctx, *partnerId, *body.Pharmacy.Id)
 	if err != nil {
-        return err
-    }
+		return err
+	}
 	if pharma.Pharmacy.Id == nil {
 		return apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
-	
+
 	_, err = u.repoStore.Atomic(ctx, func(rs repository.RepoStore) (any, error) {
 		pr := rs.ProductRepository()
 		ppr := rs.PharmacyProductRepository()
@@ -309,7 +314,7 @@ func (u *pharmacyProductUsecaseImpl) CreatePharmacyProduct(ctx context.Context, 
 
 			if err != nil {
 				return nil, err
-			}	
+			}
 		}
 
 		if prdct.MinPrice > *body.Price {

@@ -62,8 +62,14 @@ func (h *ProductHandler) GetProductDetailBySlug(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
+	var forSales bool
 
-	res := dto.ToProductDetailResponse(product)
+	role, _ := ctx.Value(constant.AuthenticationRole).(string)
+	if role == constant.RoleAdmin {
+		forSales = true
+	}
+
+	res := dto.ToProductDetailResponse(product, forSales)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: constant.ResponseOkMsg,
 		Data:    res,

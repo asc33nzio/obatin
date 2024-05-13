@@ -59,6 +59,7 @@ func ToPharmacyListResponse(pharmacies *entity.PharmacyListPage) []GetOnePharmac
 			Id:                values.Id,
 			Name:              values.Name,
 			Address:           values.Address,
+			CityId:            values.City.Id,
 			City:              values.City.Name,
 			Latitude:          values.Latitude,
 			Longitude:         values.Longitude,

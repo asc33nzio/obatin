@@ -18,10 +18,10 @@ type PharmacyProductRepository interface {
 	UpdateStockPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct) error
 	GetPharmacyProductListByPartnerId(ctx context.Context, params entity.PharmacyProductFilter, partnerId int64) (*entity.PharmacyProductListPage, error)
 	FindPharmacyProductByPharmacyProductId(ctx context.Context, pharmacyProductId int64) (*entity.PharmacyProduct, error)
-	FindPharmacyProductByPharmacyIdAndProductId(ctx context.Context, pharmacyId int64, productId int64) (*entity.PharmacyProduct,error)
-	FindIdPharmacyProductByProductAndPharmacyId(ctx context.Context, partnerId int64, pharmacyId int64) (*entity.PharmacyProduct,error)
+	FindPharmacyProductByPharmacyIdAndProductId(ctx context.Context, pharmacyId int64, productId int64) (*entity.PharmacyProduct, error)
+	FindIdPharmacyProductByProductAndPharmacyId(ctx context.Context, partnerId int64, pharmacyId int64) (*entity.PharmacyProduct, error)
 	InsertPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct) (*int64, error)
-	UpdatePharmacyProductDetail(ctx context.Context, body entity.UpdatePharmacyProduct)error
+	UpdatePharmacyProductDetail(ctx context.Context, body entity.UpdatePharmacyProduct) error
 }
 
 type pharmacyProductRepositoryPostgres struct {
@@ -167,7 +167,7 @@ func (r *pharmacyProductRepositoryPostgres) FindPharmacyProductByPharmacyProduct
 	return &res, nil
 }
 
-func (r *pharmacyProductRepositoryPostgres)FindPharmacyProductByPharmacyIdAndProductId(ctx context.Context, pharmacyId int64, productId int64) (*entity.PharmacyProduct,error){
+func (r *pharmacyProductRepositoryPostgres) FindPharmacyProductByPharmacyIdAndProductId(ctx context.Context, pharmacyId int64, productId int64) (*entity.PharmacyProduct, error) {
 	res := entity.PharmacyProduct{}
 	query := `
 		SELECT
@@ -218,7 +218,7 @@ func (r *pharmacyProductRepositoryPostgres)FindPharmacyProductByPharmacyIdAndPro
 	return &res, nil
 }
 
-func (r *pharmacyProductRepositoryPostgres)FindIdPharmacyProductByProductAndPharmacyId(ctx context.Context, partnerId int64, pharmacyId int64) (*entity.PharmacyProduct,error){
+func (r *pharmacyProductRepositoryPostgres) FindIdPharmacyProductByProductAndPharmacyId(ctx context.Context, partnerId int64, pharmacyId int64) (*entity.PharmacyProduct, error) {
 	var pharmacyResId int64
 	query := `
 		SELECT 
@@ -536,8 +536,8 @@ func (r *pharmacyProductRepositoryPostgres) UpdateStockPharmacyProduct(ctx conte
 	return nil
 }
 
-func (r *pharmacyProductRepositoryPostgres) InsertPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct)(*int64, error) {
-	var ppId int64 
+func (r *pharmacyProductRepositoryPostgres) InsertPharmacyProduct(ctx context.Context, pp *entity.PharmacyProduct) (*int64, error) {
+	var ppId int64
 	queryInsertPharmacyProduct := `
         INSERT INTO
             pharmacies_products(

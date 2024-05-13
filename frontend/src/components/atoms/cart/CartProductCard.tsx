@@ -33,14 +33,12 @@ import DetailICO from '@/assets/icons/DetailICO';
 import DeleteICO from '@/assets/dashboard/DeleteICO';
 import BikeICO from '@/assets/icons/BikeICO';
 import Axios from 'axios';
-import InvokableModal from '@/components/organisms/modal/InvokableModal';
 import { PharmacyItf } from '@/types/pharmacyTypes';
-import { navigateToProductDetail } from '@/app/actions';
+import InvokableModal from '@/components/organisms/modal/InvokableModal';
 
-const ProductCartItem = () => {
+const CartProductCard = () => {
   const dispatch = useObatinDispatch();
   const accessToken = getCookie('access_token');
-  const pharmaciesState = useObatinSelector((state) => state?.pharmacy);
   const pharmacies = useObatinSelector((state) => state?.pharmacy?.pharmacies);
   const items = useObatinSelector((state) => state?.cart?.items);
   const { openModal } = useModal();
@@ -64,10 +62,8 @@ const ProductCartItem = () => {
         },
       );
 
-      const pharmaciesCart = response.data.data.pharmacies_cart;
-      dispatch(
-        setPharmacies({ ...pharmaciesState, pharmacies: pharmaciesCart }),
-      );
+      const { pharmacies_cart } = response.data.data;
+      if (pharmacies_cart.length > 0) dispatch(setPharmacies(pharmacies_cart));
     } catch (error) {
       console.error(error);
     } finally {
@@ -111,6 +107,7 @@ const ProductCartItem = () => {
   const handleCartDelete = async (
     cart_id: number,
     product_id: number,
+    pharmacy_id: number,
     name: string,
   ) => {
     const payload = {
@@ -148,7 +145,12 @@ const ProductCartItem = () => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
-      dispatch(removeItemFromPharmacyCart(product_id));
+      dispatch(
+        removeItemFromPharmacyCart({
+          product_id,
+          pharmacy_id,
+        }),
+      );
       dispatch(removeItemFromCart(existingItem));
       setShouldUpdate(!shouldUpdate);
     } catch (error: any) {
@@ -202,12 +204,11 @@ const ProductCartItem = () => {
 
     await updateCartItemDb(product_id, existingItem.quantity - 1);
     if (existingItem.quantity === 1) {
-      await handleCartDelete(cart_id, product_id, name);
+      await handleCartDelete(cart_id, product_id, pharmacy.id, name);
     }
   };
 
   const handlePharmacyDetailOpen = (pharmacy: PharmacyCart) => {
-    //! todo: invoke invokable modal
     setSelectedPharmacyDetail(pharmacy);
     setIsModalOpen(true);
   };
@@ -228,7 +229,7 @@ const ProductCartItem = () => {
   }, [shouldUpdate]);
 
   return (
-    pharmacies && (
+    pharmacies.length !== 0 && (
       <>
         {pharmacies?.map((pharmacy: PharmacyCart, index) => {
           if (pharmacy.cart_items?.length === 0) return null;
@@ -236,17 +237,31 @@ const ProductCartItem = () => {
             (pharma) => pharma.id === pharmacy.id,
           );
 
+          const totalPrice = realPharmaState?.cart_items?.reduce(
+            (total, product) => {
+              return total + product.quantity * product.price;
+            },
+            0,
+          );
           return (
             <CartItemContainer
               key={`cartCard${pharmacy.id}_${index}_${pharmacy.shipping_cost}`}
             >
               <PharmacyName>
-                <PharmacyICO />
-                <p>{pharmacy.name}</p>
-                <DetailICO onClick={() => handlePharmacyDetailOpen(pharmacy)} />
+                <div>
+                  <PharmacyICO />
+                  <p>
+                    {pharmacy?.name?.charAt(0).toUpperCase()}
+                    {pharmacy?.name?.slice(1, pharmacy.name.length)}
+                  </p>
+                  <DetailICO
+                    onClick={() => handlePharmacyDetailOpen(pharmacy)}
+                  />
+                </div>
+                <p>Total : Rp. {totalPrice?.toLocaleString('id-ID')}</p>
               </PharmacyName>
 
-              {pharmacy.cart_items.map((item, index) => (
+              {pharmacy?.cart_items?.map((item, index) => (
                 <ProductItem
                   key={`cartProductItem${item?.id}_${index}_${item.pharmacy_product_id}`}
                 >
@@ -257,17 +272,9 @@ const ProductCartItem = () => {
                     height={100}
                   />
                   <Details>
-                    <h1
-                      onClick={() =>
-                        navigateToProductDetail(
-                          item.name.split(' ').join('-').toLowerCase(),
-                        )
-                      }
-                    >
-                      {item?.name}
-                    </h1>
+                    <h1>{item?.name}</h1>
                     <p>stock: {item?.stock}</p>
-                    <p>Rp{item?.price}</p>
+                    <p>Rp. {item?.price?.toLocaleString('id-ID')}</p>
                   </Details>
                   <ButtonAddContainer>
                     <CustomButton
@@ -296,7 +303,12 @@ const ProductCartItem = () => {
                     />
                     <DeleteICO
                       onClick={() =>
-                        handleCartDelete(item.id, item.product_id, item.name)
+                        handleCartDelete(
+                          item.id,
+                          item.product_id,
+                          pharmacy.id,
+                          item.name,
+                        )
                       }
                     />
                   </ButtonAddContainer>
@@ -308,14 +320,21 @@ const ProductCartItem = () => {
                   <BikeICO />
                   <div>
                     <h3>Opsi Pengiriman</h3>
-                    <p>{realPharmaState?.shipping_id}id</p>
-                    <p>
-                      Total: Rp.{' '}
-                      {realPharmaState?.subtotal_pharmacy?.toLocaleString(
-                        'id-ID',
-                      )}
-                    </p>
-                    <p>Kurir: {realPharmaState?.shipping_name ?? '-'}</p>
+                    <div>
+                      <p>Kurir</p>
+                      <p>:</p>
+                      <p>{realPharmaState?.shipping_name ?? '-'}</p>
+                    </div>
+                    <div>
+                      <p>Servis</p>
+                      <p>:</p>
+                      <p>{realPharmaState?.shipping_service ?? '-'}</p>
+                    </div>
+                    <div>
+                      <p>Estimasi</p>
+                      <p>:</p>
+                      <p>{realPharmaState?.shipping_estimation ?? '-'}</p>
+                    </div>
                   </div>
                 </div>
                 <OngkosKirim>
@@ -352,4 +371,4 @@ const ProductCartItem = () => {
   );
 };
 
-export default ProductCartItem;
+export default CartProductCard;

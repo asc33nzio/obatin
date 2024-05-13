@@ -457,6 +457,95 @@ func convertUpdateDoctorQueryParamstoSql(params entity.DoctorUpdateRequest, id i
 	return query.String(), args
 }
 
+func convertQuerySalesFromProductDetail(forSales bool, queryColumn string) string {
+	var resultQuery strings.Builder
+
+	queryFrom := `
+		FROM 
+			products p 
+		JOIN
+			manufacturers m
+		ON 
+			p.manufacturer_id = m.id
+		`
+	queryWhere := `
+		WHERE
+			p.product_slug = $1
+		AND
+			p.deleted_at IS NULL
+		AND 
+			p.is_active IS TRUE `
+	
+	queryCountSales := `
+		WITH sales_data AS (
+			SELECT
+				pp.product_id,
+				EXTRACT(MONTH FROM sm.created_at) AS sales_month,
+				SUM(CASE WHEN sm.movement_type = 'sale' THEN sm.delta ELSE 0 END) AS total_sales,
+				sm.is_addition AS is_addition
+			FROM
+				pharmacies_products pp
+			JOIN
+				stock_movements sm ON pp.id = sm.pharmacy_product_id
+			WHERE
+				pp.deleted_at IS NULL
+				AND sm.deleted_at IS NULL
+				AND sm.is_addition IS FALSE
+			GROUP BY
+				pp.product_id, EXTRACT(MONTH FROM sm.created_at), sm.is_addition
+		),
+		monthly_sales AS (
+			SELECT
+				product_id,
+				SUM(CASE WHEN sales_month = 1 THEN total_sales ELSE 0 END) AS January,
+				SUM(CASE WHEN sales_month = 2 THEN total_sales ELSE 0 END) AS February,
+				SUM(CASE WHEN sales_month = 3 THEN total_sales ELSE 0 END) AS March,
+				SUM(CASE WHEN sales_month = 4 THEN total_sales ELSE 0 END) AS April,
+				SUM(CASE WHEN sales_month = 5 THEN total_sales ELSE 0 END) AS May,
+				SUM(CASE WHEN sales_month = 6 THEN total_sales ELSE 0 END) AS June,
+				SUM(CASE WHEN sales_month = 7 THEN total_sales ELSE 0 END) AS July,
+				SUM(CASE WHEN sales_month = 8 THEN total_sales ELSE 0 END) AS August,
+				SUM(CASE WHEN sales_month = 9 THEN total_sales ELSE 0 END) AS September,
+				SUM(CASE WHEN sales_month = 10 THEN total_sales ELSE 0 END) AS October,
+				SUM(CASE WHEN sales_month = 11 THEN total_sales ELSE 0 END) AS November,
+				SUM(CASE WHEN sales_month = 12 THEN total_sales ELSE 0 END) AS December
+			FROM
+				sales_data
+			GROUP BY
+				product_id
+		)
+	`
+
+	if forSales {
+		resultQuery.WriteString(queryCountSales)
+	}
+	resultQuery.WriteString(queryColumn)
+	if forSales {
+		resultQuery.WriteString(` ,
+		ms.January, 
+		ms.February, 
+		ms.March, 
+        ms.April, 
+        ms.May, 
+        ms.June, 
+        ms.July,
+		ms.August, 
+        ms.September, 
+        ms.October, 
+        ms.November, 
+        ms.December
+		`)
+	}
+	resultQuery.WriteString(queryFrom)
+	if forSales {
+		resultQuery.WriteString(`LEFT JOIN
+		monthly_sales ms ON p.id = ms.product_id`)
+	}
+	resultQuery.WriteString(queryWhere)
+
+	return resultQuery.String()
+}
+
 func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
@@ -548,7 +637,7 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 	var query strings.Builder
 	var filters []interface{}
 	var countParams = constant.StartingParamsCount + 1
-	if params.Search != "" || params.Classification != nil || params.PharmacyId != 0 || params.ProductId != nil {
+	if params.Search != "" || params.SearchPharmacy != "" || params.Classification != nil || params.PharmacyId != 0 || params.ProductId != nil {
 		query.WriteString(" WHERE ")
 	}
 
@@ -558,6 +647,15 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 		filters = append(filters, params.Search)
 		countParams++
 	}
+	if params.SearchPharmacy != "" {
+		if countParams > constant.StartingParamsCount+1 {
+			query.WriteString(` AND `)
+		}
+		query.WriteString(fmt.Sprintf(` ppc.pharmacy_name ILIKE '%%' ||$%v|| '%%' `, countParams))
+		filters = append(filters, &params.SearchPharmacy)
+		countParams++
+	}
+
 	if params.PharmacyId != 0 {
 		if countParams > constant.StartingParamsCount+1 {
 			query.WriteString(` AND `)
@@ -609,6 +707,11 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 			query.WriteString(`ASC`)
 		case constant.OrderDescending:
 			query.WriteString(`DESC`)
+		}
+	}
+	if params.Order == nil {
+		if params.SortBy == nil {
+			query.WriteString(` ORDER BY pp.updated_at DESC`)
 		}
 	}
 	return query.String(), filters
@@ -986,12 +1089,21 @@ func allOrdersQuery(params *entity.OrdersFilter) (string, []interface{}) {
 		args = append(args, *params.UserId)
 	}
 
+	if params.InvoiceNumber != nil {
+		queryConditionalPart.WriteString(fmt.Sprintf(" AND p.invoice_number = $%d ", len(args)+1))
+		args = append(args, *params.InvoiceNumber)
+	}
+
 	subqueryRowsCount.WriteString(fmt.Sprintf(`
 		CROSS JOIN (
 			SELECT
 				COUNT(*) as total_rows
 			FROM
 				orders o
+			JOIN
+				payments p
+			ON
+				o.payment_id = p.id
 			%v
 		) AS tr
 `, queryConditionalPart.String()))

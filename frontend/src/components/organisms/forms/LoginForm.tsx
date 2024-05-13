@@ -15,6 +15,11 @@ import {
   navigateToForgotPassword,
   navigateToRegister,
 } from '@/app/actions';
+import {
+  ProductItemItf,
+  syncCartItem,
+  syncTotalPrice,
+} from '@/redux/reducers/cartSlice';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEmailValidation } from '@/hooks/useEmailValidation';
@@ -27,8 +32,6 @@ import { setAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedJwtItf } from '@/types/jwtTypes';
 import { PropagateLoader } from 'react-spinners';
-import { syncCartItem, syncTotalPrice } from '@/redux/reducers/cartSlice';
-import { CartItemItf } from '@/types/transactionTypes';
 import Axios from 'axios';
 import RegularInput from '@/components/atoms/input/RegularInput';
 import PasswordInput from '@/components/atoms/input/PasswordInput';
@@ -128,14 +131,17 @@ const LoginForm = (): React.ReactElement => {
           },
         );
 
-        const userCartData = cartDataResponse.data.data.cart;
+        const userCartData: Array<ProductItemItf> =
+          cartDataResponse.data.data.cart;
         const userCartSubotal = cartDataResponse.data.data.subtotal;
         if (userCartData && userCartData.length !== 0) {
           dispatch(syncTotalPrice(userCartSubotal));
-          userCartData.forEach((cartItem: CartItemItf) => {
+          userCartData.forEach((cartItem) => {
             dispatch(
               syncCartItem({
                 product_id: cartItem.product_id,
+                prescription_id: cartItem.prescription_id ?? null,
+                pharmacy_id: null,
                 quantity: cartItem.quantity,
               }),
             );
