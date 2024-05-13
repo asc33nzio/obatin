@@ -29,12 +29,12 @@ func (h *PharmacyHandler) GetAllPharmacy(ctx *gin.Context) {
 		return
 	}
 	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleAdmin || role == "" {
-		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
-		return
-	}
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+		return
+	}
+	if role != constant.RoleAdmin && role != constant.RoleManager || role == "" {
+		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 		return
 	}
 

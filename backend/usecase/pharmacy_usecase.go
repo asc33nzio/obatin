@@ -3,7 +3,9 @@ package usecase
 import (
 	"context"
 	"obatin/appconstant"
+	"obatin/apperror"
 	"obatin/config"
+	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 )
@@ -29,11 +31,32 @@ func NewPharmacyUsecaseImpl(
 
 func (u *pharmacyUsecaseImpl) GetAllPharmacies(ctx context.Context, params entity.PharmacyFilter) (*entity.PharmacyListPage, error) {
 	pr := u.repoStore.PharmacyRepository()
+	pnr := u.repoStore.PartnerRepository()
+
 	if params.Limit < appconstant.DefaultMinLimit {
 		params.Limit = appconstant.DefaultProductLimit
 	}
 	if params.Page < appconstant.DefaultMinPage {
 		params.Page = appconstant.DefaultMinPage
+	}
+
+	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	if !ok {
+		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+	}
+
+	if role == constant.RoleManager {
+		authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+		if !ok {
+			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		}
+
+		partnerId, err := pnr.FindPartnerIdByAuthId(ctx, authenticationId)
+		if err != nil {
+			return nil, err
+		}
+
+		params.PartnerId = partnerId
 	}
 
 	res, err := pr.FindPharmacyList(ctx, params)

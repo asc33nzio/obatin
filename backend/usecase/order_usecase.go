@@ -116,6 +116,26 @@ func (u *orderUsecaseImpl) GetAllOrders(ctx context.Context, params *entity.Orde
 
 func (u *orderUsecaseImpl) UpdateOrderStatus(ctx context.Context, o *entity.Order) error {
 	or := u.repoStore.OrderRepository()
+	ur := u.repoStore.UserRepository()
+
+	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	if !ok {
+		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+	}
+
+	if role == constant.RoleUser {
+		authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+		if !ok {
+			return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
+		}
+
+		userId, err := ur.FindUserIdByAuthId(ctx, authenticationId)
+		if err != nil {
+			return err
+		}
+
+		o.User.Id = userId
+	}
 
 	err := or.UpdateOrderById(ctx, o)
 	if err != nil {

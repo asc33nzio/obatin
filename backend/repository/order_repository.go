@@ -92,6 +92,11 @@ func (r *orderRepositoryPostgres) UpdateOrderById(ctx context.Context, o *entity
 			deleted_at IS NULL
 	`)
 
+	if o.User.Id != nil {
+		querySetPart.WriteString(fmt.Sprintf(" AND user_id = $%d ", len(args)+1))
+		args = append(args, *o.User.Id)
+	}
+
 	query.WriteString(querySetPart.String())
 	query.WriteString(queryWherePart.String())
 	res, err := r.db.ExecContext(

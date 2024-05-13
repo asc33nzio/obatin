@@ -16,12 +16,13 @@ type Order struct {
 }
 
 type OrdersFilter struct {
-	UserId     *int64
-	PharmacyId *int64
-	Status     *string
-	PartnerId  *int64
-	Page       int
-	Limit      int
+	InvoiceNumber *string
+	UserId        *int64
+	PharmacyId    *int64
+	Status        *string
+	PartnerId     *int64
+	Page          int
+	Limit         int
 }
 
 type OrdersPagination struct {
