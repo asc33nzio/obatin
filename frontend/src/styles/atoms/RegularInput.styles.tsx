@@ -65,7 +65,7 @@ export const CustomUploadButton = styled.button<{
   height: 100%;
   z-index: 1;
   background-color: ${({ $hasError, $isSet }) =>
-    $hasError ? '#e04146' : $isSet ? '#53BC38' : '#b3e5fc'};
+    $hasError ? '#e04146' : $isSet ? '#53BC38' : '#76D0F9'};
   border: none;
   outline: none;
 

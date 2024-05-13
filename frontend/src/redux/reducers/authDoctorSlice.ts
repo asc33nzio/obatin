@@ -20,7 +20,7 @@ const initialState: AuthDoctorReduxItf = {
   operationalDays: [],
 };
 
-export const authDoctorSlice = createSlice({
+const authDoctorSlice = createSlice({
   name: 'authDoctor',
   initialState,
   reducers: {

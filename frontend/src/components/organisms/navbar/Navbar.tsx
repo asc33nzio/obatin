@@ -150,8 +150,6 @@ const Navbar = (): React.ReactElement => {
           },
         },
       );
-
-      navigateToCart();
     } catch (error: any) {
       console.log(error);
       const resStatus = error?.response?.status;
@@ -183,6 +181,7 @@ const Navbar = (): React.ReactElement => {
 
     try {
       await postToCart();
+      navigateToCart();
     } catch (error) {
       console.error(error);
       setToast({

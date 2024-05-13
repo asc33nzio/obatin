@@ -16,7 +16,7 @@ import { ProductType } from '@/types/Product';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { RingLoader } from 'react-spinners';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { navigateToChat } from '@/app/actions';
+import { navigateToChat, navigateToProductList } from '@/app/actions';
 import { useToast } from '@/hooks/useToast';
 import Axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
@@ -44,6 +44,7 @@ const ProductDetailPage = () => {
         setProduct(response.data);
       } catch (error) {
         console.error(error);
+        navigateToProductList();
       }
     };
 

@@ -121,7 +121,12 @@ export default async function middleware(request: NextRequest) {
   }
 
   if (request.nextUrl.pathname.startsWith('/shop')) {
-    const restrictedPaths = ['/shop', '/shop/'];
+    const restrictedPaths = [
+      '/shop',
+      '/shop/',
+      '/shop/checkout',
+      '/shop/checkout/',
+    ];
 
     if (restrictedPaths.includes(request.nextUrl.pathname)) {
       return NextResponse.redirect(redirectToShop);

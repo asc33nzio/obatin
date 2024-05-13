@@ -3,13 +3,13 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import { authReducer } from '@/redux/reducers/authSlice';
 import { authDoctorReducer } from '../reducers/authDoctorSlice';
+import { cartReducer } from '../reducers/cartSlice';
+import { pharmacyReducer } from '@/redux/reducers/pharmacySlice';
 import { txReducer } from '../reducers/txSlice';
 import { provincesReducer } from '../reducers/provincesSlice';
 import { encryptTransform } from 'redux-persist-transform-encrypt';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
-import cartSlice from '../reducers/cartSlice';
-import pharmacySlice from '../reducers/pharmacySlice';
 
 const createNoopStorage = () => {
   return {
@@ -53,8 +53,8 @@ const rootReducer = combineReducers({
   auth: authReducer,
   authDoctor: authDoctorReducer,
   provinces: provincesReducer,
-  cart: cartSlice,
-  pharmacy: pharmacySlice,
+  cart: cartReducer,
+  pharmacy: pharmacyReducer,
   tx: txReducer,
 });
 

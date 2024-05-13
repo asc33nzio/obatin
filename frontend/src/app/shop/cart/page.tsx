@@ -17,7 +17,7 @@ import { useObatinSelector } from '@/redux/store/store';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import LocationICO from '@/assets/icons/LocationICO';
 import CustomButton from '@/components/atoms/button/CustomButton';
-import ProductCartItem from '@/components/atoms/cart/ProductCartItem';
+import CartProductCard from '@/components/atoms/cart/CartProductCard';
 import AddressCard from '@/components/molecules/cards/AddressCard';
 import PaymentSummaryComponent from '@/components/molecules/summary/PaymentSummary';
 
@@ -61,7 +61,7 @@ const CartPage = (): React.ReactElement => {
               })}
             </CartItemContainer>
             <CartSection>
-              <ProductCartItem />
+              <CartProductCard />
             </CartSection>
             <SubmitSection>
               <CustomButton
@@ -73,7 +73,7 @@ const CartPage = (): React.ReactElement => {
             </SubmitSection>
           </Cart>
           <OrderSummary>
-            <PaymentSummaryComponent isNext />
+            <PaymentSummaryComponent />
           </OrderSummary>
         </Content>
       </Body>
