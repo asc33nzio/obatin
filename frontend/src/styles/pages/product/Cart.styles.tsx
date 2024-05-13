@@ -15,20 +15,30 @@ export const Content = styled.div`
     width: 80vw;
   }
 `;
+
 export const CartSection = styled.div`
   width: 100%;
   height: max-content;
   border-radius: 12px;
-
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
 `;
 
 export const OrderSummary = styled.div`
   width: 100%;
   height: max-content;
+  border-radius: 12px;
+
+  margin-top: 5.5rem;
+  padding: 30px;
+
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+`;
+
+export const OrderSummaryCheckout = styled.div`
+  width: 100%;
+  height: 82vh;
   border-radius: 12px;
 
   margin-top: 5.5rem;
@@ -260,4 +270,13 @@ export const CheckoutPageSubcontainer = styled.div`
     flex-direction: column;
     width: 80vw;
   }
+`;
+
+export const CheckoutUploadSection = styled.section`
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
 `;

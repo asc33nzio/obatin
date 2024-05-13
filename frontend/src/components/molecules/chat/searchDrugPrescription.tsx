@@ -1,6 +1,6 @@
 'use client';
 
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/debounceThrottle';
 import Axios from 'axios';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';

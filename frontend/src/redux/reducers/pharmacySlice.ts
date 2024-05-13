@@ -5,7 +5,7 @@ export interface PharmacyCart {
   id: number;
   name: string;
   quantity: number;
-  address: number;
+  address: string;
   city_id: number;
   lat: string;
   lng: string;

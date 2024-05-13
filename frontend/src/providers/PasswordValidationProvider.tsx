@@ -1,6 +1,6 @@
 'use client';
 import { PasswordValidationItf } from '@/types/passwordValidationTypes';
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/debounceThrottle';
 import { useState } from 'react';
 import PasswordValidationContext from '@/contexts/passwordValidationContext';
 

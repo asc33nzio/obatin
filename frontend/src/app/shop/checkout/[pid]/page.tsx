@@ -3,13 +3,13 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import {
   Cart,
-  CartSection,
   CheckoutPageSubcontainer,
-  OrderSummary,
+  CheckoutUploadSection,
+  OrderSummaryCheckout,
   SectionTitle,
 } from '@/styles/pages/product/Cart.styles';
 import {
-  ImageContainer,
+  CheckoutImageContainer,
   PdfContainer,
 } from '@/styles/organisms/modal/modalContent/UploadPayment.styles';
 import {
@@ -171,9 +171,9 @@ const Checkout = (): React.ReactElement => {
       <Body>
         <CheckoutPageSubcontainer>
           <Cart>
-            <CartSection>
+            <CheckoutUploadSection>
               <SectionTitle>
-                <p>Upload Bukti Pembayaran</p>
+                <p>Unggah Bukti Pembayaran</p>
               </SectionTitle>
               <RegularInput
                 type='file'
@@ -185,7 +185,7 @@ const Checkout = (): React.ReactElement => {
                 $isSet={userUpload !== undefined}
               />
 
-              <ImageContainer>
+              <CheckoutImageContainer>
                 {userUpload && userUpload.type === 'application/pdf' ? (
                   <PdfContainer>
                     <Document file={userUpload} loading={<div>Loading...</div>}>
@@ -200,7 +200,7 @@ const Checkout = (): React.ReactElement => {
                     height={500}
                   />
                 ) : null}
-              </ImageContainer>
+              </CheckoutImageContainer>
 
               {isLoading ? (
                 <LoaderDiv>
@@ -224,11 +224,11 @@ const Checkout = (): React.ReactElement => {
                   disabled={isLoading ? true : false}
                 />
               )}
-            </CartSection>
+            </CheckoutUploadSection>
           </Cart>
-          <OrderSummary>
+          <OrderSummaryCheckout>
             <PaymentSummaryUploadPayment />
-          </OrderSummary>
+          </OrderSummaryCheckout>
           <CustomButton
             content='Kembali'
             $fontSize='16px'

@@ -12,7 +12,6 @@ import ChangePasswordModalContent from './modalContent/ChangePasswordModalConten
 import CloseICO from '@/assets/icons/CloseICO';
 import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmPasswordModalContent';
 import AddAddressModalContent from '@/components/organisms/modal/modalContent/AddAddressModalContent';
-import UploadPembayaranModal from '@/components/organisms/modal/modalContent/UploadPembayaranModal';
 import SelectAddressModalContent from './modalContent/SelectAddressModalContent';
 import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
 import AddShippingModalContent from './modalContent/AddShippingModalContent';
@@ -88,15 +87,6 @@ const Modal = () => {
       modalProps = {
         $containerWidth: '650px',
         $containerHeight: '850px',
-      };
-      break;
-
-    case 'payment-upload':
-      modalContent = <UploadPembayaranModal />;
-      title = 'Upload Bukti Pembayaran';
-      modalProps = {
-        $containerWidth: '500px',
-        $containerHeight: '500px',
       };
       break;
 

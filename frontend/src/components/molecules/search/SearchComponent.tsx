@@ -11,7 +11,7 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useToast } from '@/hooks/useToast';
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/debounceThrottle';
 import Axios from 'axios';
 import Image from 'next/image';
 import MagnifyBlueICO from '@/assets/icons/MagnifyBlueICO';

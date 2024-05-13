@@ -30,10 +30,8 @@ export const SearchContainer = styled.div`
 
 export const SearchInput = styled.input`
   width: 100%;
-
   border: none;
   outline: none;
-
   font-size: 18px;
 `;
 
@@ -58,7 +56,7 @@ export const SearchResult = styled.div<{
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 
   height: 65px;
   margin-bottom: 2px;
@@ -82,15 +80,11 @@ export const SearchResult = styled.div<{
     overflow: hidden;
     text-overflow: ellipsis;
 
-    width: 70%;
+    width: 72%;
     height: 100%;
     font-size: 18px;
     font-weight: 200;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(0, 181, 192, 1) 53%
-    );
+    background: #fff;
   }
 
   h2 {
@@ -99,7 +93,7 @@ export const SearchResult = styled.div<{
     justify-content: center;
     text-align: center;
 
-    color: #ffffff;
+    color: #fff;
     width: 100%;
     height: 100%;
     font-size: 18px;
@@ -146,7 +140,7 @@ export const ExploreMore = styled.div`
 
   overflow: hidden;
   text-overflow: ellipsis;
-  background: #dd1b50;
+  background: ${COLORS.primary_color};
   box-shadow: 3px 10px 20px gray;
 
   span {

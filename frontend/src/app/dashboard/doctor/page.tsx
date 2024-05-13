@@ -30,7 +30,7 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/debounceThrottle';
 import { getCookie } from 'cookies-next';
 import { setAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
 import { BounceLoader } from 'react-spinners';

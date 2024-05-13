@@ -25,9 +25,8 @@ import { useModal } from '@/hooks/useModal';
 import { getCookie } from 'cookies-next';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
-import { PharmacyItf } from '@/types/pharmacyTypes';
-import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import CustomButton from '../button/CustomButton';
 import PharmacyICO from '@/assets/icons/PharmacyICO';
 import DetailICO from '@/assets/icons/DetailICO';
@@ -47,7 +46,7 @@ const CartProductCard = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
   const [selectedPharmacyDetail, setSelectedPharmacyDetail] =
-    useState<PharmacyItf | null>(null);
+    useState<PharmacyCart | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const fetchCartItems = async () => {

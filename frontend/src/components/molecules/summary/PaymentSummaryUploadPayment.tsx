@@ -12,17 +12,15 @@ import Axios from 'axios';
 import styled from 'styled-components';
 
 const PaymentSummaryUploadPaymentContainer = styled.div`
-  border: 1px solid ${COLORS.primary_text};
-  padding: 10px;
-  border: 12px;
+  display: flex;
+  flex-direction: column;
 
   min-width: 30vw;
-  height: 75vh;
+  height: 85vh;
 `;
 
 const PaymentSummaryUploadPaymentSubcontainer = styled.div`
   color: ${COLORS.primary_text};
-  padding-bottom: 20px;
 
   div {
     display: flex;
@@ -34,7 +32,7 @@ const PaymentSummaryUploadPaymentSubcontainer = styled.div`
 
     p {
       padding: 5px 0;
-      height: 125px;
+      height: 155px;
       max-width: 275px;
       text-align: end;
       overflow: hidden;
