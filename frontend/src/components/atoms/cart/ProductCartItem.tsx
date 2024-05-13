@@ -35,6 +35,7 @@ import BikeICO from '@/assets/icons/BikeICO';
 import Axios from 'axios';
 import InvokableModal from '@/components/organisms/modal/InvokableModal';
 import { PharmacyItf } from '@/types/pharmacyTypes';
+import { navigateToProductDetail } from '@/app/actions';
 
 const ProductCartItem = () => {
   const dispatch = useObatinDispatch();
@@ -256,7 +257,13 @@ const ProductCartItem = () => {
                     height={100}
                   />
                   <Details>
-                    <h1>{item?.name}</h1>
+                    <h1
+                      onClick={() =>
+                        navigateToProductDetail(item.name.toLocaleLowerCase())
+                      }
+                    >
+                      {item?.name}
+                    </h1>
                     <p>stock: {item?.stock}</p>
                     <p>Rp{item?.price}</p>
                   </Details>

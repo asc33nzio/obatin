@@ -15,6 +15,7 @@ export interface ProductItemItf {
   stock: number;
   weight: number;
   is_prescription_required: boolean;
+  product_slug: string;
 }
 
 export interface CartItemItf {

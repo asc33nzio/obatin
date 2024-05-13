@@ -23,6 +23,7 @@ import Navbar from '@/components/organisms/navbar/Navbar';
 import Footer from '@/components/organisms/footer/Footer';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Image from 'next/image';
+import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
 
 const ProductDetailPage = () => {
   const pathname = usePathname();
@@ -34,6 +35,8 @@ const ProductDetailPage = () => {
   const items = useObatinSelector((state) => state.cart.items);
   const [isProductSelected, setIsProductSelected] =
     useState<ProductType | null>();
+  const [nearbyPharmacies, setNearbyPharmacies] = useState<PharmacyCart[]>([]);
+  const userInfo = useObatinSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +54,33 @@ const ProductDetailPage = () => {
       fetchData();
     }
   }, [product_slug]);
+
+  useEffect(() => {
+    const fetchNearbyPharmacies = async () => {
+      try {
+        const userAddress = userInfo?.addresses?.find(
+          (address) => address.id === userInfo.activeAddressId,
+        );
+        if (!userAddress) return;
+        const { data } = await Axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/nearby-pharmacies/products/${product?.id}`,
+          {
+            params: {
+              latitude: userAddress.latitude,
+              longitude: userAddress.longitude,
+            },
+          },
+        );
+        setNearbyPharmacies(data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (product && userInfo) {
+      fetchNearbyPharmacies();
+    }
+  }, [product, userInfo]);
 
   const handleAddToCart = (product: ProductType) => {
     if (product.is_prescription_required) {
@@ -83,6 +113,10 @@ const ProductDetailPage = () => {
     }
   };
 
+  // const handleSelectPharmacy = (pharmacy) => {
+  //   console.log('selected pharmacy:', pharmacy);
+  // };
+
   return (
     <Container>
       <Navbar />
@@ -97,6 +131,18 @@ const ProductDetailPage = () => {
             />
           ) : (
             <RingLoader loading={product === undefined} />
+          )}
+          {nearbyPharmacies?.length > 0 && (
+            <div>
+              <h2>apotek terdekat:</h2>
+              <ul>
+                {nearbyPharmacies?.map((pharmacy) => (
+                  <li key={pharmacy.id}>
+                    <p>apotek:{pharmacy.name}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
           <ProductDetail>
             <h1>{product?.name}</h1>
@@ -159,7 +205,6 @@ const ProductDetailPage = () => {
                 $fontSize='16px'
               />
             )}
-
             {product?.description && (
               <div>
                 <h2>Deskripsi</h2>
