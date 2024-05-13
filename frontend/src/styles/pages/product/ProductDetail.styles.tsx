@@ -49,15 +49,13 @@ export const ProductDetail = styled.div`
       padding: 10px 0;
     }
   }
-  svg {
-    width: 50px;
-  }
 `;
 
 export const ButtonAdd = styled.div`
   display: flex;
   gap: 30px;
   align-items: center;
+  justify-content: center;
 `;
 
 export const Price = styled.p`
@@ -73,6 +71,17 @@ export const Buttoncontainer = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+`;
+
+export const PharmacyNameContainer = styled.div`
+  width: max-content;
+  height: 50px;
+  border-radius: 12px;
+  border: 1px solid ${COLORS.primary_color};
+  color: ${COLORS.primary_color};
+  text-align: center;
+  align-items: center;
+  padding: 10px;
 `;
 
 export const PharmacyCard = styled.div`
@@ -105,12 +114,32 @@ export const PharmacyItem = styled.div`
 `;
 
 export const Row = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0 0 0 20px;
+  padding: 0 20px 0 20px;
   padding-bottom: 0;
   gap: 20px;
   border-bottom: 0px solid white;
   font-size: 16px;
+`;
+
+export const Column = styled.div`
+  flex-direction: column;
+  padding: 20px;
+  border: 1px solid ${COLORS.primary_color};
+  border-radius: 12px;
+  width: 100%;
+  height: 170px;
+
+  div {
+    flex-direction: row;
+  }
+
+  &:hover {
+    background-color: ${COLORS.primary_color};
+    color: white;
+    border: 1px solid white;
+  }
 `;

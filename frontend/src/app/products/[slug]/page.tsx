@@ -2,8 +2,10 @@
 import {
   ButtonAdd,
   Buttoncontainer,
+  Column,
   PharmacyCard,
   PharmacyItem,
+  PharmacyNameContainer,
   Price,
   ProductDetail,
   ProductDetailContainer,
@@ -53,6 +55,8 @@ const ProductDetailPage = () => {
     undefined,
   );
   const [nearbyPharmacies, setNearbyPharmacies] = useState<PharmacyCart[]>([]);
+  const [PharmacyName, setPharmacyName] = useState<PharmacyCart>();
+
   const userInfo = useObatinSelector((state) => state.auth);
   const accessToken = getCookie('access_token');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -137,6 +141,7 @@ const ProductDetailPage = () => {
 
   const handleSelectedPharmacy = (pharmacy: PharmacyCart) => {
     dispatch(setSelectedPharmacy(pharmacy));
+    setPharmacyName(pharmacy);
     setIsModalOpen(false);
     console.log(pharmacy);
   };
@@ -166,7 +171,7 @@ const ProductDetailPage = () => {
             <h3>{product?.selling_unit}</h3>
             <Buttoncontainer>
               <CustomButton
-                content='Pilih Apotek'
+                content={'Pilih Apotek'}
                 onClick={() => setIsModalOpen(true)}
                 $width='150px'
                 $height='50px'
@@ -188,7 +193,7 @@ const ProductDetailPage = () => {
                         : () => {}
                     }
                     $width='80px'
-                    $height='30px'
+                    $height='50px'
                     $fontSize='18px'
                     $color='#00B5C0'
                     $bgColor='white'
@@ -208,7 +213,7 @@ const ProductDetailPage = () => {
                         : () => {}
                     }
                     $width='80px'
-                    $height='30px'
+                    $height='50px'
                     $fontSize='18px'
                     $color='#00B5C0'
                     $bgColor='white'
@@ -228,6 +233,9 @@ const ProductDetailPage = () => {
                   $fontSize='16px'
                 />
               )}
+              <PharmacyNameContainer>
+                {PharmacyName?.name}
+              </PharmacyNameContainer>
             </Buttoncontainer>
 
             {product?.description && (
@@ -293,6 +301,20 @@ const ProductDetailPage = () => {
                         <LocationICO />
                         <p>{pharmacy.address}</p>
                         <p>{pharmacy.distance} km dari rumahmu</p>
+                      </Row>
+                      <Row>
+                        <Column>
+                          <p>Buka: {pharmacy.opening_time}</p>
+                          <p>Tutup: {pharmacy.closing_time}</p>
+                          <p>
+                            Hari Operasional:{' '}
+                            {pharmacy.operational_days.join(', ')}
+                          </p>
+                        </Column>
+                        <Column>
+                          <p>{pharmacy.pharmacist_name}</p>
+                          <p>{pharmacy.pharmacist_phone}</p>
+                        </Column>
                       </Row>
                     </PharmacyItem>
                   ))}
