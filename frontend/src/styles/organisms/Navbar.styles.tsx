@@ -136,26 +136,28 @@ export const VerifyPopup = styled.div<{ $isPopupOpen: boolean }>`
   background-color: rgba(255, 0, 0, 0.5);
 
   p {
-    font-size: 12px;
-    color: #ffffff;
-    font-weight: 550;
-    background-color: transparent;
-    width: 100%;
     display: flex;
     text-align: center;
     justify-content: center;
     align-items: center;
+
+    font-size: 14px;
+    font-weight: 550;
+    color: #ffffff;
+    background-color: transparent;
+    width: 100%;
     gap: 4px;
 
     u {
-      cursor: pointer;
       display: flex;
       text-align: center;
       justify-content: center;
       align-items: center;
-      font-size: 12px;
+
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 550;
       color: #ffffff;
-      font-weight: 500;
       background-color: transparent;
     }
   }
