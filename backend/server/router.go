@@ -230,6 +230,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.PATCH(appconstant.EndpointUpdateIsTyping, h.ChatRoomHandler.UpdateIsTyping)
 	r.GET(appconstant.EndpointGetAllChatRoom, h.ChatRoomHandler.GetListChatRoom)
 	r.DELETE(appconstant.EndpointDeleteChatRoom, h.ChatRoomHandler.DeleteChatRoom)
+	r.PATCH(appconstant.EndpointUpdateChatIsActive, h.ChatRoomHandler.UpdateChatRoomInactiveByChatRoomId)
 	r.POST(appconstant.EndpointCart, h.CartHandler.Bulk)
 	r.GET(appconstant.EndpointCartDetails, h.CartHandler.GetCartDetails)
 	r.PUT(appconstant.EndpointCart, h.CartHandler.UpdateOneCartItemQuantity)

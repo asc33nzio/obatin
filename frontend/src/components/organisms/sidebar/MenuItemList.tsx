@@ -34,7 +34,7 @@ export default function MenuItemsList({
   return (
     <>
       {options.map((option) => {
-        if (option.name === 'Logout') {
+        if (option.name === 'Keluar') {
           if (!isLoggedIn) return null;
 
           return (
