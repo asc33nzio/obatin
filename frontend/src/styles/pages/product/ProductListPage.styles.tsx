@@ -9,7 +9,8 @@ export const ProductListContainer = styled.div`
   width: 100%;
 
   @media (max-width: 1440px) {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     padding: 3rem 1rem;
     align-items: center;
@@ -20,7 +21,7 @@ export const ProductListContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-top: 13rem;
+    padding-top: 0.5rem;
   }
 `;
 
@@ -89,19 +90,21 @@ export const FilterContainer = styled.div`
   gap: 20px;
   padding: 0 3rem 3rem;
   justify-content: flex-end;
+  font-size: 14px;
   h2 {
     color: ${COLORS.primary_text};
   }
   @media (max-width: 1440px) {
-    width: 90%;
-    justify-content: center;
+    justify-content: flex-start;
   }
   @media (max-width: 768px) {
-    justify-content: flex-start;
+    width: 500px;
+    justify-content: center;
     display: flex;
+    flex-wrap: wrap;
     flex-direction: column;
-    padding-top: 20px;
     align-items: center;
+    padding: 0 3rem;
   }
 `;
 

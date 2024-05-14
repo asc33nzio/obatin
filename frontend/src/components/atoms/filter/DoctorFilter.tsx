@@ -159,9 +159,9 @@ const DoctorFilterComponent = ({
 
       <CustomButton
         content='Hapus filter'
-        $width='200px'
-        $height='54px'
-        $fontSize='16px'
+        $width='150px'
+        $height='50px'
+        $fontSize='14px'
         onClick={() => {
           handleClearClicked();
           setIsOpenOrderBy(false);

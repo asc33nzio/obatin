@@ -22,6 +22,7 @@ export const ProductCard = styled.a`
   text-align: center;
   text-decoration: none;
   height: 350px;
+  overflow-y: auto;
 
   &:hover {
     border: 1px solid ${COLORS.primary_color};
