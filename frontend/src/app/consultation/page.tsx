@@ -183,6 +183,13 @@ function ChatPage(): React.ReactElement {
   ) => {
     if (usedPrescriptionIDs.includes(drugData.PrescriptionId)) {
       setIsPrescriptionValid(false);
+      setToast({
+        showToast: true,
+        toastMessage: 'Resep ini telah anda gunakan',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
       return;
     }
 
@@ -262,13 +269,6 @@ function ChatPage(): React.ReactElement {
       convertAddCartFromPrescriptionToPayload(dataPrescriptionById?.data);
 
     if (payload === undefined) {
-      setToast({
-        showToast: true,
-        toastMessage: 'Resep ini telah anda gunakan',
-        toastType: 'error',
-        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-        orientation: 'center',
-      });
       return;
     }
 
