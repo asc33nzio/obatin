@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/entity"
 	"obatin/usecase"
@@ -31,13 +30,13 @@ func (h *OrderHandler) GetUserOrders(ctx *gin.Context) {
 		return
 	}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -56,7 +55,7 @@ func (h *OrderHandler) GetUserOrders(ctx *gin.Context) {
 
 	res := dto.ToUserOrdersRes(orders.Orders)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseOkMsg,
+		Message:    appconstant.ResponseOkMsg,
 		Pagination: (*dto.PaginationResponse)(&orders.Pagination),
 		Data:       res,
 	})
@@ -65,20 +64,20 @@ func (h *OrderHandler) GetUserOrders(ctx *gin.Context) {
 func (h *OrderHandler) GetAllOrders(ctx *gin.Context) {
 	var params dto.OrdersFilter
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleAdmin {
-		if role != constant.RoleManager {
+	if role != appconstant.RoleAdmin {
+		if role != appconstant.RoleManager {
 			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
 		}
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -103,7 +102,7 @@ func (h *OrderHandler) GetAllOrders(ctx *gin.Context) {
 
 	res := dto.ToUserOrdersRes(orders.Orders)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseOkMsg,
+		Message:    appconstant.ResponseOkMsg,
 		Pagination: (*dto.PaginationResponse)(&orders.Pagination),
 		Data:       res,
 	})
@@ -113,20 +112,20 @@ func (h *OrderHandler) UpdateOrderStatus(ctx *gin.Context) {
 	var body dto.UpdateOrderStatusReq
 	var uriParams dto.OrderIdUriParams
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleAdmin {
-		if role != constant.RoleManager && role != constant.RoleUser {
+	if role != appconstant.RoleAdmin {
+		if role != appconstant.RoleManager && role != appconstant.RoleUser {
 			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
 		}
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -149,7 +148,7 @@ func (h *OrderHandler) UpdateOrderStatus(ctx *gin.Context) {
 		return
 	}
 
-	if role == constant.RoleUser {
+	if role == appconstant.RoleUser {
 		if body.Status != appconstant.OrderConfirmed {
 			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
@@ -166,6 +165,6 @@ func (h *OrderHandler) UpdateOrderStatus(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 	})
 }

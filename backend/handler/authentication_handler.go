@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/appvalidator"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 	"strconv"
@@ -31,7 +31,7 @@ func (h *AuthenticationHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	isExtendedQuery := ctx.Query(constant.IsExtendedQueryParam)
+	isExtendedQuery := ctx.Query(appconstant.IsExtendedQueryParam)
 	var isExtended bool
 	if isExtendedQuery == "true" {
 		isExtended = true
@@ -51,14 +51,14 @@ func (h *AuthenticationHandler) Login(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseLoginMsg,
+		Message: appconstant.ResponseLoginMsg,
 		Data:    res,
 	})
 }
 
 func (h *AuthenticationHandler) RegisterDoctor(ctx *gin.Context) {
 
-	file, FileHeader, err := ctx.Request.FormFile(constant.CertificateJSONTag)
+	file, FileHeader, err := ctx.Request.FormFile(appconstant.CertificateJSONTag)
 	if err != nil {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
@@ -72,13 +72,13 @@ func (h *AuthenticationHandler) RegisterDoctor(ctx *gin.Context) {
 	}
 	defer file.Close()
 
-	result, err := strconv.Atoi(ctx.Request.FormValue(constant.SpecializationIdJSONTag))
+	result, err := strconv.Atoi(ctx.Request.FormValue(appconstant.SpecializationIdJSONTag))
 	if err != nil {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
 	}
 	body := dto.DoctorRegisterReq{
-		Email:            ctx.Request.FormValue(constant.EmailJSONTag),
+		Email:            ctx.Request.FormValue(appconstant.EmailJSONTag),
 		Certificate:      file,
 		SpecializationId: int64(result),
 	}
@@ -95,7 +95,7 @@ func (h *AuthenticationHandler) RegisterDoctor(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponseRegisterMsg,
+		Message: appconstant.ResponseRegisterMsg,
 	})
 }
 
@@ -115,7 +115,7 @@ func (h *AuthenticationHandler) RegisterUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponseRegisterMsg,
+		Message: appconstant.ResponseRegisterMsg,
 	})
 }
 
@@ -127,12 +127,12 @@ func (h *AuthenticationHandler) SendVerifyToEmail(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponseSendVerifyToEmailMsg,
+		Message: appconstant.ResponseSendVerifyToEmailMsg,
 	})
 }
 
 func (h *AuthenticationHandler) VerifyEmail(ctx *gin.Context) {
-	token := ctx.Query(constant.TokenQueryParam)
+	token := ctx.Query(appconstant.TokenQueryParam)
 
 	err := h.userUsecase.VerifyEmail(ctx, token)
 	if err != nil {
@@ -141,12 +141,12 @@ func (h *AuthenticationHandler) VerifyEmail(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseVerifiedMsg,
+		Message: appconstant.ResponseVerifiedMsg,
 	})
 }
 
 func (h *AuthenticationHandler) UpdatePasswordByToken(ctx *gin.Context) {
-	token := ctx.Query(constant.TokenQueryParam)
+	token := ctx.Query(appconstant.TokenQueryParam)
 	body := dto.UpdatePasswordReq{}
 
 	err := ctx.ShouldBindJSON(&body)
@@ -162,7 +162,7 @@ func (h *AuthenticationHandler) UpdatePasswordByToken(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseUpdatePasswordMsg,
+		Message: appconstant.ResponseUpdatePasswordMsg,
 	})
 }
 
@@ -181,18 +181,18 @@ func (h *AuthenticationHandler) UpdatePasswordByAuth(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseUpdatePasswordMsg,
+		Message: appconstant.ResponseUpdatePasswordMsg,
 	})
 }
 
 func (h *AuthenticationHandler) UpdateApproval(ctx *gin.Context) {
-	authID, err := strconv.Atoi(ctx.Param(constant.AuthenticationIDParam))
+	authID, err := strconv.Atoi(ctx.Param(appconstant.AuthenticationIDParam))
 	if err != nil {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
 	}
 
-	isApprove, err := strconv.ParseBool(ctx.Query(constant.ApproveQueryParam))
+	isApprove, err := strconv.ParseBool(ctx.Query(appconstant.ApproveQueryParam))
 	if err != nil {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
@@ -202,13 +202,13 @@ func (h *AuthenticationHandler) UpdateApproval(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusOK, dto.APIResponse{
-			Message: constant.ResponseUpdateApprovalRejectedMsg,
+			Message: appconstant.ResponseUpdateApprovalRejectedMsg,
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseUpdateApprovalAcceptedMsg,
+		Message: appconstant.ResponseUpdateApprovalAcceptedMsg,
 	})
 }
 
@@ -228,7 +228,7 @@ func (h *AuthenticationHandler) SendVerifyForgotPassword(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseSendVerifyResetPassword,
+		Message: appconstant.ResponseSendVerifyResetPassword,
 	})
 }
 
@@ -249,7 +249,7 @@ func (h *AuthenticationHandler) GetPendingDoctorApproval(ctx *gin.Context) {
 
 	res := dto.ToGetAllDoctorPendingApprovalRes(doctorPendingApproval.Doctors)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseGetAllPendingDoctorApproval,
+		Message:    appconstant.ResponseGetAllPendingDoctorApproval,
 		Pagination: (*dto.PaginationResponse)(&doctorPendingApproval.Pagination),
 		Data:       res,
 	})
@@ -274,7 +274,7 @@ func (h *AuthenticationHandler) GetRefreshToken(ctx *gin.Context) {
 		RefreshToken: newTokens.RefreshToken,
 	}
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseGetNewRefreshTokenMsg,
+		Message: appconstant.ResponseGetNewRefreshTokenMsg,
 		Data:    res,
 	})
 

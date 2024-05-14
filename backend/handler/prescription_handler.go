@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -23,18 +23,18 @@ func NewPrescriptionHandler(prescriptionUsecase usecase.PrescriptionUsecase) *Pr
 func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 	body := dto.CreatePrescriptionReq{}
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleDoctor {
+	if role != appconstant.RoleDoctor {
 		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -58,30 +58,30 @@ func (h *PrescriptionHandler) CreatePrescription(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponsePrescriptionCreatedMsg,
+		Message: appconstant.ResponsePrescriptionCreatedMsg,
 		Data:    dto.CreatePrescriptionRes{PrescriptionId: *id},
 	})
 }
 
 func (h *PrescriptionHandler) GetAllUserPrescriptions(ctx *gin.Context) {
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleUser {
+	if role != appconstant.RoleUser {
 		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -100,30 +100,30 @@ func (h *PrescriptionHandler) GetAllUserPrescriptions(ctx *gin.Context) {
 
 	res := dto.ToGetAllUserPrescriptionRes(prescriptions)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }
 
 func (h *PrescriptionHandler) GetAllDoctorPrescriptions(ctx *gin.Context) {
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleDoctor {
+	if role != appconstant.RoleDoctor {
 		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -142,7 +142,7 @@ func (h *PrescriptionHandler) GetAllDoctorPrescriptions(ctx *gin.Context) {
 
 	res := dto.ToGetAllDoctorPrescriptionRes(prescriptions)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }
@@ -150,7 +150,7 @@ func (h *PrescriptionHandler) GetAllDoctorPrescriptions(ctx *gin.Context) {
 func (h *PrescriptionHandler) GetPrescriptionDetails(ctx *gin.Context) {
 	var uriParam dto.PrescriptionIdUriParam
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -175,7 +175,7 @@ func (h *PrescriptionHandler) GetPrescriptionDetails(ctx *gin.Context) {
 
 	res := dto.ToGetPrescriptionDetailsRes(items)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }

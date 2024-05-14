@@ -1,5 +1,5 @@
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import CustomButton from '../button/CustomButton';
 
@@ -27,12 +27,17 @@ const FilterComponent = ({
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const newParams = new URLSearchParams(searchParams.toString());
-  const pathname = usePathname();
+  const pathName = usePathname();
 
   const [isOpenSortBy, setIsOpenSortBy] = useState(false);
   const [isOpenOrderBy, setIsOpenOrderBy] = useState(false);
   const [isOpenClassification, setIsOpenClassification] = useState(false);
+
+  const handleSetSearchParams = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set(key, value);
+    router.replace(`${pathName}?${params.toString()}`);
+  };
 
   const toggleFilterSortBy = () => {
     setIsOpenSortBy(!isOpenSortBy);
@@ -44,31 +49,6 @@ const FilterComponent = ({
     setIsOpenClassification(!isOpenClassification);
   };
 
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams],
-  );
-
-  const handleFilterClicked = useCallback(
-    (name: string, value: string) => {
-      const currentFilter = newParams.get(name);
-      if (currentFilter === value) {
-        newParams.delete(name);
-      } else {
-        newParams.set(name, value);
-      }
-      router.push(pathname + '?' + createQueryString(name, `${value}`));
-    },
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router, newParams],
-  );
-
   const handleSortByClicked = (sortBy: string) => {
     setSortBy(sortBy);
   };
@@ -79,19 +59,6 @@ const FilterComponent = ({
 
   const handleOrderClicked = (order: string) => {
     setOrderBy(order);
-  };
-
-  const handleClearClicked = () => {
-    newParams.delete('sort_by');
-    newParams.delete('classification');
-    newParams.delete('order');
-    setSortBy(null);
-    setClassification(null);
-    setOrderBy(null);
-    onClickClear();
-
-    const queryString = newParams.toString();
-    router.push(`${pathname}${queryString ? `?${queryString}` : ''}`);
   };
 
   return (
@@ -112,7 +79,7 @@ const FilterComponent = ({
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button
               onClick={() => {
-                handleFilterClicked('sort_by', 'name');
+                handleSetSearchParams('sort_by', 'name');
                 handleSortByClicked('name');
                 setIsOpenSortBy(false);
               }}
@@ -121,7 +88,7 @@ const FilterComponent = ({
             </button>
             <button
               onClick={() => {
-                handleFilterClicked('sort_by', 'price');
+                handleSetSearchParams('sort_by', 'price');
                 handleSortByClicked('price');
                 setIsOpenSortBy(false);
               }}
@@ -152,7 +119,7 @@ const FilterComponent = ({
           <div>
             <button
               onClick={() => {
-                handleFilterClicked('classification', 'obat_keras');
+                handleSetSearchParams('classification', 'obat_keras');
                 handleClassificationClicked('obat_keras');
                 setIsOpenClassification(false);
               }}
@@ -161,7 +128,7 @@ const FilterComponent = ({
             </button>
             <button
               onClick={() => {
-                handleFilterClicked('classification', 'obat_bebas');
+                handleSetSearchParams('classification', 'obat_bebas');
                 handleClassificationClicked('obat_bebas');
                 setIsOpenClassification(false);
               }}
@@ -170,7 +137,7 @@ const FilterComponent = ({
             </button>
             <button
               onClick={() => {
-                handleFilterClicked('classification', 'obat_bebas_terbatas');
+                handleSetSearchParams('classification', 'obat_bebas_terbatas');
                 handleClassificationClicked('obat_bebas_terbatas');
                 setIsOpenClassification(false);
               }}
@@ -179,7 +146,7 @@ const FilterComponent = ({
             </button>
             <button
               onClick={() => {
-                handleFilterClicked('classification', 'non_obat');
+                handleSetSearchParams('classification', 'non_obat');
                 handleClassificationClicked('non_obat');
                 setIsOpenClassification(false);
               }}
@@ -206,7 +173,7 @@ const FilterComponent = ({
           <div>
             <button
               onClick={() => {
-                handleFilterClicked('order', 'asc');
+                handleSetSearchParams('order', 'asc');
                 handleOrderClicked('asc');
                 setIsOpenOrderBy(false);
               }}
@@ -215,7 +182,7 @@ const FilterComponent = ({
             </button>
             <button
               onClick={() => {
-                handleFilterClicked('order', 'desc');
+                handleSetSearchParams('order', 'desc');
                 handleOrderClicked('desc');
                 setIsOpenOrderBy(false);
               }}
@@ -232,11 +199,10 @@ const FilterComponent = ({
         $height='50px'
         $fontSize='16px'
         onClick={() => {
-          handleClearClicked();
+          onClickClear();
           setIsOpenOrderBy(false);
           setIsOpenSortBy(false);
           setIsOpenClassification(false);
-          // toggleFilter();
         }}
       />
     </FilterContainer>

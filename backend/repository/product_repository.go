@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -31,7 +31,7 @@ func NewProductRepositoryPostgres(db *sql.DB) *productRepositoryPostgres {
 }
 
 func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params entity.ProductFilter) (*entity.ProductListPage, error) {
-	paramsCount := constant.StartingParamsCount
+	paramsCount := appconstant.StartingParamsCount
 	res := []entity.ProductList{}
 	var sb strings.Builder
 	rowsCount := 0
@@ -75,7 +75,7 @@ func (r *productRepositoryPostgres) GetProductsList(ctx context.Context, params 
 	queryParams, paramsData := convertProductQueryParamstoSql(params)
 	sb.WriteString(selectQuery)
 	if params.Search != "" {
-		searchParamsCount := constant.StartingParamsCount
+		searchParamsCount := appconstant.StartingParamsCount
 		if params.Category != "" {
 			searchParamsCount += 1
 		}

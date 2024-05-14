@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -91,7 +91,7 @@ func (r *partnerRepositoryPostgres) IsPartnerExist(ctx context.Context, name str
 }
 
 func (r *partnerRepositoryPostgres) GetPartnerList(ctx context.Context, params entity.PartnerFilter) (*entity.PartnerListPage, error) {
-	paramsCount := constant.StartingParamsCount
+	paramsCount := appconstant.StartingParamsCount
 	res := []entity.Partner{}
 	var sb strings.Builder
 	rowsCount := 0

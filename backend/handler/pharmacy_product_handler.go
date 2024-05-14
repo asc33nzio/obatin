@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/entity"
 	"obatin/usecase"
@@ -39,7 +38,7 @@ func (h *PharmacyProductHandler) GetNearbyPharmacies(ctx *gin.Context) {
 
 	res := dto.ToGetNearbyPharmaciesRes(nearbyPharmacies)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }
@@ -52,8 +51,8 @@ func (h *PharmacyProductHandler) GetAllPartnerPharmacyProduct(ctx *gin.Context) 
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
 	}
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleManager || role == "" {
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role != appconstant.RoleManager || role == "" {
 		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
@@ -75,7 +74,7 @@ func (h *PharmacyProductHandler) GetAllPartnerPharmacyProduct(ctx *gin.Context) 
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseOkMsg,
+		Message:    appconstant.ResponseOkMsg,
 		Pagination: productsRes.Pagination,
 		Data:       productsRes.Data,
 	})
@@ -89,7 +88,7 @@ func (h *PharmacyProductHandler) TotalStockPerPartner(ctx *gin.Context) {
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -112,14 +111,14 @@ func (h *PharmacyProductHandler) TotalStockPerPartner(ctx *gin.Context) {
 		TotalStock: *totalStock,
 	})
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }
 
 func (h *PharmacyProductHandler) CreateOnePharmacyProduct(ctx *gin.Context) {
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleManager || role == "" {
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role != appconstant.RoleManager || role == "" {
 		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
@@ -141,7 +140,7 @@ func (h *PharmacyProductHandler) CreateOnePharmacyProduct(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponsePharmacyProductCreatedMsg,
+		Message: appconstant.ResponsePharmacyProductCreatedMsg,
 	})
 }
 
@@ -153,8 +152,8 @@ func (h *PharmacyProductHandler) UpdatePharmacyProduct(ctx *gin.Context) {
 		return
 	}
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleManager || role == "" {
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role != appconstant.RoleManager || role == "" {
 		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
@@ -198,6 +197,6 @@ func (h *PharmacyProductHandler) UpdatePharmacyProduct(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 	})
 }

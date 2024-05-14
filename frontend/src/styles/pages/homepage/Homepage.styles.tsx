@@ -26,6 +26,7 @@ export const CategoryContent = styled.div`
   height: 100%;
   align-items: center;
   justify-content: center;
+  margin-top: 16px;
 `;
 
 export const FiturContainer = styled.div`

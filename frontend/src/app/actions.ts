@@ -52,3 +52,7 @@ export const navigateToChat = async () => {
 export const navigateToProductDetail = async (slug: string) => {
   redirect(`/products/${slug}`);
 };
+
+export const navigateToAdminHome = async () => {
+  redirect('/admin');
+};

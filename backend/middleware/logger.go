@@ -9,7 +9,6 @@ import (
 
 	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 )
 
 func (m *GinMiddleware) Logger(log *logrus.Logger) func(c *gin.Context) {
@@ -35,22 +34,24 @@ func (m *GinMiddleware) Logger(log *logrus.Logger) func(c *gin.Context) {
 			requestId = ""
 		}
 
-		aid, exist := c.Get(constant.AuthenticationIdKey)
+		aid, exist := c.Get(appconstant.AuthenticationIdKey)
 		if !exist {
 			aid = ""
 		}
 
+		location, _ := time.LoadLocation("Asia/Jakarta")
+
 		entry := log.WithFields(logrus.Fields{
-			appconstant.RequestIdKey:        requestId,
-			constant.AuthenticationIdKey:    aid,
-			appconstant.LoggerLatencyKey:    time.Since(start),
-			appconstant.LoggerMethodKey:     c.Request.Method,
-			appconstant.LoggerStatusCodeKey: statusCode,
-			appconstant.LoggerPathKey:       path,
-			"client_ip":                     clientIP,
-			"user_agent":                    userAgent,
-			"request_body":                  requestBody,
-			"response_size":                 responseSize,
+			appconstant.RequestIdKey:          requestId,
+			appconstant.AuthenticationIdKey:   aid,
+			appconstant.LoggerLatencyKey:      time.Since(start),
+			appconstant.LoggerMethodKey:       c.Request.Method,
+			appconstant.LoggerStatusCodeKey:   statusCode,
+			appconstant.LoggerPathKey:         path,
+			appconstant.LoggerClientIpKey:     clientIP,
+			appconstant.LoggerUserAgentKey:    userAgent,
+			appconstant.LoggerRequestBodyKey:  requestBody,
+			appconstant.LoggerResponseSizeKey: responseSize,
 		})
 
 		if statusCode >= 500 && statusCode <= 599 {
@@ -60,13 +61,13 @@ func (m *GinMiddleware) Logger(log *logrus.Logger) func(c *gin.Context) {
 					entry.WithFields(logrus.Fields{
 						appconstant.LoggerErrorKey: appErr,
 						appconstant.LoggerStackKey: string(appErr.StackTrace()),
-					}).Error(appErr.Err().Error())
+					}).WithTime(start.In(location)).Error(appErr.Err().Error())
 				}
 			}
 
 			return
 		}
 
-		entry.Info(appconstant.LoggerRequestProcessed)
+		entry.WithTime(start.In(location)).Info(appconstant.LoggerRequestProcessed)
 	}
 }

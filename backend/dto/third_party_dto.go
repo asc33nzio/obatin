@@ -3,7 +3,7 @@ package dto
 type RajaOngkirCostReq struct {
 	Origin      string `json:"origin" binding:"required"`
 	Destination string `json:"destination" binding:"required"`
-	Weight      int    `json:"weight" binding:"required"`
+	Weight      int    `json:"weight" binding:"required,gte=1,max=30000"`
 	Courier     string `json:"courier" binding:"required"`
 }
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -65,7 +65,7 @@ func (r *doctorRepositoryPostgres) CreateNewDoctor(ctx context.Context, authenti
 }
 
 func (r *doctorRepositoryPostgres) GetDoctorList(ctx context.Context, params entity.DoctorFilter) (*entity.DoctorListPage, error) {
-	paramsCount := constant.StartingParamsCount
+	paramsCount := appconstant.StartingParamsCount
 	res := []entity.DoctorList{}
 	var sb strings.Builder
 	rowsCount := 0

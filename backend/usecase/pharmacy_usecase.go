@@ -5,7 +5,6 @@ import (
 	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 )
@@ -41,13 +40,13 @@ func (u *pharmacyUsecaseImpl) GetAllPharmacies(ctx context.Context, params entit
 		params.Page = appconstant.DefaultMinPage
 	}
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	if role == constant.RoleManager {
-		authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if role == appconstant.RoleManager {
+		authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 		if !ok {
 			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 		}
@@ -60,16 +59,16 @@ func (u *pharmacyUsecaseImpl) GetAllPharmacies(ctx context.Context, params entit
 		params.PartnerId = partnerId
 	}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	if authenticationRole == constant.RoleManager {
+	if authenticationRole == appconstant.RoleManager {
 		partnerId, err := partnerR.FindPartnerIdByAuthId(ctx, authenticationId)
 		if err != nil {
 			return nil, err

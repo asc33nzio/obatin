@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -168,7 +168,7 @@ func (r *chatRoomRepositoryPostgres) UpdateDoctorIsTypingByDoctorId(ctx context.
 func (r *chatRoomRepositoryPostgres) GetAllMessageForDoctor(ctx context.Context, doctorId int64, params entity.Pagination) (*entity.ChatRoomListPage, error) {
 	chatRooms := []entity.ChatRoom{}
 	rowsCount := 0
-	paramsCount := constant.StartingParamsCount
+	paramsCount := appconstant.StartingParamsCount
 	var queryDataCount strings.Builder
 	var queryPage strings.Builder
 	var data []interface{}
@@ -260,7 +260,7 @@ func (r *chatRoomRepositoryPostgres) GetAllMessageForDoctor(ctx context.Context,
 func (r *chatRoomRepositoryPostgres) GetAllMessageForUser(ctx context.Context, userId int64, params entity.Pagination) (*entity.ChatRoomListPage, error) {
 	chatRooms := []entity.ChatRoom{}
 	rowsCount := 0
-	paramsCount := constant.StartingParamsCount
+	paramsCount := appconstant.StartingParamsCount
 	var queryDataCount strings.Builder
 	var queryPage strings.Builder
 	var data []interface{}

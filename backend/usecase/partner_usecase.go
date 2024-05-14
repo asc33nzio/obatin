@@ -6,7 +6,6 @@ import (
 	"obatin/apperror"
 	"obatin/appvalidator"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 	"obatin/util"
@@ -54,12 +53,12 @@ func (u *partnerUsecaseImpl) CreateNewPartner(ctx context.Context, uReq entity.P
 		ar := rs.AuthenticationRepository()
 		pr := rs.PartnerRepository()
 
-		authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+		authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 		if !ok {
 			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 		}
 
-		if authenticationRole != constant.RoleAdmin {
+		if authenticationRole != appconstant.RoleAdmin {
 			return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 		}
 
@@ -107,9 +106,9 @@ func (u *partnerUsecaseImpl) CreateNewPartner(ctx context.Context, uReq entity.P
 		}
 
 		uReq.Password = string(hashedPass)
-		uReq.Role = constant.RoleManager
-		uReq.IsApproved = constant.HasNotApproved
-		uReq.IsVerify = constant.HasVerified
+		uReq.Role = appconstant.RoleManager
+		uReq.IsApproved = appconstant.HasNotApproved
+		uReq.IsVerify = appconstant.HasVerified
 		uReq.LogoURL = uploadLogoUrl
 
 		uReqAuth := entity.Authentication{
@@ -149,12 +148,12 @@ func (u *partnerUsecaseImpl) CreateNewPartner(ctx context.Context, uReq entity.P
 func (u *partnerUsecaseImpl) GetAllPartner(ctx context.Context, params entity.PartnerFilter) (*entity.PartnerListPage, error) {
 	pr := u.repoStore.PartnerRepository()
 
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	if authenticationRole != constant.RoleAdmin {
+	if authenticationRole != appconstant.RoleAdmin {
 		return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 
@@ -188,12 +187,12 @@ func (u *partnerUsecaseImpl) UpdateOnePartner(ctx context.Context, pReq entity.P
 		pr := u.repoStore.PartnerRepository()
 		ar := u.repoStore.AuthenticationRepository()
 
-		authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+		authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 		if !ok {
 			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 		}
 
-		if authenticationRole != constant.RoleAdmin {
+		if authenticationRole != appconstant.RoleAdmin {
 			return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 		}
 

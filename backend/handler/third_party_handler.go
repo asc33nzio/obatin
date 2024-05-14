@@ -8,7 +8,6 @@ import (
 	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/dto"
 	"strconv"
 	"strings"
@@ -73,7 +72,7 @@ func (h *ThirdPartyHandler) RajaOngkirCost(ctx *gin.Context) {
 		}
 	case result := <-resCh:
 		ctx.JSON(http.StatusOK, dto.APIResponse{
-			Message: constant.ResponseOkMsg,
+			Message: appconstant.ResponseOkMsg,
 			Data:    result,
 		})
 	}

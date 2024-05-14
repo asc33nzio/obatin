@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -67,7 +67,7 @@ func (r *productCategoriesRepositoryPostgres) CreateProductCategories(ctx contex
 		VALUES 
 	`
 	bulkQuery.WriteString(queryAdd)
-	dataCount := constant.StartingParamsCount
+	dataCount := appconstant.StartingParamsCount
 
 	for key, category := range categories {
 		bulkQuery.WriteString(fmt.Sprintf(`( $%v, $%v )`, dataCount, dataCount+1))
