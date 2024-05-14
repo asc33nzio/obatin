@@ -65,7 +65,7 @@ const LoginForm = (): React.ReactElement => {
         toastMessage: 'Login gagal',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-        orientation: 'center',
+        orientation: isDesktopDisplay ? 'right' : 'center',
       });
       return;
     }
@@ -198,7 +198,7 @@ const LoginForm = (): React.ReactElement => {
         toastMessage: 'Login berhasil',
         toastType: 'ok',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-        orientation: 'center',
+        orientation: isDesktopDisplay ? 'right' : 'center',
       });
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message;
@@ -212,7 +212,7 @@ const LoginForm = (): React.ReactElement => {
             : 'Login gagal',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-        orientation: 'center',
+        orientation: isDesktopDisplay ? 'right' : 'center',
       });
     } finally {
       setIsLoading(false);

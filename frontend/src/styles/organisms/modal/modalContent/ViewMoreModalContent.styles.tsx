@@ -164,12 +164,54 @@ export const InfoDivAlt = styled.div`
   p {
     display: flex;
     width: 75%;
-    height: 50px;
     font-size: 16px;
     font-weight: 250;
-    margin-top: 28px;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+`;
+
+export const InfoDivAltLong = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+
+  height: 100px;
+  width: 100%;
+  gap: 25px;
+
+  h2 {
+    font-weight: 350;
+    font-size: 16px;
+    width: 150px;
+  }
+
+  span {
+    width: 10px;
+    font-size: 14px;
+  }
+
+  p {
+    display: flex;
+    width: 75%;
+    font-size: 16px;
+    font-weight: 250;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+export const PharmacyInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  height: 24%;
+  width: 100%;
+  margin-top: 15px;
+
+  h1 {
+    font-size: 20px;
+    margin-bottom: 5px;
   }
 `;
 
@@ -177,13 +219,24 @@ export const ShippingInfo = styled.div`
   display: flex;
   flex-direction: column;
 
-  height: 20%;
+  height: 17%;
   width: 100%;
   margin-top: 15px;
 
   h1 {
     font-size: 20px;
     margin-bottom: 5px;
+  }
+
+  p {
+    display: flex;
+    width: 75%;
+    height: 50px;
+    font-size: 16px;
+    font-weight: 250;
+    margin-top: 28px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 

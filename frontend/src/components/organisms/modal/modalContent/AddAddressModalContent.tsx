@@ -16,7 +16,7 @@ import { ObatinProvinceItf, RajaOngkirProvinceItf } from '@/types/reduxTypes';
 import { setProvincesState } from '@/redux/reducers/provincesSlice';
 import { HashLoader, PropagateLoader } from 'react-spinners';
 import { getCookie } from 'cookies-next';
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/debounceThrottle';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import Axios from 'axios';
 import CustomSelect from '@/components/atoms/select/CustomSelect';

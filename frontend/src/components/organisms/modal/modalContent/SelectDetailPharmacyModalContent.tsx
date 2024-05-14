@@ -5,11 +5,10 @@ import {
   DetailSecRow,
 } from '@/styles/organisms/modal/modalContent/DetailPharmacy.styles';
 import { PharmacyItf } from '@/types/pharmacyTypes';
-import React from 'react';
 
 const SelectDetailPharmacyModalContent = (props: {
   $pharmacyDetail: PharmacyItf | undefined;
-}) => {
+}): React.ReactElement => {
   return (
     <DetailPharmacyContainer>
       <h2>{props.$pharmacyDetail?.name}</h2>

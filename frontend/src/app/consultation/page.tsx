@@ -40,6 +40,8 @@ import UploadFile from '@/assets/chat/UploadFile';
 import { Document, Page, pdfjs } from 'react-pdf';
 import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
 import RightArrowICO from '@/assets/arrows/RightArrowICO ';
+import { useObatinDispatch } from '@/redux/store/store';
+import { syncCartItem } from '@/redux/reducers/cartSlice';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -85,6 +87,8 @@ function ChatPage(): React.ReactElement {
     isModalConfirmAddPrescriptionToCartOpen,
     setIsModalConfirmAddPrescriptionToCartOpen,
   ] = useState<boolean>(false);
+  const dispatch = useObatinDispatch();
+
   const handleSelectedDrugChange = (
     newSelectedDrug: CompactProductItf | null,
   ) => {
@@ -175,6 +179,15 @@ function ChatPage(): React.ReactElement {
         prescription_id: drugData.PrescriptionId,
         quantity: item.quantity,
       });
+
+      dispatch(
+        syncCartItem({
+          product_id: item.product_id,
+          prescription_id: drugData.PrescriptionId,
+          quantity: item.quantity,
+          pharmacy_id: null,
+        }),
+      );
     });
     return temp;
   };

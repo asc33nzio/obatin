@@ -26,4 +26,8 @@ export const CustomButtonStyle = styled.button<ButtonPropsItf>`
 
   font-size: ${({ $fontSize }) => ($fontSize ? $fontSize : '24px')};
   font-weight: 600;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;

@@ -17,13 +17,14 @@ export type ModalType =
   | 'add-address'
   | 'doctor-detail'
   | 'update-address'
-  | 'payment-upload'
   | 'select-address'
   | 'view-more-tx'
   | 'add-shipping'
   | 'unset-shipment'
   | 'confirm-checkout'
   | 'select-nearby-pharmacy'
+  | 'confirm-receive-order'
+  | 'confirm-cancel-order'
   | '';
 
 export type InvokableModalType = 'pharmacy-detail' | 'doctor-detail';

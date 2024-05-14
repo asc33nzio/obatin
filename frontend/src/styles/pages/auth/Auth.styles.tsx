@@ -190,7 +190,7 @@ export const ReturnHomeContainerDiv = styled.div`
     justify-content: center;
 
     height: 100%;
-    width: 30%;
+    width: 50%;
     gap: 15px;
     background: transparent;
     color: #718096;
@@ -201,8 +201,12 @@ export const ReturnHomeContainerDiv = styled.div`
       cursor: pointer;
       object-fit: cover;
       background: transparent;
-      width: 25px;
-      height: 25px;
+      width: 35px;
+      height: 35px;
+
+      path {
+        stroke: #718096;
+      }
     }
   }
 `;

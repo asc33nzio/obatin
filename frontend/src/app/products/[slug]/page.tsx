@@ -27,7 +27,6 @@ import { RingLoader } from 'react-spinners';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { navigateToChat, navigateToProductList } from '@/app/actions';
 import { useToast } from '@/hooks/useToast';
-import { PharmacyItf } from '@/types/pharmacyTypes';
 import { PharmacyCart } from '@/redux/reducers/pharmacySlice';
 import { getCookie } from 'cookies-next';
 import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
@@ -50,10 +49,6 @@ const ProductDetailPage = () => {
   const items = useObatinSelector((state) => state.cart.items);
   const [isProductSelected, setIsProductSelected] =
     useState<ProductType | null>();
-  // eslint-disable-next-line
-  const [productId, setProductId] = useState<PharmacyItf | undefined>(
-    undefined,
-  );
   const [nearbyPharmacies, setNearbyPharmacies] = useState<PharmacyCart[]>([]);
   const [PharmacyName, setPharmacyName] = useState<PharmacyCart>();
 

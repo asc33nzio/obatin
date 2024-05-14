@@ -14,6 +14,7 @@ import { useModal } from '@/hooks/useModal';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { setAuthState } from '@/redux/reducers/authSlice';
 import { InputSwitch } from 'primereact/inputswitch';
+import { resetPharmacyStates } from '@/redux/reducers/pharmacySlice';
 import Axios from 'axios';
 import DeleteICO from '@/assets/dashboard/DeleteICO';
 import EditICO from '@/assets/dashboard/EditICO';
@@ -26,7 +27,7 @@ const AddressCard = (props: {
   $justify?: string | undefined;
   $marBot?: number | undefined;
   $borderDisable?: boolean | undefined;
-  $disableButtons?: boolean | undefined;
+  $omitButtons?: boolean | undefined;
   $padding?: string | undefined;
   $fontSize?: number | undefined;
   $height?: number | undefined;
@@ -123,7 +124,6 @@ const AddressCard = (props: {
         },
       });
       const newUserData = getNewUserDetailReq.data.data;
-
       dispatch(
         setAuthState({
           aid: userInfo.aid,
@@ -139,6 +139,8 @@ const AddressCard = (props: {
           addresses: newUserData.addresses,
         }),
       );
+
+      dispatch(resetPharmacyStates());
 
       setToast({
         showToast: true,
@@ -180,10 +182,17 @@ const AddressCard = (props: {
         <AddressDetails>{props.details}</AddressDetails>
       </AddressCardLeftSection>
 
-      {!props.$disableButtons && (
+      {!props.$omitButtons ? (
         <AddressCardRightSection>
           <DeleteICO onClick={handleDelete} />
           <EditICO onClick={handleOpenUpdateInterface} />
+          <InputSwitch
+            checked={userInfo?.activeAddressId === props.$id}
+            onChange={handleSetMainAddress}
+          />
+        </AddressCardRightSection>
+      ) : (
+        <AddressCardRightSection>
           <InputSwitch
             checked={userInfo?.activeAddressId === props.$id}
             onChange={handleSetMainAddress}

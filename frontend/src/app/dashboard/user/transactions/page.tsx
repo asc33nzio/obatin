@@ -21,6 +21,8 @@ import { setTxState } from '@/redux/reducers/txSlice';
 import { useModal } from '@/hooks/useModal';
 import { getCookie } from 'cookies-next';
 import { useToast } from '@/hooks/useToast';
+import { useEventEmitter } from '@/hooks/useEventEmitter';
+import { ModalType } from '@/types/modalTypes';
 import TransactionCard from '@/components/molecules/cards/TransactionCard';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import Axios from 'axios';
@@ -31,6 +33,7 @@ const TransactionHistoryPage = (): React.ReactElement => {
   const { openModal } = useModal();
   const { setToast } = useToast();
   const { isDesktopDisplay } = useClientDisplayResolution();
+  const emitter = useEventEmitter();
   const accessToken = getCookie('access_token');
   const [chosenFilter, setChosenFilter] = useState<TxFilterItf>({
     all: false,
@@ -50,6 +53,7 @@ const TransactionHistoryPage = (): React.ReactElement => {
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [shouldRefetch, setShouldRefetch] = useState<boolean>(false);
   const apiFilterMap = {
     all: '',
     waitingUserPayment: 'waiting_payment',
@@ -92,6 +96,70 @@ const TransactionHistoryPage = (): React.ReactElement => {
       setTimeout(() => {
         setIsLoading(false);
       }, 500);
+    }
+  };
+
+  const triggerModal = async (type: ModalType) => {
+    return new Promise<boolean>((resolve) => {
+      openModal(type);
+
+      emitter.once('close-modal-fail', () => {
+        resolve(false);
+      });
+
+      emitter.once('close-modal-ok', () => {
+        resolve(true);
+      });
+    });
+  };
+
+  const handleCompleteOrder = async (order_id: number) => {
+    try {
+      const canProceed = await triggerModal('confirm-receive-order');
+      if (!canProceed) {
+        setToast({
+          showToast: true,
+          toastMessage:
+            'Pesanan anda akan secara otomatis diselesaikan dalam 2 x 24 jam',
+          toastType: 'ok',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
+
+      await Axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/orders/${order_id}`,
+        {
+          status: 'confirmed',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      setShouldRefetch(!shouldRefetch);
+      handleResetFilter();
+      handleFilterSelect('received');
+      setToast({
+        showToast: true,
+        toastMessage:
+          'Terima kasih atas konfirmasi anda. Semoga anda puas dengan pembelanjaan anda',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } catch (error) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: 'Maaf, terjadi kesalahan saat konfirmasi penerimaan',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
     }
   };
 
@@ -145,7 +213,7 @@ const TransactionHistoryPage = (): React.ReactElement => {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, chosenFilter]);
+  }, [currentPage, chosenFilter, shouldRefetch]);
 
   return (
     <TxHistoryPageContainer $isDesktopDisplay={isDesktopDisplay}>
@@ -253,6 +321,7 @@ const TransactionHistoryPage = (): React.ReactElement => {
                 payment_id={order.payment_id}
                 number_items={order.number_items}
                 handleOpenViewMore={handleOpenViewMore}
+                handleConfirmOrder={handleCompleteOrder}
               />
             );
           })}
