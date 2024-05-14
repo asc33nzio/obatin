@@ -71,6 +71,7 @@ export const ProfileHeader = styled.div<{ $isDesktopDisplay: boolean }>`
   height: ${({ $isDesktopDisplay }) => ($isDesktopDisplay ? '15%' : '8%')};
   padding-left: 15px;
   padding-right: 15px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #00b5c0;
 
   h1 {
@@ -90,6 +91,10 @@ export const ProfileHeaderButtonsDiv = styled.div`
   height: 100%;
 
   gap: 25px;
+  button {
+    align-items: center;
+    padding: 10px;
+  }
 `;
 
 export const ProfileContent = styled.section<{ $isDesktopDisplay: boolean }>`

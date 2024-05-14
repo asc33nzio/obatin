@@ -11,4 +11,5 @@ export const DoctorModalContainer = styled.div`
   justify-content: center;
   gap: 5px;
   padding: 20px;
+  text-align: center;
 `;

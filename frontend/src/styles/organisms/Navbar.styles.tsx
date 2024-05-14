@@ -8,7 +8,7 @@ export const NavContainer = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  z-index: 20000;
+  z-index: 19999;
   background-color: white;
 
   align-self: center;

@@ -20,7 +20,8 @@ const ContainerShip = styled.div`
   gap: 5px;
 
   @media (max-width: 768px) {
-    flex-direction: column;
+    padding-top: 2rem;
+    overflow-y: auto;
   }
 `;
 

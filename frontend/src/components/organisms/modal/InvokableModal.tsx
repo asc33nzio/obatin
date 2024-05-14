@@ -9,6 +9,7 @@ import DoctorDetailModalContent from './modalContent/DoctorDetailModalContent';
 import CloseICO from '@/assets/icons/CloseICO';
 import SelectDetailPharmacyModalContent from './modalContent/SelectDetailPharmacyModalContent';
 import { PharmacyItf } from '@/types/pharmacyTypes';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 
 export interface DoctorDetailItf {
   id?: number | undefined;
@@ -55,6 +56,7 @@ const InvokableModal = (props: {
     $isOpen: false,
     $onClose: () => {},
   };
+  const { isDesktopDisplay } = useClientDisplayResolution();
 
   switch (props.modalType) {
     case 'doctor-detail':
@@ -64,7 +66,7 @@ const InvokableModal = (props: {
       title = 'Detail Dokter';
       modalProps = {
         $overlayHeight: '200vh',
-        $containerWidth: '450px',
+        $containerWidth: !isDesktopDisplay ? '350px' : '450px',
         $containerHeight: '500px',
         $onOpen: () => {},
         $isOpen: false,
@@ -81,7 +83,7 @@ const InvokableModal = (props: {
       title = '';
       modalProps = {
         $overlayHeight: '200vh',
-        $containerWidth: '450px',
+        $containerWidth: !isDesktopDisplay ? '350px' : '450px',
         $containerHeight: 'max-content',
         $onOpen: () => {},
         $isOpen: false,

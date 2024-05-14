@@ -3,7 +3,7 @@ import React from 'react';
 const ProductICO = () => {
   return (
     <svg
-      fill='#000000'
+      fill='#00b5c0'
       width='800px'
       height='800px'
       viewBox='0 0 24 24'

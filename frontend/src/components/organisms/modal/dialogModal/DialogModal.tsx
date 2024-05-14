@@ -13,6 +13,7 @@ const CustomDialog = styled.dialog`
   align-self: center;
   justify-self: center;
   border: none;
+  border-radius: 12px;
 
   &::backdrop {
     background: #00000057;

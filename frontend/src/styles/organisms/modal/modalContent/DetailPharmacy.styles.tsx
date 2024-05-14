@@ -17,6 +17,9 @@ export const DetailPharmacyContainer = styled.div`
     text-align: center;
     color: ${COLORS.primary_color};
   }
+  @media (max-width: 768px) {
+    width: 300px;
+  }
 `;
 
 export const DetailSec = styled.div`
