@@ -1,5 +1,4 @@
 'use client';
-import Navbar from '@/components/organisms/navbar/Navbar';
 import axios from 'axios';
 import { getCookie } from 'cookies-next';
 import React, { useEffect, useState } from 'react';
@@ -20,6 +19,7 @@ import {
 import SeeDetail from '@/assets/admin/SeeDetail';
 import ModalDetailProduct from '@/components/organisms/admin/ModalDetailProduct';
 import DropdownTest from '@/components/molecules/admin/DropdownTest';
+import NavbarAdmin from '@/components/organisms/navbar/NavbarAdmin';
 import { PaginationDiv } from '@/styles/pages/dashboard/transactions/Transactions.styles';
 import PaginationComponent from '@/components/organisms/pagination/PaginationComponent';
 
@@ -611,7 +611,7 @@ function AdminProduct() {
           gap: '10px',
         }}
       >
-        <Navbar />
+        <NavbarAdmin />
         <div
           style={{
             display: 'flex',

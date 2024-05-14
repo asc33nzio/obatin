@@ -1,4 +1,5 @@
 import DoctorICO from '@/assets/icons/DoctorICO';
+import HomeICO from '@/assets/icons/HomeICO';
 import LogoutICO from '@/assets/icons/LogoutICO';
 import OrderICO from '@/assets/icons/OrderICO';
 import PartnerICO from '@/assets/icons/PartnerICO';
@@ -14,6 +15,11 @@ type MenuOption = {
 
 const MENU_ADMIN: MenuOption[] = [
   {
+    name: 'Beranda',
+    icon: HomeICO,
+    url: '/admin',
+  },
+  {
     name: 'Produk',
     icon: ProductICO,
     url: '/admin/product',
@@ -21,7 +27,7 @@ const MENU_ADMIN: MenuOption[] = [
   {
     name: 'Pesanan',
     icon: OrderICO,
-    url: '/admin/order',
+    url: '/admin/orders',
   },
   {
     name: 'Akun Dokter',

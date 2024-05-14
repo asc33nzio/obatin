@@ -1,10 +1,6 @@
-import CartICO from '@/assets/icons/CartICO';
 import ConsulICO from '@/assets/icons/ConsulICO';
-import DoctorICO from '@/assets/icons/DoctorICO';
 import HomeICO from '@/assets/icons/HomeICO';
 import LogoutICO from '@/assets/icons/LogoutICO';
-import OrderICO from '@/assets/icons/OrderICO';
-import ProductICO from '@/assets/icons/ProductICO';
 import UserICO from '@/assets/icons/UserICO';
 import React from 'react';
 
@@ -15,41 +11,21 @@ type MenuOption = {
   subItems?: MenuOption[];
 };
 
-const MENU_USER: MenuOption[] = [
+const MENU_DOCTOR: MenuOption[] = [
   {
     name: 'Beranda',
     icon: HomeICO,
-    url: '/',
+    url: '/dashboard/doctor',
   },
   {
     name: 'Profil',
     icon: UserICO,
-    url: '/dashboard',
-  },
-  {
-    name: 'List Product',
-    icon: ProductICO,
-    url: '/products',
-  },
-  {
-    name: 'Keranjang',
-    icon: CartICO,
-    url: '/shop/cart',
-  },
-  {
-    name: 'Riwayat Pembelian',
-    icon: OrderICO,
-    url: '/dashboard/user/transactions',
+    url: '/dashboard/doctor',
   },
   {
     name: 'Konsultasi',
     icon: ConsulICO,
     url: '/consultation',
-  },
-  {
-    name: 'List Dokter',
-    icon: DoctorICO,
-    url: '/doctors',
   },
   {
     name: 'Keluar',
@@ -79,4 +55,4 @@ function makeMenuLevel(options: MenuOption[], depth = 0): MenuItem[] {
   }));
 }
 
-export const MENU_ITEMS_USER: MenuItem[] = makeMenuLevel(MENU_USER);
+export const MENU_ITEMS_DOCTOR: MenuItem[] = makeMenuLevel(MENU_DOCTOR);

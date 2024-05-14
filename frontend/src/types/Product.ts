@@ -39,6 +39,7 @@ export type ProductType = {
   min_price: number;
   max_price: number;
   size: string;
+  sales?: number;
 };
 
 export type CategoryType = {

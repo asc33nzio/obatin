@@ -40,6 +40,7 @@ type RouterOpt struct {
 	PaymentHandler              *handler.PaymentHandler
 	ManufacturerHandler         *handler.ManufacturerHandler
 	PharmacyHandler             *handler.PharmacyHandler
+	StockMovementHandler        *handler.StockMovementHandler
 }
 
 func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
@@ -108,6 +109,9 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 	pharmacyUseCase := usecase.NewPharmacyUsecaseImpl(dbStore, config)
 	pharmacyHandler := handler.NewPharmacyHandler(pharmacyUseCase)
 
+	stockMovementUsecase := usecase.NewStockMovementUsecaseImpl(dbStore, config)
+	stockMovementHandler := handler.NewStockMovementHandler(stockMovementUsecase)
+
 	thirdPartyHandler := handler.NewThirdPartyHandler(config)
 
 	return NewRouter(RouterOpt{
@@ -132,6 +136,7 @@ func createRouter(db *sql.DB, config *config.Config) *gin.Engine {
 		PaymentHandler:              paymentHandler,
 		ManufacturerHandler:         manufacturerHandler,
 		PharmacyHandler:             pharmacyHandler,
+		StockMovementHandler:        stockMovementHandler,
 	})
 }
 
@@ -245,5 +250,7 @@ func NewRouter(h RouterOpt) *gin.Engine {
 	r.POST(appconstant.EndpointPaymentCancel, h.PaymentHandler.CancelPayment)
 	r.GET(appconstant.EndpointCart, h.CartHandler.GetCart)
 	r.PATCH(appconstant.EndpointOrdersDetails, h.OrderHandler.UpdateOrderStatus)
+	r.GET(appconstant.EndpointGetAllStockMovements, h.StockMovementHandler.GetAllStockMovements)
+
 	return r
 }

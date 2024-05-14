@@ -1,19 +1,27 @@
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import {
-  BannerContainer,
-  Imagecontainer,
-} from '@/styles/molecules/Banner.styles';
+import { BannerContainer } from '@/styles/molecules/Banner.styles';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Keyboard, Mousewheel, Navigation, Pagination } from 'swiper/modules';
-import { CSSProperties } from 'styled-components';
+import styled, { CSSProperties } from 'styled-components';
+import banner1 from '@/assets/banner1.jpg';
+import banner2 from '@/assets/banner2.jpg';
+import banner3 from '@/assets/banner3.jpg';
+import Image from 'next/image';
 
-const slide_img = [
-  'https://img.freepik.com/free-vector/medical-sale-banner-template_23-2149091920.jpg?w=1380&t=st=1715605026~exp=1715605626~hmac=eba75fd8a05229c505764f1967a1480c750b7eba448fb2fb0a214655d93c3346',
-  'https://img.freepik.com/free-vector/hospital-healthcare-service-facebook-template_23-2150394108.jpg?w=1380&t=st=1715592727~exp=1715593327~hmac=fafd33ccab233b7df614998f9edae1818adf057113016db7f701e2b9ef987c5a',
-  'https://img.freepik.com/free-vector/flat-ophthalmologist-social-media-post-template_23-2149372778.jpg?w=1380&t=st=1715592794~exp=1715593394~hmac=b09480b5b3db4052b10586320717661ef89fd05c5cd1220b5a2dcc62bc2d1c0d',
-];
+const slide_img = [banner1, banner2, banner3];
+
+const CustomImage = styled(Image)`
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+
+  @media (max-width: 769px) {
+    height: 300px;
+    width: 300px;
+  }
+`;
 
 const Banner = (): React.ReactElement => {
   return (
@@ -50,7 +58,7 @@ const Banner = (): React.ReactElement => {
         {slide_img.map((image, i) => {
           return (
             <SwiperSlide key={i}>
-              <Imagecontainer src={image} alt='banner' />
+              <CustomImage width={1300} height={500} src={image} alt='banner' />
             </SwiperSlide>
           );
         })}

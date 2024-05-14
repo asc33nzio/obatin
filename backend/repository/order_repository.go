@@ -93,7 +93,7 @@ func (r *orderRepositoryPostgres) UpdateOrderById(ctx context.Context, o *entity
 	`)
 
 	if o.User.Id != nil {
-		querySetPart.WriteString(fmt.Sprintf(" AND user_id = $%d ", len(args)+1))
+		queryWherePart.WriteString(fmt.Sprintf(" AND user_id = $%d ", len(args)+1))
 		args = append(args, *o.User.Id)
 	}
 
