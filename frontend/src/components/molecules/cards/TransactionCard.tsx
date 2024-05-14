@@ -2,6 +2,7 @@
 import 'react-loading-skeleton/dist/skeleton.css';
 import 'moment/locale/id';
 import {
+  BottomContentContainer,
   BreakdownCenterDiv,
   BreakdownRightDiv,
   DeliveryStatusBadge,
@@ -14,7 +15,7 @@ import {
   TxHeaders,
   TxProductBreakdown,
 } from '@/styles/molecules/cards/TransactionCard.styles';
-import { useModal } from '@/hooks/useModal';
+// import { useModal } from '@/hooks/useModal';
 import { TxItf } from '@/types/transactionTypes';
 import { useRouter } from 'next/navigation';
 import DetailICO from '@/assets/icons/DetailICO';
@@ -23,11 +24,12 @@ import DotICO from '@/assets/icons/DotICO';
 import moment from 'moment';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
+import CustomButton from '@/components/atoms/button/CustomButton';
+import { encrypt } from '@/utils/crypto';
 moment.locale('id');
 
 const TransactionCard = (props: TxItf): React.ReactElement => {
   const router = useRouter();
-  const { openModal } = useModal();
   const splittedDate = props?.created_at?.split(' ')?.[0];
   const orderTime = props?.created_at?.split(' ')?.[1];
   const formattedDate = moment(splittedDate, 'DD-MM-YYYY').format(
@@ -35,7 +37,7 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
   );
 
   const handleOpenDetail = () => {
-    openModal('detail-pharmacy');
+    // openModal('detail-pharmacy');
   };
 
   const deliveryStatusMap = {
@@ -54,6 +56,13 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
     sent: '#5F5D98',
     confirmed: '#14F500',
     cancelled: '#DE161C',
+  };
+
+  const handleUploadPayment = async () => {
+    const encryptedPID = await encrypt(props?.payment_id?.toString());
+    const encodedEncryptedPID = encodeURIComponent(encryptedPID);
+
+    router.replace(`/shop/checkout/${encodedEncryptedPID}`);
   };
 
   return (
@@ -140,7 +149,7 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
           <React.Fragment
             key={`txProductCard${product.pharmacy_product_id}_${index}`}
           >
-            <TxProductBreakdown>
+            <TxProductBreakdown $isLoading={props.isLoading}>
               {props.isLoading ? (
                 <SkeletonDiv $width='100px'>
                   <Skeleton
@@ -283,14 +292,27 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
         );
       })}
 
-      <SeeMoreDiv onClick={props.handleOpenViewMore}>
-        {props?.cart_items?.length <= 2 ? (
-          <h4>Lihat Detail Transaksi</h4>
-        ) : (
-          <h4>Lihat {props?.cart_items?.length - 2} produk lainnya</h4>
+      <BottomContentContainer>
+        {props?.status === 'waiting_payment' && (
+          <CustomButton
+            content='Unggah Pembayaran'
+            $bgColor='#00B5C0'
+            $width='200px'
+            $height='25px'
+            $fontSize='14px'
+            onClick={() => handleUploadPayment()}
+          />
         )}
-        <DotICO />
-      </SeeMoreDiv>
+
+        <SeeMoreDiv onClick={props.handleOpenViewMore}>
+          {props?.cart_items?.length <= 2 ? (
+            <h4>Lihat Detail Transaksi</h4>
+          ) : (
+            <h4>Lihat {props?.cart_items?.length - 2} produk lainnya</h4>
+          )}
+          <DotICO />
+        </SeeMoreDiv>
+      </BottomContentContainer>
     </TransactionCardContainer>
   );
 };

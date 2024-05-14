@@ -74,7 +74,9 @@ export const TxCardPharmacyName = styled.div`
   }
 `;
 
-export const TxProductBreakdown = styled.div`
+export const TxProductBreakdown = styled.div<{
+  $isLoading: boolean | undefined;
+}>`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -82,7 +84,8 @@ export const TxProductBreakdown = styled.div`
   width: 100%;
   height: 33.3%;
 
-  border: 1px solid ${COLORS.input_border};
+  border: ${({ $isLoading }) =>
+    !$isLoading ? `1px solid ${COLORS.input_border}` : 'none'};
   border-radius: 15px;
 
   img {
@@ -171,6 +174,18 @@ export const BreakdownRightDiv = styled.div<{ $isModal?: boolean }>`
   }
 `;
 
+export const BottomContentContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 75px;
+
+  padding-left: 10px;
+`;
+
 export const SeeMoreDiv = styled.div`
   display: flex;
   flex-direction: row;
@@ -180,7 +195,7 @@ export const SeeMoreDiv = styled.div`
 
   cursor: pointer;
   width: 20%;
-  height: 75px;
+  height: 25px;
   gap: 25px;
 
   h4 {
@@ -190,8 +205,8 @@ export const SeeMoreDiv = styled.div`
 
   svg {
     cursor: pointer;
-    width: 35px;
-    height: 35px;
+    width: 25px;
+    height: 25px;
   }
 `;
 
@@ -203,7 +218,7 @@ export const DeliveryStatusBadge = styled.div<{
   align-items: center;
   justify-content: center;
 
-  width: 225px;
+  width: 300px;
   height: ${({ $isModal }) => (!$isModal ? '100%' : '25%')};
 
   border: ${({ $color }) => `2.5px solid ${$color}`};

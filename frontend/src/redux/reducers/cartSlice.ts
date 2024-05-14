@@ -40,7 +40,7 @@ export interface SyncCartItf {
   pharmacy_id?: number | null;
 }
 
-export interface AddToCartWithPharmaItf {
+export interface ChangePharmacyItf {
   product_id: number;
   pharmacy_id: number;
 }
@@ -131,7 +131,7 @@ const cartSlice = createSlice({
       state.totalQuantity = action.payload;
     },
 
-    changePharmacy: (state, action: PayloadAction<AddToCartWithPharmaItf>) => {
+    changePharmacy: (state, action: PayloadAction<ChangePharmacyItf>) => {
       const { product_id, pharmacy_id } = action.payload;
       const existingItem = state.items.find(
         (item) => item.product_id === product_id,
