@@ -18,7 +18,14 @@ import {
 import { TxItf } from '@/types/transactionTypes';
 import { useRouter } from 'next/navigation';
 import { encrypt } from '@/utils/crypto';
+import { useModal } from '@/hooks/useModal';
+import { useEventEmitter } from '@/hooks/useEventEmitter';
+import { ModalType } from '@/types/modalTypes';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { useToast } from '@/hooks/useToast';
+import { getCookie } from 'cookies-next';
 import React, { useState } from 'react';
+import Axios from 'axios';
 import DetailICO from '@/assets/icons/DetailICO';
 import Image from 'next/image';
 import DotICO from '@/assets/icons/DotICO';
@@ -29,7 +36,12 @@ import InvokableModal from '@/components/organisms/modal/InvokableModal';
 moment.locale('id');
 
 const TransactionCard = (props: TxItf): React.ReactElement => {
+  const { openModal } = useModal();
+  const { setToast } = useToast();
+  const { isDesktopDisplay } = useClientDisplayResolution();
+  const accessToken = getCookie('access_token');
   const router = useRouter();
+  const emitter = useEventEmitter();
   const splittedDate = props?.created_at?.split(' ')?.[0];
   const orderTime = props?.created_at?.split(' ')?.[1];
   const formattedDate = moment(splittedDate, 'DD-MM-YYYY').format(
@@ -61,7 +73,66 @@ const TransactionCard = (props: TxItf): React.ReactElement => {
     router.replace(`/shop/checkout/${encodedEncryptedPID}`);
   };
 
-  const handleCompleteOrder = async () => {};
+  const triggerModal = async (type: ModalType) => {
+    return new Promise<boolean>((resolve) => {
+      openModal(type);
+
+      emitter.once('close-modal-fail', () => {
+        resolve(false);
+      });
+
+      emitter.once('close-modal-ok', () => {
+        resolve(true);
+      });
+    });
+  };
+
+  const handleCompleteOrder = async () => {
+    try {
+      const canProceed = await triggerModal('confirm-receive-order');
+      if (!canProceed) {
+        setToast({
+          showToast: true,
+          toastMessage:
+            'Pesanan anda akan secara otomatis diselesaikan dalam 2 x 24 jam',
+          toastType: 'ok',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
+
+      await Axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/orders/${props?.order_id}`,
+        {
+          status: 'confirmed',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage:
+          'Terima kasih atas konfirmasi anda. Semoga anda puas dengan pembelanjaan anda',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    } catch (error) {
+      console.error(error);
+      setToast({
+        showToast: true,
+        toastMessage: 'Maaf, terjadi kesalahan saat konfirmasi penerimaan',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    }
+  };
 
   return (
     <React.Fragment>

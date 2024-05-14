@@ -19,6 +19,7 @@ import ViewMoreTxModalContent from './modalContent/ViewMoreTxModalContent';
 import UnsetShippingModalContent from './modalContent/UnsetShippingModalContent';
 import ConfirmCheckoutModalContent from './modalContent/ConfirmCheckoutModalContent';
 import ConfirmCancelModalContent from './modalContent/CancelOrderModalContent';
+import ConfirmReceiveModalContent from './modalContent/ConfirmReceiveModalContent';
 
 interface DoctorDetailItf {
   name: string;
@@ -142,6 +143,15 @@ const Modal = () => {
       modalProps = {
         $containerWidth: '650px',
         $containerHeight: '350px',
+      };
+      break;
+
+    case 'confirm-receive-order':
+      modalContent = <ConfirmReceiveModalContent />;
+      title = 'Konfirmasi penerimaan barang';
+      modalProps = {
+        $containerWidth: '700px',
+        $containerHeight: '250px',
       };
       break;
 
