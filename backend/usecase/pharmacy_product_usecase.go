@@ -267,14 +267,14 @@ func (u *pharmacyProductUsecaseImpl) CreatePharmacyProduct(ctx context.Context, 
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 	phPr := u.repoStore.PharmacyProductRepository()
-	ar := u.repoStore.AuthenticationRepository()
+	pnr := u.repoStore.PartnerRepository()
 
 	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	partnerId, err := ar.FindPartnerIdByAuthId(ctx, authenticationId)
+	partnerId, err := pnr.FindPartnerIdByAuthId(ctx, authenticationId)
 	if err != nil {
 		return err
 	}

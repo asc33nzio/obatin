@@ -1,3 +1,5 @@
+import { PaginationParamsItf } from './request';
+
 export type Category = {
   id: number;
   name: string;
@@ -142,3 +144,19 @@ export interface ISales {
   month: string;
   total_sales: string;
 }
+
+export interface IGetProductsParam extends PaginationParamsItf {
+  search?: string | null;
+  category?: number | null;
+}
+
+export type INullableProduct = {
+  id?: number;
+  name?: string;
+  product_slug?: string;
+  selling_unit?: string;
+  min_price?: number;
+  max_price?: number;
+  image_url?: string;
+  sales?: number;
+};
