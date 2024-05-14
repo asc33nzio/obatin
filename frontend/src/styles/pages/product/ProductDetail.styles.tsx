@@ -73,7 +73,7 @@ export const SelectPharmacy = styled.div`
     justify-content: center;
     width: 300px;
     height: 600px;
-    h2{
+    h2 {
       padding-bottom: 20px;
     }
   }
