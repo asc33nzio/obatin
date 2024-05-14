@@ -36,6 +36,12 @@ export const PagingButton = styled.button<{
     background-color: ${({ $disabled }) =>
       !$disabled ? '#00C2CC' : '#00b5c0'};
   }
+
+  @media (max-width: 768px) {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
 `;
 
 export const PagingInfo = styled.button<{

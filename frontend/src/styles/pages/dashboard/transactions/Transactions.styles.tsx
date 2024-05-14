@@ -96,4 +96,8 @@ export const PaginationDiv = styled.div`
 
   width: 100%;
   height: 10%;
+
+  @media (max-width: 768) {
+    width: 300px;
+  }
 `;

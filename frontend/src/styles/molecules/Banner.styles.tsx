@@ -5,6 +5,9 @@ export const BannerContainer = styled.div`
   height: 500px;
   border-radius: 12px;
   overflow: hidden;
+  @media (max-width: 1440px) {
+    width: 850px;
+  }
   @media (max-width: 769px) {
     height: 300px;
     width: 300px;

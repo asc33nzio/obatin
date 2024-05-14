@@ -365,15 +365,15 @@ const UserDashboardPage = (): React.ReactElement => {
                 content='Riwayat Transaksi'
                 $bgColor='#00B5C0'
                 $width='150px'
-                $height='40px'
-                $fontSize='18px'
+                $height='50px'
+                $fontSize='14px'
                 onClick={() => navigateToTxHistory()}
               />
               <CustomButton
                 content='Simpan Profil'
                 $width='150px'
-                $height='40px'
-                $fontSize='18px'
+                $height='50px'
+                $fontSize='14px'
                 disabled={!Object.values(hasNewValue).some((value) => value)}
                 onClick={handleUpdateUserProfile}
               />

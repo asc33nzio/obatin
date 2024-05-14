@@ -3,7 +3,7 @@ import React from 'react';
 const OrderICO = (): React.ReactElement => {
   return (
     <svg
-      fill='#000000'
+      fill='#00b5c0'
       height='800px'
       width='800px'
       version='1.1'

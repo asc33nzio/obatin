@@ -167,6 +167,16 @@ export const PharmacyName = styled.div`
       object-fit: cover;
     }
   }
+  @media (max-width: 768px) {
+    div {
+      div {
+        gap: 10px;
+      }
+    }
+    p {
+      font-size: 13px;
+    }
+  }
 `;
 
 export const DeliveryItem = styled.div`

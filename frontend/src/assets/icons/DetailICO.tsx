@@ -5,7 +5,7 @@ interface DetailICOPropsItf {
 const DetailICO = (props: DetailICOPropsItf): React.ReactElement => {
   return (
     <svg
-      fill='#000000'
+      fill='#fff0f0'
       viewBox='0 0 16 16'
       xmlns='http://www.w3.org/2000/svg'
       onClick={() => props.onClick()}

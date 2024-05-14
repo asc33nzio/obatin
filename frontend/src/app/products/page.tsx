@@ -13,6 +13,7 @@ import {
   PrescriptionBadge,
   Price,
   ProductCard,
+  ProductCardContent,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
 import {
@@ -263,7 +264,7 @@ const ProductsPage = () => {
                       {product.is_prescription_required && (
                         <PrescriptionBadge>Membutuhkan Resep</PrescriptionBadge>
                       )}
-                      <div
+                      <ProductCardContent
                         onClick={() =>
                           handleProductClicked(product.product_slug)
                         }
@@ -282,7 +283,7 @@ const ProductsPage = () => {
                           Rp{product?.min_price.toLocaleString()} - Rp
                           {product?.max_price.toLocaleString()}
                         </Price>
-                      </div>
+                      </ProductCardContent>
                       {selectedProduct?.id === product.id &&
                       items.find((item) => item.product_id === product.id)
                         ?.quantity !== undefined ? (
@@ -319,9 +320,9 @@ const ProductsPage = () => {
                         <CustomButton
                           content='Tambah Ke Keranjang'
                           onClick={() => handleAddToCart(product)}
-                          $width='150px'
+                          $width='170px'
                           $height='50px'
-                          $fontSize='16px'
+                          $fontSize='14px'
                         />
                       )}
                     </>

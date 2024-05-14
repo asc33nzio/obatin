@@ -39,7 +39,7 @@ const MENU_USER: MenuOption[] = [
   {
     name: 'Riwayat Pembelian',
     icon: OrderICO,
-    url: '/',
+    url: '/dashboard/user/transactions',
   },
   {
     name: 'Konsultasi',
@@ -52,7 +52,7 @@ const MENU_USER: MenuOption[] = [
     url: '/doctors',
   },
   {
-    name: 'Logout',
+    name: 'Keluar',
     icon: LogoutICO,
     url: '/auth/login',
   },

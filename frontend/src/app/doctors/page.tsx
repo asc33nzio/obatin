@@ -13,6 +13,7 @@ import {
   Bold,
   Imagecontainer,
   ProductCard,
+  ProductCardContent,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
 import { Body, Container } from '@/styles/Global.styles';
@@ -159,22 +160,27 @@ const DoctorsPage = () => {
                   key={doctor.id}
                   onClick={() => handleModalOpen(doctor)}
                 >
-                  <Imagecontainer>
-                    <Image
-                      height={150}
-                      width={150}
-                      src='https://unsplash.com/photos/FVh_yqLR9eA/download?ixid=M3wxMjA3fDB8MXxzZWFyY2h8MTF8fGRvY3RvcnxlbnwwfHx8fDE3MTQ2NTQ1ODR8MA&force=true&w=1920'
-                      alt='banner'
-                    />
-                  </Imagecontainer>
-                  {doctor.is_online ? (
-                    <IsOnline>Aktif</IsOnline>
-                  ) : (
-                    <IsOffline>Tidak Aktif</IsOffline>
-                  )}
-                  <Bold>{doctor.name}</Bold>
-                  <Smallfont>{doctor.specialization}</Smallfont>
-                  <Experience>{doctor.experiences} tahun pengalaman</Experience>
+                  <ProductCardContent>
+                    <Imagecontainer>
+                      <Image
+                        height={150}
+                        width={150}
+                        src='https://unsplash.com/photos/FVh_yqLR9eA/download?ixid=M3wxMjA3fDB8MXxzZWFyY2h8MTF8fGRvY3RvcnxlbnwwfHx8fDE3MTQ2NTQ1ODR8MA&force=true&w=1920'
+                        alt='banner'
+                      />
+                    </Imagecontainer>
+                    {doctor.is_online ? (
+                      <IsOnline>Aktif</IsOnline>
+                    ) : (
+                      <IsOffline>Tidak Aktif</IsOffline>
+                    )}
+                    <Bold>{doctor.name}</Bold>
+                    <Smallfont>{doctor.specialization}</Smallfont>
+                    <Experience>
+                      {doctor.experiences} tahun pengalaman
+                    </Experience>
+                  </ProductCardContent>
+
                   <CustomButton
                     $width='150px'
                     $height='32px'
