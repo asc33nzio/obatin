@@ -4,6 +4,7 @@ import {
   ModalOverlay,
   ModalHeader,
 } from '@/styles/organisms/modal/Modal.styles';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEventEmitter } from '@/hooks/useEventEmitter';
 import { useModal } from '@/hooks/useModal';
 import { useObatinDispatch } from '@/redux/store/store';
@@ -43,6 +44,7 @@ const Modal = () => {
     dispatch(resetTxState());
     closeModal();
   };
+  const { isDesktopDisplay } = useClientDisplayResolution();
 
   let modalContent: React.ReactElement | null;
   let title: string | null = null;
@@ -114,8 +116,8 @@ const Modal = () => {
       modalContent = <AddShippingModalContent />;
       title = 'Tambahkan Metode Pengiriman';
       modalProps = {
-        $containerWidth: '1050px',
-        $containerHeight: 'max-content',
+        $containerWidth: !isDesktopDisplay ? '400px' : '1050px',
+        $containerHeight: !isDesktopDisplay ? '600px' : 'max-content',
       };
       break;
 
@@ -161,6 +163,15 @@ const Modal = () => {
       modalProps = {
         $containerWidth: '550px',
         $containerHeight: '225px',
+      };
+      break;
+
+    case 'confirm-checkout':
+      modalContent = <ConfirmCheckoutModalContent />;
+      title = 'Berikut perincian pembelanjaan anda';
+      modalProps = {
+        $containerWidth: '650px',
+        $containerHeight: '650px',
       };
       break;
 

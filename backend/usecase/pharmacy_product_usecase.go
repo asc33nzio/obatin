@@ -76,7 +76,8 @@ func (u *pharmacyProductUsecaseImpl) TotalStockPerPartner(ctx context.Context, p
 
 func (u *pharmacyProductUsecaseImpl) GetPharmacyProductByPartner(ctx context.Context, filter entity.PharmacyProductFilter) (*entity.PharmacyProductListPage, error) {
 	ppr := u.repoStore.PharmacyProductRepository()
-	ar := u.repoStore.AuthenticationRepository()
+	pnr := u.repoStore.PartnerRepository()
+
 	if filter.Limit < appconstant.DefaultMinLimit {
 		filter.Limit = appconstant.DefaultProductLimit
 	}
@@ -89,7 +90,7 @@ func (u *pharmacyProductUsecaseImpl) GetPharmacyProductByPartner(ctx context.Con
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	partnerId, err := ar.FindPartnerIdByAuthId(ctx, authenticationId)
+	partnerId, err := pnr.FindPartnerIdByAuthId(ctx, authenticationId)
 	if err != nil {
 		return nil, err
 	}

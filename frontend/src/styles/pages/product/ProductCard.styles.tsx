@@ -30,18 +30,17 @@ export const CategoryName = styled.h3`
 export const ProductCard = styled.a`
   cursor: pointer;
   position: relative;
-  width: 270px;
+  width: 280px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   border: 1px solid ${COLORS.input_border};
   border-radius: 12px;
-  padding: 20px;
+  padding: 15px;
   color: ${COLORS.primary_text};
   text-align: center;
   text-decoration: none;
-  height: 350px;
 
   &:hover {
     border: 1px solid ${COLORS.primary_color};
@@ -55,6 +54,16 @@ export const ProductCard = styled.a`
     gap: 5px;
     width: 250px;
   }
+`;
+
+export const ProductCardContent = styled.div`
+  height: 270px;
+  overflow-y: auto;
+  overflow: hidden;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 `;
 
 export const Bold = styled.p`

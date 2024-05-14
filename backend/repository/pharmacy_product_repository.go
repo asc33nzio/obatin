@@ -140,8 +140,6 @@ func (r *pharmacyProductRepositoryPostgres) FindPharmacyProductByPharmacyProduct
 			pp.id = $1
 		AND
 			pp.deleted_at IS NULL
-		AND
-			pp.is_active = true
 		FOR UPDATE
 	`
 	err := r.db.QueryRowContext(
