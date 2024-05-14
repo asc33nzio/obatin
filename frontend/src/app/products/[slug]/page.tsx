@@ -318,7 +318,7 @@ const ProductDetailPage = () => {
                     >
                       <Row>
                         <HomeICO />
-                        <p>{pharmacy.name}</p>
+                        <h2>{pharmacy.name}</h2>
                       </Row>
                       <Row>
                         <p>{pharmacy.address}</p>
