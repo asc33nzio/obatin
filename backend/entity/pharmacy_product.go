@@ -8,6 +8,7 @@ type PharmacyProduct struct {
 	Stock      *int
 	TotalStock int
 	IsActive   bool
+	Sales      int64
 }
 
 type PharmacyProductFilter struct {
