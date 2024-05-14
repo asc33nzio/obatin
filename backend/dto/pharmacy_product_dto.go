@@ -22,7 +22,7 @@ type PharmacyProductFilter struct {
 	SearchPharmacy string  `form:"search_pharmacy"`
 	ProductId      *int64  `form:"product_id" binding:"omitempty"`
 	PharmacyId     int64   `form:"pharmacy_id" binding:"omitempty"`
-	SortBy         *string `form:"sort_by" binding:"omitempty,oneof='name' 'price' 'pharmacy'"`
+	SortBy         *string `form:"sort_by" binding:"omitempty,oneof='name' 'price' 'pharmacy' 'sales'"`
 	Classification *string `form:"classification" binding:"omitempty,oneof='obat_bebas' 'obat_bebas_terbatas' 'non_obat' 'obat_keras'"`
 	Order          *string `form:"order" binding:"omitempty,oneof='asc' 'desc'"`
 	Page           int     `form:"page" binding:"omitempty,min=1"`

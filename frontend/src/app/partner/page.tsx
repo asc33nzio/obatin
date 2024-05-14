@@ -79,6 +79,8 @@ const PartnersPage = () => {
   const accessToken = getCookie('access_token');
   const [loading, setLoading] = useState(false);
   const [classification, setClassification] = useState<string | null>(null);
+  const [orderBy, setOrderBy] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<string | null>(null);
   const { isDesktopDisplay } = useClientDisplayResolution();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [searchPharmacy, setSearchPharmacy] = useState<string | null>(null);
@@ -117,7 +119,8 @@ const PartnersPage = () => {
             classification: classification,
             search: searchProduct,
             search_pharmacy: searchPharmacy,
-
+            sort_by: sortBy,
+            order: orderBy,
             limit: limit,
             page,
           },
@@ -189,6 +192,7 @@ const PartnersPage = () => {
     setClassification(null);
     setPage(1);
     setLimit(12);
+    setSortBy(null);
   };
 
   useEffect(() => {
@@ -202,6 +206,8 @@ const PartnersPage = () => {
     selectedProduct,
     classification,
     isModalAddProductOpen,
+    sortBy,
+    orderBy,
   ]);
 
   return (
@@ -236,6 +242,7 @@ const PartnersPage = () => {
                     }}
                   ></CustomButton>
                   <PP.LimitInput
+                    style={{ width: '60px' }}
                     placeholder='limit'
                     onBlur={(e) => {
                       if (!isNaN(parseInt(e.target.value))) {
@@ -330,6 +337,24 @@ const PartnersPage = () => {
                     </option>
                     <option value='non_obat'>Non Obat</option>
                   </PP.FilterStatus>
+                  <PP.FilterStatus
+                    onChange={(e) => setSortBy(e.target.value)}
+                    defaultValue={''}
+                  >
+                    <option>Urutkan</option>
+                    <option value='name'>Nama Produk</option>
+                    <option value='sales'>Penjualan</option>
+                    <option value='price'>Harga</option>
+                    <option value='pharmacy'>Nama Farmasi</option>
+                  </PP.FilterStatus>
+                  <PP.FilterStatus
+                    onChange={(e) => setOrderBy(e.target.value)}
+                    defaultValue={''}
+                  >
+                    <option>Mengurut Dari</option>
+                    <option value='desc'>Tinggi ke Rendah</option>
+                    <option value='asc'>Rendah ke Tinggi</option>
+                  </PP.FilterStatus>
                   <ClearTxFilterButton onClick={() => handleResetFilter()}>
                     Hapus Filter
                   </ClearTxFilterButton>
@@ -353,6 +378,7 @@ const PartnersPage = () => {
                           <th style={{ textAlign: 'left' }}>Nama Farmasi</th>
                           <th>Price</th>
                           <th>Stock</th>
+                          <th>Total Penjualan</th>
                           <th>Edit</th>
                           <th>Status</th>
                         </tr>
@@ -380,6 +406,7 @@ const PartnersPage = () => {
                             </td>
                             <td>Rp. {item.price.toLocaleString()}</td>
                             <td>{item.stock}</td>
+                            <td>{item.sales}</td>
                             <td>
                               <CustomButton
                                 content='edit produk'
