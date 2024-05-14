@@ -1,6 +1,6 @@
 const PartnerICO = () => {
   return (
-    <svg fill='#000000' version='1.1' id='Layer_1_1_' viewBox='0 0 64 64'>
+    <svg fill='#00b5c0' version='1.1' id='Layer_1_1_' viewBox='0 0 64 64'>
       <g></g>
       <g>
         <path

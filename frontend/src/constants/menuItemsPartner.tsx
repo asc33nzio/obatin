@@ -1,6 +1,7 @@
 import HomeICO from '@/assets/icons/HomeICO';
 import LogoutICO from '@/assets/icons/LogoutICO';
 import OrderICO from '@/assets/icons/OrderICO';
+import ReportICO from '@/assets/icons/ReportICO';
 import React from 'react';
 
 type MenuOption = {
@@ -22,8 +23,8 @@ const MENU_PARTNER: MenuOption[] = [
     url: '/partner/orders',
   },
   {
-    name: 'Laporan',
-    icon: OrderICO,
+    name: 'Jurnal Mutasi',
+    icon: ReportICO,
     url: '/partner/report',
   },
   {
