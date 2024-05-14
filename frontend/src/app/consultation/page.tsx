@@ -42,6 +42,7 @@ import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
 import RightArrowICO from '@/assets/arrows/RightArrowICO ';
 import { useObatinDispatch } from '@/redux/store/store';
 import { syncCartItem } from '@/redux/reducers/cartSlice';
+import { addUsedPrescription } from '@/redux/reducers/prescriptionReducer';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -179,6 +180,8 @@ function ChatPage(): React.ReactElement {
         prescription_id: drugData.PrescriptionId,
         quantity: item.quantity,
       });
+
+      dispatch(addUsedPrescription(prescription_id));
 
       dispatch(
         syncCartItem({

@@ -8,6 +8,7 @@ import { pharmacyReducer } from '@/redux/reducers/pharmacySlice';
 import { txReducer } from '../reducers/txSlice';
 import { provincesReducer } from '../reducers/provincesSlice';
 import { encryptTransform } from 'redux-persist-transform-encrypt';
+import { prescriptionReducer } from '../reducers/prescriptionReducer';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
@@ -56,6 +57,7 @@ const rootReducer = combineReducers({
   cart: cartReducer,
   pharmacy: pharmacyReducer,
   tx: txReducer,
+  prescription: prescriptionReducer,
 });
 
 const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(
@@ -79,6 +81,10 @@ export const createPreloadedState = (customState: Partial<RootState>) => {
     cart: { ...store.getState().cart, ...customState.cart },
     pharmacy: { ...store.getState().pharmacy, ...customState.pharmacy },
     tx: { ...store.getState().tx, ...customState.tx },
+    prescription: {
+      ...store.getState().prescription,
+      ...customState.prescription,
+    },
   };
 };
 
