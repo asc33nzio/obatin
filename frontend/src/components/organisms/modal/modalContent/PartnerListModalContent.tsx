@@ -1,6 +1,6 @@
 import { useToast } from '@/hooks/useToast';
 import { APIResponseItf } from '@/types/response';
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/debounceThrottle';
 import axios from 'axios';
 import { getCookie } from 'cookies-next';
 import Image from 'next/image';

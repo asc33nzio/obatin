@@ -28,7 +28,7 @@ import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/hooks/useToast';
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/debounceThrottle';
 import { getCookie } from 'cookies-next';
 import { setAuthState } from '@/redux/reducers/authSlice';
 import { BounceLoader } from 'react-spinners';
@@ -89,7 +89,6 @@ const UserDashboardPage = (): React.ReactElement => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitialPassCheckLoading, setIsInitialPassCheckLoading] =
     useState<boolean>(false);
-
   type ValuePiece = Date | null;
   type Value = ValuePiece | [ValuePiece, ValuePiece];
   const [date, setDate] = useState<Value>(new Date());
@@ -208,8 +207,6 @@ const UserDashboardPage = (): React.ReactElement => {
   };
 
   const handleUpdateUserProfile = async () => {
-    setIsLoading(true);
-
     if (!userInfo?.isVerified) {
       setToast({
         showToast: true,
@@ -260,6 +257,7 @@ const UserDashboardPage = (): React.ReactElement => {
     });
 
     try {
+      setIsLoading(true);
       const patchProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
       // const patchEmailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
       const userDetailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${userInfo?.aid}`;
@@ -391,6 +389,14 @@ const UserDashboardPage = (): React.ReactElement => {
                       display: 'flex',
                       backgroundColor: 'transparent',
                     }}
+                  />
+                ) : userUpload !== undefined ? (
+                  <Image
+                    width={275}
+                    height={275}
+                    src={URL.createObjectURL(userUpload)}
+                    alt='avatar'
+                    priority
                   />
                 ) : (
                   <Image

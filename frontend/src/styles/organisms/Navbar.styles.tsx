@@ -132,34 +132,41 @@ export const VerifyPopup = styled.div<{ $isPopupOpen: boolean }>`
   top: 125px;
   left: 0;
   right: 0;
-  padding-left: 250px;
-  padding-right: 100px;
+  padding-left: 50px;
+  padding-right: 15px;
   width: 100%;
   height: 25px;
   background-color: rgba(255, 0, 0, 0.5);
 
   p {
-    font-size: 12px;
-    color: #ffffff;
-    font-weight: 550;
-    background-color: transparent;
-    width: 100%;
     display: flex;
     text-align: center;
     justify-content: center;
     align-items: center;
+
+    font-size: 14px;
+    font-weight: 550;
+    color: #ffffff;
+    background-color: transparent;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-wrap: break-word;
+    height: 100%;
     gap: 4px;
 
     u {
-      cursor: pointer;
       display: flex;
       text-align: center;
       justify-content: center;
       align-items: center;
-      font-size: 12px;
+
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 550;
       color: #ffffff;
-      font-weight: 500;
       background-color: transparent;
+      text-overflow: clip;
     }
   }
 
@@ -176,4 +183,25 @@ export const VerifyPopup = styled.div<{ $isPopupOpen: boolean }>`
     }
   }
   z-index: 50;
+
+  @media (max-width: 768px) {
+    height: 250px;
+    padding: 0;
+
+    p {
+      padding-left: 5px;
+      font-size: 12px;
+      margin-top: 150px;
+      height: 150px;
+
+      u {
+        font-size: 12px;
+      }
+    }
+
+    svg {
+      padding-right: 5px;
+      margin-top: 150px;
+    }
+  }
 `;

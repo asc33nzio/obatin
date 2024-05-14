@@ -55,13 +55,20 @@ const AddShippingModalContent = () => {
     const fetchShippingMethods = async () => {
       try {
         setIsLoading(true);
+        const totalWeight = selectedPharmacy?.cart_items?.reduce(
+          (total, cartItem) => {
+            return total + cartItem.weight * cartItem.quantity;
+          },
+          0,
+        );
+        if (totalWeight >= 29998) return;
         const response = await Axios.post(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/pharmacy/shippings`,
           {
             pharmacy_id: selectedPharmacy?.id,
             destination_city_id: selectedPharmacy?.city_id,
             distance: selectedPharmacy?.distance,
-            weight: selectedPharmacy?.total_weight,
+            weight: totalWeight,
           },
           {
             headers: {

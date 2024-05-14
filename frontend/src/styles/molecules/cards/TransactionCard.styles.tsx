@@ -59,12 +59,11 @@ export const TxCardPharmacyName = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
 
   height: 100%;
-  width: 17%;
+  width: 23%;
   border-top-left-radius: 15px;
-  gap: 10px;
 
   svg {
     cursor: pointer;
@@ -119,17 +118,20 @@ export const BreakdownCenterDiv = styled.div<{ $isModal?: boolean }>`
   padding-left: 25px;
 
   h1 {
-    height: ${({ $isModal }) => (!$isModal ? '45%' : '35%')};
-    width: 100%;
-    margin: 0;
     display: flex;
     align-items: center;
+    height: 35%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
 
     font-size: ${({ $isModal }) => (!$isModal ? '22px' : '18px')};
     font-weight: 550;
     word-wrap: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-top: 5px;
+    margin-bottom: 1px;
   }
 
   span {
@@ -174,15 +176,15 @@ export const BreakdownRightDiv = styled.div<{ $isModal?: boolean }>`
   }
 `;
 
-export const BottomContentContainer = styled.div`
+export const BottomContentContainer = styled.div<{ $hasMultiple: boolean }>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: ${({ $hasMultiple }) =>
+    $hasMultiple ? 'space-between' : 'flex-end'};
 
   width: 100%;
   height: 75px;
-
   padding-left: 10px;
 `;
 
@@ -214,9 +216,10 @@ export const DeliveryStatusBadge = styled.div<{
   $color: string;
   $isModal?: boolean;
 }>`
-  display: flex;
+  display: inline-block;
   align-items: center;
   justify-content: center;
+  text-align: center;
 
   width: 300px;
   height: ${({ $isModal }) => (!$isModal ? '100%' : '25%')};

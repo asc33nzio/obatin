@@ -4,7 +4,7 @@ export interface PharmacyItf {
   id?: number;
   name?: string;
   quantity?: number;
-  address?: number;
+  address?: string;
   city_id?: number;
   lat?: string;
   lng?: string;
@@ -13,7 +13,7 @@ export interface PharmacyItf {
   pharmacist_phone?: string;
   opening_time?: string;
   closing_time?: string;
-  operational_days?: [];
+  operational_days?: string[];
   partner_id?: number;
   distance?: number;
   total_weight?: number;

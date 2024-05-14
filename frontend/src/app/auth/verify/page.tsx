@@ -100,7 +100,7 @@ const VerifyPage = () => {
       {isLoading ? (
         <PropagateLoader color='#dd1b50' speedMultiplier={0.8} size={'10px'} />
       ) : (
-        <p>{`Anda akan dihalau ke ${isSuccessful ? 'login' : 'beranda'} dalam ${count} detik...`}</p>
+        <p>{`Anda akan diarahkan ke ${isSuccessful ? 'login' : 'beranda'} dalam ${count} detik...`}</p>
       )}
 
       <CustomButton

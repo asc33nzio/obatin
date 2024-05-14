@@ -11,7 +11,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
     toastMessage: '',
     toastType: 'ok',
     resolution: 'desktop',
-    orientation: 'center',
+    orientation: 'right',
     setToast: () => {},
   });
 

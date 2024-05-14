@@ -1,4 +1,4 @@
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/debounceThrottle';
 import { useState } from 'react';
 
 export const useInputValidation = () => {

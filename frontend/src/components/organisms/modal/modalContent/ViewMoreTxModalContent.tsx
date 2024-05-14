@@ -7,7 +7,9 @@ import {
 import {
   InfoDiv,
   InfoDivAlt,
+  InfoDivAltLong,
   PaymentInfo,
+  PharmacyInfo,
   ProductBreakdownContainer,
   ShippingInfo,
   TxProductBreakdownModal,
@@ -148,26 +150,26 @@ const ViewMoreTxModalContent = (): React.ReactElement => {
         </button>
       )}
 
-      <ShippingInfo>
+      <PharmacyInfo>
         <h1>Info Apotik</h1>
         <InfoDivAlt>
           <h2>Nama</h2>
           <span>:</span>
           <h3>{info?.pharmacy?.name}</h3>
         </InfoDivAlt>
-        <InfoDivAlt>
-          <h2>Alamat</h2>
-          <span>:</span>
-          <p>{info?.pharmacy?.address}</p>
-        </InfoDivAlt>
         {userInfo.addresses && (
           <InfoDivAlt>
-            <h2>Alamat Pengiriman</h2>
+            <h2>Alamat Penerima</h2>
             <span>:</span>
             <p>{fullUserAddress}</p>
           </InfoDivAlt>
         )}
-      </ShippingInfo>
+        <InfoDivAltLong>
+          <h2>Alamat Apotik</h2>
+          <span>:</span>
+          <p>{info?.pharmacy?.address}</p>
+        </InfoDivAltLong>
+      </PharmacyInfo>
 
       <ShippingInfo>
         <h1>Info Pengiriman</h1>

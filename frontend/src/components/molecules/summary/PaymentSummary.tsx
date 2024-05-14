@@ -18,6 +18,9 @@ import { ModalType } from '@/types/modalTypes';
 import { useRouter } from 'next/navigation';
 import { clearCart, syncCartItem } from '@/redux/reducers/cartSlice';
 import { encrypt } from '@/utils/crypto';
+import { useState } from 'react';
+import { PropagateLoader } from 'react-spinners';
+import { LoaderDiv } from '@/styles/pages/auth/Auth.styles';
 import Axios from 'axios';
 import CustomButton from '@/components/atoms/button/CustomButton';
 
@@ -28,6 +31,7 @@ const PaymentSummaryComponent = (): React.ReactElement => {
   const { setToast } = useToast();
   const { openModal } = useModal();
   const { isDesktopDisplay } = useClientDisplayResolution();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const emitter = useEventEmitter();
   const router = useRouter();
   const dispatch = useObatinDispatch();
@@ -48,6 +52,7 @@ const PaymentSummaryComponent = (): React.ReactElement => {
 
   const handleCheckout = async () => {
     try {
+      setIsLoading(true);
       let pharmacies_cart: Array<Partial<PharmacyCart>> = [];
       let unsetShippingProductsCount = 0;
       let atLeastOneShippingSet = false;
@@ -79,7 +84,7 @@ const PaymentSummaryComponent = (): React.ReactElement => {
           toastMessage: 'Pilihlah metode pengiriman',
           toastType: 'warning',
           resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-          orientation: 'center',
+          orientation: 'right',
         });
         return;
       }
@@ -149,6 +154,14 @@ const PaymentSummaryComponent = (): React.ReactElement => {
         });
       });
 
+      setToast({
+        showToast: true,
+        toastMessage: 'Silahkan melakukan pembayaran',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'right',
+      });
+
       dispatch(resetPharmacyStates());
       router.replace(`/shop/checkout/${encodedEncryptedPID}`);
     } catch (error) {
@@ -158,8 +171,10 @@ const PaymentSummaryComponent = (): React.ReactElement => {
         toastMessage: 'Maaf, mohon coba kembali',
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
-        orientation: 'center',
+        orientation: 'right',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -197,15 +212,29 @@ const PaymentSummaryComponent = (): React.ReactElement => {
             </p>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <CustomButton
-              content='Proses Transaksi'
-              $width='250px'
-              $height='50px'
-              $fontSize='16px'
-              onClick={handleCheckout}
-            />
-          </div>
+          {isLoading ? (
+            <LoaderDiv style={{ marginLeft: '185px' }}>
+              <PropagateLoader
+                color='#dd1b50'
+                speedMultiplier={0.8}
+                size={'18px'}
+                cssOverride={{
+                  alignSelf: 'center',
+                  justifySelf: 'center',
+                }}
+              />
+            </LoaderDiv>
+          ) : (
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <CustomButton
+                content='Proses Transaksi'
+                $width='250px'
+                $height='50px'
+                $fontSize='16px'
+                onClick={handleCheckout}
+              />
+            </div>
+          )}
         </Summary>
       </PaymentSummaryContainer>
     </>

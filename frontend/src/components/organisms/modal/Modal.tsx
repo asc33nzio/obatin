@@ -4,6 +4,7 @@ import {
   ModalOverlay,
   ModalHeader,
 } from '@/styles/organisms/modal/Modal.styles';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEventEmitter } from '@/hooks/useEventEmitter';
 import { useModal } from '@/hooks/useModal';
 import { useObatinDispatch } from '@/redux/store/store';
@@ -12,14 +13,14 @@ import ChangePasswordModalContent from './modalContent/ChangePasswordModalConten
 import CloseICO from '@/assets/icons/CloseICO';
 import RegisterConfirmPasswordModalContent from './modalContent/RegisterConfirmPasswordModalContent';
 import AddAddressModalContent from '@/components/organisms/modal/modalContent/AddAddressModalContent';
-import UploadPembayaranModal from '@/components/organisms/modal/modalContent/UploadPembayaranModal';
 import SelectAddressModalContent from './modalContent/SelectAddressModalContent';
 import UpdateAddressModalContent from './modalContent/UpdateAddressModalContent';
 import AddShippingModalContent from './modalContent/AddShippingModalContent';
 import ViewMoreTxModalContent from './modalContent/ViewMoreTxModalContent';
 import UnsetShippingModalContent from './modalContent/UnsetShippingModalContent';
 import ConfirmCheckoutModalContent from './modalContent/ConfirmCheckoutModalContent';
-import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import ConfirmCancelModalContent from './modalContent/CancelOrderModalContent';
+import ConfirmReceiveModalContent from './modalContent/ConfirmReceiveModalContent';
 
 interface DoctorDetailItf {
   name: string;
@@ -93,15 +94,6 @@ const Modal = () => {
       };
       break;
 
-    case 'payment-upload':
-      modalContent = <UploadPembayaranModal />;
-      title = 'Upload Bukti Pembayaran';
-      modalProps = {
-        $containerWidth: '500px',
-        $containerHeight: '500px',
-      };
-      break;
-
     case 'select-address':
       modalContent = <SelectAddressModalContent />;
       title = 'Pilih atau tambahkan alamat';
@@ -116,15 +108,6 @@ const Modal = () => {
       title = 'Ubah Informasi Alamat';
       modalProps = {
         $containerWidth: '650px',
-        $containerHeight: '850px',
-      };
-      break;
-
-    case 'view-more-tx':
-      modalContent = <ViewMoreTxModalContent />;
-      title = 'Detail Transaksi';
-      modalProps = {
-        $containerWidth: '1050px',
         $containerHeight: '850px',
       };
       break;
@@ -147,24 +130,6 @@ const Modal = () => {
       };
       break;
 
-    case 'view-more-tx':
-      modalContent = <ViewMoreTxModalContent />;
-      title = 'Detail Transaksi';
-      modalProps = {
-        $containerWidth: '1050px',
-        $containerHeight: '850px',
-      };
-      break;
-
-    case 'view-more-tx':
-      modalContent = <ViewMoreTxModalContent />;
-      title = 'Detail Transaksi';
-      modalProps = {
-        $containerWidth: '1000px',
-        $containerHeight: '775px',
-      };
-      break;
-
     case 'unset-shipment':
       modalContent = <UnsetShippingModalContent />;
       title = 'Ada pengiriman yang belum diatur dalam keranjang';
@@ -179,16 +144,25 @@ const Modal = () => {
       title = 'Berikut perincian pembelanjaan anda';
       modalProps = {
         $containerWidth: '650px',
-        $containerHeight: '650px',
+        $containerHeight: '350px',
       };
       break;
 
-    case 'confirm-checkout':
-      modalContent = <ConfirmCheckoutModalContent />;
-      title = 'Berikut perincian pembelanjaan anda';
+    case 'confirm-receive-order':
+      modalContent = <ConfirmReceiveModalContent />;
+      title = 'Konfirmasi penerimaan barang';
       modalProps = {
-        $containerWidth: '650px',
-        $containerHeight: '650px',
+        $containerWidth: '700px',
+        $containerHeight: '250px',
+      };
+      break;
+
+    case 'confirm-cancel-order':
+      modalContent = <ConfirmCancelModalContent />;
+      title = 'Anda yakin untuk membatalkan pesanan?';
+      modalProps = {
+        $containerWidth: '550px',
+        $containerHeight: '225px',
       };
       break;
 

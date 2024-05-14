@@ -85,6 +85,7 @@ export interface TxItf {
   pharmacy: PharmacyItf;
   cart_items: Array<CartItemItf>;
   handleOpenViewMore?: () => void;
+  handleConfirmOrder?: (order_id: number) => void;
   isLoading?: boolean;
 }
 
