@@ -52,7 +52,7 @@ const MENU_USER: MenuOption[] = [
     url: '/doctors',
   },
   {
-    name: 'Logout',
+    name: 'Keluar',
     icon: LogoutICO,
     url: '/auth/login',
   },
