@@ -161,8 +161,12 @@ const PartnerStockMovementsTable = () => {
                 <td>{item.created_at.replace('T', ' ').split('.')[0]}</td>
                 <td>{item.product_name}</td>
                 <td>{item.pharmacy_name}</td>
-                <td>{item.is_addition ? 'penambahan' : 'pengurangan'}</td>
-                <td>{item.delta} unit penjualan</td>
+                <td className={item.is_addition ? 'green' : 'red'}>
+                  {item.is_addition ? 'Penambahan' : 'Pengurangan'}
+                </td>
+                <td className={item.is_addition ? 'green' : 'red'}>
+                  {item.delta} unit penjualan
+                </td>
                 <td>{determineMutationType(item.movement_type)}</td>
               </tr>
             ))}

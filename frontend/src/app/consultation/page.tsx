@@ -38,11 +38,12 @@ import {
 import { NoRoomSelectedImage } from '@/assets/chat/NoRoomSelectedImage';
 import UploadFile from '@/assets/chat/UploadFile';
 import { Document, Page, pdfjs } from 'react-pdf';
-import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
+// import LeftArrowICO from '@/assets/arrows/LeftArrowICO';
 import RightArrowICO from '@/assets/arrows/RightArrowICO ';
-import { useObatinDispatch } from '@/redux/store/store';
+import LeftArrow from '@/assets/arrows/LeftArrow';
 import { syncCartItem } from '@/redux/reducers/cartSlice';
 import { addUsedPrescription } from '@/redux/reducers/prescriptionReducer';
+import { useObatinDispatch, useObatinSelector } from '@/redux/store/store';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -88,7 +89,14 @@ function ChatPage(): React.ReactElement {
     isModalConfirmAddPrescriptionToCartOpen,
     setIsModalConfirmAddPrescriptionToCartOpen,
   ] = useState<boolean>(false);
+  const [isModalConfirmEndChatOpen, setIsModalConfirmEndChatOpen] =
+    useState<boolean>(false);
   const dispatch = useObatinDispatch();
+  const usedPrescriptionIDs = useObatinSelector(
+    (state) => state?.prescription?.usedPrescriptionIDs,
+  );
+  const [isPrescriptionValid, setIsPrescriptionValid] =
+    useState<boolean>(false);
 
   const handleSelectedDrugChange = (
     newSelectedDrug: CompactProductItf | null,
@@ -173,6 +181,11 @@ function ChatPage(): React.ReactElement {
   const convertAddCartFromPrescriptionToPayload = (
     drugData: IDetailPrescriptionData,
   ) => {
+    if (usedPrescriptionIDs.includes(drugData.PrescriptionId)) {
+      setIsPrescriptionValid(false);
+      return;
+    }
+
     const temp: ICartPayloadBulkAddCartFromPrescription[] = [];
     drugData?.items.forEach((item: IOneDrugDetailPrescription) => {
       temp.push({
@@ -181,8 +194,7 @@ function ChatPage(): React.ReactElement {
         quantity: item.quantity,
       });
 
-      dispatch(addUsedPrescription(prescription_id));
-
+      dispatch(addUsedPrescription(drugData.PrescriptionId));
       dispatch(
         syncCartItem({
           product_id: item.product_id,
@@ -249,6 +261,17 @@ function ChatPage(): React.ReactElement {
     const payload: ICartPayloadBulkAddCartFromPrescription[] =
       convertAddCartFromPrescriptionToPayload(dataPrescriptionById?.data);
 
+    if (payload === undefined) {
+      setToast({
+        showToast: true,
+        toastMessage: 'Resep ini telah anda gunakan',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      return;
+    }
+
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
@@ -270,6 +293,8 @@ function ChatPage(): React.ReactElement {
       setTimeout(() => {
         setIsModalConfirmAddPrescriptionToCartOpen(false);
         setIsModalConfirmAddPrescriptionToCartOpen(false);
+        setIsModalPrescriptionOpen(false);
+        setIsPrescriptionOpen(false);
       }, 2000);
     } catch (error: any) {
       const errorMessage = error.response.data.message;
@@ -377,6 +402,37 @@ function ChatPage(): React.ReactElement {
       console.log(error);
     }
   }, [isTyping, selectedIdChatRoom, accessToken]);
+
+  const updateEndChatRoom = async () => {
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room/inactive/${selectedIdChatRoom}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+      setToast({
+        showToast: true,
+        toastMessage: 'Berhasil mengakhir chat',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      setIsChatRoomActive(false);
+    } catch (error: any) {
+      const errorMessage = error.response.data.message;
+      setToast({
+        showToast: true,
+        toastMessage: `Gagal akhiri chat: ${errorMessage}`,
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+    }
+  };
 
   const postMessage = async (id: number, message: string | number) => {
     try {
@@ -816,11 +872,29 @@ function ChatPage(): React.ReactElement {
                       )}
                     </ChatRoomContainer>
                   </div>
+                  {isChatRoomActive && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '5px 10px',
+                        backgroundColor: 'red',
+                        color: 'white',
+                        borderRadius: '6px',
+                        boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => setIsModalConfirmEndChatOpen(true)}
+                    >
+                      akhiri chat
+                    </div>
+                  )}
                   <ArrowButtonMobileOnly
                     onClick={() => setIsChatRoomShowOnMobile(true)}
                     background='#00B5C0'
                   >
-                    <LeftArrowICO />
+                    <LeftArrow />
                   </ArrowButtonMobileOnly>
                 </ChatRoomContainer>
                 <div style={{ backgroundColor: '#e3e3e3', flexGrow: '1' }}>
@@ -988,11 +1062,6 @@ function ChatPage(): React.ReactElement {
                                     inputValues['message'],
                                   );
                                 }
-                                // else {
-                                //   console.error(
-                                //     'selectedIdChatRoom is undefined',
-                                //   );
-                                // }
                               }
                             }}
                             name='message'
@@ -1009,15 +1078,23 @@ function ChatPage(): React.ReactElement {
                                   inputValues['message'],
                                 );
                               }
-                              // else {
-                              //   console.error(
-                              //     'selectedIdChatRoom is undefined',
-                              //   );
-                              // }
                             }}
                           />
                         </div>
-                      ) : null}
+                      ) : (
+                        <div
+                          style={{
+                            fontSize: '16px',
+                            color: 'red',
+                            display: 'flex',
+                            width: '100%',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          Anda tidak dapat mengirim pesan pada ruang chat yang
+                          sudah tidak aktif
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1043,7 +1120,7 @@ function ChatPage(): React.ReactElement {
                     onClick={() => setIsChatRoomShowOnMobile(true)}
                     background='#00B5C0'
                   >
-                    <LeftArrowICO />
+                    <LeftArrow />
                   </ArrowButtonMobileOnly>
                 </div>
                 <NoRoomSelectedImage />
@@ -1392,49 +1469,78 @@ function ChatPage(): React.ReactElement {
                 ))}
               </div>
             </div>
-            <div
-              style={{
-                display: 'flex',
-                alignSelf: 'end',
-                gap: '25px',
-              }}
-            >
+            {role === 'user' && (
               <div
                 style={{
                   display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: '10px 20px',
-                  backgroundColor: 'white',
-                  color: 'red',
-                  borderRadius: '6px',
-                  boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
-                  cursor: 'pointer',
+                  alignSelf: 'end',
+                  gap: '25px',
                 }}
-                onClick={() => setIsPrescriptionOpen(false)}
               >
-                batal
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '10px 20px',
+                    backgroundColor: 'white',
+                    color: 'red',
+                    borderRadius: '6px',
+                    boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setIsPrescriptionOpen(false)}
+                >
+                  batal
+                </div>
+                <button
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '10px 20px',
+                    backgroundColor: '#00B5C0',
+                    color: 'white',
+                    borderRadius: '6px',
+                    boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                    cursor: 'pointer',
+                  }}
+                  disabled={isPrescriptionValid}
+                  onMouseDown={(e) => {
+                    setIsModalConfirmAddPrescriptionToCartOpen(true);
+                    e.preventDefault();
+                  }}
+                >
+                  tambah ke keranjang
+                </button>
               </div>
+            )}
+            {role === 'doctor' && (
               <div
                 style={{
                   display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: '10px 20px',
-                  backgroundColor: '#00B5C0',
-                  color: 'white',
-                  borderRadius: '6px',
-                  boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
-                  cursor: 'pointer',
-                }}
-                onMouseDown={(e) => {
-                  setIsModalConfirmAddPrescriptionToCartOpen(true);
-                  e.preventDefault();
+                  alignSelf: 'end',
+                  gap: '25px',
                 }}
               >
-                tambah ke keranjang
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '10px 20px',
+                    backgroundColor: 'white',
+                    color: 'red',
+                    borderRadius: '6px',
+                    boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setIsPrescriptionOpen(false)}
+                >
+                  tutup
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
         {isModalConfirmAddPrescriptionToCartOpen && (
@@ -1610,6 +1716,81 @@ function ChatPage(): React.ReactElement {
                 onClick={() => postCloudinary()}
               >
                 kirim
+              </div>
+            </div>
+          </div>
+        )}
+        {isModalConfirmEndChatOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              height: '25vh',
+              width: '20vw',
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '5px',
+              boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+              zIndex: '15',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              gap: '5%',
+            }}
+          >
+            <div style={{ textAlign: 'center' }}>
+              Apakah anda yakin ingin mengakhiri chat ?
+            </div>
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignSelf: 'center',
+                gap: '25px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '10px 20px',
+                  backgroundColor: 'white',
+                  color: 'red',
+                  borderRadius: '6px',
+                  boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                  cursor: 'pointer',
+                  width: '50%',
+                }}
+                onClick={() => setIsModalConfirmEndChatOpen(false)}
+              >
+                tidak
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '10px 20px',
+                  backgroundColor: '#00B5C0',
+                  color: 'white',
+                  borderRadius: '6px',
+                  boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
+                  cursor: 'pointer',
+                  width: '50%',
+                  textAlign: 'center',
+                }}
+                onMouseDown={(e) => {
+                  updateEndChatRoom();
+                  setIsModalConfirmEndChatOpen(false);
+                  // handlePostCartFromPrescription();
+                  e.preventDefault();
+                }}
+              >
+                ya, akhiri...
               </div>
             </div>
           </div>

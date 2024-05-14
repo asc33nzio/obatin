@@ -186,8 +186,16 @@ func (h *ChatRoomHandler) UpdateChatRoomInactiveByChatRoomId(ctx *gin.Context) {
 	}
 	isDoctor := checkDoctor(ctx)
 	if !isDoctor {
-		ctx.Error(apperror.ErrForbiddenAccess(nil))
-		return
+		role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
+		if !ok {
+			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
+			return
+		}
+
+		if role != appconstant.RoleUser {
+			ctx.Error(apperror.ErrForbiddenAccess(nil))
+			return
+		}
 	}
 
 	err = h.chatRoomUsecase.UpdateChatRoomInactiveByChatId(ctx, idParam.Id)

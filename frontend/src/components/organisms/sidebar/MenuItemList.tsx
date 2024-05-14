@@ -6,6 +6,7 @@ import { navigateToLogin } from '@/app/actions';
 import { resetAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
 import { clearCart } from '@/redux/reducers/cartSlice';
 import { resetPharmacyStates } from '@/redux/reducers/pharmacySlice';
+import { resetPrescriptionState } from '@/redux/reducers/prescriptionReducer';
 import MenuItem from './MenuItem';
 
 type MenuItemsListProps = {
@@ -28,6 +29,7 @@ export default function MenuItemsList({
     dispatch(resetAuthDoctorState());
     dispatch(clearCart());
     dispatch(resetPharmacyStates());
+    dispatch(resetPrescriptionState());
     navigateToLogin();
   };
 

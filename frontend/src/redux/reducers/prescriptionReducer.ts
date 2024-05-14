@@ -16,9 +16,6 @@ const prescriptionSlice = createSlice({
       const prescriptionID = action.payload;
 
       if (state.usedPrescriptionIDs.includes(prescriptionID)) {
-        console.log(state.usedPrescriptionIDs);
-
-        console.log('called');
         return;
       }
 
