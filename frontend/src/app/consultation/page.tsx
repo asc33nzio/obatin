@@ -272,6 +272,7 @@ function ChatPage(): React.ReactElement {
       return;
     }
 
+    setIsPrescriptionValid(true);
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
@@ -1505,7 +1506,7 @@ function ChatPage(): React.ReactElement {
                     boxShadow: '-1px 3px 9px 0px rgba(0, 0, 0, 0.3)',
                     cursor: 'pointer',
                   }}
-                  disabled={isPrescriptionValid}
+                  disabled={!isPrescriptionValid}
                   onMouseDown={(e) => {
                     setIsModalConfirmAddPrescriptionToCartOpen(true);
                     e.preventDefault();
