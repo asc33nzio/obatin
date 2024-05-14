@@ -320,7 +320,6 @@ const ProductDetailPage = () => {
                       <Row>
                         <HomeICO />
                         <h2>{pharmacy.name}</h2>
-                        <h2>{pharmacy.name}</h2>
                       </Row>
                       <Row>
                         <p>{pharmacy.address}</p>
