@@ -150,7 +150,8 @@ const PartnerStockMovementsTable = () => {
               <th>Tanggal</th>
               <th>Produk</th>
               <th>Apotek</th>
-              <th>Mutasi</th>
+              <th>Klasifikasi</th>
+              <th>Jumlah Mutasi</th>
               <th>Tipe Mutasi</th>
             </tr>
           </thead>
@@ -160,11 +161,9 @@ const PartnerStockMovementsTable = () => {
                 <td>{item.created_at.replace('T', ' ').split('.')[0]}</td>
                 <td>{item.product_name}</td>
                 <td>{item.pharmacy_name}</td>
-                <td>
-                  {item.is_addition ? '+' : '-'}
-                  {item.delta}
-                </td>
-                <td>{item.movement_type}</td>
+                <td>{item.is_addition ? 'penambahan' : 'pengurangan'}</td>
+                <td>{item.delta} unit penjualan</td>
+                <td>{determineMutationType(item.movement_type)}</td>
               </tr>
             ))}
           </tbody>
@@ -223,3 +222,13 @@ const PartnerStockMovementsTable = () => {
 };
 
 export default PartnerStockMovementsTable;
+
+const determineMutationType = (type: string): string => {
+  if (type === 'manual_addition') {
+    return 'Penambahan/Pengurangan Manual';
+  }
+  if (type === 'internal_mutation') {
+    return 'Mutasi Internal/Otomatis';
+  }
+  return 'Penjualan';
+};
