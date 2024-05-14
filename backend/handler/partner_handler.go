@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/appvalidator"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -23,7 +23,7 @@ func NewPartnerHandler(partnerUsecase usecase.PartnerUsecase) *PartnerHandler {
 
 func (h *PartnerHandler) RegisterPartner(ctx *gin.Context) {
 
-	file, FileHeader, err := ctx.Request.FormFile(constant.LogoJSONTag)
+	file, FileHeader, err := ctx.Request.FormFile(appconstant.LogoJSONTag)
 	if err != nil {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
@@ -38,10 +38,10 @@ func (h *PartnerHandler) RegisterPartner(ctx *gin.Context) {
 	defer file.Close()
 
 	body := dto.PartnerRegisterReq{
-		Email:    ctx.Request.FormValue(constant.EmailJSONTag),
+		Email:    ctx.Request.FormValue(appconstant.EmailJSONTag),
 		Logo:     file,
-		Password: ctx.Request.FormValue(constant.PasswordJSONTag),
-		Name:     ctx.Request.FormValue(constant.NameJSONTag),
+		Password: ctx.Request.FormValue(appconstant.PasswordJSONTag),
+		Name:     ctx.Request.FormValue(appconstant.NameJSONTag),
 	}
 	err = ctx.ShouldBind(&body)
 	if err != nil {
@@ -56,7 +56,7 @@ func (h *PartnerHandler) RegisterPartner(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponseRegisterMsg,
+		Message: appconstant.ResponseRegisterMsg,
 	})
 }
 
@@ -82,7 +82,7 @@ func (h *PartnerHandler) GetAllPartner(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseOkMsg,
+		Message:    appconstant.ResponseOkMsg,
 		Pagination: partnersRes.Pagination,
 		Data:       partnersRes.Data,
 	})
@@ -105,7 +105,7 @@ func (h *PartnerHandler) UpdateOnePartner(ctx *gin.Context) {
 		return
 	}
 
-	file, FileHeader, err := ctx.Request.FormFile(constant.LogoJSONTag)
+	file, FileHeader, err := ctx.Request.FormFile(appconstant.LogoJSONTag)
 	if file != nil {
 		if err != nil {
 			ctx.Error(apperror.ErrInvalidReq(err))
@@ -127,7 +127,7 @@ func (h *PartnerHandler) UpdateOnePartner(ctx *gin.Context) {
 	res := dto.ToPartnerResponse(partner)
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponsePartnerUpdateMsg,
+		Message: appconstant.ResponsePartnerUpdateMsg,
 		Data:    res,
 	})
 }
@@ -148,7 +148,7 @@ func (h *PartnerHandler) GetPartnerDetailById(ctx *gin.Context) {
 
 	res := dto.ToPartnerResponse(partner)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }

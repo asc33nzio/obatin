@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -21,13 +21,13 @@ func NewCartHandler(cartUsecase usecase.CartUsecase) *CartHandler {
 }
 
 func (h *CartHandler) GetCart(ctx *gin.Context) {
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -46,19 +46,19 @@ func (h *CartHandler) GetCart(ctx *gin.Context) {
 
 	res := dto.ToGetCartRes(cart)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }
 
 func (h *CartHandler) GetCartDetails(ctx *gin.Context) {
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -77,7 +77,7 @@ func (h *CartHandler) GetCartDetails(ctx *gin.Context) {
 
 	res := dto.ToGetCartDetailsRes(cart)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }
@@ -85,13 +85,13 @@ func (h *CartHandler) GetCartDetails(ctx *gin.Context) {
 func (h *CartHandler) Bulk(ctx *gin.Context) {
 	body := dto.UpdateCartReq{}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -115,20 +115,20 @@ func (h *CartHandler) Bulk(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponseCartUpdatedMsg,
+		Message: appconstant.ResponseCartUpdatedMsg,
 	})
 }
 
 func (h *CartHandler) UpdateOneCartItemQuantity(ctx *gin.Context) {
 	body := dto.UpdateOneCartItemReq{}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -152,20 +152,20 @@ func (h *CartHandler) UpdateOneCartItemQuantity(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseCartUpdatedMsg,
+		Message: appconstant.ResponseCartUpdatedMsg,
 	})
 }
 
 func (h *CartHandler) DeleteOneCartItem(ctx *gin.Context) {
 	body := dto.DeleteOneCartItemReq{}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -189,20 +189,20 @@ func (h *CartHandler) DeleteOneCartItem(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseCartItemDeletedMsg,
+		Message: appconstant.ResponseCartItemDeletedMsg,
 	})
 }
 
 func (h *CartHandler) Checkout(ctx *gin.Context) {
 	body := dto.CartCheckoutReq{}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -226,7 +226,7 @@ func (h *CartHandler) Checkout(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseCartCheckoutMsg,
+		Message: appconstant.ResponseCartCheckoutMsg,
 		Data:    dto.CartCheckoutRes{PaymentId: *id},
 	})
 }

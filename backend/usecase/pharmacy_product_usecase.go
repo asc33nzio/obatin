@@ -5,7 +5,6 @@ import (
 	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 )
@@ -37,7 +36,7 @@ func (u *pharmacyProductUsecaseImpl) GetPharmaciesWithin25kmByProductId(ctx cont
 	ur := u.repoStore.UserRepository()
 	ppr := u.repoStore.PharmacyProductRepository()
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -85,7 +84,7 @@ func (u *pharmacyProductUsecaseImpl) GetPharmacyProductByPartner(ctx context.Con
 		filter.Page = appconstant.DefaultMinPage
 	}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -259,8 +258,8 @@ func (u *pharmacyProductUsecaseImpl) UpdatePharmacyProduct(ctx context.Context, 
 }
 
 func (u *pharmacyProductUsecaseImpl) CreatePharmacyProduct(ctx context.Context, body entity.PharmacyProduct) error {
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleManager || role == "" {
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role != appconstant.RoleManager || role == "" {
 		return apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 	if !ok {
@@ -269,7 +268,7 @@ func (u *pharmacyProductUsecaseImpl) CreatePharmacyProduct(ctx context.Context, 
 	phPr := u.repoStore.PharmacyProductRepository()
 	ar := u.repoStore.AuthenticationRepository()
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}

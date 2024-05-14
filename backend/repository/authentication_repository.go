@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -415,7 +415,7 @@ func (r *authenticationRepositoryPostgres) IsVerified(ctx context.Context, email
 func (r *authenticationRepositoryPostgres) GetPendingDoctorApproval(ctx context.Context, params entity.Pagination) (*entity.DoctorApprovalPage, error) {
 	doctors := []entity.Doctor{}
 	rowsCount := 0
-	paramsCount := constant.StartingParamsCount
+	paramsCount := appconstant.StartingParamsCount
 	var queryDataCount strings.Builder
 	var queryPage strings.Builder
 

@@ -7,6 +7,26 @@ export const Imagecontainer = styled.div`
   }
 `;
 
+export const CategoryCardContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:hover {
+    scale: 1.03;
+    filter: brightness(0.9);
+  }
+`;
+
+export const CategoryName = styled.h3`
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+`;
+
 export const ProductCard = styled.a`
   cursor: pointer;
   position: relative;

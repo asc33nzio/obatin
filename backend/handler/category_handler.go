@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/appvalidator"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -30,14 +30,14 @@ func (h *CategoryHandler) GetAllCategory(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    categories,
 	})
 }
 
 func checkAdmin(ctx *gin.Context) bool {
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleAdmin || role == "" {
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role != appconstant.RoleAdmin || role == "" {
 		return false
 	}
 	if !ok {
@@ -63,7 +63,7 @@ func (h *CategoryHandler) CreateOneCategory(ctx *gin.Context) {
 		return
 	}
 
-	file, FileHeader, err := ctx.Request.FormFile(constant.ImageUrlFormKey)
+	file, FileHeader, err := ctx.Request.FormFile(appconstant.ImageUrlFormKey)
 	if err != nil {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
@@ -84,7 +84,7 @@ func (h *CategoryHandler) CreateOneCategory(ctx *gin.Context) {
 	res := dto.ToCategoryResponse(category)
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponseCategoryCreatedMsg,
+		Message: appconstant.ResponseCategoryCreatedMsg,
 		Data:    res,
 	})
 
@@ -112,7 +112,7 @@ func (h *CategoryHandler) UpdateOneCategory(ctx *gin.Context) {
 		return
 	}
 
-	file, FileHeader, err := ctx.Request.FormFile(constant.ImageUrlFormKey)
+	file, FileHeader, err := ctx.Request.FormFile(appconstant.ImageUrlFormKey)
 	if file != nil {
 		if err != nil {
 			ctx.Error(apperror.ErrInvalidReq(err))
@@ -138,7 +138,7 @@ func (h *CategoryHandler) UpdateOneCategory(ctx *gin.Context) {
 	res := dto.ToCategoryResponse(category)
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseCategoryUpdatedMsg,
+		Message: appconstant.ResponseCategoryUpdatedMsg,
 		Data:    res,
 	})
 }
@@ -165,6 +165,6 @@ func (h *CategoryHandler) DeleteOneCategoryBySlug(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 	})
 }

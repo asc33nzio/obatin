@@ -6,7 +6,6 @@ import (
 	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 	"sync"
@@ -90,7 +89,7 @@ func (h *ShippingHandler) AvailableShippingsPerPharmacy(ctx *gin.Context) {
 
 	res := dto.ToAvailableShippingsRes(shippings, rajaOngkirRes, body)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }

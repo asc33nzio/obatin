@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -25,7 +25,7 @@ func ManufacturerRepositoryPostgres(db *sql.DB) *manufacturerRepositoryPostgres 
 }
 
 func (r *manufacturerRepositoryPostgres) GetAllManufacturer(ctx context.Context, params entity.ManufacturerFilter) (*entity.ManufacturerListPage, error) {
-	paramsCount := constant.StartingParamsCount
+	paramsCount := appconstant.StartingParamsCount
 	res := []entity.Manufacturer{}
 	var sb strings.Builder
 	rowsCount := 0
@@ -55,7 +55,6 @@ func (r *manufacturerRepositoryPostgres) GetAllManufacturer(ctx context.Context,
 	data = append(data, paginationData...)
 	rows, err := r.db.QueryContext(ctx, sb.String(), data...)
 
-
 	if err != nil {
 		return nil, apperror.NewInternal(err)
 	}
@@ -63,14 +62,14 @@ func (r *manufacturerRepositoryPostgres) GetAllManufacturer(ctx context.Context,
 
 	for rows.Next() {
 		manufacturer := entity.Manufacturer{}
-		err := rows.Scan(&manufacturer.ID, &manufacturer.Name )
+		err := rows.Scan(&manufacturer.ID, &manufacturer.Name)
 		if err != nil {
 			return nil, apperror.NewInternal(err)
 		}
 		res = append(res, manufacturer)
 	}
 	return &entity.ManufacturerListPage{
-		Manufacturers:  res,
-		TotalRows: rowsCount,
+		Manufacturers: res,
+		TotalRows:     rowsCount,
 	}, nil
 }

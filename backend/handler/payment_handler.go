@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/appvalidator"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/entity"
 	"obatin/usecase"
@@ -25,13 +25,13 @@ func NewPaymentHandler(paymentUsecase usecase.PaymentUsecase) *PaymentHandler {
 func (h *PaymentHandler) UploadPaymentProof(ctx *gin.Context) {
 	var uriParams dto.PaymentIdUriParams
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -48,7 +48,7 @@ func (h *PaymentHandler) UploadPaymentProof(ctx *gin.Context) {
 		return
 	}
 
-	file, fileHeader, err := ctx.Request.FormFile(constant.FileUrlFormKey)
+	file, fileHeader, err := ctx.Request.FormFile(appconstant.FileUrlFormKey)
 	if err != nil && err != http.ErrMissingFile {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
@@ -76,25 +76,25 @@ func (h *PaymentHandler) UploadPaymentProof(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 	})
 }
 
 func (h *PaymentHandler) UpdatePaymentStatus(ctx *gin.Context) {
 	var body dto.PaymentProofConfirmationReq
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleAdmin {
+	if role != appconstant.RoleAdmin {
 		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -122,25 +122,25 @@ func (h *PaymentHandler) UpdatePaymentStatus(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 	})
 }
 
 func (h *PaymentHandler) GetAllPendingPayment(ctx *gin.Context) {
 	var params dto.PaymentFilter
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleAdmin {
+	if role != appconstant.RoleAdmin {
 		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -165,7 +165,7 @@ func (h *PaymentHandler) GetAllPendingPayment(ctx *gin.Context) {
 
 	res := dto.ToGetAllPendingPayments(payments.Payments)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseOkMsg,
+		Message:    appconstant.ResponseOkMsg,
 		Pagination: (*dto.PaginationResponse)(&payments.Pagination),
 		Data:       res,
 	})
@@ -174,13 +174,13 @@ func (h *PaymentHandler) GetAllPendingPayment(ctx *gin.Context) {
 func (h *PaymentHandler) CancelPayment(ctx *gin.Context) {
 	var uriParams dto.PaymentIdUriParams
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -208,6 +208,6 @@ func (h *PaymentHandler) CancelPayment(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 	})
 }

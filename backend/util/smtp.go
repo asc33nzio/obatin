@@ -2,8 +2,8 @@ package util
 
 import (
 	"net/smtp"
+	"obatin/appconstant"
 	"obatin/config"
-	"obatin/constant"
 )
 
 type EmailParams struct {
@@ -34,19 +34,19 @@ func (se *SendEmail) SendVerificationEmail(params EmailParams) error {
 	var msg string
 
 	if params.IsAccepted && params.VerificationLink != "" && !params.IsForgotPassword && !params.IsReverified {
-		msg = constant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, "", constant.EmailTypeApprove)
+		msg = appconstant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, "", appconstant.EmailTypeApprove)
 
 	} else if !params.IsAccepted && params.DefaultPassword == "" && params.VerificationLink != "" && !params.IsForgotPassword && !params.IsReverified {
-		msg = constant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, "", constant.EmailTypeRejected)
+		msg = appconstant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, "", appconstant.EmailTypeRejected)
 
 	} else if params.IsReverified {
-		msg = constant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, "", constant.EmailReverifyAccount)
+		msg = appconstant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, "", appconstant.EmailReverifyAccount)
 
 	} else if params.IsForgotPassword {
-		msg = constant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, "", constant.EmailForgotPassword)
+		msg = appconstant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, "", appconstant.EmailForgotPassword)
 
 	} else {
-		msg = constant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, params.DefaultPassword, constant.EmailTypePasswordTemporary)
+		msg = appconstant.GetEmailTemplate(se.config.EmailUsernameSender(), params.ToEmail, params.VerificationLink, params.DefaultPassword, appconstant.EmailTypePasswordTemporary)
 	}
 	err := smtp.SendMail(se.config.EmailHostSender()+":"+se.config.EmailPortSender(), auth, se.config.EmailUsernameSender(), []string{params.ToEmail}, []byte(msg))
 	if err != nil {

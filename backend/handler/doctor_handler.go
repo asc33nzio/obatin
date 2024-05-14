@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/appvalidator"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 	"strconv"
@@ -30,7 +30,7 @@ func (h *DoctorHandler) GetDoctorDetailbyAuthId(ctx *gin.Context) {
 		ctx.Error(apperror.ErrForbiddenAccess(nil))
 		return
 	}
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -43,7 +43,7 @@ func (h *DoctorHandler) GetDoctorDetailbyAuthId(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    dto.ToDoctorProfileResponse(doctor),
 	})
 }
@@ -70,7 +70,7 @@ func (h *DoctorHandler) GetAllDoctor(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseOkMsg,
+		Message:    appconstant.ResponseOkMsg,
 		Pagination: doctorRes.Pagination,
 		Data:       doctorRes.Data,
 	})
@@ -102,7 +102,7 @@ func (h *DoctorHandler) UpdateOneDoctor(ctx *gin.Context) {
 		return
 	}
 
-	file, FileHeader, err := ctx.Request.FormFile(constant.AvatarURLFormKey)
+	file, FileHeader, err := ctx.Request.FormFile(appconstant.AvatarURLFormKey)
 	isEmpty := body == dto.DoctorUpdateRequest{}
 	if isEmpty && file == nil {
 		ctx.Error(apperror.ErrInvalidReq(nil))
@@ -134,14 +134,14 @@ func (h *DoctorHandler) UpdateOneDoctor(ctx *gin.Context) {
 	res := dto.ToDoctorDetailResponse(doctor)
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseCategoryUpdatedMsg,
+		Message: appconstant.ResponseCategoryUpdatedMsg,
 		Data:    res,
 	})
 }
 
 func checkDoctor(ctx *gin.Context) bool {
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleDoctor || role == "" {
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role != appconstant.RoleDoctor || role == "" {
 		return false
 	}
 	if !ok {

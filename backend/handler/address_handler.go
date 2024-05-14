@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/entity"
 	"obatin/usecase"
@@ -34,26 +34,26 @@ func (h *AddressHandler) CreateOneAddress(ctx *gin.Context) {
 
 	authenticationId = pathParam.Id
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleAdmin {
-		if role != constant.RoleUser {
+	if role != appconstant.RoleAdmin {
+		if role != appconstant.RoleUser {
 			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
 		}
 
-		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
+		authenticationId, ok = ctx.Value(appconstant.AuthenticationIdKey).(int64)
 		if !ok {
 			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 			return
 		}
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -77,7 +77,7 @@ func (h *AddressHandler) CreateOneAddress(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponseAddressCreatedMsg,
+		Message: appconstant.ResponseAddressCreatedMsg,
 	})
 }
 
@@ -101,26 +101,26 @@ func (h *AddressHandler) UpdateOneAddress(ctx *gin.Context) {
 
 	authenticationId = authIdParam.Id
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleAdmin {
-		if role != constant.RoleUser {
+	if role != appconstant.RoleAdmin {
+		if role != appconstant.RoleUser {
 			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
 		}
 
-		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
+		authenticationId, ok = ctx.Value(appconstant.AuthenticationIdKey).(int64)
 		if !ok {
 			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 			return
 		}
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -144,7 +144,7 @@ func (h *AddressHandler) UpdateOneAddress(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseAddressUpdatedMsg,
+		Message: appconstant.ResponseAddressUpdatedMsg,
 	})
 }
 
@@ -167,26 +167,26 @@ func (h *AddressHandler) DeleteOneAddress(ctx *gin.Context) {
 
 	authenticationId = authIdParam.Id
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleAdmin {
-		if role != constant.RoleUser {
+	if role != appconstant.RoleAdmin {
+		if role != appconstant.RoleUser {
 			ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 			return
 		}
 
-		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
+		authenticationId, ok = ctx.Value(appconstant.AuthenticationIdKey).(int64)
 		if !ok {
 			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 			return
 		}
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -206,6 +206,6 @@ func (h *AddressHandler) DeleteOneAddress(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseAddressDeletedMsg,
+		Message: appconstant.ResponseAddressDeletedMsg,
 	})
 }
