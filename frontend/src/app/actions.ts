@@ -60,3 +60,23 @@ export const navigateToProductDetail = async (slug: string) => {
 export const navigateToAdminHome = async () => {
   redirect('/admin');
 };
+
+export const navigateToAdminOrders = async () => {
+  redirect('/admin/orders');
+};
+
+export const navigateToAdminProduct = async () => {
+  redirect('/admin/product');
+};
+
+export const navigateToAdminDoctorApproval = async () => {
+  redirect('/admin/doctor-approval');
+};
+
+export const navigateToAdminPartner = async () => {
+  redirect('/admin/partner');
+};
+
+export const navigateToPartnerHome = async () => {
+  redirect('/partner');
+};

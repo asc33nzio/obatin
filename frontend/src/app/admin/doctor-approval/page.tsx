@@ -1,5 +1,4 @@
 'use client';
-import Navbar from '@/components/organisms/navbar/Navbar';
 import axios from 'axios';
 import { getCookie } from 'cookies-next';
 import React, { useEffect, useState } from 'react';
@@ -11,6 +10,7 @@ import Pagination from '@/components/molecules/admin/Pagination';
 import TableRow from '@/components/molecules/admin/TableHover';
 import DeleteIcon from '@/assets/admin/DeleteIcon';
 import ModalConfirmation from '@/components/molecules/admin/ModalConfirmation';
+import NavbarAdmin from '@/components/organisms/navbar/NavbarAdmin';
 
 export interface IPendingDoctorPagination {
   page: number;
@@ -203,7 +203,7 @@ function AdminDoctorApproval() {
           gap: '10px',
         }}
       >
-        <Navbar />
+        <NavbarAdmin />
         <div
           style={{
             display: 'flex',

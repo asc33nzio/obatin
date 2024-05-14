@@ -13,16 +13,30 @@ const protectedRoutes = [
   '/dashboard/user',
   '/dashboard/user/transactions',
   '/dashboard/doctor',
+  '/admin',
+  '/admin/product',
+  '/admin/orders',
+  '/admin/doctor-approval',
+  '/admin/partner',
+  '/partner',
+  '/partner/orders',
 ];
 const userOnlyRoutes = ['/dashboard/user', '/dashboard/user/transactions'];
 const doctorOnlyRoutes = ['/dashboard/doctor'];
+const adminOnlyRoutes = [
+  '/admin',
+  '/admin/product',
+  '/admin/orders',
+  '/admin/doctor-approval',
+  '/admin/partner',
+];
+const partnerOnlyRoutes = ['/partner', '/partner/orders'];
 
 export default async function middleware(request: NextRequest) {
   const prefix = process.env.NODE_ENV === 'production' ? '/vm4' : '';
 
   const response = NextResponse.next();
 
-  //! Prolong access_token if refresh token is valid
   const accessToken = cookies().get('access_token')?.value;
   const refreshToken = cookies().get('refresh_token')?.value;
 
@@ -67,8 +81,7 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  //! Redirect URL definitionsAuthDoc
-  // const redirectToHome = new URL(prefix + '/', request.nextUrl.href).toString();
+  const redirectToHome = new URL(prefix + '/', request.nextUrl.href).toString();
 
   const redirectToLogin = new URL(
     prefix + '/auth/login',
@@ -90,6 +103,16 @@ export default async function middleware(request: NextRequest) {
     request.nextUrl.href,
   ).toString();
 
+  const redirectToAdminDashboard = new URL(
+    prefix + '/admin',
+    request.nextUrl.href,
+  ).toString();
+
+  const redirectToPartnerDashboard = new URL(
+    prefix + '/partner',
+    request.nextUrl.href,
+  ).toString();
+
   const path = request.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(path);
   // eslint-disable-next-line
@@ -97,6 +120,8 @@ export default async function middleware(request: NextRequest) {
   const isAuthRoute = authRoutes.includes(path);
   const isUserOnlyRoute = userOnlyRoutes.includes(path);
   const isDoctorOnlyRoute = doctorOnlyRoutes.includes(path);
+  const isAdminOnlyRoute = adminOnlyRoutes.includes(path);
+  const isPartnerOnlyRoute = partnerOnlyRoutes.includes(path);
 
   // eslint-disable-next-line
   const authId = userSessionCredentials?.payload?.Payload?.aid;
@@ -106,12 +131,10 @@ export default async function middleware(request: NextRequest) {
   // eslint-disable-next-line
   const isApproved = userSessionCredentials?.payload?.Payload?.is_approved;
 
-  //! Protected route guard clause
   if (isProtectedRoute && tokenExpirationTime < currentTime) {
     return NextResponse.redirect(redirectToLogin);
   }
 
-  //! Restricted base routes
   if (request.nextUrl.pathname.startsWith('/auth')) {
     const restrictedPaths = ['/auth', '/auth/'];
 
@@ -148,7 +171,6 @@ export default async function middleware(request: NextRequest) {
   }
 
   if (tokenExpirationTime > currentTime) {
-    //! Authorization based validations
     if (isAuthRoute && userRole === 'user') {
       return NextResponse.redirect(redirectToUserDashboard);
     }
@@ -157,13 +179,40 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectToDoctorDashboard);
     }
 
-    //! Role based validations
-    if (isDoctorOnlyRoute && userRole === 'user') {
-      return NextResponse.redirect(redirectToUserDashboard);
+    if (isAuthRoute && userRole === 'admin') {
+      return NextResponse.redirect(redirectToAdminDashboard);
     }
 
-    if (isUserOnlyRoute && userRole === 'doctor') {
+    if (isAuthRoute && userRole === 'manager') {
+      return NextResponse.redirect(redirectToPartnerDashboard);
+    }
+
+    if (
+      (isDoctorOnlyRoute || isAdminOnlyRoute || isPartnerOnlyRoute) &&
+      userRole === 'user'
+    ) {
+      return NextResponse.redirect(redirectToHome);
+    }
+
+    if (
+      (isUserOnlyRoute || isAdminOnlyRoute || isPartnerOnlyRoute) &&
+      userRole === 'doctor'
+    ) {
       return NextResponse.redirect(redirectToDoctorDashboard);
+    }
+
+    if (
+      (isUserOnlyRoute || isAdminOnlyRoute || isDoctorOnlyRoute) &&
+      userRole === 'manager'
+    ) {
+      return NextResponse.redirect(redirectToPartnerDashboard);
+    }
+
+    if (
+      (isUserOnlyRoute || isPartnerOnlyRoute || isDoctorOnlyRoute) &&
+      userRole === 'admin'
+    ) {
+      return NextResponse.redirect(redirectToPartnerDashboard);
     }
   }
 

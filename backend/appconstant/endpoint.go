@@ -61,4 +61,5 @@ const (
 	EndpointOrdersDetails                 = "/shop/orders/:id"
 	EndpointManufacturerList              = "/shop/manufacturers"
 	EndpointAllPharmacies                 = "/pharmacies"
+	EndpointGetAllStockMovements          = "/stock-movements"
 )
