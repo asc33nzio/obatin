@@ -76,6 +76,7 @@ func (u *pharmacyUsecaseImpl) GetAllPharmacies(ctx context.Context, params entit
 		params.PartnerId = partnerId
 	}
 
+
 	res, err := pr.FindPharmacyList(ctx, params)
 	if err != nil {
 		return nil, err
