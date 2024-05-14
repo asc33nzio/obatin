@@ -8,14 +8,18 @@ import {
 } from '@/styles/organisms/Footer.styles';
 import React from 'react';
 import ObatinICO from '@/assets/icons/ObatinICO';
-import { navigateToHome } from '@/app/actions';
+import {
+  navigateToDoctorList,
+  navigateToHome,
+  navigateToProductList,
+} from '@/app/actions';
 
 const Footer = (): React.ReactElement => {
   return (
     <FooterContainer $resolution='desktop'>
       <Top>
         <Slogan>
-          <ObatinICO />
+          <ObatinICO handleClick={() => navigateToHome()} />
         </Slogan>
         <Sitemap>
           <ul>
@@ -24,11 +28,11 @@ const Footer = (): React.ReactElement => {
                 onClick={() => navigateToHome()}
                 style={{ textDecoration: 'none' }}
               >
-                Pages
+                Halaman
               </a>
             </Title>
             <li>
-              <a onClick={() => navigateToHome()}>Home</a>
+              <a onClick={() => navigateToHome()}>Beranda</a>
             </li>
             <li>
               <a onClick={() => navigateToHome()}>FAQ</a>
@@ -40,19 +44,19 @@ const Footer = (): React.ReactElement => {
 
           <ul>
             <Title>
-              <a onClick={() => navigateToHome()}>Service</a>
+              <a onClick={() => navigateToHome()}>Layanan</a>
             </Title>
             <li>
-              <a onClick={() => navigateToHome()}>Chat Dokter</a>
+              <a onClick={() => navigateToDoctorList()}>Chat Dokter</a>
             </li>
             <li>
-              <a onClick={() => navigateToHome()}>Beli Obat</a>
+              <a onClick={() => navigateToProductList()}>Beli Obat</a>
             </li>
           </ul>
 
           <ul>
             <Title>
-              <a onClick={() => navigateToHome()}>Contact</a>
+              <a onClick={() => navigateToHome()}>Kontak</a>
             </Title>
             <li>
               <a onClick={() => navigateToHome()}>00909098</a>

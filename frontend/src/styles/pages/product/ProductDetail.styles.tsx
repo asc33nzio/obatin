@@ -2,11 +2,12 @@ import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
 export const ProductDetailContainer = styled.div`
-  width: 100%;
-  padding: 5rem;
+  width: 1440px;
+  padding: 2rem;
   min-height: 100vh;
   display: flex;
   gap: 3rem;
+  align-items: flex-start;
   img {
     border: 1px solid ${COLORS.primary_color};
     border-radius: 12px;
@@ -17,6 +18,7 @@ export const ProductDetailContainer = styled.div`
     flex-direction: column;
   }
   @media (max-width: 768px) {
+    width: 100%;
     padding: 1.5rem;
     align-items: center;
     img {
@@ -30,7 +32,8 @@ export const ProductDetail = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 100%;
+  width: 80%;
+  text-align: justify;
   h1 {
     font-size: 21px;
     font-weight: 500;
@@ -40,14 +43,15 @@ export const ProductDetail = styled.div`
     font-size: 16;
   }
   div {
-    padding-bottom: 20px;
-    /* border-bottom: 1px solid ${COLORS.primary_text}; */
     h2 {
       font-size: 18px;
     }
     p {
       padding: 10px 0;
     }
+  }
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `;
 
@@ -64,10 +68,13 @@ export const Price = styled.p`
 `;
 
 export const SelectPharmacy = styled.div`
-  padding: 5px;
+  padding: 5px 20px 5px 0;
   margin: 30px;
   width: 500px;
   height: 600px;
+  h2 {
+    padding-bottom: 20px;
+  }
   @media (max-width: 768px) {
     align-items: center;
     justify-content: center;
@@ -124,9 +131,11 @@ export const PharmacyCard = styled.div`
 export const PharmacyItem = styled.div`
   border: 1px solid ${COLORS.primary_color};
   border-radius: 12px;
+  padding: 20px;
+
   &:hover {
-    background-color: ${COLORS.primary_color};
-    color: white;
+    background-color: ${COLORS.input_border};
+    color: ${COLORS.primary_text};
     svg {
       color: white;
     }
@@ -141,20 +150,27 @@ export const Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
+  align-content: center;
   padding: 0 20px 0 20px;
-  padding-bottom: 0;
+  padding-bottom: 10x;
   gap: 20px;
   border-bottom: 0px solid white;
   font-size: 16px;
-  /* h2 {
-    color: ${COLORS.primary_color};
-  } */
+
+  h2 {
+    padding-bottom: 0;
+  }
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
     padding: 10px 0 10px 10px;
+    padding: 10px 0 10px 10px;
     gap: 5px;
+    p {
+      padding: 10px;
+    }
     p {
       padding: 10px;
     }
@@ -167,7 +183,7 @@ export const Column = styled.div`
   border: 1px solid ${COLORS.primary_color};
   border-radius: 12px;
   width: 100%;
-  height: 200px;
+  height: 250px;
 
   div {
     display: flex;
@@ -178,25 +194,26 @@ export const Column = styled.div`
     svg {
       opacity: 70%;
     }
-    &:hover {
-      color: white;
-      svg {
-        stroke: white;
-      }
-    }
-  }
-
-  &:hover {
-    background-color: ${COLORS.primary_color};
-    color: white;
-    border: 1px solid white;
-    svg {
-    }
   }
 
   @media (max-width: 768px) {
     width: 100%;
     padding: 5px;
     height: max-content;
+  }
+`;
+
+export const Distance = styled.div`
+  width: 200px;
+  padding: 5px;
+  align-items: center;
+  background-color: #ff6500;
+  color: white;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 20px;
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-bottom: 10px;
   }
 `;
