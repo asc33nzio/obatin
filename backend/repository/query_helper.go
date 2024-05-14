@@ -637,7 +637,7 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 	var query strings.Builder
 	var filters []interface{}
 	var countParams = appconstant.StartingParamsCount + 1
-	if params.Search != "" || params.SearchPharmacy != "" || params.Classification != nil || params.PharmacyId != 0 || params.ProductId != nil {
+	if params.Search != "" || params.SearchPharmacy != "" || params.SearchPharmacy != "" || params.Classification != nil || params.PharmacyId != 0 || params.ProductId != nil {
 		query.WriteString(" WHERE ")
 	}
 
@@ -647,6 +647,7 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 		filters = append(filters, params.Search)
 		countParams++
 	}
+
 	if params.SearchPharmacy != "" {
 		if countParams > appconstant.StartingParamsCount+1 {
 			query.WriteString(` AND `)
