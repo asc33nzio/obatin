@@ -133,8 +133,8 @@ const Modal = () => {
       modalContent = <AddShippingModalContent />;
       title = 'Tambahkan Metode Pengiriman';
       modalProps = {
-        $containerWidth: isDesktopDisplay ? '1050px' : '300px',
-        $containerHeight: 'max-content',
+        $containerWidth: !isDesktopDisplay ? '400px' : '1050px',
+        $containerHeight: !isDesktopDisplay ? '600px' : 'max-content',
       };
       break;
 
