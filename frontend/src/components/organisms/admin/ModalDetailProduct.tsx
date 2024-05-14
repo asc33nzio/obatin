@@ -11,6 +11,27 @@ interface IModalDetailProduct {
   data: IResponseGetDetailProduct;
 }
 
+const monthObject: {
+  [key: string]: string;
+} = {
+  January: 'Januari',
+  February: 'Februari',
+  March: 'Maret',
+  April: 'April',
+  May: 'Mei',
+  June: 'Juni',
+  July: 'Juli',
+  August: 'Agustus',
+  September: 'September',
+  October: 'Oktober',
+  November: 'November',
+  December: 'Desember',
+};
+
+function convertMonthToBahasa(month: string) {
+  return monthObject[month] || month;
+}
+
 function ModalDetailProduct(props: IModalDetailProduct) {
   return (
     <div
@@ -34,7 +55,6 @@ function ModalDetailProduct(props: IModalDetailProduct) {
       }}
     >
       <Image src={props.data.data.image_url} height={120} width={120} alt='' />
-      ini dia:{JSON.stringify(props?.data?.data?.sales?.[0]?.month)}
       <div style={{ overflowY: 'auto', height: '30vh', width: '80%' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           <div
@@ -309,8 +329,33 @@ function ModalDetailProduct(props: IModalDetailProduct) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            Laporan Penjualan
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '30px',
+              marginTop: '30px',
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              Laporan Penjualan
+            </div>
+            <div>
+              <select
+                style={{
+                  backgroundColor: 'lightblue',
+                  color: 'black',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc',
+                }}
+                name=''
+                id=''
+              >
+                <option value='2024'>2024</option>
+              </select>
+            </div>
           </div>
           <div
             style={{ display: 'flex', justifyContent: 'center', width: '100%' }}
@@ -322,7 +367,7 @@ function ModalDetailProduct(props: IModalDetailProduct) {
                     Bulan
                   </th>
                   <th style={{ backgroundColor: '#00B5C0', color: 'white' }}>
-                    Jumlah Penjualan
+                    Jumlah Penjualan / unit penjualan
                   </th>
                 </tr>
               </thead>
@@ -344,7 +389,7 @@ function ModalDetailProduct(props: IModalDetailProduct) {
                           width: '20%',
                         }}
                       >
-                        {item.month}
+                        {convertMonthToBahasa(item.month)}
                       </td>
                       <td
                         style={{
@@ -378,7 +423,6 @@ function ModalDetailProduct(props: IModalDetailProduct) {
       >
         Tutup
       </div>
-      {/* <div onClick={() => props.onCancel && props.onCancel()}>Tutup</div> */}
     </div>
   );
 }

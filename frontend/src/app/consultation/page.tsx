@@ -107,12 +107,12 @@ function ChatPage(): React.ReactElement {
 
   const handleClickAddPrescription = () => {
     if (!selectedDrugParent) {
-      setErrorMessageDrug('Invalid drug: please select a drug');
+      setErrorMessageDrug('Tolong pilih obat');
       return;
     }
 
     if (isNaN(Number(quantity)) || quantity == '' || Number(quantity) <= 0) {
-      setErrorMessageQty('Invalid quantity: Please enter a positive number.');
+      setErrorMessageQty('Masukkan nilai jumlah dan positif');
       return;
     }
 
@@ -131,7 +131,13 @@ function ChatPage(): React.ReactElement {
       setErrorMessageQty(null);
       deleteFunction();
     } else {
-      console.error('Please select a drug and enter a quantity.');
+      setToast({
+        showToast: true,
+        toastMessage: `Tolong pilih produk dan masukkan jumlah`,
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
     }
   };
 
@@ -208,8 +214,15 @@ function ChatPage(): React.ReactElement {
       setTimeout(() => {
         setIsModalPrescriptionOpen(false);
       }, 2000);
-    } catch (error) {
-      console.error('Error posting prescription:', error);
+    } catch (error: any) {
+      const errorMessage = error.response.data.message;
+      setToast({
+        showToast: true,
+        toastMessage: `Gagal tambah resep: ${errorMessage}`,
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
     }
   };
 
@@ -220,7 +233,6 @@ function ChatPage(): React.ReactElement {
     const payload: ICartPayloadBulkAddCartFromPrescription[] =
       convertAddCartFromPrescriptionToPayload(dataPrescriptionById?.data);
 
-    console.log(payload);
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/cart`,
@@ -243,11 +255,11 @@ function ChatPage(): React.ReactElement {
         setIsModalConfirmAddPrescriptionToCartOpen(false);
         setIsModalConfirmAddPrescriptionToCartOpen(false);
       }, 2000);
-    } catch (error) {
-      console.error('Error posting prescription:', error);
+    } catch (error: any) {
+      const errorMessage = error.response.data.message;
       setToast({
         showToast: true,
-        toastMessage: 'Gagal menambahkan obat ke keranjang',
+        toastMessage: `Gagal menambahkan obat ke keranjang : ${errorMessage}`,
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
@@ -281,7 +293,7 @@ function ChatPage(): React.ReactElement {
       })
       .then((res) => res.data);
 
-  const { data: dataChatRoom, error: errorChatRoom } = useSWR<IGetAllChatRoom>(
+  const { data: dataChatRoom } = useSWR<IGetAllChatRoom>(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room`,
     fetcherChatRoom,
     { refreshInterval: 4000 },
@@ -296,13 +308,12 @@ function ChatPage(): React.ReactElement {
       })
       .then((res) => res.data);
 
-  const { data: dataPrescriptionById, error: errorGetPrescriptionById } =
-    useSWR<IResponseOneDetailPrescription>(
-      selectedPrescriptionId
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/prescriptions/${selectedPrescriptionId}`
-        : null,
-      fetcherPrescriptionById,
-    );
+  const { data: dataPrescriptionById } = useSWR<IResponseOneDetailPrescription>(
+    selectedPrescriptionId
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/prescriptions/${selectedPrescriptionId}`
+      : null,
+    fetcherPrescriptionById,
+  );
 
   const fetcherMessage = (url: string) =>
     axios
@@ -313,7 +324,7 @@ function ChatPage(): React.ReactElement {
       })
       .then((res) => res.data.data);
 
-  const { data: dataMessage, error: errorGetMessage } = useSWR(
+  const { data: dataMessage } = useSWR(
     selectedIdChatRoom
       ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/chat-room/${selectedIdChatRoom}`
       : null,
@@ -346,8 +357,8 @@ function ChatPage(): React.ReactElement {
           },
         },
       );
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.log(error);
     }
   }, [isTyping, selectedIdChatRoom, accessToken]);
 
@@ -404,8 +415,15 @@ function ChatPage(): React.ReactElement {
         },
       );
       setInputValues({ ...inputValues, ['message']: '' });
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      const errorMessage = error.response.data.message;
+      setToast({
+        showToast: true,
+        toastMessage: `Gagal kirim pesan: ${errorMessage}`,
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
     }
   };
 
@@ -436,26 +454,6 @@ function ChatPage(): React.ReactElement {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTyping]);
-
-  useEffect(() => {
-    if (errorGetMessage) {
-      console.log('eror get message');
-      return;
-    }
-  }, [errorGetMessage]);
-
-  useEffect(() => {
-    if (errorGetPrescriptionById) {
-      console.log('eror get message');
-      return;
-    }
-  }, [errorGetPrescriptionById]);
-
-  useEffect(() => {
-    if (errorChatRoom) {
-      return;
-    }
-  }, [errorChatRoom]);
 
   useEffect(() => {
     if (role === 'doctor') {
@@ -560,8 +558,15 @@ function ChatPage(): React.ReactElement {
       setInputFile({});
       setPreviewUrl(null);
       setFileCoba(null);
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      const errorMessage = error.response.data.message;
+      setToast({
+        showToast: true,
+        toastMessage: `Gagal upload: ${errorMessage}`,
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
     }
   };
 
@@ -570,7 +575,6 @@ function ChatPage(): React.ReactElement {
       <ChatRoomPage height='100vh' width='100vw'>
         <Navbar />
         <div style={{ display: 'flex', flexGrow: '1', marginTop: '-25px' }}>
-          {/* kiri */}
           <ChatRoomSection
             width='30%'
             height='100%'
@@ -597,7 +601,7 @@ function ChatPage(): React.ReactElement {
                   padding: '0 10px',
                 }}
               >
-                <MagnifyBlueICO onClick={() => console.log('click di icon')} />
+                <MagnifyBlueICO />
                 <input style={{ padding: '10px', flexGrow: '1' }}></input>
               </div>
 
@@ -608,14 +612,11 @@ function ChatPage(): React.ReactElement {
               </ArrowButtonMobileOnly>
             </div>
 
-            {/* list chat room */}
-            {/* --------------- ini organism */}
             <ChatRoomSection
               height='75vh'
               overFlowY='auto'
               isDisplay={isChatRoomShowOnMobile}
             >
-              {/* ------------- ini molecul */}
               {dataChatRoom?.data?.length !== 0 ? (
                 dataChatRoom?.data?.map((el: IChatRoom, index: number) => (
                   <ChatRoomContainer
@@ -676,7 +677,11 @@ function ChatPage(): React.ReactElement {
                             {el?.doctor_name || el?.user_name}
                           </div>
                           <div style={{ fontSize: '14px', fontWeight: '400' }}>
-                            {el?.last_message}
+                            {el?.last_message?.includes(
+                              '%prescription-doctor-obatin',
+                            )
+                              ? 'resep.pdf'
+                              : el?.last_message}
                           </div>
                         </ChatRoomContainer>
                       </div>
@@ -714,7 +719,6 @@ function ChatPage(): React.ReactElement {
               <div ref={observerRef}></div>
             </ChatRoomSection>
           </ChatRoomSection>
-          {/* kanan */}
           <MessageRoomSection
             width='70%'
             height='100%'
@@ -796,9 +800,6 @@ function ChatPage(): React.ReactElement {
                       )}
                     </ChatRoomContainer>
                   </div>
-                  {/* <div>
-                    {dataMessage.doctor.certificate}
-                  </div> */}
                   <ArrowButtonMobileOnly
                     onClick={() => setIsChatRoomShowOnMobile(true)}
                     background='#00B5C0'
@@ -871,7 +872,6 @@ function ChatPage(): React.ReactElement {
                             padding: '15px',
                           }}
                         >
-                          {/* {role == 'doctor' && ( */}
                           <div
                             style={{
                               position: 'relative',
@@ -958,7 +958,6 @@ function ChatPage(): React.ReactElement {
                               </div>
                             )}
                           </div>
-                          {/*)}*/}
                           <input
                             style={{
                               flexGrow: '1',
@@ -972,11 +971,12 @@ function ChatPage(): React.ReactElement {
                                     selectedIdChatRoom,
                                     inputValues['message'],
                                   );
-                                } else {
-                                  console.error(
-                                    'selectedIdChatRoom is undefined',
-                                  );
                                 }
+                                // else {
+                                //   console.error(
+                                //     'selectedIdChatRoom is undefined',
+                                //   );
+                                // }
                               }
                             }}
                             name='message'
@@ -992,11 +992,12 @@ function ChatPage(): React.ReactElement {
                                   selectedIdChatRoom,
                                   inputValues['message'],
                                 );
-                              } else {
-                                console.error(
-                                  'selectedIdChatRoom is undefined',
-                                );
                               }
+                              // else {
+                              //   console.error(
+                              //     'selectedIdChatRoom is undefined',
+                              //   );
+                              // }
                             }}
                           />
                         </div>
