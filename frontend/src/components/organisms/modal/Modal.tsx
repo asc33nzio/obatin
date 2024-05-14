@@ -19,6 +19,7 @@ import AddShippingModalContent from './modalContent/AddShippingModalContent';
 import ViewMoreTxModalContent from './modalContent/ViewMoreTxModalContent';
 import UnsetShippingModalContent from './modalContent/UnsetShippingModalContent';
 import ConfirmCheckoutModalContent from './modalContent/ConfirmCheckoutModalContent';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 
 interface DoctorDetailItf {
   name: string;
@@ -42,6 +43,7 @@ const Modal = () => {
     dispatch(resetTxState());
     closeModal();
   };
+  const { isDesktopDisplay } = useClientDisplayResolution();
 
   let modalContent: React.ReactElement | null;
   let title: string | null = null;
@@ -131,7 +133,7 @@ const Modal = () => {
       modalContent = <AddShippingModalContent />;
       title = 'Tambahkan Metode Pengiriman';
       modalProps = {
-        $containerWidth: '1050px',
+        $containerWidth: isDesktopDisplay ? '1050px' : '300px',
         $containerHeight: 'max-content',
       };
       break;

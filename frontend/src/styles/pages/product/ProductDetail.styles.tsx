@@ -127,6 +127,9 @@ export const PharmacyItem = styled.div`
   &:hover {
     background-color: ${COLORS.primary_color};
     color: white;
+    svg {
+      color: white;
+    }
   }
   @media (max-width: 768px) {
     width: 280px;
@@ -143,16 +146,17 @@ export const Row = styled.div`
   gap: 20px;
   border-bottom: 0px solid white;
   font-size: 16px;
-  h2 {
+  /* h2 {
     color: ${COLORS.primary_color};
-  }
+  } */
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
     padding: 10px 0 10px 10px;
     gap: 5px;
     p {
-      padding: 0;
+      padding: 10px;
     }
   }
 `;

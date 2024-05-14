@@ -16,10 +16,7 @@ export const MenuItemContainer = styled.div<{ $depth: number }>`
   }
 
   &:hover {
-    background-color: ${COLORS.primary_color};
-    span {
-      color: white;
-    }
+    background-color: ${COLORS.input_border};
   }
 `;
 
