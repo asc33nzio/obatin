@@ -37,6 +37,7 @@ const (
 	EndpointCreateMessage                 = "/message"
 	EndpointGetAllMessageOnChatRoom       = "/chat-room/:id"
 	EndpointUpdateIsTyping                = "/chat-room/:id"
+	EndpointUpdateChatIsActive            = "/chat-room/inactive/:id"
 	EndpointDeleteChatRoom                = "/chat-room/:id"
 	EndpointCart                          = "/shop/cart"
 	EndpointCartDetails                   = "/shop/cart/details"

@@ -49,6 +49,7 @@ type PharmacyProduct struct {
 	Price        *int   `json:"price"`
 	Stock        *int   `json:"stock"`
 	IsActive     bool   `json:"is_active"`
+	Sales        int64  `json:"sales"`
 }
 
 type CreatePharmacyProduct struct {
@@ -128,6 +129,7 @@ func ToPharmacyProductResponse(pp []entity.PharmacyProduct) []PharmacyProduct {
 			Price:        pharmacyProduct.Price,
 			Stock:        pharmacyProduct.Stock,
 			IsActive:     pharmacyProduct.IsActive,
+			Sales:        pharmacyProduct.Sales,
 		})
 	}
 	return res

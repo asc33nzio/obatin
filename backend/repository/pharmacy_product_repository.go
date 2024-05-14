@@ -413,7 +413,21 @@ func (r *pharmacyProductRepositoryPostgres) GetPharmacyProductListByPartnerId(ct
 	var data []interface{}
 
 	sb.WriteString(`
-		WITH 
+		WITH sales_data AS (
+			SELECT
+				pp2.product_id,
+				SUM(CASE WHEN sm.movement_type = 'sale' THEN sm.delta ELSE 0 END) AS total_sales
+			FROM
+				pharmacies_products pp2
+			JOIN
+				stock_movements sm ON pp2.id = sm.pharmacy_product_id
+			WHERE
+				pp2.deleted_at IS NULL
+				AND sm.deleted_at IS NULL
+				AND sm.is_addition IS FALSE
+			GROUP BY
+				pp2.product_id
+		),
 			partner_pharmacies AS (
 		SELECT 
 			ph.partner_id AS partner_id,
@@ -441,7 +455,8 @@ func (r *pharmacyProductRepositoryPostgres) GetPharmacyProductListByPartnerId(ct
 			p.image_url, 
 			pp.price, 
 			pp.stock,
-			pp.is_active
+			pp.is_active,
+			COALESCE(sd.total_sales, 0) AS sales 
 		FROM 
 			products p
 		JOIN
@@ -456,6 +471,8 @@ func (r *pharmacyProductRepositoryPostgres) GetPharmacyProductListByPartnerId(ct
 			partners pt
 		ON
 			pt.id = ppc.partner_id
+		LEFT JOIN
+		    sales_data sd on p.id = sd.product_id
 	`)
 
 	queryParams, paramsData := convertGetPharmacyProductQueryParamstoSql(params)
@@ -485,7 +502,7 @@ func (r *pharmacyProductRepositoryPostgres) GetPharmacyProductListByPartnerId(ct
 	for rows.Next() {
 		pp := entity.PharmacyProduct{}
 		err := rows.Scan(&pp.Id, &pp.Product.Id, &pp.Product.Name, &pp.Product.Slug, &pp.Pharmacy.Id, &pp.Pharmacy.Name,
-			&pp.Product.ImageUrl, &pp.Price, &pp.Stock, &pp.IsActive)
+			&pp.Product.ImageUrl, &pp.Price, &pp.Stock, &pp.IsActive, &pp.Sales)
 		if err != nil {
 			return nil, apperror.NewInternal(err)
 		}
