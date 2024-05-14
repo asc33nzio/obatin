@@ -139,6 +139,6 @@ export interface ICategories {
 }
 
 export interface ISales {
-  month: number;
+  month: string;
   total_sales: string;
 }

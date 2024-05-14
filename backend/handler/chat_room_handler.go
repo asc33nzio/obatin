@@ -74,6 +74,7 @@ func (h *ChatRoomHandler) GetAllMessageByChatRoomId(ctx *gin.Context) {
 		return
 	}
 
+	doctor.Certificate=""
 	res := dto.ToGetAllMessageInChatRoom(allMessage)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: appconstant.ResponseGetAllMessageInOneChatRoomMsg,
