@@ -8,14 +8,18 @@ import {
 } from '@/styles/organisms/Footer.styles';
 import React from 'react';
 import ObatinICO from '@/assets/icons/ObatinICO';
-import { navigateToHome } from '@/app/actions';
+import {
+  navigateToDoctorList,
+  navigateToHome,
+  navigateToProductList,
+} from '@/app/actions';
 
 const Footer = (): React.ReactElement => {
   return (
     <FooterContainer $resolution='desktop'>
       <Top>
         <Slogan>
-          <ObatinICO />
+          <ObatinICO handleClick={() => navigateToHome()} />
         </Slogan>
         <Sitemap>
           <ul>
@@ -43,10 +47,10 @@ const Footer = (): React.ReactElement => {
               <a onClick={() => navigateToHome()}>Service</a>
             </Title>
             <li>
-              <a onClick={() => navigateToHome()}>Chat Dokter</a>
+              <a onClick={() => navigateToDoctorList()}>Chat Dokter</a>
             </li>
             <li>
-              <a onClick={() => navigateToHome()}>Beli Obat</a>
+              <a onClick={() => navigateToProductList()}>Beli Obat</a>
             </li>
           </ul>
 

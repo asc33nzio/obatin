@@ -37,6 +37,7 @@ export const Sitemap = styled.nav`
     li {
       padding-bottom: 10px;
       list-style: none;
+      cursor: pointer;
 
       a {
         text-decoration: none;
@@ -65,10 +66,6 @@ export const SiteItem = styled.li`
   flex-direction: column;
   color: ${COLORS.primary_text};
 `;
-/* &L {
-    text-decoration: none;
-    color: ${COLORS.primary_text};
-  } */
 
 export const Slogan = styled.div`
   display: flex;
@@ -89,4 +86,5 @@ export const Slogan = styled.div`
 
 export const Copyright = styled.p`
   color: ${COLORS.primary_text};
+  padding-bottom: 10px;
 `;
