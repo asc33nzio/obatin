@@ -68,6 +68,15 @@ export const SelectPharmacy = styled.div`
   margin: 30px;
   width: 500px;
   height: 600px;
+  @media (max-width: 768px) {
+    align-items: center;
+    justify-content: center;
+    width: 300px;
+    height: 600px;
+    h2{
+      padding-bottom: 20px;
+    }
+  }
 `;
 
 export const Buttoncontainer = styled.div`
