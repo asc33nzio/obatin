@@ -66,7 +66,7 @@ const InvokableModal = (props: {
       title = 'Detail Dokter';
       modalProps = {
         $overlayHeight: '200vh',
-        $containerWidth: '450px',
+        $containerWidth: !isDesktopDisplay ? '350px' : '450px',
         $containerHeight: '500px',
         $onOpen: () => {},
         $isOpen: false,

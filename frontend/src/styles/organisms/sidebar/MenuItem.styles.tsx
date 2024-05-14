@@ -8,7 +8,7 @@ export const MenuItemContainer = styled.div<{ $depth: number }>`
   padding: 10px 0px 10px 10px;
   align-items: center;
   justify-content: space-between;
-
+  width: 100%;
   & svg {
     height: 30px;
     margin-right: 10px;
@@ -21,6 +21,7 @@ export const MenuItemContainer = styled.div<{ $depth: number }>`
 `;
 
 export const MenuItems = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
