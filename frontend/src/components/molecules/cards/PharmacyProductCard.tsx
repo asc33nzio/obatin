@@ -1,19 +1,18 @@
 import { useToast } from '@/hooks/useToast';
-import PP from '@/styles/pages/partner/PharmacyProducts.styles';
 import { PharmacyProductType } from '@/types/pharmacyProducts';
 import { getCookie } from 'cookies-next';
-import Image from 'next/image';
-import styled from 'styled-components';
 import { useState } from 'react';
-import axios from 'axios';
 import { PropagateLoader } from 'react-spinners';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useEffect } from 'react';
-import React from 'react';
-import PaginateButton from '@/components/atoms/button/PaginateButton';
-import CustomButton from '@/components/atoms/button/CustomButton';
 import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModal';
 import { Edit } from '@styled-icons/material';
+import PP from '@/styles/pages/partner/PharmacyProducts.styles';
+import Image from 'next/image';
+import styled from 'styled-components';
+import axios from 'axios';
+import PaginateButton from '@/components/atoms/button/PaginateButton';
+import CustomButton from '@/components/atoms/button/CustomButton';
 
 const PharmacyDetailsSection = styled.div`
   width: 40%;
@@ -302,6 +301,7 @@ const PharmacyProductCard = ({
     if (ppdata?.product_id != null) {
       fetchSimilarProductsData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ppdata, page]);
 
   return (
