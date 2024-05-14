@@ -696,6 +696,11 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 			query.WriteString(` ORDER BY p.name `)
 		} else if *params.SortBy == appconstant.SortByPrice {
 			query.WriteString(" ORDER BY pp.price  ")
+		} else if *params.SortBy == appconstant.SortBySales {
+			query.WriteString(" ORDER BY sales ")
+		}
+		if params.Order == nil {
+			query.WriteString(` DESC `)
 		}
 	}
 

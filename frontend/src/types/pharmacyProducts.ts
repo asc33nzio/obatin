@@ -9,4 +9,5 @@ export type PharmacyProductType = {
   price: number;
   stock: number;
   is_active: boolean;
+  sales: number;
 };
