@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -28,12 +28,12 @@ func (h *PharmacyHandler) GetAllPharmacy(ctx *gin.Context) {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
 	}
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
-	if role != constant.RoleAdmin && role != constant.RoleManager || role == "" {
+	if role != appconstant.RoleAdmin && role != appconstant.RoleManager || role == "" {
 		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 		return
 	}
@@ -46,7 +46,7 @@ func (h *PharmacyHandler) GetAllPharmacy(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseOkMsg,
+		Message:    appconstant.ResponseOkMsg,
 		Pagination: (*dto.PaginationResponse)(&pharmacies.Pagination),
 		Data:       dto.ToPharmacyListResponse(pharmacies),
 	})

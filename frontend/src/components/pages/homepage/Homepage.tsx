@@ -13,7 +13,7 @@ import {
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Keyboard, Mousewheel, Navigation } from 'swiper/modules';
-import { CSSProperties } from 'styled-components';
+import styled, { CSSProperties } from 'styled-components';
 import Navbar from '../../organisms/navbar/Navbar';
 import Footer from '../../organisms/footer/Footer';
 import Banner from '../../molecules/banner/Banner';
@@ -26,11 +26,17 @@ import { ProductListContainer } from '@/styles/pages/product/ProductListPage.sty
 import { useRouter } from 'next/navigation';
 import {
   Bold,
+  CategoryCardContainer,
+  CategoryName,
   Imagecontainer,
   Price,
   ProductCard,
   Smallfont,
 } from '@/styles/pages/product/ProductCard.styles';
+
+const CustomImage = styled(Image)`
+  border-radius: 100%;
+`;
 
 const Homepage = ({
   categories,
@@ -45,8 +51,8 @@ const Homepage = ({
     router.push(`/products/${slug}`);
   };
 
-  const handleCategoryClicked = (slug: string) => {
-    router.push(`/products?category=${slug}`);
+  const handleCategoryClicked = (id: number) => {
+    router.push(`/products?category=${id}`);
   };
 
   const handleConsultationClicked = () => {
@@ -113,22 +119,21 @@ const Homepage = ({
                             alignItems: 'center',
                           }}
                         >
-                          <Imagecontainer
-                            onClick={() =>
-                              handleCategoryClicked(item?.category_slug)
-                            }
+                          <CategoryCardContainer
+                            onClick={() => handleCategoryClicked(item?.id)}
                           >
-                            <Image
-                              height={150}
-                              width={150}
+                            <CustomImage
+                              height={110}
+                              width={110}
                               src={
                                 item.image_url !== ''
                                   ? item.image_url
                                   : 'https://img.freepik.com/free-vector/virus-cure-concept_23-2148488766.jpg?t=st=1715234591~exp=1715238191~hmac=7d5be4a2f251beedead023dbac5e7c87179fdbb05ff4be5c609ed7bd873b213f&w=826'
                               }
-                              alt='banner'
+                              alt='category'
                             />
-                          </Imagecontainer>
+                            <CategoryName>{item.name}</CategoryName>
+                          </CategoryCardContainer>
                         </SwiperSlide>
                       );
                     })}

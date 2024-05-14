@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"obatin/constant"
+	"obatin/appconstant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -28,7 +28,7 @@ func (h *DoctorSpecializationHandler) GetAll(ctx *gin.Context) {
 
 	res := dto.ToGetAllSpecializationsRes(specializations)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseGetDoctorSpecializations,
+		Message: appconstant.ResponseGetDoctorSpecializations,
 		Data:    res,
 	})
 }

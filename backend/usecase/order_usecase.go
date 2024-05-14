@@ -5,7 +5,6 @@ import (
 	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 )
@@ -70,12 +69,12 @@ func (u *orderUsecaseImpl) GetAllOrders(ctx context.Context, params *entity.Orde
 	or := u.repoStore.OrderRepository()
 	pr := u.repoStore.PartnerRepository()
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -87,7 +86,7 @@ func (u *orderUsecaseImpl) GetAllOrders(ctx context.Context, params *entity.Orde
 		params.Page = appconstant.DefaultMinPage
 	}
 
-	if role == constant.RoleManager {
+	if role == appconstant.RoleManager {
 		partnerId, err := pr.FindPartnerIdByAuthId(ctx, authenticationId)
 		if err != nil {
 			return nil, err
@@ -118,13 +117,13 @@ func (u *orderUsecaseImpl) UpdateOrderStatus(ctx context.Context, o *entity.Orde
 	or := u.repoStore.OrderRepository()
 	ur := u.repoStore.UserRepository()
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	if role == constant.RoleUser {
-		authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	if role == appconstant.RoleUser {
+		authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 		if !ok {
 			return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 		}

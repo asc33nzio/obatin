@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -36,6 +36,6 @@ func (h *MessageHandler) CreateMessage(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseCreateMessageMsg,
+		Message: appconstant.ResponseCreateMessageMsg,
 	})
 }

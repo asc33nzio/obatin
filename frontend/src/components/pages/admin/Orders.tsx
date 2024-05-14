@@ -1,5 +1,5 @@
 'use client';
-import Navbar from '@/components/organisms/navbar/Navbar';
+import NavbarAdmin from '@/components/organisms/navbar/NavbarAdmin';
 import AdminOrdersTable from '@/components/organisms/table/AdminOrderTable';
 import AdminPaymentsTable from '@/components/organisms/table/AdminPaymentTable';
 import { Container } from '@/styles/Global.styles';
@@ -17,7 +17,7 @@ const OrdersPage = () => {
   return (
     <>
       <Container>
-        <Navbar />
+        <NavbarAdmin />
         <AO.CustomSection>
           <AO.CustomSelect
             onChange={(e) => {

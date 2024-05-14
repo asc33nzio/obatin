@@ -10,6 +10,7 @@ import {
 } from '@/styles/organisms/Navbar.styles';
 import {
   navigateToDoctorDashboard,
+  navigateToHome,
   navigateToLogin,
   navigateToUserDashboard,
 } from '@/app/actions';
@@ -215,7 +216,7 @@ const Navbar = (): React.ReactElement => {
           <IconContainer onClick={() => toggleDrawer()}>
             {isOpened ? <ChevronLeft /> : <Menu />}
           </IconContainer>
-          <ObatinICO />
+          <ObatinICO handleClick={() => navigateToHome()} />
         </Left>
 
         {!['admin', 'manager', 'doctor'].includes(userRole!) && (

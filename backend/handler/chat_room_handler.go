@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -38,7 +38,7 @@ func (h *ChatRoomHandler) CreateChatRoom(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseCreateChatRoomMsg,
+		Message: appconstant.ResponseCreateChatRoomMsg,
 	})
 }
 
@@ -76,7 +76,7 @@ func (h *ChatRoomHandler) GetAllMessageByChatRoomId(ctx *gin.Context) {
 
 	res := dto.ToGetAllMessageInChatRoom(allMessage)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseGetAllMessageInOneChatRoomMsg,
+		Message: appconstant.ResponseGetAllMessageInOneChatRoomMsg,
 		Data: dto.OneChatRoom{
 			Message:        res,
 			Id:             idParam.Id,
@@ -106,13 +106,13 @@ func (h *ChatRoomHandler) UpdateIsTyping(ctx *gin.Context) {
 		return
 	}
 
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 		return
 	}
 
-	if authenticationRole == constant.RoleDoctor {
+	if authenticationRole == appconstant.RoleDoctor {
 		err = h.chatRoomUsecase.UpdateIsTyping(ctx, body.ToUpdateIsTypingDoctor(), body.ChatRoomId)
 		if err != nil {
 			ctx.Error(err)
@@ -120,7 +120,7 @@ func (h *ChatRoomHandler) UpdateIsTyping(ctx *gin.Context) {
 		}
 	}
 
-	if authenticationRole == constant.RoleUser {
+	if authenticationRole == appconstant.RoleUser {
 		err = h.chatRoomUsecase.UpdateIsTyping(ctx, body.ToUpdateIsTypingUser(), body.ChatRoomId)
 		if err != nil {
 			ctx.Error(err)
@@ -129,7 +129,7 @@ func (h *ChatRoomHandler) UpdateIsTyping(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseUpdateIsTypingMsg,
+		Message: appconstant.ResponseUpdateIsTypingMsg,
 	})
 }
 
@@ -150,7 +150,7 @@ func (h *ChatRoomHandler) GetListChatRoom(ctx *gin.Context) {
 
 	res := dto.ToGetAllChatRoomRes(messageChatRoom.ChatRooms)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseGetAllChatRoomMsg,
+		Message:    appconstant.ResponseGetAllChatRoomMsg,
 		Pagination: (*dto.PaginationResponse)(&messageChatRoom.Pagination),
 		Data:       res,
 	})
@@ -172,6 +172,6 @@ func (h *ChatRoomHandler) DeleteChatRoom(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseDeleteChatRoomMsg,
+		Message: appconstant.ResponseDeleteChatRoomMsg,
 	})
 }

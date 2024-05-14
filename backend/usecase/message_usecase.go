@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"context"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 	"obatin/util"
@@ -51,11 +51,11 @@ func (u *messageUsecaseImpl) CreateMessage(ctx context.Context, mReq entity.Mess
 		dr := rs.DoctorRepository()
 		crr := rs.ChatRoomRepository()
 
-		authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+		authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 		if !ok {
 			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 		}
-		authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+		authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 		if !ok {
 			return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 		}
@@ -74,7 +74,7 @@ func (u *messageUsecaseImpl) CreateMessage(ctx context.Context, mReq entity.Mess
 			return nil, apperror.ErrChatRoomAlreadyInactive(nil)
 		}
 
-		if authenticationRole == constant.RoleDoctor {
+		if authenticationRole == appconstant.RoleDoctor {
 			doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)
 			if err != nil {
 				return nil, err
@@ -85,7 +85,7 @@ func (u *messageUsecaseImpl) CreateMessage(ctx context.Context, mReq entity.Mess
 			}
 		}
 
-		if authenticationRole == constant.RoleUser {
+		if authenticationRole == appconstant.RoleUser {
 			user, err := ur.FindUserByAuthId(ctx, authenticationId)
 			if err != nil {
 				return nil, err

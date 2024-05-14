@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -407,7 +407,7 @@ func (r pharmacyProductRepositoryPostgres) FindNearbyPartner(ctx context.Context
 }
 
 func (r *pharmacyProductRepositoryPostgres) GetPharmacyProductListByPartnerId(ctx context.Context, params entity.PharmacyProductFilter, partnerId int64) (*entity.PharmacyProductListPage, error) {
-	paramsCount := constant.StartingParamsCount
+	paramsCount := appconstant.StartingParamsCount
 	res := []entity.PharmacyProduct{}
 	var sb strings.Builder
 	rowsCount := 0
@@ -427,7 +427,7 @@ func (r *pharmacyProductRepositoryPostgres) GetPharmacyProductListByPartnerId(ct
 			ph.partner_id = $1
 	`)
 	if params.SortBy != nil {
-		if *params.SortBy == constant.SortByPharmacy {
+		if *params.SortBy == appconstant.SortByPharmacy {
 			sb.WriteString(`ORDER BY pharmacy_name`)
 		}
 	}

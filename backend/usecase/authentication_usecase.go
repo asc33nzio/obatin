@@ -7,7 +7,6 @@ import (
 	"obatin/apperror"
 	"obatin/appvalidator"
 	"obatin/config"
-	"obatin/constant"
 	"strings"
 	"time"
 
@@ -103,7 +102,7 @@ func (u *authentictionUsecaseImpl) Login(ctx context.Context, uReq entity.Authen
 		return nil, apperror.NewInternal(err)
 	}
 
-	if authentication.Role == constant.RoleDoctor {
+	if authentication.Role == appconstant.RoleDoctor {
 		onlineStatus := appconstant.DoctorOnlineTrue
 		_, err = dr.UpdateOneDoctor(ctx, entity.DoctorUpdateRequest{
 			IsOnline: &onlineStatus,
@@ -219,8 +218,8 @@ func (u *authentictionUsecaseImpl) RegisterDoctor(ctx context.Context, uReq enti
 		}
 
 		uReq.Password = string(hashedPass)
-		uReq.Role = constant.RoleDoctor
-		uReq.IsApproved = constant.HasNotApproved
+		uReq.Role = appconstant.RoleDoctor
+		uReq.IsApproved = appconstant.HasNotApproved
 
 		user, err := ar.CreateOne(ctx, uReq)
 		if err != nil {
@@ -240,10 +239,10 @@ func (u *authentictionUsecaseImpl) RegisterDoctor(ctx context.Context, uReq enti
 		emailParamsRegisterDoctor := util.EmailParams{
 			ToEmail:          user.Email,
 			VerificationLink: "",
-			IsAccepted:       constant.IsNotAccepted,
+			IsAccepted:       appconstant.IsNotAccepted,
 			DefaultPassword:  defaultPassword,
-			IsForgotPassword: constant.IsNotForgotPassword,
-			IsReverified:     constant.IsNotReverified,
+			IsForgotPassword: appconstant.IsNotForgotPassword,
+			IsReverified:     appconstant.IsNotReverified,
 		}
 
 		err = u.sendEmail.SendVerificationEmail(emailParamsRegisterDoctor)
@@ -295,8 +294,8 @@ func (u *authentictionUsecaseImpl) RegisterUser(ctx context.Context, uReq entity
 		}
 
 		uReq.Password = string(hashedPass)
-		uReq.Role = constant.RoleUser
-		uReq.IsApproved = constant.HasApproved
+		uReq.Role = appconstant.RoleUser
+		uReq.IsApproved = appconstant.HasApproved
 		user, err := ar.CreateOne(ctx, uReq)
 		if err != nil {
 			return nil, err
@@ -348,11 +347,11 @@ func (u *authentictionUsecaseImpl) VerifyEmail(ctx context.Context, token string
 }
 
 func (u *authentictionUsecaseImpl) SendVerificationEmail(ctx context.Context) error {
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -382,10 +381,10 @@ func (u *authentictionUsecaseImpl) SendVerificationEmail(ctx context.Context) er
 	emailParamsVerificationEmail := util.EmailParams{
 		ToEmail:          authentication.Email,
 		VerificationLink: verificationLink,
-		IsAccepted:       constant.IsAccepted,
+		IsAccepted:       appconstant.IsAccepted,
 		DefaultPassword:  "",
-		IsForgotPassword: constant.IsNotForgotPassword,
-		IsReverified:     constant.IsNotReverified,
+		IsForgotPassword: appconstant.IsNotForgotPassword,
+		IsReverified:     appconstant.IsNotReverified,
 	}
 	err = u.sendEmail.SendVerificationEmail(emailParamsVerificationEmail)
 	if err != nil {
@@ -401,7 +400,7 @@ func (u *authentictionUsecaseImpl) UpdatePasswordWithToken(ctx context.Context, 
 
 	claims, err := u.jwtAuth.ParseAndVerify(token, u.config.JwtSecret())
 	if err != nil {
-		if strings.Contains(err.Error(), constant.ErrorTokenIsExpired) {
+		if strings.Contains(err.Error(), appconstant.ErrorTokenIsExpired) {
 			err := rpr.DeleteResetPasswordTokenAfterExpired(ctx)
 			if err != nil {
 				return err
@@ -457,7 +456,7 @@ func (u *authentictionUsecaseImpl) UpdatePasswordWithToken(ctx context.Context, 
 func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, updateReq entity.UpdatePassword) error {
 	ar := u.repoStore.AuthenticationRepository()
 
-	authId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -500,12 +499,12 @@ func (u *authentictionUsecaseImpl) UpdatePassword(ctx context.Context, updateReq
 
 func (u *authentictionUsecaseImpl) UpdateApproval(ctx context.Context, authenticationId int, isApprove bool) error {
 	ar := u.repoStore.AuthenticationRepository()
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	if authenticationRole != constant.RoleAdmin {
+	if authenticationRole != appconstant.RoleAdmin {
 		return apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 
@@ -540,10 +539,10 @@ func (u *authentictionUsecaseImpl) UpdateApproval(ctx context.Context, authentic
 		emailParamsApprovalRejected := util.EmailParams{
 			ToEmail:          foundUser.Email,
 			VerificationLink: verificationLink,
-			IsAccepted:       constant.IsNotAccepted,
+			IsAccepted:       appconstant.IsNotAccepted,
 			DefaultPassword:  "",
-			IsForgotPassword: constant.IsNotForgotPassword,
-			IsReverified:     constant.IsNotReverified,
+			IsForgotPassword: appconstant.IsNotForgotPassword,
+			IsReverified:     appconstant.IsNotReverified,
 		}
 		err = u.sendEmail.SendVerificationEmail(emailParamsApprovalRejected)
 		if err != nil {
@@ -557,10 +556,10 @@ func (u *authentictionUsecaseImpl) UpdateApproval(ctx context.Context, authentic
 	emailParamsApprovalAccepted := util.EmailParams{
 		ToEmail:          authentication.Email,
 		VerificationLink: verificationLink,
-		IsAccepted:       constant.IsAccepted,
+		IsAccepted:       appconstant.IsAccepted,
 		DefaultPassword:  "",
-		IsForgotPassword: constant.IsNotForgotPassword,
-		IsReverified:     constant.IsNotReverified,
+		IsForgotPassword: appconstant.IsNotForgotPassword,
+		IsReverified:     appconstant.IsNotReverified,
 	}
 	err = u.sendEmail.SendVerificationEmail(emailParamsApprovalAccepted)
 	if err != nil {
@@ -637,10 +636,10 @@ func (u *authentictionUsecaseImpl) SendEmailForgotPasssword(ctx context.Context,
 		emailParamsResetPassword := util.EmailParams{
 			ToEmail:          uReq.Email,
 			VerificationLink: verificationLink,
-			IsAccepted:       constant.IsAccepted,
+			IsAccepted:       appconstant.IsAccepted,
 			DefaultPassword:  "",
-			IsForgotPassword: constant.IsForgotPassword,
-			IsReverified:     constant.IsNotReverified,
+			IsForgotPassword: appconstant.IsForgotPassword,
+			IsReverified:     appconstant.IsNotReverified,
 		}
 		err = u.sendEmail.SendVerificationEmail(emailParamsResetPassword)
 		if err != nil {
@@ -675,10 +674,10 @@ func (u *authentictionUsecaseImpl) SendEmailForgotPasssword(ctx context.Context,
 	emailParamsResetPassword := util.EmailParams{
 		ToEmail:          uReq.Email,
 		VerificationLink: verificationLink,
-		IsAccepted:       constant.IsAccepted,
+		IsAccepted:       appconstant.IsAccepted,
 		DefaultPassword:  "",
-		IsForgotPassword: constant.IsForgotPassword,
-		IsReverified:     constant.IsNotReverified,
+		IsForgotPassword: appconstant.IsForgotPassword,
+		IsReverified:     appconstant.IsNotReverified,
 	}
 	err = u.sendEmail.SendVerificationEmail(emailParamsResetPassword)
 	if err != nil {
@@ -718,10 +717,10 @@ func (u *authentictionUsecaseImpl) ResendVerificationEmail(ctx context.Context, 
 	emailParamsResendVerification := util.EmailParams{
 		ToEmail:          authentication.Email,
 		VerificationLink: verificationLink,
-		IsAccepted:       constant.IsAccepted,
+		IsAccepted:       appconstant.IsAccepted,
 		DefaultPassword:  "",
-		IsForgotPassword: constant.IsNotForgotPassword,
-		IsReverified:     constant.IsReverified,
+		IsForgotPassword: appconstant.IsNotForgotPassword,
+		IsReverified:     appconstant.IsReverified,
 	}
 
 	err = u.sendEmail.SendVerificationEmail(emailParamsResendVerification)
@@ -741,12 +740,12 @@ func (u *authentictionUsecaseImpl) GetPendingDoctorApproval(ctx context.Context,
 		params.Page = appconstant.DefaultMinPage
 	}
 
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	if authenticationRole != constant.RoleAdmin {
+	if authenticationRole != appconstant.RoleAdmin {
 		return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 

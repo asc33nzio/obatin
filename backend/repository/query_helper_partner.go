@@ -2,7 +2,7 @@ package repository
 
 import (
 	"fmt"
-	"obatin/constant"
+	"obatin/appconstant"
 	"obatin/entity"
 	"strings"
 )
@@ -10,7 +10,7 @@ import (
 func convertPartnerQueryParamstoSql(params entity.PartnerFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.Search != "" {
 		query.WriteString(fmt.Sprintf(` AND p.name ILIKE '%%' ||$%v|| '%%' `, countParams))
 		filters = append(filters, params.Search)
@@ -48,7 +48,7 @@ func convertPaginationPartnerParamsToSql(params entity.PartnerFilter, paramsCoun
 func convertUpdatePartnerQueryParamstoSql(params entity.PartnerUpdateRequest, id int64) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.Name != nil {
 		query.WriteString(fmt.Sprintf("name = $%d ", countParams))
 		args = append(args, *params.Name)
@@ -79,7 +79,7 @@ func convertUpdatePartnerQueryParamstoSql(params entity.PartnerUpdateRequest, id
 func convertUpdateAuthenticationPartnerQueryParamstoSql(params entity.PartnerUpdateRequest, id int64) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.Email != nil {
 		query.WriteString(fmt.Sprintf("email = $%d ", countParams))
 		args = append(args, *params.Email)

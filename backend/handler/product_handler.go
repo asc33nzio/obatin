@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/appvalidator"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -43,7 +43,7 @@ func (h *ProductHandler) GetAllProducts(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message:    constant.ResponseOkMsg,
+		Message:    appconstant.ResponseOkMsg,
 		Pagination: productsRes.Pagination,
 		Data:       productsRes.Data,
 	})
@@ -64,14 +64,14 @@ func (h *ProductHandler) GetProductDetailBySlug(ctx *gin.Context) {
 	}
 	var forSales bool
 
-	role, _ := ctx.Value(constant.AuthenticationRole).(string)
-	if role == constant.RoleAdmin {
+	role, _ := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role == appconstant.RoleAdmin {
 		forSales = true
 	}
 
 	res := dto.ToProductDetailResponse(product, forSales)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }
@@ -86,8 +86,8 @@ func (h *ProductHandler) UpdateProductDetaiBySlug(ctx *gin.Context) {
 
 	body := dto.UpdateProductRequest{}
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleAdmin || role == "" {
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role != appconstant.RoleAdmin || role == "" {
 		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 		return
 	}
@@ -102,7 +102,7 @@ func (h *ProductHandler) UpdateProductDetaiBySlug(ctx *gin.Context) {
 		return
 	}
 
-	file, FileHeader, err := ctx.Request.FormFile(constant.ImageUrlFormKey)
+	file, FileHeader, err := ctx.Request.FormFile(appconstant.ImageUrlFormKey)
 	if file != nil {
 		if err != nil {
 			ctx.Error(apperror.ErrInvalidReq(err))
@@ -133,7 +133,7 @@ func (h *ProductHandler) UpdateProductDetaiBySlug(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 	})
 
 }
@@ -141,8 +141,8 @@ func (h *ProductHandler) UpdateProductDetaiBySlug(ctx *gin.Context) {
 func (h *ProductHandler) CreateProduct(ctx *gin.Context) {
 	body := dto.AddProductRequest{}
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleAdmin || role == "" {
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role != appconstant.RoleAdmin || role == "" {
 		ctx.Error(apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess))
 		return
 	}
@@ -156,7 +156,7 @@ func (h *ProductHandler) CreateProduct(ctx *gin.Context) {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
 	}
-	file, FileHeader, err := ctx.Request.FormFile(constant.ImageUrlFormKey)
+	file, FileHeader, err := ctx.Request.FormFile(appconstant.ImageUrlFormKey)
 	if file != nil {
 		if err != nil {
 			ctx.Error(apperror.ErrInvalidReq(err))
@@ -188,6 +188,6 @@ func (h *ProductHandler) CreateProduct(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 	})
 }

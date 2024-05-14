@@ -1,22 +1,22 @@
 package middleware
 
 import (
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (m *GinMiddleware) JWTAuth(ctx *gin.Context) {
-	bearerToken := ctx.GetHeader(constant.HeaderBearerToken)
+	bearerToken := ctx.GetHeader(appconstant.HeaderBearerToken)
 	if bearerToken == "" {
 		ctx.Error(apperror.ErrNotLogin(nil))
 		ctx.Abort()
 		return
 	}
 
-	if !strings.HasPrefix(bearerToken, constant.PrefixBearerToken) {
+	if !strings.HasPrefix(bearerToken, appconstant.PrefixBearerToken) {
 		ctx.Error(apperror.ErrInvalidToken(nil))
 		ctx.Abort()
 		return
@@ -26,7 +26,7 @@ func (m *GinMiddleware) JWTAuth(ctx *gin.Context) {
 
 	claims, err := m.jwtAuth.ParseAndVerify(accessToken, m.config.JwtSecret())
 	if err != nil {
-		if strings.Contains(err.Error(), constant.ErrorTokenIsExpired) {
+		if strings.Contains(err.Error(), appconstant.ErrorTokenIsExpired) {
 			ctx.Error(apperror.ErrTokenHasExpired(err))
 		} else {
 			ctx.Error(apperror.ErrInvalidToken(err))
@@ -35,9 +35,9 @@ func (m *GinMiddleware) JWTAuth(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set(constant.AuthenticationIdKey, claims.Payload.AuthenticationId)
-	ctx.Set(constant.AuthenticationRole, claims.Payload.Role)
-	ctx.Set(constant.IsVerifiedKey, claims.Payload.IsVerified)
-	ctx.Set(constant.IsApprovedKey, claims.Payload.IsApproved)
+	ctx.Set(appconstant.AuthenticationIdKey, claims.Payload.AuthenticationId)
+	ctx.Set(appconstant.AuthenticationRole, claims.Payload.Role)
+	ctx.Set(appconstant.IsVerifiedKey, claims.Payload.IsVerified)
+	ctx.Set(appconstant.IsApprovedKey, claims.Payload.IsApproved)
 	ctx.Next()
 }
