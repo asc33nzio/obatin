@@ -14,6 +14,8 @@ import {
   navigateToDoctorDashboard,
   navigateToForgotPassword,
   navigateToRegister,
+  navigateToAdminHome,
+  navigateToPartnerHome,
 } from '@/app/actions';
 import {
   ProductItemItf,
@@ -181,6 +183,14 @@ const LoginForm = (): React.ReactElement => {
         );
 
         navigateToDoctorDashboard();
+      }
+
+      if (userRole === 'admin') {
+        navigateToAdminHome();
+      }
+
+      if (userRole === 'manager') {
+        navigateToPartnerHome();
       }
 
       setToast({

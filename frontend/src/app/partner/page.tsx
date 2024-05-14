@@ -13,7 +13,6 @@ import { DialogModal } from '@/components/organisms/modal/dialogModal/DialogModa
 import { PropagateLoader } from 'react-spinners';
 import Image from 'next/image';
 import styled from 'styled-components';
-import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import PharmacyProductCard from '@/components/molecules/cards/PharmacyProductCard';
 import { PaginationInfoItf } from '@/types/transactionTypes';
@@ -25,6 +24,7 @@ import { useToast } from '@/hooks/useToast';
 import ProductListModalContent from '@/components/organisms/modal/modalContent/ProductListModalContent';
 import { INullableProduct } from '@/types/Product';
 import AddPharmacyProductContent from '@/components/organisms/admin/AddPharmacyProductContent';
+import NavbarPartner from '@/components/organisms/navbar/NavbarPartner';
 
 const StyledContentContainer = styled.section`
   width: 80vw;
@@ -207,7 +207,7 @@ const PartnersPage = () => {
   return (
     <>
       <PageContainer>
-        <Navbar />
+        <NavbarPartner />
         <ContainerChoicePharmacyProduct>
           <PP.FilterStatus
             onChange={(e) => setIsModalAddProductOpen(e.target.value == 'true')}

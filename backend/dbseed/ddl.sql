@@ -320,18 +320,45 @@ CREATE TABLE shippings(
 );
 
 CREATE TYPE payment_method_enum AS ENUM ('transfer', 'credit_card', 'e_wallet');
-CREATE TABLE payments(
+CREATE TABLE payments (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     payment_method payment_method_enum NOT NULL DEFAULT 'transfer',
     total_payment INTEGER NOT NULL,
     payment_proof_url VARCHAR(255),
-    expired_at TIMESTAMP NOT NULL DEFAULT NOW() + '30 minutes',
+    is_confirmed BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
+
+ALTER TABLE payments
+ADD COLUMN invoice_number TEXT;
+
+CREATE FUNCTION gen_invoice_number() RETURNS TRIGGER AS $$
+DECLARE
+    curr_date TEXT;
+    curr_id TEXT;
+    new_invoice_number TEXT;
+BEGIN
+    curr_date := to_char(NEW.created_at, 'YYYYMMDD');
+    SELECT MAX(id) INTO curr_id FROM payments WHERE date_trunc('day', created_at) = date_trunc('day', NEW.created_at);
+    IF curr_id IS NULL THEN
+        curr_id := '1';
+    ELSE
+        curr_id := to_char(to_number(curr_id, '999999') + 1, 'FM999999');
+    END IF;
+    new_invoice_number := 'INV/OBTN/' || curr_date || '/' || curr_id;
+    NEW.invoice_number := new_invoice_number;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_gen_invoice_number
+    BEFORE INSERT ON payments
+    FOR EACH ROW
+    EXECUTE FUNCTION gen_invoice_number();
 
 CREATE TYPE delivery_status_enum AS ENUM ('waiting_payment', 'waiting_confirmation', 'processed', 'sent', 'confirmed', 'cancelled');
 CREATE TABLE orders(

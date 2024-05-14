@@ -36,7 +36,6 @@ import { setAuthDoctorState } from '@/redux/reducers/authDoctorSlice';
 import { BounceLoader } from 'react-spinners';
 import { InputSwitch } from 'primereact/inputswitch';
 import { ValidDays } from '@/types/reduxTypes';
-import Navbar from '@/components/organisms/navbar/Navbar';
 import CustomButton from '@/components/atoms/button/CustomButton';
 import EditPencilICO from '@/assets/dashboard/EditPencilICO';
 import RegularInput from '@/components/atoms/input/RegularInput';
@@ -47,6 +46,7 @@ import DefaultDoctorAvatar from '@/assets/DefaultDoctorAvatar.svg';
 import ProgressBar from '@/components/atoms/progressBar/ProgressBar';
 import TimeRangePicker from '@wojtekmaj/react-timerange-picker';
 import moment from 'moment';
+import NavbarDoctor from '@/components/organisms/navbar/NavbarDoctor';
 moment.locale('id');
 
 const DoctorDashboardPage = (): React.ReactElement => {
@@ -601,7 +601,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
 
   return (
     <DoctorDashboardPageContainer $isDesktopDisplay={isDesktopDisplay}>
-      <Navbar />
+      <NavbarDoctor />
 
       <DashboardPageContentContainer>
         <DoctorProfileContainer $isDesktopDisplay={isDesktopDisplay}>

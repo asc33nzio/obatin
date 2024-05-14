@@ -1,20 +1,20 @@
 'use client';
 import NavbarPartner from '@/components/organisms/navbar/NavbarPartner';
-import PartnerOrdersTable from '@/components/organisms/table/PartnerOrderTable';
+import PartnerStockMovementsTable from '@/components/organisms/table/PartnerStockMovementsTable';
 import { Container } from '@/styles/Global.styles';
 import AO from '@/styles/pages/admin/AdminOrders.styles';
 
-const OrdersPage = () => {
+const ReportPage = () => {
   return (
     <>
       <Container>
         <NavbarPartner />
         <AO.CustomSection>
-          <PartnerOrdersTable />
+          <PartnerStockMovementsTable />
         </AO.CustomSection>
       </Container>
     </>
   );
 };
 
-export default OrdersPage;
+export default ReportPage;

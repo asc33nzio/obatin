@@ -125,8 +125,12 @@ const PartnerListModalContent = ({
   }
 
   return (
-    <ContentContainer onChange={handleSearch}>
-      <CutomSearch type='text' placeholder='Cari Partner' />
+    <ContentContainer>
+      <CutomSearch
+        onChange={handleSearch}
+        type='text'
+        placeholder='Cari Partner'
+      />
       {isLoading ? (
         <PropagateLoader />
       ) : (

@@ -133,8 +133,12 @@ const PharmacyListModalContent = ({
   }
 
   return (
-    <ContentContainer onChange={handleSearch}>
-      <CutomSearch type='text' placeholder='Cari Apotek' />
+    <ContentContainer>
+      <CutomSearch
+        onChange={handleSearch}
+        type='text'
+        placeholder='Cari Apotek'
+      />
       {isLoading ? (
         <PropagateLoader />
       ) : (
