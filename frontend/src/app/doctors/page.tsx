@@ -28,7 +28,8 @@ import Image from 'next/image';
 import DoctorFilterComponent from '@/components/atoms/filter/DoctorFilter';
 import Footer from '@/components/organisms/footer/Footer';
 import InvokableModal from '@/components/organisms/modal/InvokableModal';
-import Pagination from '@/components/molecules/admin/Pagination';
+import { PaginationDiv } from '@/styles/pages/dashboard/transactions/Transactions.styles';
+import PaginationComponent from '@/components/organisms/pagination/PaginationComponent';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -53,7 +54,6 @@ const DoctorsPage = () => {
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorType | null>(null);
   const [specializations, setSpecializations] = useState<DoctorSpecType[]>([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
   const [specSlug, setSpecSlug] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [isOnline] = useState<string | null>(null);
@@ -70,13 +70,18 @@ const DoctorsPage = () => {
     setIsModalOpen(false);
   };
 
-  const handleClickPage = async (page: number) => {
-    setPage(page);
-    setLoading(false);
+  const handlePageJump = (i: number) => {
+    setPage(i);
+  };
 
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+  const handlePrevPage = () => {
+    if (page === 1) return;
+    setPage(page - 1);
+  };
+
+  const handleNextPage = () => {
+    if (page === doctors?.pagination.page_count) return;
+    setPage(page + 1);
   };
 
   const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors?`;
@@ -91,7 +96,6 @@ const DoctorsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
         const { data: response } = await axios.get(fullUrl, {
           params: {
             limit: 12,
@@ -104,10 +108,8 @@ const DoctorsPage = () => {
         });
 
         setDoctors(response);
-        setLoading(false);
       } catch (error) {
         console.error(error);
-        setLoading(false);
       }
     };
     fetchData();
@@ -191,14 +193,16 @@ const DoctorsPage = () => {
               ))}
             </ProductListContainer>
 
-            {!loading && doctors && doctors.pagination && (
-              <div style={{ padding: '30px 0' }}>
-                <Pagination
-                  currentPage={doctors.pagination.page}
+            {doctors && doctors.pagination && (
+              <PaginationDiv>
+                <PaginationComponent
+                  page={doctors.pagination.page}
                   totalPages={doctors.pagination.page_count}
-                  onPageChange={(page) => handleClickPage(page)}
+                  goToPage={handlePageJump}
+                  handlePrevPage={handlePrevPage}
+                  handleNextPage={handleNextPage}
                 />
-              </div>
+              </PaginationDiv>
             )}
           </ProductContent>
         </Content>

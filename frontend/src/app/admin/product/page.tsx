@@ -19,12 +19,19 @@ import {
 } from '@/types/Product';
 import SeeDetail from '@/assets/admin/SeeDetail';
 import ModalDetailProduct from '@/components/organisms/admin/ModalDetailProduct';
-import CascadeDropdown from '@/components/molecules/admin/DropdownCascade';
 import DropdownTest from '@/components/molecules/admin/DropdownTest';
+import { PaginationDiv } from '@/styles/pages/dashboard/transactions/Transactions.styles';
+import PaginationComponent from '@/components/organisms/pagination/PaginationComponent';
 
 export interface ICategoryResponse {
   message: string;
   data: ICategoryDataResponse[];
+}
+
+export interface IFlattenDataCategory {
+  id: number;
+  name: string;
+  parentName: string;
 }
 
 export interface ICategoryDataResponse {
@@ -38,7 +45,34 @@ export interface ICategoryDataResponse {
   parentId?: number;
 }
 
+interface IOptionsDropdown {
+  value: string;
+  label: string;
+  children?: any;
+}
+
+function formatRupiah(data: number) {
+  const formatter = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  });
+
+  return formatter.format(data);
+}
+
+function validateNumber(value: any) {
+  if (typeof value === 'string' && value.trim() !== '') {
+    return !isNaN(parseFloat(value));
+  } else {
+    return false;
+  }
+}
+
 function AdminProduct() {
+  const accessToken = getCookie('access_token');
+  const { setToast } = useToast();
+  const { isDesktopDisplay } = useClientDisplayResolution();
   const [isModalEditProductOpen, setIsModalEditProductOpen] =
     useState<boolean>(false);
   const [isModalAddProductOpen, setIsModalAddProductOpen] =
@@ -46,32 +80,30 @@ function AdminProduct() {
   const [selectedSlugProduct, setSelectedSlugProduct] = useState<string | null>(
     null,
   );
-
   const [isModalManufactureOpen, setIsModalManufactureOpen] =
     useState<boolean>(false);
-  const handleClickCloseModal = () => {
-    setIsModalEditProductOpen(false);
-    setIsModalAddProductOpen(false);
-    setIsModalOpen(false);
-    setInputValues({});
-    setPreviewUrl(null);
-  };
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
   const [paramsState, setParamsState] = useState<string | null>(null);
-
   const [refetchProduct, setRefetchProduct] = useState<boolean>(true);
   const [refetchOneProduct, setRefetchOneProduct] = useState<boolean>(true);
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  interface IOptionsDropdown {
-    value: string;
-    label: string;
-  }
+  const [inputValues, setInputValues] = useState<{
+    [key: string]: string | Blob;
+  }>({});
+  const [inputSearchValue, setInputSearchValue] = useState<string>('');
+  const [paramSearchValue, setParamSearchValue] = useState<string | null>(null);
+  const [inputLimitValue, setInputLimitValue] = useState<string>('');
+  const [paramLimitValue, setParamLimitValue] = useState<number | null>(null);
+  // const [selectedCategoryLabel, setSelectedCategoryLabel] = useState<
+  //   string[] | null
+  // >(null);
+  const [page, setPage] = useState(1);
+  const [selectedPageManufacturers, setSelectedPageManufacturers] =
+    useState<number>(1);
+  const [isModalDetailProductOpen, setIsModalDetailProductOpen] =
+    useState<boolean>(false);
+  const [flatData, setFlatData] = useState<IFlattenDataCategory[] | null>(null);
 
   const options: IOptionsDropdown[] = [
     { value: 'true', label: 'true' },
@@ -84,48 +116,61 @@ function AdminProduct() {
     { value: 'obat_bebas_terbatas', label: 'obat_bebas_terbatas' },
   ];
 
-  const convertBackendResponseToOptions = (data: ICategoryDataResponse[]) => {
-    const options: IOptionsDropdown[] = [];
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
-    data?.forEach((category) => {
-      const categoryOption = {
-        value: category.category_slug,
-        label: category.name,
-        children: category.children,
-      };
-
-      if (category?.children && category?.children?.length > 0) {
-        const childrenOptions: IOptionsDropdown[] = [];
-
-        category?.children?.forEach((child) => {
-          const childOption: IOptionsDropdown = {
-            value: child.id.toString(),
-            label: child.name,
-          };
-          childrenOptions.push(childOption);
-        });
-
-        categoryOption.children = childrenOptions;
-      }
-
-      options.push(categoryOption);
-    });
-
-    return options;
-  };
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string[]>([]);
-  const onChangeCategory = (categoryId: string) => {
-    if (categoryId) {
-      const index = selectedCategoryId.indexOf(categoryId);
-      if (index === -1) {
-        setSelectedCategoryId([...selectedCategoryId, categoryId]);
+  const handleChange = (id: number) => {
+    setSelectedCategories((prevSelectedCategories) => {
+      if (prevSelectedCategories.includes(id)) {
+        return prevSelectedCategories.filter((categoryId) => categoryId !== id);
       } else {
-        const updatedCategoryIds = [...selectedCategoryId];
-        updatedCategoryIds.splice(index, 1);
-        setSelectedCategoryId(updatedCategoryIds);
+        return [...prevSelectedCategories, id];
+      }
+    });
+  };
+
+  function flattenCategories(data: ICategoryResponse) {
+    const result: IFlattenDataCategory[] = [];
+
+    function traverse(
+      categories: ICategoryDataResponse[],
+      parentName: string | null,
+    ) {
+      for (const category of categories) {
+        if (parentName) {
+          result.push({ id: category.id, name: category.name, parentName });
+        }
+        if (category.children) {
+          traverse(category.children, category.name);
+        }
       }
     }
-  };
+
+    traverse(data?.data, null);
+    return result;
+  }
+
+  function getSelectedCategoryNames(
+    data: IFlattenDataCategory[],
+    selectedCategories: number[],
+  ) {
+    const idToNameMap: {
+      [key: string]: string;
+    } = {};
+    if (data) {
+      for (const item of data) {
+        idToNameMap[item.id] = item.name;
+      }
+    }
+
+    const selectedCategoryNames = [];
+    for (const categoryId of selectedCategories) {
+      if (idToNameMap[categoryId]) {
+        selectedCategoryNames.push(idToNameMap[categoryId]);
+      }
+    }
+
+    return selectedCategoryNames.join(', ');
+  }
 
   const handleInputChange = (name: string, value: string | File) => {
     setInputValues({ ...inputValues, [name]: value });
@@ -135,38 +180,13 @@ function AdminProduct() {
     handleInputChange(objectKey, value);
   };
 
-  const [inputValues, setInputValues] = useState<{
-    [key: string]: string | Blob;
-  }>({});
-  const [inputSearchValue, setInputSearchValue] = useState<string>('');
-  const [paramSearchValue, setParamSearchValue] = useState<string | null>(null);
-
-  const [selectedPage, setSelectedPage] = useState<number | null>(null);
-
-  const [inputLimitValue, setInputLimitValue] = useState<string>('');
-  const [paramLimitValue, setParamLimitValue] = useState<number | null>(null);
-
   useEffect(() => {
-    setSelectedPage(1);
+    setPage(1);
     setParamLimitValue(10);
   }, []);
 
-  const [selectedPageManufacturers, setSelectedPageManufacturers] =
-    useState<number>(1);
-
   const handleClickPageManufacturers = (page: number) => {
     setSelectedPageManufacturers(page);
-  };
-
-  const handleClickPage = (page: number) => {
-    setSelectedPage(page);
-    setRefetchProduct(false);
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setRefetchProduct(true);
-      setIsLoading(false);
-    }, 1000);
   };
 
   const handleClickLimit = () => {
@@ -201,24 +221,20 @@ function AdminProduct() {
     }
     setRefetchProduct(false);
     setIsLoading(true);
-    setSelectedPage(1);
+    setPage(1);
     setTimeout(() => {
       setRefetchProduct(true);
       setIsLoading(false);
     }, 1000);
   };
 
-  useEffect(() => {
-    if (paramSearchValue?.trim() === '') {
-      setParamsState('');
-    } else {
-      setParamsState(`search=${paramSearchValue}`);
-    }
-  }, [paramSearchValue]);
-
-  const accessToken = getCookie('access_token');
-
-  const { isDesktopDisplay } = useClientDisplayResolution();
+  const handleClickCloseModal = () => {
+    setIsModalEditProductOpen(false);
+    setIsModalAddProductOpen(false);
+    setIsModalOpen(false);
+    setInputValues({});
+    setPreviewUrl(null);
+  };
 
   useEffect(() => {
     if (paramSearchValue?.trim() === '') {
@@ -239,8 +255,6 @@ function AdminProduct() {
     handleInputChange(name, event.target.value);
   };
 
-  const { setToast } = useToast();
-
   const handleInputValueFileChange = (
     name: string,
     event: React.ChangeEvent<HTMLInputElement>,
@@ -258,9 +272,6 @@ function AdminProduct() {
     setIsModalOpen(true);
     setSelectedSlugProduct(slug);
   };
-
-  const [isModalDetailProductOpen, setIsModalDetailProductOpen] =
-    useState<boolean>(false);
 
   const handleClickDetailProduct = (slug: string) => {
     setIsModalDetailProductOpen(true);
@@ -281,16 +292,13 @@ function AdminProduct() {
       })
       .then((res) => res.data);
 
-  const {
-    data: dataProduct,
-    error: errorGetProduct,
-    isLoading: loadingGetDataProduct,
-  } = useSWR<IResponseGetAllProduct>(
-    refetchProduct
-      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?page=${selectedPage}&${paramsState}&limit=${paramLimitValue}`
-      : null,
-    fetcherGetProduct,
-  );
+  const { data: dataProduct, isLoading: loadingGetDataProduct } =
+    useSWR<IResponseGetAllProduct>(
+      refetchProduct
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?page=${page}&${paramsState}&limit=${paramLimitValue}`
+        : null,
+      fetcherGetProduct,
+    );
 
   const fetcherGetManufacturers = (url: string) =>
     axios
@@ -301,13 +309,12 @@ function AdminProduct() {
       })
       .then((res) => res.data);
 
-  const { data: dataManufacturers, error: errorGetManufacturers } =
-    useSWR<IResponseGetAllManufacture>(
-      isModalManufactureOpen
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/manufacturers?page=${selectedPageManufacturers}`
-        : null,
-      fetcherGetManufacturers,
-    );
+  const { data: dataManufacturers } = useSWR<IResponseGetAllManufacture>(
+    isModalManufactureOpen
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/manufacturers?page=${selectedPageManufacturers}`
+      : null,
+    fetcherGetManufacturers,
+  );
 
   const fetcherGetCategory = (url: string) =>
     axios
@@ -318,13 +325,19 @@ function AdminProduct() {
       })
       .then((res) => res.data);
 
-  const { data: dataCategory, error: errorGetCategory } =
-    useSWR<ICategoryResponse>(
-      isModalEditProductOpen || isModalAddProductOpen
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/categories`
-        : null,
-      fetcherGetCategory,
-    );
+  const { data: dataCategory } = useSWR<ICategoryResponse>(
+    isModalEditProductOpen || isModalAddProductOpen
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/categories`
+      : null,
+    fetcherGetCategory,
+  );
+
+  useEffect(() => {
+    if (dataCategory) {
+      // const flatData =
+      setFlatData(flattenCategories(dataCategory));
+    }
+  }, [dataCategory]);
 
   const fetcherGetOneProduct = (url: string) =>
     axios
@@ -335,23 +348,56 @@ function AdminProduct() {
       })
       .then((res) => res.data);
 
-  const { data: dataOneProduct, error: errorGetOneProduct } =
-    useSWR<IResponseGetDetailProduct>(
-      selectedSlugProduct && refetchOneProduct
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/products/${selectedSlugProduct}`
-        : null,
-      fetcherGetOneProduct,
-    );
+  const { data: dataOneProduct } = useSWR<IResponseGetDetailProduct>(
+    selectedSlugProduct && refetchOneProduct
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products/${selectedSlugProduct}`
+      : null,
+    fetcherGetOneProduct,
+  );
 
-  function formatRupiah(data: number) {
-    const formatter = new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    });
+  const handlePageJump = (i: number) => {
+    setPage(i);
+    setRefetchProduct(false);
+    setIsLoading(true);
 
-    return formatter.format(data);
-  }
+    setTimeout(() => {
+      setRefetchProduct(true);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handlePrevPage = () => {
+    if (page === 1) return;
+    setPage(page - 1);
+    setRefetchProduct(false);
+    setIsLoading(true);
+
+    setTimeout(() => {
+      setRefetchProduct(true);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleNextPage = () => {
+    if (page === dataProduct?.pagination.page_count) return;
+    setPage(page + 1);
+    setRefetchProduct(false);
+    setIsLoading(true);
+
+    setTimeout(() => {
+      setRefetchProduct(true);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleClickIconSearch = () => {
+    setPage(1);
+    setParamSearchValue(inputSearchValue);
+  };
+
+  const handleClickOpenManufacture = async () => {
+    setIsModalManufactureOpen(true);
+  };
 
   const updateOneProduct = async () => {
     try {
@@ -370,6 +416,16 @@ function AdminProduct() {
       for (const key in inputValues) {
         formData.append(key, inputValues[key]);
       }
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products/${selectedSlugProduct}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products/${selectedSlugProduct}`,
         formData,
@@ -400,25 +456,17 @@ function AdminProduct() {
       setIsModalEditProductOpen(false);
       setIsModalOpen(false);
       setInputValues({});
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.response.data.message;
       setToast({
         showToast: true,
-        toastMessage: 'Gagal edit produk',
+        toastMessage: `Gagal edit produk: ${errorMessage}`,
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
-      console.error(error);
     }
   };
-
-  function validateNumber(value: any) {
-    if (typeof value === 'string' && value.trim() !== '') {
-      return !isNaN(parseFloat(value));
-    } else {
-      return false;
-    }
-  }
 
   const createOneProduct = async () => {
     try {
@@ -428,7 +476,7 @@ function AdminProduct() {
         formData.append(key, inputValues[key]);
       }
 
-      formData.append('categories', selectedCategoryId.toString());
+      formData.append('categories', selectedCategories.toString());
       if (
         inputValues['name'] == '' ||
         inputValues['min_price'] == '' ||
@@ -545,38 +593,12 @@ function AdminProduct() {
       }
       setToast({
         showToast: true,
-        toastMessage: 'Gagal tambah produk',
+        toastMessage: `Gagal tambah produk: ${errorMessage}`,
         toastType: 'error',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
-      console.error(error);
     }
-  };
-
-  useEffect(() => {
-    console.log(errorGetProduct);
-  }, [errorGetProduct]);
-
-  useEffect(() => {
-    console.log(errorGetManufacturers);
-  }, [errorGetManufacturers]);
-
-  useEffect(() => {
-    console.log(errorGetOneProduct);
-  }, [errorGetOneProduct]);
-
-  useEffect(() => {
-    console.log(errorGetCategory);
-  }, [errorGetCategory]);
-
-  const handleClickIconSearch = () => {
-    setSelectedPage(1);
-    setParamSearchValue(inputSearchValue);
-  };
-
-  const handleClickOpenManufacture = async () => {
-    setIsModalManufactureOpen(true);
   };
 
   return (
@@ -787,16 +809,17 @@ function AdminProduct() {
             </tbody>
           </table>
         )}
-        {/* </div> */}
 
-        {!isLoading && dataProduct && dataProduct.pagination && (
-          <div style={{ padding: '30px 0' }}>
-            <Pagination
-              currentPage={dataProduct.pagination.page}
+        {dataProduct && dataProduct.pagination && (
+          <PaginationDiv>
+            <PaginationComponent
+              page={dataProduct.pagination.page}
               totalPages={dataProduct.pagination.page_count}
-              onPageChange={(page) => handleClickPage(page)}
+              goToPage={handlePageJump}
+              handlePrevPage={handlePrevPage}
+              handleNextPage={handleNextPage}
             />
-          </div>
+          </PaginationDiv>
         )}
 
         {isModalOpen && (
@@ -832,7 +855,6 @@ function AdminProduct() {
               </div>
             )}
 
-            {/* {selectedSlugProduct} */}
             <div
               style={{
                 width: '90%',
@@ -1256,14 +1278,31 @@ function AdminProduct() {
               </div>
               {dataCategory && (
                 <>
-                  <div>Kategori Terpilih</div>
-                  <CascadeDropdown
-                    options={convertBackendResponseToOptions(
-                      dataCategory?.data,
-                    )}
-                    onChange={onChangeCategory}
-                    padding='10px'
-                  />
+                  {flatData && (
+                    <div style={{ marginTop: '10px' }}>
+                      <strong>Kategori Terpilih: </strong>
+                      {getSelectedCategoryNames(flatData, selectedCategories) ||
+                        'Tidak ada kategori yang dipilih'}
+                    </div>
+                  )}
+                  <div>
+                    <select
+                      onChange={(event) =>
+                        handleChange(parseInt(event.target.value))
+                      }
+                      defaultValue={'Pilih'}
+                      style={{ height: '30px' }}
+                    >
+                      <option value={'Pilih'}>Pilih kategori</option>
+                      {flatData?.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.parentName
+                            ? `${category.parentName} >${category.name}`
+                            : category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </>
               )}
             </div>
