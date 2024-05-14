@@ -12,10 +12,14 @@ export const MenuItemContainer = styled.div<{ $depth: number }>`
   & svg {
     height: 30px;
     margin-right: 10px;
+    color: ${COLORS.primary_text};
   }
 
-  &.selected {
-    color: ${COLORS.primary_color};
+  &:hover {
+    background-color: ${COLORS.primary_color};
+    span {
+      color: white;
+    }
   }
 `;
 
