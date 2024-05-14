@@ -393,12 +393,10 @@ const DoctorDashboardPage = (): React.ReactElement => {
   };
 
   const handleUpdateDoctorProfile = async () => {
-    setIsLoading(true);
-
     if (!doctorInfo?.isVerified) {
       setToast({
         showToast: true,
-        toastMessage: 'Maaf, anda belum melakukan verifikasi akun anda.',
+        toastMessage: 'Maaf, lakukan verifikasi terlebih dahulu.',
         toastType: 'warning',
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
@@ -447,6 +445,7 @@ const DoctorDashboardPage = (): React.ReactElement => {
     });
 
     try {
+      setIsLoading(true);
       const patchProfileUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/${doctorInfo?.aid}`;
       // const patchEmailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/ping`;
       const doctorDetailUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/doctors/details`;
@@ -631,6 +630,14 @@ const DoctorDashboardPage = (): React.ReactElement => {
                       display: 'flex',
                       backgroundColor: 'transparent',
                     }}
+                  />
+                ) : userUpload !== undefined ? (
+                  <Image
+                    width={275}
+                    height={275}
+                    src={URL.createObjectURL(userUpload)}
+                    alt='avatar'
+                    priority
                   />
                 ) : (
                   <Image
