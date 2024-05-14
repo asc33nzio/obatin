@@ -18,6 +18,7 @@ import AddShippingModalContent from './modalContent/AddShippingModalContent';
 import ViewMoreTxModalContent from './modalContent/ViewMoreTxModalContent';
 import UnsetShippingModalContent from './modalContent/UnsetShippingModalContent';
 import ConfirmCheckoutModalContent from './modalContent/ConfirmCheckoutModalContent';
+import ConfirmCancelModalContent from './modalContent/CancelOrderModalContent';
 
 interface DoctorDetailItf {
   name: string;
@@ -108,15 +109,6 @@ const Modal = () => {
       };
       break;
 
-    case 'view-more-tx':
-      modalContent = <ViewMoreTxModalContent />;
-      title = 'Detail Transaksi';
-      modalProps = {
-        $containerWidth: '1050px',
-        $containerHeight: '850px',
-      };
-      break;
-
     case 'add-shipping':
       modalContent = <AddShippingModalContent />;
       title = 'Tambahkan Metode Pengiriman';
@@ -135,24 +127,6 @@ const Modal = () => {
       };
       break;
 
-    case 'view-more-tx':
-      modalContent = <ViewMoreTxModalContent />;
-      title = 'Detail Transaksi';
-      modalProps = {
-        $containerWidth: '1050px',
-        $containerHeight: '850px',
-      };
-      break;
-
-    case 'view-more-tx':
-      modalContent = <ViewMoreTxModalContent />;
-      title = 'Detail Transaksi';
-      modalProps = {
-        $containerWidth: '1000px',
-        $containerHeight: '775px',
-      };
-      break;
-
     case 'unset-shipment':
       modalContent = <UnsetShippingModalContent />;
       title = 'Ada pengiriman yang belum diatur dalam keranjang';
@@ -167,16 +141,16 @@ const Modal = () => {
       title = 'Berikut perincian pembelanjaan anda';
       modalProps = {
         $containerWidth: '650px',
-        $containerHeight: '650px',
+        $containerHeight: '350px',
       };
       break;
 
-    case 'confirm-checkout':
-      modalContent = <ConfirmCheckoutModalContent />;
-      title = 'Berikut perincian pembelanjaan anda';
+    case 'confirm-cancel-order':
+      modalContent = <ConfirmCancelModalContent />;
+      title = 'Anda yakin untuk membatalkan pesanan?';
       modalProps = {
-        $containerWidth: '650px',
-        $containerHeight: '650px',
+        $containerWidth: '550px',
+        $containerHeight: '225px',
       };
       break;
 

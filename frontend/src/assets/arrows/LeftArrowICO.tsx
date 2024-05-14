@@ -1,15 +1,18 @@
 const LeftArrowICO = (): React.ReactElement => {
   return (
     <svg
-      width='16'
-      height='16'
-      viewBox='0 0 16 16'
-      fill='white'
+      width='800px'
+      height='800px'
+      viewBox='0 0 24 24'
+      fill='none'
       xmlns='http://www.w3.org/2000/svg'
     >
       <path
-        d='M3.825 9L9.425 14.6L8 16L0 8L8 0L9.425 1.4L3.825 7H16V9H3.825Z'
-        fill='white'
+        d='M6 12H18M6 12L11 7M6 12L11 17'
+        stroke='#000000'
+        strokeWidth='2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
     </svg>
   );

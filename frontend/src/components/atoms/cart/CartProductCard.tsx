@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   ButtonAddContainer,
   CartItemContainer,
@@ -25,6 +26,8 @@ import { useModal } from '@/hooks/useModal';
 import { getCookie } from 'cookies-next';
 import { useToast } from '@/hooks/useToast';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
+import { ClipLoader, PuffLoader } from 'react-spinners';
+import { LoaderDiv } from '@/styles/pages/auth/Auth.styles';
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import CustomButton from '../button/CustomButton';
@@ -34,10 +37,10 @@ import DeleteICO from '@/assets/dashboard/DeleteICO';
 import BikeICO from '@/assets/icons/BikeICO';
 import Axios from 'axios';
 import InvokableModal from '@/components/organisms/modal/InvokableModal';
-import { LoaderDiv } from '@/styles/pages/auth/Auth.styles';
-import { PuffLoader } from 'react-spinners';
+import WarningICO from '@/assets/icons/WarningICO';
 
 const CartProductCard = () => {
+  const userInfo = useObatinSelector((state) => state?.auth);
   const dispatch = useObatinDispatch();
   const accessToken = getCookie('access_token');
   const pharmacies = useObatinSelector((state) => state?.pharmacy?.pharmacies);
@@ -47,10 +50,15 @@ const CartProductCard = () => {
   const { isDesktopDisplay } = useClientDisplayResolution();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [isFetchingStock, setIsFetchingStock] = useState<boolean>(false);
+  const [hasFetchedStock, setHasFetchedStock] = useState<boolean>(false);
   const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
   const [selectedPharmacyDetail, setSelectedPharmacyDetail] =
     useState<PharmacyCart | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [partnerStockData, setPartnerStockData] = useState<{
+    [key: number]: number;
+  }>({});
 
   const fetchCartItems = async () => {
     try {
@@ -71,6 +79,55 @@ const CartProductCard = () => {
     } finally {
       setIsFetching(false);
     }
+  };
+
+  const fetchTotalStockForOneProduct = async (
+    product_id: number,
+    partner_id: number,
+  ) => {
+    try {
+      const response = await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products/total-stock`,
+        {
+          product_id,
+          partner_id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      return response.data.data.total_stock;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
+  const fetchAllStock = async (pharmacies_cart: PharmacyCart[]) => {
+    setIsFetchingStock(true);
+    const stockPromises = pharmacies_cart.flatMap((pharmacy) =>
+      pharmacy.cart_items.map((item) =>
+        fetchTotalStockForOneProduct(item.product_id, pharmacy.partner_id).then(
+          (total_stock) => ({
+            product_id: item.product_id,
+            total_stock,
+          }),
+        ),
+      ),
+    );
+
+    const stockResults = await Promise.all(stockPromises);
+    const stockMap = stockResults.reduce((acc, { product_id, total_stock }) => {
+      acc[product_id] = total_stock;
+      return acc;
+    }, {});
+
+    setPartnerStockData(stockMap);
+    setIsFetchingStock(false);
+    setHasFetchedStock(true);
   };
 
   const updateCartItemDb = async (product_id: number, quantity: number) => {
@@ -156,7 +213,7 @@ const CartProductCard = () => {
       dispatch(removeItemFromCart(existingItem));
       setShouldUpdate(!shouldUpdate);
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -220,15 +277,35 @@ const CartProductCard = () => {
     setIsModalOpen(false);
   };
 
-  const openAddShippingInterface = (pharmacy: PharmacyCart) => {
+  const openAddShippingInterface = (
+    pharmacy: PharmacyCart,
+    isOverweight: boolean,
+  ) => {
+    if (isOverweight) {
+      setToast({
+        showToast: true,
+        toastMessage:
+          'Maaf, pembelanjaan anda terlalu berat. Total berat tidak boleh melebihi 30kg',
+        toastType: 'error',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+      return;
+    }
+
     dispatch(setSelectedPharmacy(pharmacy));
     openModal('add-shipping');
   };
 
   useEffect(() => {
     fetchCartItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldUpdate]);
+  }, [shouldUpdate, userInfo?.activeAddressId]);
+
+  useEffect(() => {
+    if (pharmacies.length > 0 && !isFetching && !hasFetchedStock) {
+      fetchAllStock(pharmacies);
+    }
+  }, [pharmacies, isFetching, hasFetchedStock]);
 
   return pharmacies.length !== 0 && !isFetching ? (
     <>
@@ -238,112 +315,195 @@ const CartProductCard = () => {
           (pharma) => pharma.id === pharmacy.id,
         );
 
+        const nearbyPharmaNotFound = realPharmaState?.name === null;
+
         const totalPrice = realPharmaState?.cart_items?.reduce(
           (total, product) => {
             return total + product.quantity * product.price;
           },
           0,
         );
+
+        const totalWeight = realPharmaState?.cart_items?.reduce(
+          (total, product) => {
+            return total + product.quantity * product.weight;
+          },
+          0,
+        );
+        const isOverweight = totalWeight >= 29998;
+
         return (
           <CartItemContainer
             key={`cartCard${pharmacy.id}_${index}_${pharmacy.shipping_cost}`}
+            $isNotAvailable={nearbyPharmaNotFound}
+            $isOverweight={isOverweight}
           >
             <PharmacyName>
               <div>
-                <PharmacyICO />
-                <p>
-                  {pharmacy?.name?.charAt(0).toUpperCase()}
-                  {pharmacy?.name?.slice(1, pharmacy.name.length)}
-                </p>
-                <DetailICO onClick={() => handlePharmacyDetailOpen(pharmacy)} />
+                {nearbyPharmaNotFound || isOverweight ? (
+                  <WarningICO />
+                ) : (
+                  <PharmacyICO />
+                )}
+                {nearbyPharmaNotFound ? (
+                  <div
+                    style={{
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      justifyContent: 'center',
+                      gap: '1px',
+                    }}
+                  >
+                    <p style={{ fontWeight: '660' }}>PRODUK TIDAK TERSEDIA</p>
+                    <p style={{ fontSize: '12px' }}>
+                      Maaf, tidak ada apotik dekat kamu yang menyediakan barang
+                      ini
+                    </p>
+                    <p style={{ fontSize: '12px', fontWeight: '550' }}>
+                      Mohon untuk mengeluarkan barang dari keranjang atau
+                    </p>
+                    <p style={{ fontSize: '12px', fontWeight: '550' }}>
+                      atau menggati alamat pengiriman
+                    </p>
+                  </div>
+                ) : (
+                  <p>
+                    {pharmacy?.name?.charAt(0).toUpperCase()}
+                    {pharmacy?.name?.slice(1, pharmacy.name.length)}
+                  </p>
+                )}
+
+                {!nearbyPharmaNotFound && (
+                  <DetailICO
+                    onClick={() => handlePharmacyDetailOpen(pharmacy)}
+                  />
+                )}
               </div>
               <p>Total : Rp. {totalPrice?.toLocaleString('id-ID')}</p>
             </PharmacyName>
 
-            {pharmacy?.cart_items?.map((item, index) => (
-              <ProductItem
-                key={`cartProductItem${item?.id}_${index}_${item.pharmacy_product_id}`}
-              >
-                <Image
-                  alt='image'
-                  src={item.thumbnail_url}
-                  width={100}
-                  height={100}
-                />
-                <Details>
-                  <h1>{item?.name}</h1>
-                  <p>stock: {item?.stock}</p>
-                  <p>Rp. {item?.price?.toLocaleString('id-ID')}</p>
-                </Details>
-                <ButtonAddContainer>
-                  <CustomButton
-                    disabled={isLoading}
-                    content='-'
-                    $width='40px'
-                    $height='40px'
-                    $border='#00B5C0'
-                    onClick={() =>
-                      handleSubtract(
-                        item.product_id,
-                        pharmacy,
-                        item.id,
-                        item.name,
-                      )
-                    }
-                  />
-                  <p>{item.quantity}</p>
-                  <CustomButton
-                    disabled={isLoading}
-                    content='+'
-                    $width='40px'
-                    $height='40px'
-                    $border='#00B5C0'
-                    onClick={() => handleIncrease(item.product_id, pharmacy)}
-                  />
-                  <DeleteICO
-                    onClick={() =>
-                      handleCartDelete(
-                        item.id,
-                        item.product_id,
-                        pharmacy.id,
-                        item.name,
-                      )
-                    }
-                  />
-                </ButtonAddContainer>
-              </ProductItem>
-            ))}
+            {pharmacy?.cart_items?.map((item, index) => {
+              const partnerTotalStock =
+                partnerStockData[item.product_id] ?? 'Tidak Tersedia';
 
-            <DeliveryItem onClick={() => openAddShippingInterface(pharmacy)}>
-              <div>
-                <BikeICO />
+              return (
+                <ProductItem
+                  key={`cartProductItem${item?.id}_${index}_${item.pharmacy_product_id}`}
+                >
+                  <Image
+                    alt='image'
+                    src={item.thumbnail_url}
+                    width={100}
+                    height={100}
+                  />
+                  <Details>
+                    <h1>{item?.name}</h1>
+                    <div>
+                      <span>Stok</span>
+                      <p>:</p>
+                      <p>
+                        {!isFetchingStock ? (
+                          partnerTotalStock
+                        ) : (
+                          <ClipLoader
+                            size={20}
+                            loading={isFetchingStock}
+                            speedMultiplier={0.75}
+                            color='#00b5c0'
+                          />
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <span>Berat</span>
+                      <p>:</p>
+                      <p>{(item?.weight / 1000).toFixed(3)} kg</p>
+                    </div>
+                    <div>
+                      <span>Harga</span>
+                      <p>:</p>
+                      <p>Rp. {item?.price?.toLocaleString('id-ID')}</p>
+                    </div>
+                  </Details>
+                  <ButtonAddContainer>
+                    <CustomButton
+                      disabled={isLoading}
+                      content='-'
+                      $width='40px'
+                      $height='40px'
+                      $border='#00B5C0'
+                      onClick={() =>
+                        handleSubtract(
+                          item.product_id,
+                          pharmacy,
+                          item.id,
+                          item.name,
+                        )
+                      }
+                    />
+                    <p>{item.quantity}</p>
+                    <CustomButton
+                      disabled={isLoading || nearbyPharmaNotFound}
+                      content='+'
+                      $width='40px'
+                      $height='40px'
+                      $border='#00B5C0'
+                      onClick={() => handleIncrease(item.product_id, pharmacy)}
+                    />
+                    <DeleteICO
+                      onClick={() =>
+                        handleCartDelete(
+                          item.id,
+                          item.product_id,
+                          pharmacy.id,
+                          item.name,
+                        )
+                      }
+                    />
+                  </ButtonAddContainer>
+                </ProductItem>
+              );
+            })}
+
+            {!nearbyPharmaNotFound && (
+              <DeliveryItem
+                onClick={() => openAddShippingInterface(pharmacy, isOverweight)}
+              >
                 <div>
-                  <h3>Opsi Pengiriman</h3>
+                  <BikeICO />
                   <div>
-                    <p>Kurir</p>
-                    <p>:</p>
-                    <p>{realPharmaState?.shipping_name ?? '-'}</p>
-                  </div>
-                  <div>
-                    <p>Servis</p>
-                    <p>:</p>
-                    <p>{realPharmaState?.shipping_service ?? '-'}</p>
-                  </div>
-                  <div>
-                    <p>Estimasi</p>
-                    <p>:</p>
-                    <p>{realPharmaState?.shipping_estimation ?? '-'}</p>
+                    <h3>Opsi Pengiriman</h3>
+                    <div>
+                      <h2>Total Berat</h2>
+                      <p>:</p>
+                      <p>{(totalWeight / 1000).toFixed(3)} kg</p>
+                    </div>
+                    <div>
+                      <h2>Kurir</h2>
+                      <p>:</p>
+                      <p>{realPharmaState?.shipping_name ?? '-'}</p>
+                    </div>
+                    <div>
+                      <h2>Servis</h2>
+                      <p>:</p>
+                      <p>{realPharmaState?.shipping_service ?? '-'}</p>
+                    </div>
+                    <div>
+                      <h2>Estimasi</h2>
+                      <p>:</p>
+                      <p>{realPharmaState?.shipping_estimation ?? '-'}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <OngkosKirim>
-                <p>
-                  Rp.{' '}
-                  {realPharmaState?.shipping_cost?.toLocaleString('id-ID') ??
-                    `0`}
-                </p>
-              </OngkosKirim>
-            </DeliveryItem>
+                <OngkosKirim>
+                  <p>
+                    Rp.{' '}
+                    {realPharmaState?.shipping_cost?.toLocaleString('id-ID') ??
+                      `0`}
+                  </p>
+                </OngkosKirim>
+              </DeliveryItem>
+            )}
           </CartItemContainer>
         );
       })}

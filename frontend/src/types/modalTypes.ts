@@ -23,6 +23,7 @@ export type ModalType =
   | 'unset-shipment'
   | 'confirm-checkout'
   | 'select-nearby-pharmacy'
+  | 'confirm-cancel-order'
   | '';
 
 export type InvokableModalType = 'pharmacy-detail' | 'doctor-detail';

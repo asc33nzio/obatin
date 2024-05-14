@@ -149,7 +149,7 @@ export const VerifyPopup = styled.div<{ $isPopupOpen: boolean }>`
     color: #ffffff;
     background-color: transparent;
     width: 100%;
-    text-overflow: hidden;
+    text-overflow: ellipsis;
     overflow: hidden;
     word-wrap: break-word;
     height: 100%;
@@ -166,6 +166,7 @@ export const VerifyPopup = styled.div<{ $isPopupOpen: boolean }>`
       font-weight: 550;
       color: #ffffff;
       background-color: transparent;
+      text-overflow: clip;
     }
   }
 
@@ -182,4 +183,25 @@ export const VerifyPopup = styled.div<{ $isPopupOpen: boolean }>`
     }
   }
   z-index: 50;
+
+  @media (max-width: 768px) {
+    height: 250px;
+    padding: 0;
+
+    p {
+      padding-left: 5px;
+      font-size: 12px;
+      margin-top: 150px;
+      height: 150px;
+
+      u {
+        font-size: 12px;
+      }
+    }
+
+    svg {
+      padding-right: 5px;
+      margin-top: 150px;
+    }
+  }
 `;

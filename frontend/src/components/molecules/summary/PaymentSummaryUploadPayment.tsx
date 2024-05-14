@@ -1,6 +1,5 @@
 'use client';
 import { Summary } from '@/styles/pages/product/Cart.styles';
-import { useObatinSelector } from '@/redux/store/store';
 import { getCookie } from 'cookies-next';
 import { usePathname } from 'next/navigation';
 import { decrypt } from '@/utils/crypto';
@@ -8,6 +7,8 @@ import { CartItemItf, TxItf } from '@/types/transactionTypes';
 import { useEffect, useState } from 'react';
 import { navigateToHome } from '@/app/actions';
 import { COLORS } from '@/constants/variables';
+import { useToast } from '@/hooks/useToast';
+import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import Axios from 'axios';
 import styled from 'styled-components';
 
@@ -43,12 +44,13 @@ const PaymentSummaryUploadPaymentSubcontainer = styled.div`
 `;
 
 const PaymentSummaryUploadPayment = (): React.ReactElement => {
-  const pharmacyState = useObatinSelector((state) => state?.pharmacy);
+  const { setToast } = useToast();
+  const { isDesktopDisplay } = useClientDisplayResolution();
   const accessToken = getCookie('access_token');
   const [orderInfo, setOrderInfo] = useState<TxItf>();
+  const [totalQty, setTotalQty] = useState<number>(0);
   const pathname = usePathname();
   const pid = pathname.split('/').pop();
-  const [totalQty, setTotalQty] = useState<number>(0);
 
   const validatePID = async () => {
     try {
@@ -75,21 +77,31 @@ const PaymentSummaryUploadPayment = (): React.ReactElement => {
         );
 
         const pid = await validatePID();
-        const currentOrder = response?.data?.data?.find((order: TxItf) => {
+        const validOrder = response?.data?.data?.find((order: TxItf) => {
           return order.payment_id.toString() === pid;
         });
 
-        const qty = currentOrder.cart_items.reduce(
+        if (!validOrder) throw new Error('order does not exist!');
+
+        const qty = validOrder.cart_items.reduce(
           (total: number, cartItem: CartItemItf) => {
             return total + cartItem.quantity;
           },
           0,
         );
 
-        setOrderInfo(currentOrder);
+        setOrderInfo(validOrder);
         setTotalQty(qty);
       } catch (error) {
         console.error(error);
+        setToast({
+          showToast: true,
+          toastMessage: 'Transaksi yang anda cari tidak ada',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        navigateToHome();
       }
     };
 
@@ -167,8 +179,7 @@ const PaymentSummaryUploadPayment = (): React.ReactElement => {
             <span>
               Rp.&nbsp;
               {(
-                pharmacyState?.checkoutSubtotal +
-                pharmacyState?.checkoutShipmentSubtotal
+                orderInfo?.subtotal + orderInfo?.shipping?.cost
               )?.toLocaleString('id-ID')}
             </span>
           </div>

@@ -94,15 +94,30 @@ export const Left = styled.div`
 
 export const Details = styled.div`
   width: 100%;
+  padding: 0;
+
   h1 {
     font-weight: 600;
     font-size: 16px;
     padding-bottom: 10px;
   }
-  p {
-    font-weight: 400;
-    color: ${COLORS.primary_text};
-    padding-bottom: 5px;
+
+  div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    gap: 7.5px;
+
+    span {
+      width: 47.5px;
+    }
+
+    p {
+      font-weight: 400;
+      color: ${COLORS.primary_text};
+    }
   }
 `;
 
@@ -212,8 +227,16 @@ export const DeliveryItem = styled.div`
       div {
         flex-direction: row;
 
+        h2 {
+          font-size: 14px;
+        }
+
+        p {
+          font-size: 14px;
+        }
+
         :first-child {
-          width: 60px;
+          width: 85px;
         }
       }
     }
@@ -245,7 +268,10 @@ export const OngkosKirim = styled.div`
   }
 `;
 
-export const CartItemContainer = styled.div`
+export const CartItemContainer = styled.div<{
+  $isNotAvailable?: boolean;
+  $isOverweight?: boolean;
+}>`
   width: 100%;
   height: max-content;
   border-radius: 12px;
@@ -255,6 +281,10 @@ export const CartItemContainer = styled.div`
   flex-direction: column;
   gap: 20px;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border: ${({ $isNotAvailable, $isOverweight }) =>
+    $isNotAvailable || $isOverweight
+      ? '2px solid rgba(255, 0, 0, 0.5)'
+      : 'none'};
 `;
 
 export const CheckoutPageSubcontainer = styled.div`
@@ -279,4 +309,19 @@ export const CheckoutUploadSection = styled.section`
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
+`;
+
+export const CartAddressContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 200px;
+  gap: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  overflow-y: auto;
+  padding: 20px 30px;
+  transition: all 2s ease;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 `;

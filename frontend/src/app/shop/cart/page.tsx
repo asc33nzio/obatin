@@ -1,7 +1,7 @@
 'use client';
 import {
   Cart,
-  CartItemContainer,
+  CartAddressContainer,
   CartSection,
   Content,
   OrderSummary,
@@ -31,7 +31,7 @@ const CartPage = (): React.ReactElement => {
         <Content>
           <Cart>
             <SectionTitle>Keranjang Saya</SectionTitle>
-            <CartItemContainer>
+            <CartAddressContainer className='scrollbar-5px'>
               <SectionTitle>
                 <LocationICO />
                 <p>Alamat Pengiriman</p>
@@ -49,7 +49,7 @@ const CartPage = (): React.ReactElement => {
                       isMainAddress={false}
                       alias={address.alias}
                       details={fullAddress}
-                      $disableButtons
+                      $omitButtons
                       $justify='space-between'
                       $padding='20px 0'
                       $fontSize={16}
@@ -59,7 +59,29 @@ const CartPage = (): React.ReactElement => {
                   )
                 );
               })}
-            </CartItemContainer>
+              {userInfo?.addresses?.map((address, index) => {
+                if (!address.alias) return;
+                let fullAddress = address.detail;
+                fullAddress += `, ${address.city.province.name}, ${address.city.type} ${address.city.name}, ${address.city.postal_code}`;
+                return (
+                  userInfo.activeAddressId !== address.id && (
+                    <AddressCard
+                      $id={address.id === null ? 0 : address.id}
+                      key={`userAddressCard${index}`}
+                      isMainAddress={false}
+                      alias={address.alias}
+                      details={fullAddress}
+                      $omitButtons
+                      $justify='space-between'
+                      $padding='20px 0'
+                      $fontSize={16}
+                      $borderDisable={true}
+                      $height={100}
+                    />
+                  )
+                );
+              })}
+            </CartAddressContainer>
             <CartSection>
               <CartProductCard />
             </CartSection>

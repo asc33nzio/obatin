@@ -118,11 +118,12 @@ export const BreakdownCenterDiv = styled.div<{ $isModal?: boolean }>`
   padding-left: 25px;
 
   h1 {
-    height: ${({ $isModal }) => (!$isModal ? '30%' : '35%')};
-    width: 100%;
-    margin: 0;
     display: flex;
     align-items: center;
+    height: 35%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
 
     font-size: ${({ $isModal }) => (!$isModal ? '22px' : '18px')};
     font-weight: 550;
@@ -130,7 +131,7 @@ export const BreakdownCenterDiv = styled.div<{ $isModal?: boolean }>`
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 1px;
   }
 
   span {
@@ -184,7 +185,6 @@ export const BottomContentContainer = styled.div<{ $hasMultiple: boolean }>`
 
   width: 100%;
   height: 75px;
-
   padding-left: 10px;
 `;
 

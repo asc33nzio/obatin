@@ -30,6 +30,9 @@ import { usePathname } from 'next/navigation';
 import { decrypt } from '@/utils/crypto';
 import { PropagateLoader } from 'react-spinners';
 import { LoaderDiv } from '@/styles/pages/auth/Auth.styles';
+import { ModalType } from '@/types/modalTypes';
+import { useModal } from '@/hooks/useModal';
+import { useEventEmitter } from '@/hooks/useEventEmitter';
 import Axios from 'axios';
 import Navbar from '@/components/organisms/navbar/Navbar';
 import RegularInput from '@/components/atoms/input/RegularInput';
@@ -49,13 +52,15 @@ const Checkout = (): React.ReactElement => {
     handlePdfChange,
     userUploadValidationError,
   } = useUploadValidation();
+  const { openModal } = useModal();
+  const { setToast } = useToast();
+  const { isDesktopDisplay } = useClientDisplayResolution();
   const accessToken = getCookie('access_token');
   const pathname = usePathname();
   const cipherPID = pathname.split('/').pop();
-  const { setToast } = useToast();
-  const { isDesktopDisplay } = useClientDisplayResolution();
   const [plaintextPID, setPlaintextPID] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const emitter = useEventEmitter();
 
   const handleUpload = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files === null) return;
@@ -136,6 +141,73 @@ const Checkout = (): React.ReactElement => {
         resolution: isDesktopDisplay ? 'desktop' : 'mobile',
         orientation: 'center',
       });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const triggerModal = async (type: ModalType) => {
+    return new Promise<boolean>((resolve) => {
+      openModal(type);
+
+      emitter.once('close-modal-fail', () => {
+        resolve(false);
+      });
+
+      emitter.once('close-modal-ok', () => {
+        resolve(true);
+      });
+    });
+  };
+
+  const handleCancelOrder = async () => {
+    try {
+      setIsLoading(true);
+
+      const canProceed = await triggerModal('confirm-cancel-order');
+      if (!canProceed) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Silahkan melanjutkan pembayaran',
+          toastType: 'ok',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        return;
+      }
+
+      await Axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/payments/${plaintextPID}/cancelation`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      setToast({
+        showToast: true,
+        toastMessage: 'Pesanan ini telah dibatalkan',
+        toastType: 'ok',
+        resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+        orientation: 'center',
+      });
+
+      navigateToTxHistory();
+    } catch (error: any) {
+      console.error(error);
+      if (error.response.request.status === 404) {
+        setToast({
+          showToast: true,
+          toastMessage: 'Transaksi yang anda cari tidak ditemukan',
+          toastType: 'error',
+          resolution: isDesktopDisplay ? 'desktop' : 'mobile',
+          orientation: 'center',
+        });
+        navigateToProductList();
+        return;
+      }
     } finally {
       setIsLoading(false);
     }
@@ -229,13 +301,22 @@ const Checkout = (): React.ReactElement => {
           <OrderSummaryCheckout>
             <PaymentSummaryUploadPayment />
           </OrderSummaryCheckout>
-          <CustomButton
-            content='Kembali'
-            $fontSize='16px'
-            $width='120px'
-            $bgColor='#de161c'
-            onClick={() => navigateToCart()}
-          />
+          <div style={{ gap: '25px', display: 'flex' }}>
+            <CustomButton
+              content='Kembali'
+              $fontSize='16px'
+              $width='120px'
+              $bgColor='#de161c'
+              onClick={() => navigateToCart()}
+            />
+            <CustomButton
+              content='Batalkan Pesanan'
+              $fontSize='16px'
+              $width='125px'
+              $bgColor='#de161c'
+              onClick={() => handleCancelOrder()}
+            />
+          </div>
         </CheckoutPageSubcontainer>
       </Body>
     </Container>

@@ -172,27 +172,6 @@ const ViewMoreTxModalContent = (): React.ReactElement => {
       </PharmacyInfo>
 
       <ShippingInfo>
-        <h1>Info Apotik</h1>
-        <InfoDivAlt>
-          <h2>Nama</h2>
-          <span>:</span>
-          <h3>{info?.pharmacy?.name}</h3>
-        </InfoDivAlt>
-        <InfoDivAlt>
-          <h2>Alamat</h2>
-          <span>:</span>
-          <p>{info?.pharmacy?.address}</p>
-        </InfoDivAlt>
-        {userInfo.addresses && (
-          <InfoDivAlt>
-            <h2>Alamat Pengiriman</h2>
-            <span>:</span>
-            <p>{fullUserAddress}</p>
-          </InfoDivAlt>
-        )}
-      </ShippingInfo>
-
-      <ShippingInfo>
         <h1>Info Pengiriman</h1>
         <InfoDivAlt>
           <h2>Kurir</h2>
