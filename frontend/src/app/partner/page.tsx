@@ -22,6 +22,9 @@ import PharmacyListModalContent from '@/components/organisms/modal/modalContent/
 import { PharmacyType } from '@/types/pharmacyType';
 import { useClientDisplayResolution } from '@/hooks/useClientDisplayResolution';
 import { useToast } from '@/hooks/useToast';
+import ProductListModalContent from '@/components/organisms/modal/modalContent/ProductListModalContent';
+import { INullableProduct } from '@/types/Product';
+import AddPharmacyProductContent from '@/components/organisms/admin/AddPharmacyProductContent';
 
 const StyledContentContainer = styled.section`
   width: 80vw;
@@ -44,6 +47,28 @@ const CustomPropagateLoader = styled(PropagateLoader)`
   top: 50%;
   left: 50%;
   margin: 'auto';
+`;
+export const ClearTxFilterButton = styled.button`
+  cursor: pointer;
+  width: 150px;
+  height: 50px;
+
+  border-radius: 12px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #00b5c0;
+`;
+
+export const ContainerChoicePharmacyProduct = styled.div`
+  width: 10%;
+  display: flex;
+  margin-left: 10%;
+  justify-content: center;
+  align-items: center;
 `;
 
 const PartnersPage = () => {
@@ -71,10 +96,14 @@ const PartnersPage = () => {
     useState<PharmacyProductType | null>(null);
   const [isModalPharmacyOpen, setIsModalPharmacyOpen] =
     useState<boolean>(false);
+  const [isModalProductOpen, setIsModalProductOpen] = useState<boolean>(false);
+  const [isModalAddProductOpen, setIsModalAddProductOpen] =
+    useState<boolean>(false);
   const [productPagination, setProductPagination] = useState<PaginationInfoItf>(
     { limit: 10, page: 1, page_count: 1, total_records: 0 },
   );
   const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyType>();
+  const [selectedProduct, setSelectedProduct] = useState<INullableProduct>();
 
   const fetchData = async () => {
     try {
@@ -84,6 +113,7 @@ const PartnersPage = () => {
         {
           params: {
             pharmacy_id: selectedPharmacy?.id,
+            product_id: selectedProduct?.id,
             classification: classification,
             search: searchProduct,
             search_pharmacy: searchPharmacy,
@@ -153,232 +183,315 @@ const PartnersPage = () => {
     setPage(page + 1);
   };
 
+  const handleResetFilter = () => {
+    setSelectedPharmacy({});
+    setSelectedProduct({});
+    setClassification(null);
+    setPage(1);
+    setLimit(12);
+  };
+
   useEffect(() => {
     fetchData();
     setIsModalOpen(false);
-  }, [page, limit, !refetchState, selectedPharmacy, classification]);
+  }, [
+    page,
+    limit,
+    !refetchState,
+    selectedPharmacy,
+    selectedProduct,
+    classification,
+    isModalAddProductOpen,
+  ]);
 
   return (
     <>
       <PageContainer>
         <Navbar />
+        <ContainerChoicePharmacyProduct>
+          <PP.FilterStatus
+            onChange={(e) => setIsModalAddProductOpen(e.target.value == 'true')}
+          >
+            <option value='false'>List Produk</option>
+            <option value='true'>Tambah Produk ke Farmasi</option>
+          </PP.FilterStatus>
+        </ContainerChoicePharmacyProduct>
+
         <StyledContentContainer>
-          <PP.TableFilterWrapper>
-            <PP.FilterContainer>
-              <PP.LimitInput
-                placeholder='limit'
-                onBlur={(e) => {
-                  if (!isNaN(parseInt(e.target.value))) {
-                    setLimit(parseInt(e.target.value));
-                  }
-                }}
-                type='number'
-              />
-              <PP.SearchTextInput
-                placeholder='Cari Farmasi'
-                onChange={(e) => {
-                  setSearchPharmacy(e.target.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    fetchData();
-                    setPage(1);
-                  }
-                }}
-                type='text'
-              />
-              <PP.SearchTextInput
-                placeholder='Cari Produk'
-                onChange={(e) => {
-                  setSearchProduct(e.target.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    fetchData();
-                    setPage(1);
-                  }
-                }}
-                type='text'
-              />
-              <PP.CustomInput
-                type='button'
-                value={
-                  selectedPharmacy?.name
-                    ? selectedPharmacy.name
-                    : 'Pilih Apotek'
-                }
-                onClick={() => setIsModalPharmacyOpen(true)}
-              />
-              <DialogModal
-                isOpen={isModalPharmacyOpen}
-                hasCloseBtn
-                onClose={() => setIsModalPharmacyOpen(false)}
-              >
-                <PharmacyListModalContent
-                  handleChangePharmacy={(id, name) => {
-                    setPage(1);
+          {!isModalAddProductOpen && (
+            <>
+              <PP.TableFilterWrapper>
+                <PP.FilterContainer>
+                  <CustomButton
+                    content='Tambahkan Produk'
+                    style={{ marginRight: '1rem' }}
+                    $width='160px'
+                    $height='30px'
+                    $fontSize='.8rem'
+                    $color={'white'}
+                    $bgColor={'#00B5C0'}
+                    $border='#00B5C0'
+                    onClick={() => {
+                      setIsModalAddProductOpen(true);
+                    }}
+                  ></CustomButton>
+                  <PP.LimitInput
+                    placeholder='limit'
+                    onBlur={(e) => {
+                      if (!isNaN(parseInt(e.target.value))) {
+                        setLimit(parseInt(e.target.value));
+                      }
+                    }}
+                    type='number'
+                  />
+                  <PP.SearchTextInput
+                    placeholder='Cari Farmasi'
+                    onChange={(e) => {
+                      setSearchPharmacy(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        fetchData();
+                        setPage(1);
+                      }
+                    }}
+                    type='text'
+                  />
+                  <PP.SearchTextInput
+                    placeholder='Cari Produk'
+                    onChange={(e) => {
+                      setSearchProduct(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        fetchData();
+                        setPage(1);
+                      }
+                    }}
+                    type='text'
+                  />
+                  <PP.CustomInput
+                    type='button'
+                    value={
+                      selectedProduct?.name
+                        ? selectedProduct.name
+                        : 'Pilih Produk'
+                    }
+                    onClick={() => setIsModalProductOpen(true)}
+                  />
+                  <DialogModal
+                    isOpen={isModalProductOpen}
+                    hasCloseBtn
+                    onClose={() => setIsModalProductOpen(false)}
+                  >
+                    <ProductListModalContent
+                      handleChangeProduct={(id, name) => {
+                        setPage(1);
+                        if (id != null && name != null) {
+                          setSelectedProduct({ ...selectedProduct, id, name });
+                        }
 
-                    setSelectedPharmacy({ ...selectedPharmacy, id, name });
+                        setIsModalProductOpen(false);
+                      }}
+                    />
+                  </DialogModal>
+                  <PP.CustomInput
+                    type='button'
+                    value={
+                      selectedPharmacy?.name
+                        ? selectedPharmacy.name
+                        : 'Pilih Apotek'
+                    }
+                    onClick={() => setIsModalPharmacyOpen(true)}
+                  />
+                  <DialogModal
+                    isOpen={isModalPharmacyOpen}
+                    hasCloseBtn
+                    onClose={() => setIsModalPharmacyOpen(false)}
+                  >
+                    <PharmacyListModalContent
+                      handleChangePharmacy={(id, name) => {
+                        setPage(1);
 
-                    setIsModalPharmacyOpen(false);
-                  }}
-                />
-              </DialogModal>
+                        setSelectedPharmacy({ ...selectedPharmacy, id, name });
 
-              <PP.FilterStatus
-                onChange={(e) => setClassification(e.target.value)}
-              >
-                <option value='obat_bebas'>Obat Bebas</option>
-                <option value='obat_keras'>Obat Keras</option>
-                <option value='obat_bebas_terbatas'>Obat Bebas Terbatas</option>
-                <option value='non_obat'>Non Obat</option>
-              </PP.FilterStatus>
-            </PP.FilterContainer>
-            <PP.TableContainer>
-              {loading && (
-                <CustomPropagateLoader
-                  loading={loading}
-                  color='#dd1b50'
-                  speedMultiplier={0.8}
-                  size={'15px'}
-                />
-              )}
-              {!loading && (
-                <PP.Table>
-                  <thead>
-                    <tr>
-                      <th>id</th>
-                      <th>Image</th>
-                      <th style={{ textAlign: 'left' }}>Name</th>
-                      <th style={{ textAlign: 'left' }}>Nama Farmasi</th>
-                      <th>Price</th>
-                      <th>Stock</th>
-                      <th>Edit</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pharmacyProducts.map((item, index) => (
-                      <tr
-                        key={index}
-                        className={index % 2 === 0 ? 'green' : ''}
-                      >
-                        <td>{item.id}</td>
-                        <td>
-                          <Image
-                            height={40}
-                            width={40}
-                            alt='product image'
-                            src={item.image_url}
-                          ></Image>
-                        </td>
-                        <td style={{ textAlign: 'left' }}>
-                          {item.product_name}
-                        </td>
-                        <td style={{ textAlign: 'left' }}>
-                          {item.pharmacy_name}
-                        </td>
-                        <td>{item.price}</td>
-                        <td>{item.stock}</td>
-                        <td>
-                          <CustomButton
-                            content='edit stock'
-                            onClick={() => {
-                              setSelectedPharmacyProducts({ ...item });
-                              setIsModalOpen(true);
-                            }}
-                            style={{ marginRight: '1rem' }}
-                            $width='80px'
-                            $height='30px'
-                            $fontSize='.8rem'
-                            $color='#00B5C0'
-                            $bgColor='white'
-                            $border='#00B5C0'
+                        setIsModalPharmacyOpen(false);
+                      }}
+                    />
+                  </DialogModal>
+
+                  <PP.FilterStatus
+                    onChange={(e) => setClassification(e.target.value)}
+                  >
+                    <option value='obat_bebas'>Obat Bebas</option>
+                    <option value='obat_keras'>Obat Keras</option>
+                    <option value='obat_bebas_terbatas'>
+                      Obat Bebas Terbatas
+                    </option>
+                    <option value='non_obat'>Non Obat</option>
+                  </PP.FilterStatus>
+                  <ClearTxFilterButton onClick={() => handleResetFilter()}>
+                    Hapus Filter
+                  </ClearTxFilterButton>
+                </PP.FilterContainer>
+                <PP.TableContainer>
+                  {loading && (
+                    <CustomPropagateLoader
+                      loading={loading}
+                      color='#dd1b50'
+                      speedMultiplier={0.8}
+                      size={'15px'}
+                    />
+                  )}
+                  {!loading && (
+                    <PP.Table>
+                      <thead>
+                        <tr>
+                          <th>id</th>
+                          <th>Image</th>
+                          <th style={{ textAlign: 'left' }}>Name</th>
+                          <th style={{ textAlign: 'left' }}>Nama Farmasi</th>
+                          <th>Price</th>
+                          <th>Stock</th>
+                          <th>Edit</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {pharmacyProducts.map((item, index) => (
+                          <tr
+                            key={index}
+                            className={index % 2 === 0 ? 'green' : ''}
+                          >
+                            <td>{item.id}</td>
+                            <td>
+                              <Image
+                                height={40}
+                                width={40}
+                                alt='product image'
+                                src={item.image_url}
+                              ></Image>
+                            </td>
+                            <td style={{ textAlign: 'left' }}>
+                              {item.product_name}
+                            </td>
+                            <td style={{ textAlign: 'left' }}>
+                              {item.pharmacy_name}
+                            </td>
+                            <td>Rp. {item.price.toLocaleString()}</td>
+                            <td>{item.stock}</td>
+                            <td>
+                              <CustomButton
+                                content='edit produk'
+                                onClick={() => {
+                                  setSelectedPharmacyProducts({ ...item });
+                                  setIsModalOpen(true);
+                                }}
+                                style={{ marginRight: '1rem' }}
+                                $width='80px'
+                                $height='30px'
+                                $fontSize='.8rem'
+                                $color='#00B5C0'
+                                $bgColor='white'
+                                $border='#00B5C0'
+                              />
+                            </td>
+                            <td>
+                              <InputSwitch
+                                checked={item.is_active}
+                                onClick={() => {
+                                  setSelectedUpdatePharmacyProducts({
+                                    ...item,
+                                  });
+                                }}
+                                onChange={() => {
+                                  setIsStatusChange(true);
+                                  setProductActiveStatus(!item.is_active);
+                                  setIsConfirmModalOpen(true);
+                                }}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </PP.Table>
+                  )}
+                  {isConfirmModalOpen && (
+                    <DialogModal
+                      isOpen={isConfirmModalOpen}
+                      hasCloseBtn
+                      onClose={() => setIsConfirmModalOpen(false)}
+                    >
+                      <PP.ModalConfirmationContainer>
+                        <PP.TitleText>
+                          Apakah anda yakin akan mengubah status aktif produk
+                        </PP.TitleText>
+                        {loading && (
+                          <CustomPropagateLoader
+                            loading={loading}
+                            color='#dd1b50'
+                            speedMultiplier={0.8}
+                            size={'15px'}
                           />
-                        </td>
-                        <td>
-                          <InputSwitch
-                            checked={item.is_active}
+                        )}
+                        <PP.CustomButtonsWrapper>
+                          <PP.CustomButton
                             onClick={() => {
-                              setSelectedUpdatePharmacyProducts({ ...item });
+                              setIsConfirmModalOpen(false);
                             }}
-                            onChange={() => {
-                              setIsStatusChange(true);
-                              setProductActiveStatus(!item.is_active);
-                              setIsConfirmModalOpen(true);
+                          >
+                            Tutup
+                          </PP.CustomButton>
+                          <PP.CustomButton
+                            className='green'
+                            onClick={() => {
+                              updatePharmacyProduct();
                             }}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </PP.Table>
-              )}
-              {isConfirmModalOpen && (
+                          >
+                            Lanjutkan
+                          </PP.CustomButton>
+                        </PP.CustomButtonsWrapper>
+                      </PP.ModalConfirmationContainer>
+                    </DialogModal>
+                  )}
+                </PP.TableContainer>
                 <DialogModal
-                  isOpen={isConfirmModalOpen}
-                  hasCloseBtn
-                  onClose={() => setIsConfirmModalOpen(false)}
+                  isOpen={isModalOpen}
+                  hasCloseBtn={false}
+                  onClose={() => {
+                    setIsModalOpen(false);
+                    setSelectedPharmacyProducts(null);
+                  }}
                 >
-                  <PP.ModalConfirmationContainer>
-                    <PP.TitleText>
-                      Apakah anda yakin akan mengubah status aktif produk
-                    </PP.TitleText>
-                    {loading && (
-                      <CustomPropagateLoader
-                        loading={loading}
-                        color='#dd1b50'
-                        speedMultiplier={0.8}
-                        size={'15px'}
-                      />
-                    )}
-                    <PP.CustomButtonsWrapper>
-                      <PP.CustomButton
-                        onClick={() => {
-                          setIsConfirmModalOpen(false);
-                        }}
-                      >
-                        Tutup
-                      </PP.CustomButton>
-                      <PP.CustomButton
-                        className='green'
-                        onClick={() => {
-                          updatePharmacyProduct();
-                        }}
-                      >
-                        Lanjutkan
-                      </PP.CustomButton>
-                    </PP.CustomButtonsWrapper>
-                  </PP.ModalConfirmationContainer>
+                  <PharmacyProductCard
+                    handleCloseModal={() => {
+                      setIsModalOpen(false);
+                    }}
+                    handleConfirm={() => setRefectState(!refetchState)}
+                    ppdata={selectedPharmacyProducts as PharmacyProductType}
+                  />
                 </DialogModal>
-              )}
-            </PP.TableContainer>
-            <DialogModal
-              isOpen={isModalOpen}
-              hasCloseBtn={false}
-              onClose={() => {
-                setIsModalOpen(false);
-                setSelectedPharmacyProducts(null);
-              }}
-            >
-              <PharmacyProductCard
-                handleCloseModal={() => {
-                  setIsModalOpen(false);
+                <PP.PaginationButtonContainer style={{ marginBottom: '20px' }}>
+                  <PaginationComponent
+                    page={page}
+                    totalPages={productPagination?.page_count}
+                    goToPage={handlePageJump}
+                    handlePrevPage={handlePrevPage}
+                    handleNextPage={handleNextPage}
+                  />
+                </PP.PaginationButtonContainer>
+              </PP.TableFilterWrapper>
+            </>
+          )}
+          {isModalAddProductOpen && (
+            <>
+              <AddPharmacyProductContent
+                handleChangeProduct={() => {
+                  fetchData();
                 }}
-                handleConfirm={() => setRefectState(!refetchState)}
-                ppdata={selectedPharmacyProducts as PharmacyProductType}
-              />
-            </DialogModal>
-            <PP.PaginationButtonContainer style={{ marginBottom: '20px' }}>
-              <PaginationComponent
-                page={page}
-                totalPages={productPagination?.page_count}
-                goToPage={handlePageJump}
-                handlePrevPage={handlePrevPage}
-                handleNextPage={handleNextPage}
-              />
-            </PP.PaginationButtonContainer>
-          </PP.TableFilterWrapper>
+              ></AddPharmacyProductContent>
+            </>
+          )}
         </StyledContentContainer>
       </PageContainer>
     </>

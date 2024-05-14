@@ -41,6 +41,10 @@ export const navigateToProductList = async () => {
   redirect('/products');
 };
 
+export const navigateToDoctorList = async () => {
+  redirect('/doctors');
+};
+
 export const navigateToTxHistory = async () => {
   redirect('/dashboard/user/transactions');
 };

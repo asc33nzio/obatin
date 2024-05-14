@@ -3,6 +3,7 @@ import {
   ButtonAdd,
   Buttoncontainer,
   Column,
+  Distance,
   PharmacyCard,
   PharmacyItem,
   PharmacyNameContainer,
@@ -271,31 +272,31 @@ const ProductDetailPage = () => {
             {product?.dosage && (
               <div>
                 <h2>Dosis</h2>
-                <p>{product?.dosage.split('/\r?\n/')}</p>
+                <p>{product?.dosage.replaceAll('\\n', ' ')}</p>
               </div>
             )}
             {product?.how_to_use && (
               <div>
                 <h2>Aturan Pakai</h2>
-                <p>{product?.how_to_use.split('/\r?\n/')}</p>
+                <p>{product?.how_to_use.replaceAll('\\n', ' ')}</p>
               </div>
             )}
             {product?.warning && (
               <div>
                 <h2>Perhatian</h2>
-                <p>{product?.warning.split('\n')}</p>
+                <p>{product?.warning.replaceAll('\\n', ' ')}</p>
               </div>
             )}
             {product?.contraindication && (
               <div>
                 <h2>Kontra Indikasi</h2>
-                <p>{product?.contraindication.split('\n')}</p>
+                <p>{product?.contraindication.replaceAll('\\n', ' ')}</p>
               </div>
             )}
             {product?.packaging && (
               <div>
                 <h2>Kemasan</h2>
-                <p>{product?.packaging.split('\n')}</p>
+                <p>{product?.packaging.replaceAll('\\n', ' ')}</p>
               </div>
             )}
             <DialogModal
@@ -317,8 +318,13 @@ const ProductDetailPage = () => {
                       </Row>
                       <Row>
                         <p>{pharmacy.address}</p>
-                        <p>{pharmacy.distance} km dari rumahmu</p>
                       </Row>
+                      <Row>
+                        <Distance>
+                          <p>{pharmacy.distance} km dari rumahmu</p>
+                        </Distance>
+                      </Row>
+
                       <Row>
                         <Column>
                           <p>Buka: {pharmacy.opening_time}</p>
