@@ -17,6 +17,7 @@ type ChatRoomUsecase interface {
 	GetAllChatRoom(ctx context.Context, params entity.Pagination) (*entity.ChatRoomListPage, error)
 	GetChatRoomById(ctx context.Context, chatRoomId int64) (*entity.ChatRoom, error)
 	DeleteChatRoom(ctx context.Context, chatRoomId int64) error
+	UpdateChatRoomInactiveByChatId(ctx context.Context, chatRoomId int64) error 
 }
 
 type chatRoomUsecaseImpl struct {
@@ -224,6 +225,16 @@ func (u *chatRoomUsecaseImpl) UpdateIsTyping(ctx context.Context, crReq entity.C
 		}
 	}
 
+	return nil
+}
+
+func (u *chatRoomUsecaseImpl) UpdateChatRoomInactiveByChatId(ctx context.Context, chatRoomId int64) error {
+	crr := u.repoStore.ChatRoomRepository()
+
+	err := crr.UpdateChatRoomInactiveByChatId(ctx, chatRoomId)
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
 	return nil
 }
 

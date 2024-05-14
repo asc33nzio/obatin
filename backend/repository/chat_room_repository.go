@@ -22,6 +22,7 @@ type ChatRoomRepository interface {
 	UpdateChatRoomValidByUserId(ctx context.Context, userId int64, isUser bool) error
 	DeleteChatRoomAfterExpiredById(ctx context.Context, chatRoomId int64) error
 	UpdateChatRoomUpdatedAtByID(ctx context.Context, chatRoomId int64) error
+	UpdateChatRoomInactiveByChatId(ctx context.Context, chatRoomId int64) error
 }
 
 type chatRoomRepositoryPostgres struct {
@@ -70,6 +71,30 @@ func (r *chatRoomRepositoryPostgres) FindChatRoomByID(ctx context.Context, chatR
 	}
 
 	return &res, nil
+}
+
+func (r *chatRoomRepositoryPostgres) UpdateChatRoomInactiveByChatId(ctx context.Context, chatRoomId int64) error {
+	queryEndChat := `
+		UPDATE
+			chat_rooms
+		SET
+			is_active = FALSE
+		WHERE
+			id = $1
+	`
+	res, err := r.db.ExecContext(ctx, queryEndChat, chatRoomId)
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return apperror.NewInternal(err)
+	}
+	if rowsAffected == 0 {
+		return apperror.NewInternal(apperror.ErrStlNotFound)
+	}
+
+	return nil
 }
 
 func (r *chatRoomRepositoryPostgres) CreateOne(ctx context.Context, u entity.ChatRoom) error {
