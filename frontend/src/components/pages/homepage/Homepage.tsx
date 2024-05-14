@@ -10,6 +10,19 @@ import {
   PopularContainer,
   CategoryContent,
 } from '@/styles/pages/homepage/Homepage.styles';
+import {
+  Bold,
+  CategoryCardContainer,
+  CategoryName,
+  Imagecontainer,
+  Price,
+  ProductCard,
+  Smallfont,
+} from '@/styles/pages/product/ProductCard.styles';
+import { useEffect, useState } from 'react';
+import { Container } from '@/styles/Global.styles';
+import { ProductListContainer } from '@/styles/pages/product/ProductListPage.styles';
+import { useRouter } from 'next/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { CategoryType, ProductType } from '@/types/Product';
 import { Keyboard, Mousewheel, Navigation } from 'swiper/modules';
@@ -21,31 +34,16 @@ import Image from 'next/image';
 import toko from '@/assets/homepage/Pharmacist-pana 1.svg';
 import konsul from '@/assets/homepage/Researching-amico 1(1).svg';
 import CustomButton from '@/components/atoms/button/CustomButton';
-import { Container } from '@/styles/Global.styles';
-import { ProductListContainer } from '@/styles/pages/product/ProductListPage.styles';
-import { useRouter } from 'next/navigation';
-import {
-  Bold,
-  CategoryCardContainer,
-  CategoryName,
-  Imagecontainer,
-  Price,
-  ProductCard,
-  Smallfont,
-} from '@/styles/pages/product/ProductCard.styles';
+import axios from 'axios';
 
 const CustomImage = styled(Image)`
   border-radius: 100%;
 `;
 
-const Homepage = ({
-  categories,
-  products,
-}: {
-  categories: CategoryType[];
-  products: ProductType[];
-}): React.ReactElement => {
+const Homepage = (): React.ReactElement => {
   const router = useRouter();
+  const [products, setProducts] = useState<Array<ProductType>>([]);
+  const [categories, setCategories] = useState<Array<CategoryType>>([]);
 
   const handleProductClicked = (slug: string) => {
     router.push(`/products/${slug}`);
@@ -62,6 +60,33 @@ const Homepage = ({
   const handleShopClicked = () => {
     router.push('/products');
   };
+
+  const fetchCategories = async () => {
+    try {
+      const { data: res } = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/categories`,
+      );
+      setCategories(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const { data: res } = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/shop/products?limit=5&sort_by=sales`,
+      );
+      setProducts(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
 
   return (
     <>

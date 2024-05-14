@@ -30,7 +30,6 @@ moment.locale('id');
 
 const TransactionCard = (props: TxItf): React.ReactElement => {
   const router = useRouter();
-
   const splittedDate = props?.created_at?.split(' ')?.[0];
   const orderTime = props?.created_at?.split(' ')?.[1];
   const formattedDate = moment(splittedDate, 'DD-MM-YYYY').format(
