@@ -166,7 +166,11 @@ export const Row = styled.div`
     flex-direction: column;
     align-items: flex-start;
     padding: 10px 0 10px 10px;
+    padding: 10px 0 10px 10px;
     gap: 5px;
+    p {
+      padding: 10px;
+    }
     p {
       padding: 10px;
     }
