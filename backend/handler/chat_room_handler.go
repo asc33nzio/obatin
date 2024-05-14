@@ -74,7 +74,7 @@ func (h *ChatRoomHandler) GetAllMessageByChatRoomId(ctx *gin.Context) {
 		return
 	}
 
-	doctor.Certificate=""
+	doctor.Certificate = ""
 	res := dto.ToGetAllMessageInChatRoom(allMessage)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
 		Message: appconstant.ResponseGetAllMessageInOneChatRoomMsg,
@@ -167,6 +167,30 @@ func (h *ChatRoomHandler) DeleteChatRoom(ctx *gin.Context) {
 	}
 
 	err = h.chatRoomUsecase.DeleteChatRoom(ctx, idParam.Id)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.APIResponse{
+		Message: appconstant.ResponseDeleteChatRoomMsg,
+	})
+}
+
+func (h *ChatRoomHandler) UpdateChatRoomInactiveByChatRoomId(ctx *gin.Context) {
+	var idParam dto.ChatRoomIdParam
+	err := ctx.ShouldBindUri(&idParam)
+	if err != nil {
+		ctx.Error(apperror.ErrInvalidReq(err))
+		return
+	}
+	isDoctor := checkDoctor(ctx)
+	if !isDoctor {
+		ctx.Error(apperror.ErrForbiddenAccess(nil))
+		return
+	}
+
+	err = h.chatRoomUsecase.UpdateChatRoomInactiveByChatId(ctx, idParam.Id)
 	if err != nil {
 		ctx.Error(err)
 		return
