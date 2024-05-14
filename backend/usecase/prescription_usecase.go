@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"context"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 )
@@ -34,7 +34,7 @@ func NewPrescriptionUsecaseImpl(
 func (u *prescriptionUsecaseImpl) CreatePrescription(ctx context.Context, cp *entity.CreatePrescription) (*int64, error) {
 	dr := u.repoStore.DoctorRepository()
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}

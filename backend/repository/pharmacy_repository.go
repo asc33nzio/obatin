@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"obatin/appconstant"
 	"obatin/apperror"
-	"obatin/constant"
 	"obatin/entity"
 	"strings"
 )
@@ -25,7 +25,7 @@ func NewPharmacyRepositoryPostgres(db *sql.DB) *pharmacyRepositoryPostgres {
 }
 
 func (r *pharmacyRepositoryPostgres) FindPharmacyList(ctx context.Context, params entity.PharmacyFilter) (*entity.PharmacyListPage, error) {
-	paramsCount := constant.StartingParamsCount
+	paramsCount := appconstant.StartingParamsCount
 	res := []entity.Pharmacy{}
 	var sb strings.Builder
 	rowsCount := 0

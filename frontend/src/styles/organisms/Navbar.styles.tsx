@@ -2,11 +2,14 @@ import { COLORS } from '@/constants/variables';
 import styled from 'styled-components';
 
 export const NavContainer = styled.div`
-  position: relative;
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  z-index: 20000;
+  background-color: white;
 
   align-self: center;
   justify-self: center;

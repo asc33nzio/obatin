@@ -1,16 +1,16 @@
 package appvalidator
 
 import (
-	"obatin/constant"
+	"obatin/appconstant"
 	"strings"
 )
 
 func IsValidCertificateFileUploaded(size int, extension string) bool {
-	return size < constant.MaximumSizeFileUploaded && CheckCerificateExtension(extension)
+	return size < appconstant.MaximumSizeFileUploaded && CheckCerificateExtension(extension)
 }
 
 func IsValidImageUploaded(size int, extension string) bool {
-	return size < constant.MaximumSizeImageUploaded && CheckImageExtension(extension)
+	return size < appconstant.MaximumSizeImageUploaded && CheckImageExtension(extension)
 }
 
 func CheckCerificateExtension(filename string) bool {

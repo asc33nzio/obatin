@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { CategoryDropdown, Dropdown } from '@/styles/molecules/Dropdown.styles';
 import { CategoryType } from '@/types/Product';
 import { useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 const CategoryComponent = ({
@@ -16,7 +15,7 @@ const CategoryComponent = ({
 }): React.ReactElement => {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const router = useRouter();
-  const pathname = usePathname();
+  const pathName = usePathname();
   const searchParams = useSearchParams();
 
   const toggleCategory = (categorySlug: string) => {
@@ -27,23 +26,21 @@ const CategoryComponent = ({
     );
   };
 
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-      params.delete('search');
-      return params.toString();
-    },
-    [searchParams],
-  );
+  const handleSetSearchParams = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('sort_by');
+    params.delete('classification');
+    params.delete('order');
+    params.delete('page');
+    params.delete('search');
+    params.set(key, value);
+    router.replace(`${pathName}?${params.toString()}`);
+  };
 
-  const handleCategoryClicked = (categoryId: number, categorySlug: string) => {
+  const handleCategoryClicked = (categoryId: number) => {
+    handleSetSearchParams('category', categoryId.toString());
     setCategoryId(categoryId);
     setParentPage();
-
-    router.push(
-      pathname + '?' + createQueryString('category', `${categorySlug}`),
-    );
   };
 
   const renderCategories = (categories: CategoryType[]) => {
@@ -53,7 +50,7 @@ const CategoryComponent = ({
           <a
             onClick={(e) => {
               e.preventDefault();
-              handleCategoryClicked(category.id, category.category_slug);
+              handleCategoryClicked(category.id);
               toggleCategory(category.category_slug);
             }}
           >

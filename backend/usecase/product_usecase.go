@@ -5,7 +5,6 @@ import (
 	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 	"obatin/util"
@@ -49,8 +48,8 @@ func (u *productUsecaseImpl) GetAllProducts(ctx context.Context, params entity.P
 	if err != nil {
 		return nil, err
 	}
-	role, _ := ctx.Value(constant.AuthenticationRole).(string)
-	if role != constant.RoleAdmin {
+	role, _ := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role != appconstant.RoleAdmin {
 		for _, v := range res.Products {
 			v.Sales = 0
 		}
@@ -74,11 +73,11 @@ func (u *productUsecaseImpl) GetProductDetailBySlug(ctx context.Context, slug st
 	cr := u.repoStore.CategoryRepository()
 	var forSales bool
 
-	role, _ := ctx.Value(constant.AuthenticationRole).(string)
-	if role == constant.RoleAdmin {
+	role, _ := ctx.Value(appconstant.AuthenticationRole).(string)
+	if role == appconstant.RoleAdmin {
 		forSales = true
 	}
-	
+
 	product, err := pr.FindProductDetailBySlug(ctx, slug, forSales)
 	if err != nil {
 		return nil, err

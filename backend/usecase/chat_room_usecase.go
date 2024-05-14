@@ -5,7 +5,6 @@ import (
 	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/config"
-	"obatin/constant"
 	"obatin/entity"
 	"obatin/repository"
 	"obatin/util"
@@ -56,16 +55,16 @@ func (u *chatRoomUsecaseImpl) CreateChatRoom(ctx context.Context, crReq entity.C
 	ur := u.repoStore.UserRepository()
 	ar := u.repoStore.AuthenticationRepository()
 
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	if authenticationRole != constant.RoleUser {
+	if authenticationRole != appconstant.RoleUser {
 		return apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -118,7 +117,7 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoomMessageById(ctx context.Context, cha
 	crr := u.repoStore.ChatRoomRepository()
 	ar := u.repoStore.AuthenticationRepository()
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -130,7 +129,7 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoomMessageById(ctx context.Context, cha
 		return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -140,7 +139,7 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoomMessageById(ctx context.Context, cha
 		return nil, err
 	}
 
-	if authenticationRole == constant.RoleDoctor {
+	if authenticationRole == appconstant.RoleDoctor {
 		doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)
 		if err != nil {
 			return nil, err
@@ -151,7 +150,7 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoomMessageById(ctx context.Context, cha
 		}
 	}
 
-	if authenticationRole == constant.RoleUser {
+	if authenticationRole == appconstant.RoleUser {
 		user, err := ur.FindUserByAuthId(ctx, authenticationId)
 		if err != nil {
 			return nil, err
@@ -174,12 +173,12 @@ func (u *chatRoomUsecaseImpl) UpdateIsTyping(ctx context.Context, crReq entity.C
 	dr := u.repoStore.DoctorRepository()
 	ar := u.repoStore.AuthenticationRepository()
 
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -198,7 +197,7 @@ func (u *chatRoomUsecaseImpl) UpdateIsTyping(ctx context.Context, crReq entity.C
 	}
 
 	crReq.Id = chatRoomId
-	if authenticationRole == constant.RoleDoctor {
+	if authenticationRole == appconstant.RoleDoctor {
 		doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)
 		if err != nil {
 			return err
@@ -212,7 +211,7 @@ func (u *chatRoomUsecaseImpl) UpdateIsTyping(ctx context.Context, crReq entity.C
 		}
 	}
 
-	if authenticationRole == constant.RoleUser {
+	if authenticationRole == appconstant.RoleUser {
 		user, err := ur.FindUserByAuthId(ctx, authenticationId)
 		if err != nil {
 			return err
@@ -242,12 +241,12 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoom(ctx context.Context, params entity.
 		params.Page = appconstant.DefaultMinPage
 	}
 
-	authenticationRole, ok := ctx.Value(constant.AuthenticationRole).(string)
+	authenticationRole, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
 
-	authenticationId, ok := ctx.Value(constant.AuthenticationIdKey).(int64)
+	authenticationId, ok := ctx.Value(appconstant.AuthenticationIdKey).(int64)
 	if !ok {
 		return nil, apperror.NewInternal(apperror.ErrStlInterfaceCasting)
 	}
@@ -260,7 +259,7 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoom(ctx context.Context, params entity.
 		return nil, apperror.ErrForbiddenAccess(apperror.ErrStlForbiddenAccess)
 	}
 
-	if authenticationRole == constant.RoleDoctor {
+	if authenticationRole == appconstant.RoleDoctor {
 
 		doctor, err := dr.FindDoctorByAuthId(ctx, authenticationId)
 		if err != nil {
@@ -285,7 +284,7 @@ func (u *chatRoomUsecaseImpl) GetAllChatRoom(ctx context.Context, params entity.
 		}
 	}
 
-	if authenticationRole == constant.RoleUser {
+	if authenticationRole == appconstant.RoleUser {
 		user, err := ur.FindUserByAuthId(ctx, authenticationId)
 		if err != nil {
 			return nil, err

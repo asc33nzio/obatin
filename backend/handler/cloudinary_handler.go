@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/appvalidator"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 	"strings"
@@ -26,14 +26,14 @@ func (h *CloudinaryHandler) UploadImageOrFileToCloudinary(ctx *gin.Context) {
 	var urlImage strings.Builder
 	var urlFile strings.Builder
 
-	image, ImageHeader, err := ctx.Request.FormFile(constant.ImageUrlFormKey)
+	image, ImageHeader, err := ctx.Request.FormFile(appconstant.ImageUrlFormKey)
 	if err != nil {
 		if err != http.ErrMissingFile {
 			ctx.Error(apperror.ErrInvalidReq(err))
 			return
 		}
 	}
-	file, FileHeader, err := ctx.Request.FormFile(constant.FileUrlFormKey)
+	file, FileHeader, err := ctx.Request.FormFile(appconstant.FileUrlFormKey)
 	if err != nil {
 		if err != http.ErrMissingFile {
 			ctx.Error(apperror.ErrInvalidReq(err))
@@ -77,7 +77,7 @@ func (h *CloudinaryHandler) UploadImageOrFileToCloudinary(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, dto.APIResponse{
-		Message: constant.ResponseSuccessUploadCloudinaryMsg,
+		Message: appconstant.ResponseSuccessUploadCloudinaryMsg,
 		Data: dto.CloudinaryUrlRes{
 			FileUrl:  urlFile.String(),
 			ImageUrl: urlImage.String(),

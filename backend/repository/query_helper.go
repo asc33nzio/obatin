@@ -2,7 +2,7 @@ package repository
 
 import (
 	"fmt"
-	"obatin/constant"
+	"obatin/appconstant"
 	"obatin/entity"
 	"strings"
 )
@@ -10,7 +10,7 @@ import (
 func convertUpdateCategoryQueryParamstoSql(params entity.CategoryUpdateBody, slug string) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.Name != nil {
 		query.WriteString(fmt.Sprintf("name = $%d ", countParams))
 		args = append(args, *params.Name)
@@ -73,7 +73,7 @@ func convertUpdateCategoryQueryParamstoSql(params entity.CategoryUpdateBody, slu
 func convertUpdateProductQueryParamstoSql(params entity.UpdateProduct, productId int64) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.Name != nil {
 		query.WriteString(fmt.Sprintf("name = $%d ", countParams))
 		args = append(args, *params.Name)
@@ -290,7 +290,7 @@ func convertUpdateProductQueryParamstoSql(params entity.UpdateProduct, productId
 func convertUpdatePharmacyProductQueryParamstoSql(params entity.UpdatePharmacyProduct) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 
 	if params.Price != nil {
 		query.WriteString(fmt.Sprintf("price = $%d ", countParams))
@@ -326,7 +326,7 @@ func convertUpdatePharmacyProductQueryParamstoSql(params entity.UpdatePharmacyPr
 func convertManufacturerQueryParamstoSql(params entity.ManufacturerFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.Search != "" {
 		query.WriteString(" WHERE ")
 	}
@@ -336,16 +336,16 @@ func convertManufacturerQueryParamstoSql(params entity.ManufacturerFilter) (stri
 		countParams++
 	}
 
-	if countParams > constant.StartingParamsCount {
+	if countParams > appconstant.StartingParamsCount {
 		query.WriteString(` AND `)
 	}
-	if countParams == constant.StartingParamsCount {
+	if countParams == appconstant.StartingParamsCount {
 		query.WriteString(` WHERE `)
 	}
 	query.WriteString(` deleted_at IS NULL `)
 
 	if params.SortBy != nil {
-		if *params.SortBy == constant.SortByName {
+		if *params.SortBy == appconstant.SortByName {
 			query.WriteString(` ORDER BY name `)
 		}
 	}
@@ -355,9 +355,9 @@ func convertManufacturerQueryParamstoSql(params entity.ManufacturerFilter) (stri
 			query.WriteString(` ORDER BY id `)
 		}
 		switch order := *params.Order; order {
-		case constant.OrderAscending:
+		case appconstant.OrderAscending:
 			query.WriteString(`ASC`)
-		case constant.OrderDescending:
+		case appconstant.OrderDescending:
 			query.WriteString(`DESC`)
 		}
 	}
@@ -368,7 +368,7 @@ func convertManufacturerQueryParamstoSql(params entity.ManufacturerFilter) (stri
 func convertUpdateDoctorQueryParamstoSql(params entity.DoctorUpdateRequest, id int64) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.Name != nil {
 		query.WriteString(fmt.Sprintf("name = $%d ", countParams))
 		args = append(args, *params.Name)
@@ -475,7 +475,7 @@ func convertQuerySalesFromProductDetail(forSales bool, queryColumn string) strin
 			p.deleted_at IS NULL
 		AND 
 			p.is_active IS TRUE `
-	
+
 	queryCountSales := `
 		WITH sales_data AS (
 			SELECT
@@ -549,7 +549,7 @@ func convertQuerySalesFromProductDetail(forSales bool, queryColumn string) strin
 func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.Category != "" || params.Search != "" || params.Classification != nil {
 		query.WriteString(" WHERE ")
 	}
@@ -560,7 +560,7 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 	}
 
 	if params.Search != "" {
-		if countParams > constant.StartingParamsCount {
+		if countParams > appconstant.StartingParamsCount {
 			query.WriteString(` AND `)
 		}
 		query.WriteString(fmt.Sprintf(` (p.name ILIKE '%%' ||$%v|| '%%' `, countParams))
@@ -572,17 +572,17 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 	}
 
 	if params.Classification != nil {
-		if countParams > constant.StartingParamsCount {
+		if countParams > appconstant.StartingParamsCount {
 			query.WriteString(` AND `)
 		}
 		query.WriteString(fmt.Sprintf(` p.classification = $%v `, countParams))
 		filters = append(filters, &params.Classification)
 		countParams++
 	}
-	if countParams > constant.StartingParamsCount {
+	if countParams > appconstant.StartingParamsCount {
 		query.WriteString(` AND `)
 	}
-	if countParams == constant.StartingParamsCount {
+	if countParams == appconstant.StartingParamsCount {
 		query.WriteString(` WHERE `)
 	}
 	query.WriteString(` p.deleted_at IS NULL `)
@@ -597,11 +597,11 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 
 	if params.SortBy != nil {
 		query.WriteString(` ORDER BY `)
-		if *params.SortBy == constant.SortByName {
+		if *params.SortBy == appconstant.SortByName {
 			query.WriteString(` p.name `)
-		} else if *params.SortBy == constant.SortByPrice {
+		} else if *params.SortBy == appconstant.SortByPrice {
 			query.WriteString(" p.min_price  ")
-		} else if *params.SortBy == constant.SortBySales {
+		} else if *params.SortBy == appconstant.SortBySales {
 			query.WriteString(` sales `)
 		}
 		if params.Order == nil {
@@ -618,9 +618,9 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 			query.WriteString(` p.id `)
 		}
 		switch order := *params.Order; order {
-		case constant.OrderAscending:
+		case appconstant.OrderAscending:
 			query.WriteString(`ASC`)
-		case constant.OrderDescending:
+		case appconstant.OrderDescending:
 			query.WriteString(`DESC`)
 		}
 		if params.SortBy != nil {
@@ -636,7 +636,7 @@ func convertProductQueryParamstoSql(params entity.ProductFilter) (string, []inte
 func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
-	var countParams = constant.StartingParamsCount + 1
+	var countParams = appconstant.StartingParamsCount + 1
 	if params.Search != "" || params.SearchPharmacy != "" || params.Classification != nil || params.PharmacyId != 0 || params.ProductId != nil {
 		query.WriteString(" WHERE ")
 	}
@@ -648,7 +648,7 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 		countParams++
 	}
 	if params.SearchPharmacy != "" {
-		if countParams > constant.StartingParamsCount+1 {
+		if countParams > appconstant.StartingParamsCount+1 {
 			query.WriteString(` AND `)
 		}
 		query.WriteString(fmt.Sprintf(` ppc.pharmacy_name ILIKE '%%' ||$%v|| '%%' `, countParams))
@@ -657,7 +657,7 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 	}
 
 	if params.PharmacyId != 0 {
-		if countParams > constant.StartingParamsCount+1 {
+		if countParams > appconstant.StartingParamsCount+1 {
 			query.WriteString(` AND `)
 		}
 		query.WriteString(fmt.Sprintf(` ppc.pharmacy_id = $%v `, countParams))
@@ -666,7 +666,7 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 	}
 
 	if params.ProductId != nil {
-		if countParams > constant.StartingParamsCount+1 {
+		if countParams > appconstant.StartingParamsCount+1 {
 			query.WriteString(` AND `)
 		}
 		query.WriteString(fmt.Sprintf(` p.id = $%v `, countParams))
@@ -675,25 +675,25 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 	}
 
 	if params.Classification != nil {
-		if countParams > constant.StartingParamsCount+1 {
+		if countParams > appconstant.StartingParamsCount+1 {
 			query.WriteString(` AND `)
 		}
 		query.WriteString(fmt.Sprintf(` p.classification = $%v `, countParams))
 		filters = append(filters, &params.Classification)
 		countParams++
 	}
-	if countParams > constant.StartingParamsCount+1 {
+	if countParams > appconstant.StartingParamsCount+1 {
 		query.WriteString(` AND `)
 	}
-	if countParams == constant.StartingParamsCount+1 {
+	if countParams == appconstant.StartingParamsCount+1 {
 		query.WriteString(` WHERE `)
 	}
 	query.WriteString(` p.deleted_at IS NULL `)
 
 	if params.SortBy != nil {
-		if *params.SortBy == constant.SortByName {
+		if *params.SortBy == appconstant.SortByName {
 			query.WriteString(` ORDER BY p.name `)
-		} else if *params.SortBy == constant.SortByPrice {
+		} else if *params.SortBy == appconstant.SortByPrice {
 			query.WriteString(" ORDER BY pp.price  ")
 		}
 	}
@@ -703,9 +703,9 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 			query.WriteString(` ORDER BY pp.updated_at `)
 		}
 		switch order := *params.Order; order {
-		case constant.OrderAscending:
+		case appconstant.OrderAscending:
 			query.WriteString(`ASC`)
-		case constant.OrderDescending:
+		case appconstant.OrderDescending:
 			query.WriteString(`DESC`)
 		}
 	}
@@ -721,7 +721,7 @@ func convertGetPharmacyProductQueryParamstoSql(params entity.PharmacyProductFilt
 func convertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.Specialization != nil || params.Search != "" || params.OnlineOnly != nil {
 		query.WriteString(" WHERE ")
 	}
@@ -739,7 +739,7 @@ func convertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interf
 			if countParams > 1 {
 				query.WriteString(",")
 			}
-			if countParams > constant.StartingParamsCount {
+			if countParams > appconstant.StartingParamsCount {
 				query.WriteString(` AND `)
 			}
 			query.WriteString(fmt.Sprintf(` d.is_online = $%v `, countParams))
@@ -749,27 +749,27 @@ func convertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interf
 	}
 
 	if params.Specialization != nil {
-		if countParams > constant.StartingParamsCount {
+		if countParams > appconstant.StartingParamsCount {
 			query.WriteString(` AND `)
 		}
 		query.WriteString(fmt.Sprintf(` sp.slug = $%v `, countParams))
 		filters = append(filters, &params.Specialization)
 		countParams++
 	}
-	if countParams > constant.StartingParamsCount {
+	if countParams > appconstant.StartingParamsCount {
 		query.WriteString(` AND `)
 	}
-	if countParams == constant.StartingParamsCount {
+	if countParams == appconstant.StartingParamsCount {
 		query.WriteString(` WHERE `)
 	}
 	query.WriteString(` d.deleted_at IS NULL `)
 
 	if params.SortBy != nil {
-		if *params.SortBy == constant.SortByName {
+		if *params.SortBy == appconstant.SortByName {
 			query.WriteString(` ORDER BY d.name `)
-		} else if *params.SortBy == constant.SortByPrice {
+		} else if *params.SortBy == appconstant.SortByPrice {
 			query.WriteString(" ORDER BY d.fee ")
-		} else if *params.SortBy == constant.SortByExperience {
+		} else if *params.SortBy == appconstant.SortByExperience {
 			query.WriteString(" ORDER BY d.experience_years ")
 		}
 	}
@@ -779,9 +779,9 @@ func convertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interf
 			query.WriteString(` ORDER BY d.id `)
 		}
 		switch order := *params.Order; order {
-		case constant.OrderAscending:
+		case appconstant.OrderAscending:
 			query.WriteString(`ASC`)
-		case constant.OrderDescending:
+		case appconstant.OrderDescending:
 			query.WriteString(`DESC`)
 		}
 	}
@@ -792,7 +792,7 @@ func convertDoctorQueryParamstoSql(params entity.DoctorFilter) (string, []interf
 func convertPharmacyQueryParamstoSql(params entity.PharmacyFilter) (string, []interface{}) {
 	var query strings.Builder
 	var filters []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if params.City != nil || params.Search != "" || params.PartnerId != nil {
 		query.WriteString(" WHERE ")
 	}
@@ -804,7 +804,7 @@ func convertPharmacyQueryParamstoSql(params entity.PharmacyFilter) (string, []in
 	}
 
 	if params.City != nil {
-		if countParams > constant.StartingParamsCount {
+		if countParams > appconstant.StartingParamsCount {
 			query.WriteString(` AND `)
 		}
 		query.WriteString(fmt.Sprintf(` c.name ILIKE '%%' ||$%v|| '%%'  `, countParams))
@@ -813,7 +813,7 @@ func convertPharmacyQueryParamstoSql(params entity.PharmacyFilter) (string, []in
 	}
 
 	if params.PartnerId != nil {
-		if countParams > constant.StartingParamsCount {
+		if countParams > appconstant.StartingParamsCount {
 			query.WriteString(` AND `)
 		}
 		query.WriteString(fmt.Sprintf(` p.partner_id = $%v `, countParams))
@@ -821,10 +821,10 @@ func convertPharmacyQueryParamstoSql(params entity.PharmacyFilter) (string, []in
 		countParams++
 	}
 
-	if countParams > constant.StartingParamsCount {
+	if countParams > appconstant.StartingParamsCount {
 		query.WriteString(` AND `)
 	}
-	if countParams == constant.StartingParamsCount {
+	if countParams == appconstant.StartingParamsCount {
 		query.WriteString(` WHERE `)
 	}
 	query.WriteString(` p.deleted_at IS NULL `)
@@ -860,7 +860,7 @@ func convertPaginationParamsToSql(limit int, page int, paramsCount int) (string,
 func convertUpdateUserDetailsToSql(u entity.UpdateUser) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if u.Name != nil {
 		query.WriteString(fmt.Sprintf("name = $%d ", countParams))
 		args = append(args, *u.Name)
@@ -914,7 +914,7 @@ func convertUpdateUserDetailsToSql(u entity.UpdateUser) (string, []interface{}) 
 func convertUpdateAddressToSql(a entity.Address) (string, []interface{}) {
 	var query strings.Builder
 	var args []interface{}
-	var countParams = constant.StartingParamsCount
+	var countParams = appconstant.StartingParamsCount
 	if a.Alias != nil {
 		query.WriteString(fmt.Sprintf("alias = $%d ", countParams))
 		args = append(args, *a.Alias)

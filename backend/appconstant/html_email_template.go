@@ -1,4 +1,4 @@
-package constant
+package appconstant
 
 import (
 	"fmt"

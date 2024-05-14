@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"obatin/appconstant"
 	"obatin/apperror"
 	"obatin/appvalidator"
-	"obatin/constant"
 	"obatin/dto"
 	"obatin/usecase"
 
@@ -33,19 +33,19 @@ func (h *UserHandler) GetUserDetails(ctx *gin.Context) {
 
 	authenticationId = pathParam.Id
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleAdmin {
-		if role != constant.RoleUser {
+	if role != appconstant.RoleAdmin {
+		if role != appconstant.RoleUser {
 			ctx.Error(apperror.ErrForbiddenAccess(nil))
 			return
 		}
 
-		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
+		authenticationId, ok = ctx.Value(appconstant.AuthenticationIdKey).(int64)
 		if !ok {
 			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 			return
@@ -60,7 +60,7 @@ func (h *UserHandler) GetUserDetails(ctx *gin.Context) {
 
 	res := dto.ToGetUserRes(user)
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseOkMsg,
+		Message: appconstant.ResponseOkMsg,
 		Data:    res,
 	})
 }
@@ -84,26 +84,26 @@ func (h *UserHandler) UpdateUserDetails(ctx *gin.Context) {
 
 	authenticationId = pathParam.Id
 
-	role, ok := ctx.Value(constant.AuthenticationRole).(string)
+	role, ok := ctx.Value(appconstant.AuthenticationRole).(string)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
 	}
 
-	if role != constant.RoleAdmin {
-		if role != constant.RoleUser {
+	if role != appconstant.RoleAdmin {
+		if role != appconstant.RoleUser {
 			ctx.Error(apperror.ErrForbiddenAccess(nil))
 			return
 		}
 
-		authenticationId, ok = ctx.Value(constant.AuthenticationIdKey).(int64)
+		authenticationId, ok = ctx.Value(appconstant.AuthenticationIdKey).(int64)
 		if !ok {
 			ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 			return
 		}
 	}
 
-	isVerified, ok := ctx.Value(constant.IsVerifiedKey).(bool)
+	isVerified, ok := ctx.Value(appconstant.IsVerifiedKey).(bool)
 	if !ok {
 		ctx.Error(apperror.NewInternal(apperror.ErrStlInterfaceCasting))
 		return
@@ -114,7 +114,7 @@ func (h *UserHandler) UpdateUserDetails(ctx *gin.Context) {
 		return
 	}
 
-	file, fileHeader, err := ctx.Request.FormFile(constant.AvatarImageFormKey)
+	file, fileHeader, err := ctx.Request.FormFile(appconstant.AvatarImageFormKey)
 	if err != nil && err != http.ErrMissingFile {
 		ctx.Error(apperror.ErrInvalidReq(err))
 		return
@@ -140,6 +140,6 @@ func (h *UserHandler) UpdateUserDetails(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, dto.APIResponse{
-		Message: constant.ResponseUpdateUserMsg,
+		Message: appconstant.ResponseUpdateUserMsg,
 	})
 }

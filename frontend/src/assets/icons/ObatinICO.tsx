@@ -1,10 +1,15 @@
-const ObatinICO = (): React.ReactElement => {
+const ObatinICO = ({
+  handleClick,
+}: {
+  handleClick: () => {};
+}): React.ReactElement => {
   return (
     <svg
       width='400'
       viewBox='0 0 382 133'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
+      onClick={() => handleClick()}
     >
       <g clipPath='url(#clip0_72_1037)'>
         <path
