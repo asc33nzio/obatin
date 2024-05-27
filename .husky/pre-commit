@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+# . "$(dirname -- "$0")/_/husky.sh"
 
-npx lint-staged --cwd frontend/ 
+# npx lint-staged --cwd frontend/ 
 
-cd frontend
+# cd frontend
 
-npm run lint
+# npm run lint

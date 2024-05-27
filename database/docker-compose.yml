@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  obatin-db-develop:
+    image: yassarnaufal/obatin:db-develop
+    restart: "always"
+    ports:
+      - "9000:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

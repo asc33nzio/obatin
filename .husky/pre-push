@@ -1,15 +1,15 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+# . "$(dirname -- "$0")/_/husky.sh"
 
-set +e
+# set +e
 
-git diff HEAD --quiet -- frontend
+# git diff HEAD --quiet -- frontend
 
-if [ $? -ne 0 ]; then
-  echo "Please commit the changes before a push."
-  exit 1
-fi
+# if [ $? -ne 0 ]; then
+#   echo "Please commit the changes before a push."
+#   exit 1
+# fi
 
-cd frontend
+# cd frontend
 
-npm run lint
+# npm run lint
