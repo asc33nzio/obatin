@@ -1,6 +1,11 @@
-# group-project
+# Telemedicine App
 
-## Telemedicine App
+## Maintainers & Contributors
+
+- Amadeo Marli
+- Naufal Yassar
+- Frederik Daniel 
+- Salsabila Niarno
 
 ## This Monorepo Contains
 
